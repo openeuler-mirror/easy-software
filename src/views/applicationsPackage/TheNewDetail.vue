@@ -16,6 +16,7 @@ import IconEpkg from '~icons/pkg/epkg.svg';
 import IconImage from '~icons/pkg/image.svg';
 import IconRpm from '~icons/pkg/rpm.svg';
 import { columnTags } from '@/data/detail/index';
+import DetailTag from '../applicationsPackage/components/DetailTag.vue';
 type MaintainerT = {
   maintainerId: string;
   maintainerEmail: string;
@@ -129,6 +130,8 @@ onMounted(() => {
 });
 const imageUsage = ref();
 const license = ref();
+const latestOsSupport = ref();
+const tagVer = ref();
 const getDetailValue = (data: any) => {
   if (typePkg.value === 'RPM') {
     basicInfo.value = [
@@ -175,7 +178,9 @@ const getDetailValue = (data: any) => {
       { name: '版本支持情况', value: data.osSupport || '' },
     ];
     appData.value.size = data.appSize || 0;
+    latestOsSupport.value = data.latestOsSupport;
   }
+  tagVer.value = [data.osSupport,data.arch];
   maintainer.value = {
     maintainerId: data?.maintainerId || 'openEuler community',
     maintainerEmail: data?.maintainerEmail || OPENEULER_CONTACT,
@@ -310,14 +315,15 @@ const queryVer = () => {
                           rel="noopener noreferrer"
                           >{{ item.type }}</OLink
                         >
-                        <div class="markdown-body installation mymarkdown-body" v-dompurify-html="item.value" v-copy-code="true" v-else></div>
+                        <div class="markdown-body installation mymarkdown-body" v-dompurify-html="item.value" v-copy-code="true" v-else>
+                          <DetailTag v-if="item.name === '版本支持情况' && latestOsSupport" :data="'最新版本'" />
+                        </div>
                       </li>
                     </ul>
                     <p class="sp">> 使用方式</p>
                     <div v-if="imageUsage" v-dompurify-html="imageUsage" v-copy-code="true" class="markdown-body download"></div>
                   </div>
                   <div v-else>
-                    <!-- <OTable :data="tagsValue" :columns="columns" /> -->
                     <OTableItemNew :data="tagsValue" :columns="columnTags" />
                   </div>
                 </OTabPane>
@@ -336,6 +342,7 @@ const queryVer = () => {
               :all-show="true"
               :ver-data="verData"
               :license="license"
+              :tagVer="tagVer"
             />
           </div>
         </div>

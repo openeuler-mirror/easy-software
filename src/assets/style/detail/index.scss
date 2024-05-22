@@ -54,13 +54,18 @@
 }
 
 .basic-info {
+  margin-top: 26px;
+  background: linear-gradient(to right, rgba(0, 47, 167, 0.05) 10%, white 15%); 
+
   li {
-    padding: 12px 0;
+   
+    padding: 12px 24px;
     @include tip1;
     color: var(--o-color-info2);
     display: flex;
     align-items: top;
-
+    border: 1px solid rgba(0,0,0,0.10);
+    border-left:4px solid #002FA7;
     .label {
       min-width: 100px;
     }
