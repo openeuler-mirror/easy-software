@@ -18,7 +18,7 @@ export const moreColumns = [
 ];
 // 版本支持
 export const verColumns =  [
-  { label: 'openEuler版本', key: 'os', style: 'width:44%' },
-  { label: '架构', key: 'arch', style: 'width:30%' },
-  { label: '操作', key: 'flags' },
+  { label: 'openEuler版本', key: 'os' },
+  { label: '架构', key: 'arch' },
+  { label: '操作', key: 'flags'  },
 ];;
