@@ -59,7 +59,7 @@ const queryPkg = (tabValue: string, pkgId: any) => {
   getDetails(tabValue, pkgId).then((res) => {
     const data = res.data.list[0];
     getDetailValue(data);
-    queryVer();
+    
   });
 };
 
@@ -73,9 +73,9 @@ const queryEntity = () => {
   activeName.value = route.query.type as string;
   if (pkgId.value) {
     getDetail({
-      appPkgId: (route.query.appPkgId as string) || '',
-      epkgPkgId: (route.query.epkgPkgId as string) || '',
-      rpmPkgId: (route.query.rpmPkgId as string) || '',
+      appPkgId: encodeURIComponent(route.query.appPkgId as string) || '',
+      epkgPkgId: encodeURIComponent(route.query.epkgPkgId as string) || '',
+      rpmPkgId:encodeURIComponent(route.query.rpmPkgId as string) || '',
     })
       .then((res) => {
         const data = res.data;
@@ -101,15 +101,18 @@ const onChange = (tab: string) => {
     tabValue.value = 'rpmpkg';
     typePkg.value = 'RPM';
     getDetailValue(rpmData.value);
+    queryVer();
     
   } else if (tab === 'EPKG') {
     tabValue.value = 'epkgpkg';
     typePkg.value = 'EPKG';
     getDetailValue(epkgData.value);
+    queryVer();
   } else if (tab === 'IMAGE') {
     tabValue.value = 'apppkg';
     typePkg.value = 'IMAGE';
     getDetailValue(imgData.value);
+    queryVer();
   } else {
     useViewStore().showNotFound();
   }

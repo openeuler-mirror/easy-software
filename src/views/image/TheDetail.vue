@@ -4,7 +4,7 @@ import { OBreadcrumb, OBreadcrumbItem, OTab, OTabPane,OTag } from '@opensig/open
 import { useRoute } from 'vue-router';
 import { useMarkdown } from '@/composables/useMarkdown';
 import type { AppInfoT } from '@/@types/app';
-import { getDetails, getTags } from '@/api/api-domain';
+import { getDetails, getTags, getVer  } from '@/api/api-domain';
 import { OPENEULER_CONTACT } from '@/data/config';
 import { useLocale } from '@/composables/useLocale';
 import AppFeedback from '@/components/AppFeedback.vue';
@@ -56,7 +56,7 @@ const queryPkg = (tabValue: string, pkgId: any) => {
 };
 
 // 获取tab分类
-const pkgId = route.query.pkgId;
+const pkgId = encodeURIComponent(route.query.pkgId as string);
 const queryEntity = () => {
   getChange();
 };
@@ -76,6 +76,8 @@ onMounted(() => {
 const imageUsage = ref();
 const summary = ref();
 const latestOsSupport = ref();
+const license = ref();
+const tagVer = ref();
 const getDetailValue = (data: any) => {
   basicInfo.value = [
     { name: '架构', value: data.arch || '' },
@@ -91,6 +93,8 @@ const getDetailValue = (data: any) => {
     maintainerEmail: data?.maintainerEmail || OPENEULER_CONTACT,
     maintainerGiteeId: data?.maintainerGiteeId || 'openeuler-ci-bot',
   };
+  tagVer.value = [data.osSupport, data.arch];
+  license.value = data.license;
   version.value = data?.appVer;
   latestOsSupport.value = data.latestOsSupport;
   upStream.value = data?.upStream;
@@ -105,6 +109,7 @@ const getDetailValue = (data: any) => {
   appData.value.cover = data?.iconUrl || defaultImg;
   appData.value.repository = data.srcRepo;
   queryTags();
+  queryVer();
 };
 
 const tagsValue = ref();
@@ -125,6 +130,14 @@ const home = ref({ name: '软件市场', path: `/${locale.value}/` });
 const isTags = ref(false);
 const onChange = (v: string) => {
   isTags.value = v === 'Tags' ? true : false;
+};
+
+//获取支持
+const verData = ref();
+const queryVer = () => {
+  getVer('apppkg', appData.value.name).then((res) => {
+    verData.value = res.data.list;
+  });
 };
 </script>
 
@@ -168,7 +181,7 @@ const onChange = (v: string) => {
         <AppFeedback v-if="!isTags" :email="maintainer.maintainerEmail" />
       </div>
       <div v-if="!isTags" class="detail-row-side">
-        <DetailAside :data="appData" :basicInfo="basicInfo" :maintainer="maintainer" :type="'IMAGE'" :downloadData="downloadData" />
+        <DetailAside :data="appData" :basicInfo="basicInfo" :maintainer="maintainer" :type="'IMAGE'" :downloadData="downloadData" :ver-data="verData" :license="license" :tagVer="tagVer"/>
       </div>
     </div>
   </ContentWrapper>
