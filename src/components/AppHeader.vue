@@ -2,7 +2,7 @@
 import { watch } from 'vue';
 import { ODivider, ODropdown, ODropdownItem, OIcon } from '@opensig/opendesign';
 import { useRouter } from 'vue-router';
-import { useLangStore } from '@/stores';
+import { useLangStore } from '@/stores/common';
 import { OPENEULER } from '@/data/config';
 import { useLocale } from '@/composables/useLocale';
 import { useI18n } from 'vue-i18n';
@@ -249,3 +249,4 @@ watch(
   }
 }
 </style>
+@/stores/common

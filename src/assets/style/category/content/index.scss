@@ -9,7 +9,10 @@
     display: flex;
     flex-direction: column;
   }
-
+  .pkg-panel,
+  .result-tips {
+    margin-top: 24px;
+  }
   .filter-sidebar {
     padding-right: 32px;
     position: relative;
@@ -33,10 +36,10 @@
     }
   }
   .search-result {
-    margin-bottom: 24px;
     .text {
       @include tip1;
       color: var(--o-color-info3);
+      margin-top: 24px;
       .total {
         color: var(--o-color-info1);
         font-weight: 600;

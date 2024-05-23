@@ -5,15 +5,18 @@ import { getSearchData } from '@/api/api-search';
 import { getSearchAllColumn, getSearchAllFiled } from '@/api/api-domain';
 import { useRoute, useRouter } from 'vue-router';
 import { useLocale } from '@/composables/useLocale';
+import { useViewStore } from '@/stores/common';
 import { useI18n } from 'vue-i18n';
-import { ElPagination } from 'element-plus';
+import { ElPagination, ElConfigProvider } from 'element-plus';
+import zhCn from 'element-plus/es/locale/lang/zh-cn';
+import English from 'element-plus/es/locale/lang/en';
 
 import FilterCheckbox from '@/components/filter/FilterCheckbox.vue';
 import IconOs from '~icons/pkg/icon-os.svg';
 import IconArch from '~icons/pkg/icon-arch.svg';
 import IconCategory from '~icons/pkg/icon-category.svg';
 
-const { locale } = useLocale();
+const { locale, isZh } = useLocale();
 const route = useRoute();
 const router = useRouter();
 const { t } = useI18n();
@@ -46,7 +49,7 @@ const searchParams = computed(() => {
 });
 
 const isSearchError = ref(false);
-const isSearch = ref(false);
+const isSearchDocs = ref(false);
 // sql搜索
 const queryAllpkg = () => {
   const params = {
@@ -60,15 +63,19 @@ const queryAllpkg = () => {
     nameOrder: nameOrder.value,
   };
   isLoading.value = true;
-  getSearchAllFiled(params).then((res) => {
-    pkgData.value = res.data.list;
+  getSearchAllFiled(params)
+    .then((res) => {
+      pkgData.value = res.data.list;
 
-    total.value = res.data.total;
-    isLoading.value = false;
-    if (pkgData.value.length === 0) {
-      isSearchError.value = true;
-    }
-  });
+      total.value = res.data.total;
+      isLoading.value = false;
+      if (pkgData.value.length === 0) {
+        isSearchError.value = true;
+      }
+    })
+    .catch(() => {
+      useViewStore().showNotFound();
+    });
 };
 
 // es搜索
@@ -78,7 +85,7 @@ const querySearch = () => {
     .then((res) => {
       pkgData.value = res.data.all;
       total.value = res.data.total;
-      isSearch.value = true;
+      isSearchDocs.value = true;
       if (pkgData.value.length === 0) {
         isSearchError.value = true;
       }
@@ -87,7 +94,9 @@ const querySearch = () => {
     .catch(() => {
       pkgData.value = [];
       isLoading.value = false;
-      isSearch.value = false;
+      isSearchDocs.value = false;
+      isSearchError.value = true;
+      useViewStore().showNotFound();
     });
 };
 
@@ -133,7 +142,7 @@ const onResetTag = () => {
   searchOs.value = '';
   searchArch.value = '';
   searchCategory.value = [];
-  isSearch.value = false;
+  isSearchDocs.value = false;
   if (route.query.type) {
     router.push({
       path: `/${locale.value}/applicationsPackage`,
@@ -176,7 +185,12 @@ const pageSearch = () => {
   }
 };
 
+// 判断是否是搜索页
+const isPageSearch = ref(false);
+
 onMounted(() => {
+  isPageSearch.value = route.name === 'search';
+
   //判断主页领域应用跳转
   const homeType = route.query.type as string;
   if (homeType) {
@@ -211,7 +225,7 @@ watch(
       searchKey.value = v;
     }
     if (v === '') {
-      isSearch.value = false;
+      isSearchDocs.value = false;
     }
     currentPage.value = 1;
   }
@@ -260,9 +274,10 @@ watch(
       </FilterCheckbox>
     </div>
     <div class="pkg-content">
-      <FilterHeader :title="t('software.all')" @sort="changeTimeOrder" :isSort="false" />
-      <div v-if="isSearch || searchOs || searchArch || searchCategory.length > 0" class="search-result">
-        <p class="text">
+      <FilterHeader :title="t('software.all')" @sort="changeTimeOrder" :isSort="false" :total="total" />
+
+      <div v-if="isSearchDocs || searchOs || searchArch || searchCategory.length > 0" class="search-result">
+        <p v-if="!isPageSearch" class="text">
           为您找到符合条件的筛选<span class="total">{{ total }}</span
           >个
         </p>
@@ -273,9 +288,9 @@ watch(
           <OLink color="primary" class="resetting" @click="onResetTag">{{ t('software.filterSider.clear') }}</OLink>
         </div>
       </div>
-      <ResultNotFound v-if="pkgData.length === 0 && isSearchError" />
+      <ResultNotApp v-if="pkgData.length === 0 && isSearchError" />
       <template v-else>
-        <div v-loading.nomask="isLoading" class="pkg-content">
+        <div v-loading.nomask="isLoading" class="pkg-panel">
           <ORow gap="32px" flex-wrap="wrap">
             <OCol v-for="(subItem, index) in pkgData" :key="index" flex="0 1 33.33%" :laptop="{ flex: '0 1 33.33%' }">
               <OCardItem :data="subItem" />
@@ -283,16 +298,18 @@ watch(
           </ORow>
         </div>
         <div class="pagination-box">
-          <el-pagination
-            v-model:current-page="currentPage"
-            v-model:page-size="pageSize"
-            background
-            layout="sizes, prev, pager, next, jumper"
-            :total="total"
-            :page-sizes="pageSizes"
-            @size-change="handleSizeChange"
-            @current-change="handleCurrentChange"
-          />
+          <el-config-provider :locale="isZh ? zhCn : English">
+            <el-pagination
+              v-model:current-page="currentPage"
+              v-model:page-size="pageSize"
+              background
+              layout="sizes, prev, pager, next, jumper"
+              :total="total"
+              :page-sizes="pageSizes"
+              @size-change="handleSizeChange"
+              @current-change="handleCurrentChange"
+            />
+          </el-config-provider>
         </div>
       </template>
     </div>
@@ -302,3 +319,4 @@ watch(
 <style scoped lang="scss">
 @import '@/assets/style/category/content/index.scss';
 </style>
+@/stores/common

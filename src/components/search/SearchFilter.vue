@@ -175,20 +175,19 @@ onMounted(() => {
 </script>
 
 <template>
-  <div ref="searchRef" class="search">
+  <div ref="searchRef" class="search" :class="show ? 'xl' : 'large'">
     <OSelect
-      v-if="show"
       v-model="defaultValue"
       style="width: 120px"
       :placeholder="flitermenuItem[0].name"
       variant="text"
-      size="large"
+      :size="show ? 'large' : 'medium'"
       round="0"
       @change="(v) => changeFilter(v)"
     >
       <OOption v-for="item in flitermenuItem" :key="item.id" :label="item.name" :value="item.id" />
     </OSelect>
-    <div class="search-box" :class="{ small: !show }">
+    <div class="search-box">
       <OInput
         v-model="searchInput"
         :placeholder="t('software.searchPlaceholder')"
@@ -196,7 +195,6 @@ onMounted(() => {
         round="0"
         clearable
         class="search-input"
-        :size="show ? 'large' : 'small'"
         @press-enter="(v) => changeSearchInput(v)"
         @input="trottleSearch"
         @clear="clearInput"
@@ -247,12 +245,20 @@ onMounted(() => {
   .search-icon {
     font-size: 24px;
   }
-  :deep(.o-select) {
-    height: 48px;
+  &.xl {
+    :deep(.o-select) {
+      height: 48px;
+    }
+    :deep(.search-input) {
+      height: 48px;
+    }
   }
-  :deep(.search-input) {
-    height: 48px;
+  &.large {
+    :deep(.o-input) {
+      @include text1;
+    }
   }
+
   :deep(.search-input) {
     width: 680px;
   }

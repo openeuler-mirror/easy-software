@@ -71,15 +71,9 @@ watch(
 </script>
 
 <template>
-  <OTab v-model="searchCategoryValue" :line="false" variant="text" :style="{ '--tab-nav-justify': 'center' }" @change="(v) => onChangeTabs(v)">
+  <OTab v-model="searchCategoryValue" :line="false" variant="text" :style="{ '--tab-nav-justify': 'left' }" @change="(v) => onChangeTabs(v)">
     <OTabPane v-for="item in menu" :key="item.key" class="pane" :value="item.key" :label="t(`software.${item.key}`) + `（${item.docCount}）`"> </OTabPane>
   </OTab>
 </template>
 
-<style lang="scss" scoped>
-.result-tips {
-  margin-top: 24px;
-  padding: 60px 0;
-  text-align: center;
-}
-</style>
+<style lang="scss" scoped></style>

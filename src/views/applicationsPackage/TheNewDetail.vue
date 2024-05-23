@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { ref, onMounted } from 'vue';
-import { OBreadcrumb, OBreadcrumbItem, OTab, OTabPane, OTable, OLink, OIcon } from '@opensig/opendesign';
+import { OBreadcrumb, OBreadcrumbItem, OTab, OTabPane, OTable, OLink, OIcon,OTag } from '@opensig/opendesign';
 import { useRoute } from 'vue-router';
 import { getDetails, getDetail, getTags, getVer } from '@/api/api-domain';
 import { useMarkdown } from '@/composables/useMarkdown';
@@ -11,12 +11,12 @@ import AppFeedback from '@/components/AppFeedback.vue';
 import DetailHead from '../applicationsPackage/components/DetailNewHead.vue';
 import ExternalLink from '@/components/ExternalLink.vue';
 import DetailAside from '../applicationsPackage/components/DetailAside.vue';
-import defaultImg from '@/assets/default.png';
+import defaultImg from '@/assets/default-logo.png';
 import IconEpkg from '~icons/pkg/epkg.svg';
 import IconImage from '~icons/pkg/image.svg';
 import IconRpm from '~icons/pkg/rpm.svg';
 import { columnTags } from '@/data/detail/index';
-import DetailTag from '../applicationsPackage/components/DetailTag.vue';
+import { useI18n } from 'vue-i18n';
 type MaintainerT = {
   maintainerId: string;
   maintainerEmail: string;
@@ -28,7 +28,7 @@ interface DetailItem {
   value: string | any;
   type?: string;
 }
-
+const { t } = useI18n();
 const route = useRoute();
 const { mkit } = useMarkdown();
 
@@ -132,10 +132,10 @@ const imageUsage = ref();
 const license = ref();
 const latestOsSupport = ref();
 const tagVer = ref();
+const summary = ref();
 const getDetailValue = (data: any) => {
   if (typePkg.value === 'RPM') {
     basicInfo.value = [
-      { name: '简介', value: data.summary },
       { name: 'Description', value: data?.description },
       { name: '版本支持情况', value: data.osSupport },
       { name: '架构', value: data.arch },
@@ -149,9 +149,10 @@ const getDetailValue = (data: any) => {
       { name: 'Conflicts', value: JSON.parse(data?.conflicts || '') },
     ];
     appData.value.size = data.rpmSize || 0;
+    summary.value = data.summary;
+    version.value = data?.version;
   } else if (typePkg.value === 'EPKG') {
     basicInfo.value = [
-      { name: '简介', value: data.summary },
       { name: 'Description', value: data?.description },
       { name: '版本号', value: data.version },
       { name: '版本支持情况', value: data.osSupport },
@@ -167,26 +168,28 @@ const getDetailValue = (data: any) => {
       { name: 'Conflicts', value: JSON.parse(data?.conflicts || '') },
     ];
     appData.value.size = data.epkgSize || 0;
+    summary.value = data.summary;
+    version.value = data?.version;
   } else {
     basicInfo.value = [
-      { name: '简介', value: data.description || '' },
       { name: '架构', value: data.arch || '' },
-      // { name: '使用环境', value: mkit(data.environment || '', { isCopy: true }) },
+
       { name: '软件包分类', value: data.category || '' },
-      // { name: 'License', value: data.license || '' },
-      // { name: 'Tag', value: data.appVer || '' },
+
       { name: '版本支持情况', value: data.osSupport || '' },
     ];
     appData.value.size = data.appSize || 0;
     latestOsSupport.value = data.latestOsSupport;
+    summary.value = data.description;
+    version.value = data?.appVer;
   }
-  tagVer.value = [data.osSupport,data.arch];
+  tagVer.value = [data.osSupport, data.arch];
   maintainer.value = {
     maintainerId: data?.maintainerId || 'openEuler community',
     maintainerEmail: data?.maintainerEmail || OPENEULER_CONTACT,
     maintainerGiteeId: data?.maintainerGiteeId || 'openeuler-ci-bot',
   };
-  version.value = data?.version;
+
   upStream.value = data?.upStream;
   security.value = data?.securityLevel;
   description.value = data?.description;
@@ -251,6 +254,16 @@ const queryVer = () => {
     verData.value = res.data.list;
   });
 };
+
+// tags切换功能
+const isTags = ref(false);
+const onChangeImage = (v: string) => {
+  isTags.value = v === 'Tags' ? true : false;
+};
+
+const repeatTags = (v: string) => {
+  return v.toLocaleLowerCase() === 'image' ? t('software.apppkg') : v;
+};
 </script>
 <template>
   <ContentWrapper vertical-padding="24px">
@@ -259,17 +272,17 @@ const queryVer = () => {
       <OBreadcrumbItem :to="breadcrumbInfo.path">{{ breadcrumbInfo.name }}</OBreadcrumbItem>
       <OBreadcrumbItem>{{ appData.name }} </OBreadcrumbItem>
     </OBreadcrumb>
-    <DetailHead :data="appData" :basicInfo="basicInfo" :maintainer="maintainer" />
+    <DetailHead :data="appData" :basicInfo="summary" :maintainer="maintainer" />
 
     <OTab variant="text" @change="onChange" :line="false" class="domain-tabs" v-model="activeName" size="large">
       <OTabPane class="tab-pane" v-for="item in tabList" :key="item" :label="item">
-        <template #nav><OIcon :icon="getTabIcon(item)" class="tabs-icon" /> {{ item }}</template>
+        <template #nav><OIcon :icon="getTabIcon(item)" class="tabs-icon" /> {{ repeatTags(item) }}</template>
         <div class="detail-row">
-          <div class="detail-row-main">
+          <div class="detail-row-main" :class="{ tags: isTags }">
             <AppSection v-if="item !== 'IMAGE'">
               <div class="title">
                 <p>> 基本信息</p>
-                <p v-if="item === 'RPM'">软件包版本号：{{ version }}</p>
+                <p v-if="item === 'RPM'" class="ver">版本号：{{ version }}</p>
               </div>
               <ul class="basic-info">
                 <li v-for="item in basicInfo" :key="item.name">
@@ -288,21 +301,21 @@ const queryVer = () => {
               <p class="sp">> 安装指引</p>
               <div v-if="installation" v-dompurify-html="installation" v-copy-code="true" class="markdown-body installation"></div>
               <p class="sp" v-if="item !== 'IMAGE'">> 更多信息</p>
-              <OTab variant="text" :line="false" class="domain-tabs" v-if="item !== 'IMAGE'">
+              <OTab variant="text" :line="false" class="domain-tabs switch" v-if="item !== 'IMAGE'">
                 <template v-for="it in moreMessge" :key="it">
                   <OTabPane class="tab-pane" v-if="it.value.length > 0" :label="it.name">
                     <OTable :columns="moreColumns" :data="it.value" :small="true"> </OTable>
                   </OTabPane>
                 </template>
-                <!-- <OTabPane label="Description">{{ description }}</OTabPane> -->
               </OTab>
             </AppSection>
             <AppSection v-else>
-              <OTab variant="text" @change="onChange" :line="false" class="domain-tabs" v-model="imgName">
+              <OTab variant="text" @change="onChangeImage" :line="false" class="domain-tabs switch" v-model="imgName">
                 <OTabPane class="tab-pane" v-for="item in imgList" :key="item" :label="item">
                   <div v-if="item === '概览'">
                     <div class="title">
                       <p>> 基本信息</p>
+                      <p class="ver">版本号：{{ version }}</p>
                     </div>
                     <ul class="basic-info">
                       <li v-for="item in basicInfo" :key="item.name">
@@ -316,7 +329,7 @@ const queryVer = () => {
                           >{{ item.type }}</OLink
                         >
                         <div class="markdown-body installation mymarkdown-body" v-dompurify-html="item.value" v-copy-code="true" v-else>
-                          <DetailTag v-if="item.name === '版本支持情况' && latestOsSupport" :data="'最新版本'" />
+                          <OTag v-if="item.name === '版本支持情况' && latestOsSupport" color="primary"> 最新版本</OTag>
                         </div>
                       </li>
                     </ul>
@@ -330,9 +343,9 @@ const queryVer = () => {
               </OTab>
             </AppSection>
             <ExternalLink v-if="showExternalDlg" :href="externalLink" @change="showExternalDlg = false" />
-            <AppFeedback :email="maintainer.maintainerEmail" />
+            <AppFeedback v-if="!isTags" :email="maintainer.maintainerEmail" />
           </div>
-          <div class="detail-row-side">
+          <div v-if="!isTags" class="detail-row-side">
             <DetailAside
               :data="appData"
               :basicInfo="basicInfo"
