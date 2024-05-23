@@ -223,9 +223,14 @@ const jumpTo = (name: string, id: string) => {
   display: flex;
   justify-content: space-between;
 }
-:deep(.o-table td th) {
-    padding: 2px 4px;;
+:deep(.o-table td ) {
+    padding: 2px 4px;
     text-align: center;
-    height: 50px;
+    font-size: 16px !important;
+}
+:deep(.o-table th ) {
+    padding: 2px 4px;
+    text-align: center;
+    font-size: 16px !important;
 }
 </style>
