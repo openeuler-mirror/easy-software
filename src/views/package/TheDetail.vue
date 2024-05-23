@@ -6,7 +6,7 @@ import { useRoute } from 'vue-router';
 import { useMarkdown } from '@/composables/useMarkdown';
 import type { AppInfoT } from '@/@types/app';
 import { useLocale } from '@/composables/useLocale';
-import { getDetails } from '@/api/api-domain';
+import { getDetails, getVer } from '@/api/api-domain';
 import defaultImg from '@/assets/default-logo.png';
 import AppFeedback from '@/components/AppFeedback.vue';
 import DetailHead from '../applicationsPackage/components/DetailNewHead.vue';
@@ -46,15 +46,17 @@ const appData = ref<AppInfoT>({
 
 //详情请求
 const queryPkg = (tabValue: string, pkgId: any) => {
-  getDetails(tabValue, pkgId).then((res) => {
-    const data = res.data.list[0];
-    getDetailValue(data);
-  }).catch(() => {
+  getDetails(tabValue, pkgId)
+    .then((res) => {
+      const data = res.data.list[0];
+      getDetailValue(data);
+    })
+    .catch(() => {
       useViewStore().showNotFound();
     });
 };
 
-const pkgId = route.query.pkgId;
+const pkgId = encodeURIComponent(route.query.pkgId as string);
 const queryEntity = () => {
   getChange();
 };
@@ -69,8 +71,11 @@ const getPkg = (tabValue: string) => {
 onMounted(() => {
   queryEntity();
   getTitle();
+  
 });
 const summary = ref();
+const license = ref();
+const tagVer = ref();
 const getDetailValue = (data: any) => {
   basicInfo.value = [
     { name: 'Description', value: data?.description },
@@ -87,13 +92,14 @@ const getDetailValue = (data: any) => {
     { name: 'Conflicts', value: JSON.parse(data?.conflicts || '') },
   ];
   appData.value.size = data.rpmSize;
-
+  tagVer.value = [data.osSupport, data.arch];
   maintainer.value = {
     maintainerId: data?.maintainerId || 'openEuler community',
     maintainerEmail: data?.maintainerEmail || OPENEULER_CONTACT,
     maintainerGiteeId: data?.maintainerGiteeId || 'openeuler-ci-bot',
   };
   version.value = data?.version;
+  license.value = data.license;
   upStream.value = data?.upStream;
   security.value = data?.securityLevel;
   description.value = data?.description;
@@ -104,6 +110,7 @@ const getDetailValue = (data: any) => {
   appData.value.bin_code = data.binDownloadUrl;
   appData.value.cover = data?.iconUrl || defaultImg;
   appData.value.repository = data.srcRepo;
+  queryVer()
 };
 
 const { locale } = useLocale();
@@ -119,6 +126,14 @@ const externalLink = ref('');
 const onExternalDialog = (href: string) => {
   externalLink.value = href;
   showExternalDlg.value = true;
+};
+
+//获取支持
+const verData = ref();
+const queryVer = () => {
+  getVer('rpmpkg', appData.value.name).then((res) => {
+    verData.value = res.data.list;
+  });
 };
 </script>
 
@@ -168,7 +183,7 @@ const onExternalDialog = (href: string) => {
         <AppFeedback :email="maintainer.maintainerEmail" />
       </div>
       <div class="detail-row-side">
-        <DetailAside :data="appData" :basicInfo="basicInfo" :maintainer="maintainer" />
+        <DetailAside :data="appData" :basicInfo="basicInfo" :maintainer="maintainer" :ver-data="verData" :license="license" :tagVer="tagVer" :type="'RPM'"/>
       </div>
     </div>
   </ContentWrapper>

@@ -7,7 +7,7 @@ import { useMarkdown } from '@/composables/useMarkdown';
 import type { AppInfoT } from '@/@types/app';
 import { useLocale } from '@/composables/useLocale';
 import { useI18n } from 'vue-i18n';
-import { getDetails } from '@/api/api-domain';
+import { getDetails, getVer  } from '@/api/api-domain';
 import AppFeedback from '@/components/AppFeedback.vue';
 import DetailHead from '../applicationsPackage/components/DetailNewHead.vue';
 import ExternalLink from '@/components/ExternalLink.vue';
@@ -62,7 +62,7 @@ const queryPkg = (tabValue: string, pkgId: any) => {
 };
 
 // 获取tab分类
-const pkgId = route.query.pkgId;
+const pkgId = encodeURIComponent(route.query.pkgId as string);
 const queryEntity = () => {
   getChange();
 };
@@ -79,6 +79,8 @@ onMounted(() => {
   getTitle();
 });
 const summary = ref();
+const license = ref();
+const tagVer = ref();
 const getDetailValue = (data: any) => {
   basicInfo.value = [
     { name: 'Description', value: data?.description },
@@ -96,13 +98,14 @@ const getDetailValue = (data: any) => {
     { name: 'Conflicts', value: JSON.parse(data?.conflicts || '') },
   ];
   appData.value.size = data.epkgSize;
-
+  tagVer.value = [data.osSupport, data.arch];
   maintainer.value = {
     maintainerId: data?.maintainerId || 'openEuler community',
     maintainerEmail: data?.maintainerEmail || OPENEULER_CONTACT,
     maintainerGiteeId: data?.maintainerGiteeId || 'openeuler-ci-bot',
   };
   version.value = data?.version;
+  license.value = data.license;
   upStream.value = data?.upStream;
   security.value = data?.securityLevel;
   description.value = data?.description;
@@ -113,6 +116,7 @@ const getDetailValue = (data: any) => {
   appData.value.bin_code = data.binDownloadUrl;
   appData.value.cover = data?.iconUrl || defaultImg;
   appData.value.repository = data.srcRepo;
+  queryVer()
 };
 
 const { locale } = useLocale();
@@ -128,6 +132,14 @@ const externalLink = ref('');
 const onExternalDialog = (href: string) => {
   externalLink.value = href;
   showExternalDlg.value = true;
+};
+
+//获取支持
+const verData = ref();
+const queryVer = () => {
+  getVer('epkgpkg', appData.value.name).then((res) => {
+    verData.value = res.data.list;
+  });
 };
 </script>
 
@@ -177,7 +189,7 @@ const onExternalDialog = (href: string) => {
         <AppFeedback :email="maintainer.maintainerEmail" />
       </div>
       <div class="detail-row-side">
-        <DetailAside :data="appData" :basicInfo="basicInfo" :maintainer="maintainer" />
+        <DetailAside :data="appData" :basicInfo="basicInfo" :maintainer="maintainer" :ver-data="verData" :license="license" :tagVer="tagVer" :type="'EPKG'"/>
       </div>
     </div>
   </ContentWrapper>

@@ -174,13 +174,13 @@ const jumpTo = (name: string, id: string) => {
       </div>
     </div>
   </AppSection>
-  <AppSection title="软件合规" v-if="allShow && license">
+  <AppSection title="软件合规" v-if="license">
     <div class="license">
       <p>License</p>
       <p>{{ license }}</p>
     </div>
   </AppSection>
-  <AppSection :title="`${data.name}版本支持情况`" v-if="allShow">
+  <AppSection :title="`${data.name}版本支持情况`" >
     <OTable :columns="verColumns" :data="verData" border="all" :cell-span="arraySpanMethod" :small="true">
       <template #td_flags="{ row }">
         <a :href="jumpTo(data.name, row.pkgId)" color="primary" target="_blank" rel="noopener noreferrer">
