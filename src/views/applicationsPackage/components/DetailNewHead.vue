@@ -53,7 +53,8 @@ const onExternalDialog = (href: string) => {
           <div class="cover"><img :src="data.cover" alt="" /></div>
           <div class="box">
             <p class="title">
-              {{ appName }} <a :href="data.repository" v-if="data.repository" target="_blank" rel="noopener noreferrer"><img :src="Home" class="icon-img" alt="" />主页</a>
+              {{ appName }}
+              <a :href="data.repository" v-if="data.repository" target="_blank" rel="noopener noreferrer"><img :src="Home" class="icon-img" alt="" />主页</a>
             </p>
             <p class="detail">{{ basicInfo }}</p>
           </div>
@@ -142,6 +143,8 @@ const onExternalDialog = (href: string) => {
       display: flex;
       align-items: center;
       justify-content: center;
+      background: url(@/assets/default-logo-cover.png) no-repeat center;
+      padding: 12px;
       img {
         max-width: 100%;
         max-height: 100%;

@@ -11,7 +11,7 @@ import AppFeedback from '@/components/AppFeedback.vue';
 import DetailHead from '../applicationsPackage/components/DetailNewHead.vue';
 import ExternalLink from '@/components/ExternalLink.vue';
 import DetailAside from '../applicationsPackage/components/DetailAside.vue';
-import defaultImg from '@/assets/default.png';
+import defaultImg from '@/assets/default-logo.png';
 import IconEpkg from '~icons/pkg/epkg.svg';
 import IconImage from '~icons/pkg/image.svg';
 import IconRpm from '~icons/pkg/rpm.svg';
@@ -315,7 +315,7 @@ const repeatTags = (v: string) => {
                   <div v-if="item === '概览'">
                     <div class="title">
                       <p>> 基本信息</p>
-                      <p  class="ver">版本号：{{ version }}</p>
+                      <p class="ver">版本号：{{ version }}</p>
                     </div>
                     <ul class="basic-info">
                       <li v-for="item in basicInfo" :key="item.name">
