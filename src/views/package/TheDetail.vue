@@ -138,8 +138,8 @@ const onExternalDialog = (href: string) => {
             <p>> 基本信息</p>
             <p class="ver">版本号：{{ version }}</p>
           </div>
-          <ul class="basic-info">
-            <li v-for="item in basicInfo" :key="item.name">
+          <div class="basic-info">
+            <p v-for="item in basicInfo" :key="item.name">
               <span class="label markdown download">{{ item.name }}</span>
               <OLink
                 @click="onExternalDialog(item.value)"
@@ -147,11 +147,12 @@ const onExternalDialog = (href: string) => {
                 v-if="item.name === '所属仓库' || item.name === 'Repo源'"
                 target="_blank"
                 rel="noopener noreferrer"
+                class="mymarkdown-body"
                 >{{ item.type }}</OLink
               >
               <span class="markdown-body installation mymarkdown-body" v-dompurify-html="item.value" v-copy-code="true" v-else></span>
-            </li>
-          </ul>
+            </p>
+          </div>
           <p class="sp">> 安装指引</p>
           <div v-if="installation" v-dompurify-html="installation" v-copy-code="true" class="markdown-body installation"></div>
           <p class="sp">> 更多信息</p>
