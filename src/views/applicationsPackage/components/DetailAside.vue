@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { OLink, OTable, useMessage, OButton } from '@opensig/opendesign';
+import { OTable, useMessage, OButton } from '@opensig/opendesign';
 import OCodeCopy from '@/components/OCodeCopy.vue';
 import { ref, computed, watch } from 'vue';
 import ExternalLink from '@/components/ExternalLink.vue';
@@ -9,6 +9,7 @@ import { verColumns } from '@/data/detail/index';
 import IconCopy from '~icons/app/icon-copy.svg';
 import { useLocale } from '@/composables/useLocale';
 import {  xssAllTag } from '@/utils/common';
+import DetailTag from './DetailTag.vue';
 const props = defineProps({
   data: {
     type: Object,
@@ -53,12 +54,13 @@ const props = defineProps({
       return '';
     },
   },
+  tagVer: {
+    default: () => {
+      return [];
+    },
+  },
 });
 
-const columns = [
-  { label: '类型', key: 'name' },
-  { label: '操作', key: 'flags' },
-];
 const tableData = ref([
   {
     name: '二进制包下载',
@@ -164,20 +166,14 @@ const jumpTo = (name: string, id: string) => {
       <p class="title" v-if="type !== 'IMAGE'">软件包大小：{{ data.size }}</p>
     </div>
     <OCodeCopy :code="getCode(downloadData)" v-if="type === 'IMAGE' && downloadData" />
-    <!-- <OTable :columns="columns" :data="tableData" border="row-frame" v-if="type !== 'IMAGE' && show">
-      <template #td_flags="{ row }">
-        <OLink @click="onExternalDialog(row.download)" color="primary" rel="noopener noreferrer">下载</OLink>
-        <OLink @click="copyText($event, row.download)" class="tag" color="primary" style="margin-left: 16px" rel="noopener noreferrer">复制链接</OLink>
-      </template>
-    </OTable> -->
     <div v-if="type !== 'IMAGE' && show">
-      <div v-for="item in tableData" :key="item.name">
-        <OButton size="large" variant="solid" color="primary" @click="onExternalDialog(item.download)" style="margin-bottom: 24px; width: 70%">{{
+      <div v-for="item in tableData" :key="item.name" class="bt">
+        <OButton variant="solid" color="primary" @click="onExternalDialog(item.download)" style="margin-bottom: 24px; width: 70%">{{
           item.name
         }}</OButton>
-        <span @click="copyText($event, item.download)" style="margin-left: 30px; cursor: pointer" class="bt">
+        <p @click="copyText($event, item.download)" style="margin-left: 30px; cursor: pointer" >
           <IconCopy />
-        </span>
+        </p>
       </div>
     </div>
   </AppSection>
@@ -190,7 +186,9 @@ const jumpTo = (name: string, id: string) => {
   <AppSection :title="`${data.name}版本支持情况`" v-if="allShow">
     <OTable :columns="verColumns" :data="verData" border="all" :cell-span="arraySpanMethod">
       <template #td_flags="{ row }">
-        <a :href="jumpTo(data.name,row.pkgId)" color="primary" target="_blank" rel="noopener noreferrer">查看</a>
+        <a :href="jumpTo(data.name, row.pkgId)" color="primary" target="_blank" rel="noopener noreferrer"
+          > <span v-if="row.os === tagVer[0] && row.arch === tagVer[1]"
+        >当前版本</span> <span v-else>查看</span></a>
       </template>
     </OTable>
   </AppSection>
@@ -207,6 +205,7 @@ const jumpTo = (name: string, id: string) => {
 }
 .bt {
   height: 100%;
+  display: flex;
 }
 .license {
   border-top: 1px rgba(0, 0, 0, 0.1) solid;
@@ -214,5 +213,10 @@ const jumpTo = (name: string, id: string) => {
   width: 90%;
   display: flex;
   justify-content: space-between;
+}
+:deep(.o-table td th) {
+    padding: 2px 4px;;
+    text-align: center;
+    height: 50px;
 }
 </style>
