@@ -25,9 +25,8 @@ defineProps({
     },
   },
   basicInfo: {
-    type: Object,
     default: () => {
-      return {};
+      return '';
     },
   },
 });
@@ -54,7 +53,7 @@ const onExternalDialog = (href: string) => {
           <div class="cover"><img :src="data.cover" alt="" /></div>
           <div class="box">
             <p class="title">{{ appName }}</p>
-            <p class="detail">{{ basicInfo[0]?.value }}</p>
+            <p class="detail">{{ basicInfo}}</p>
           </div>
         </div>
 
