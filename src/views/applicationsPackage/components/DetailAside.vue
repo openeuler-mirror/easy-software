@@ -169,7 +169,7 @@ const jumpTo = (name: string, id: string) => {
       <div v-for="item in tableData" :key="item.name" class="bt">
         <OButton variant="solid" color="primary" @click="onExternalDialog(item.download)">{{ item.name }}</OButton>
         <p @click="copyText($event, item.download)" style="margin-left: 30px; cursor: pointer">
-          <IconCopy style="width: 24px; height: 24px" />
+          <IconCopy style="width: 20px; height: 20px" />
         </p>
       </div>
     </div>
@@ -181,10 +181,10 @@ const jumpTo = (name: string, id: string) => {
     </div>
   </AppSection>
   <AppSection :title="`${data.name}版本支持情况`" v-if="allShow">
-    <OTable :columns="verColumns" :data="verData" border="all" :cell-span="arraySpanMethod">
+    <OTable :columns="verColumns" :data="verData" border="all" :cell-span="arraySpanMethod" :small="true">
       <template #td_flags="{ row }">
         <a :href="jumpTo(data.name, row.pkgId)" color="primary" target="_blank" rel="noopener noreferrer">
-          <OTag v-if="row.os === tagVer[0] && row.arch === tagVer[1]" color="primary">当前版本</OTag> <span v-else>查看</span></a
+          <OTag v-if="row.os === tagVer[0] && row.arch === tagVer[1]" color="primary" :size="'small'">当前版本</OTag> <span v-else>查看</span></a
         >
       </template>
     </OTable>
@@ -224,7 +224,7 @@ const jumpTo = (name: string, id: string) => {
 :deep(.o-table td) {
   padding: 2px 4px;
   text-align: center;
-  font-size: 16px !important;
+  font-size: 14px !important;
 }
 :deep(.o-table th) {
   padding: 2px 4px;

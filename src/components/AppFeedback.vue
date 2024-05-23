@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { ref } from 'vue';
-import { ORate, OTextarea, OButton, useMessage, OLink, OPopover, OIcon } from '@opensig/opendesign';
+import { ORate, OTextarea, OButton, useMessage, OIcon } from '@opensig/opendesign';
 import { useRoute } from 'vue-router';
 import { postFeedback } from '@/api/api-feedback';
 import { GITEE } from '@/data/config';
@@ -9,7 +9,6 @@ import xss from 'xss';
 import ExternalLink from '@/components/ExternalLink.vue';
 import AppSection from '@/components/AppSection.vue';
 
-import CodeImgXzs from '@/assets/footer/code-xzs.png';
 import IconHelp from '~icons/pkg/icon-help.svg';
 import IconIssue from '~icons/pkg/icon-issue.svg';
 
@@ -122,20 +121,7 @@ const onExternalDialog = () => {
           :rows="4"
           style="width: 100%"
         />
-        <!-- <p class="text">
-          {{ t('software.feedbackTxt[0]') }}
-          <OLink color="primary" target="_blank" rel="noopener noreferrer" :href="`mailto:${email}`"> {{ t('software.feedbackTxt[1]') }}</OLink>
-          {{ t('software.feedbackTxt[2]') }}
 
-          <OPopover position="tl" trigger="hover">
-            <template #target>
-              <OLink color="primary" target="_blank" rel="noopener noreferrer"> {{ t('software.feedbackTxt[3]') }}</OLink>
-            </template>
-            <div class="box">
-              <img :src="CodeImgXzs" style="width: 120px" />
-            </div>
-          </OPopover>
-        </p> -->
         <div class="action">
           <OButton color="primary" variant="solid" size="large" @click="clickSubmit">{{ t('software.feedbackButton[0]') }}</OButton>
         </div>
@@ -144,7 +130,7 @@ const onExternalDialog = () => {
           <a @click="onExternalDialog()">
             <OIcon><IconIssue /></OIcon>提交issue
           </a>
-          <a href="">
+          <a>
             <OIcon><IconHelp /></OIcon>发帖求助
           </a>
         </div>
