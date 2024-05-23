@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { ref, onMounted } from 'vue';
-import { OBreadcrumb, OBreadcrumbItem, OTab, OTabPane } from '@opensig/opendesign';
+import { OBreadcrumb, OBreadcrumbItem, OTab, OTabPane,OTag } from '@opensig/opendesign';
 import { useRoute } from 'vue-router';
 import { useMarkdown } from '@/composables/useMarkdown';
 import type { AppInfoT } from '@/@types/app';
@@ -71,22 +71,25 @@ onMounted(() => {
   getTitle();
 });
 const imageUsage = ref();
+const summary = ref();
+const latestOsSupport = ref();
 const getDetailValue = (data: any) => {
   basicInfo.value = [
-    { name: '简介', value: data.description || '' },
     { name: '架构', value: data.arch || '' },
     { name: '分类', value: data.category || '' },
     { name: 'License', value: data.license || '' },
     { name: 'Tag', value: data.appVer || '' },
     { name: '版本支持情况', value: data.osSupport || '' },
   ];
+  summary.value = data.description;
   appData.value.size = data.appSize || 0;
   maintainer.value = {
     maintainerId: data?.maintainerId || 'openEuler community',
     maintainerEmail: data?.maintainerEmail || OPENEULER_CONTACT,
     maintainerGiteeId: data?.maintainerGiteeId || 'openeuler-ci-bot',
   };
-  version.value = data?.version;
+  version.value = data?.appVer;
+  latestOsSupport.value = data.latestOsSupport;
   upStream.value = data?.upStream;
   security.value = data?.securityLevel;
   description.value = data?.description;
@@ -129,7 +132,7 @@ const onChange = (v: string) => {
       <OBreadcrumbItem :to="breadcrumbInfo.path">{{ breadcrumbInfo.name }}</OBreadcrumbItem>
       <OBreadcrumbItem>{{ appData.name }} </OBreadcrumbItem>
     </OBreadcrumb>
-    <DetailHead :data="appData" :basicInfo="basicInfo" :maintainer="maintainer" />
+    <DetailHead :data="appData" :basicInfo="summary" :maintainer="maintainer" />
 
     <div class="detail-row">
       <div class="detail-row-main" :class="{ tags: isTags }">
@@ -138,16 +141,19 @@ const onChange = (v: string) => {
             <OTabPane class="tab-pane" v-for="item in tabList" :key="item" :label="item">
               <div v-if="item === '概览'">
                 <div class="title">
-                  <p>基本信息</p>
+                  <p>> 基本信息</p>
+                  <p class="ver">版本号：{{ version }}</p>
                 </div>
                 <ul class="basic-info">
                   <li v-for="item in basicInfo" :key="item.name">
                     <span class="label markdown download">{{ item.name }}</span>
                     <a :href="item.value" v-if="item.name === '所属仓库' || item.name === 'Repo源'" target="_blank">{{ item.type }}</a>
-                    <div class="markdown-body" v-dompurify-html="item.value" v-copy-code="true" v-else></div>
+                    <div class="markdown-body" v-dompurify-html="item.value" v-copy-code="true" v-else>
+                      <OTag v-if="item.name === '版本支持情况' && latestOsSupport" color="primary"> 最新版本</OTag>
+                    </div>
                   </li>
                 </ul>
-                <p class="sp">安装指引</p>
+                <p class="sp">> 安装指引</p>
                 <div v-if="imageUsage" v-dompurify-html="imageUsage" v-copy-code="true" class="markdown-body download"></div>
               </div>
               <div v-else>

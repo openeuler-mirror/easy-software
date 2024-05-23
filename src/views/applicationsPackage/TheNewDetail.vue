@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { ref, onMounted } from 'vue';
-import { OBreadcrumb, OBreadcrumbItem, OTab, OTabPane, OTable, OLink, OIcon } from '@opensig/opendesign';
+import { OBreadcrumb, OBreadcrumbItem, OTab, OTabPane, OTable, OLink, OIcon,OTag } from '@opensig/opendesign';
 import { useRoute } from 'vue-router';
 import { getDetails, getDetail, getTags, getVer } from '@/api/api-domain';
 import { useMarkdown } from '@/composables/useMarkdown';
@@ -16,7 +16,6 @@ import IconEpkg from '~icons/pkg/epkg.svg';
 import IconImage from '~icons/pkg/image.svg';
 import IconRpm from '~icons/pkg/rpm.svg';
 import { columnTags } from '@/data/detail/index';
-import DetailTag from '../applicationsPackage/components/DetailTag.vue';
 import { useI18n } from 'vue-i18n';
 type MaintainerT = {
   maintainerId: string;
@@ -330,7 +329,7 @@ const repeatTags = (v: string) => {
                           >{{ item.type }}</OLink
                         >
                         <div class="markdown-body installation mymarkdown-body" v-dompurify-html="item.value" v-copy-code="true" v-else>
-                          <DetailTag v-if="item.name === '版本支持情况' && latestOsSupport" :data="'最新版本'" />
+                          <OTag v-if="item.name === '版本支持情况' && latestOsSupport" color="primary"> 最新版本</OTag>
                         </div>
                       </li>
                     </ul>
