@@ -6,7 +6,7 @@ import { checkDomainLink, windowOpen } from '@/utils/common';
 
 import Email from '@/assets/email.svg';
 import Gitee from '@/assets/gitee.svg';
-
+import Home from '@/assets/icon/icon-home.svg';
 import { GITEE } from '@/data/config';
 
 import ExternalLink from '@/components/ExternalLink.vue';
@@ -52,8 +52,10 @@ const onExternalDialog = (href: string) => {
         <div class="left">
           <div class="cover"><img :src="data.cover" alt="" /></div>
           <div class="box">
-            <p class="title">{{ appName }}</p>
-            <p class="detail">{{ basicInfo}}</p>
+            <p class="title">
+              {{ appName }} <a :href="data.repository" v-if="data.repository" target="_blank" rel="noopener noreferrer"><img :src="Home" class="icon-img" alt="" />主页</a>
+            </p>
+            <p class="detail">{{ basicInfo }}</p>
           </div>
         </div>
 
@@ -99,6 +101,12 @@ const onExternalDialog = (href: string) => {
         @include h2;
         font-weight: 500;
         color: var(--o-color-info1);
+        display: flex;
+        justify-content: space-between;
+        a {
+          display: flex;
+          font-size: 14px;
+        }
       }
     }
     .right {
