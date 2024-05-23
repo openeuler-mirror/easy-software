@@ -1,0 +1,128 @@
+@use 'github-markdown-css/github-markdown-light.css' as *;
+
+.markdown-body {
+  details {
+    display: block !important;
+  }
+
+  ol {
+    list-style-type: decimal;
+  }
+
+  ul {
+    list-style-type: disc;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    color: var(--o-color-info1);
+  }
+
+  a {
+    color: var(--o-color-link1);
+
+    @include hover {
+      color: var(--o-color-link2);
+    }
+  }
+
+  h1,
+  h2 {
+    border-bottom: 1px solid var(--o-color-control4);
+  }
+
+  hr {
+    background-color: var(--o-color-control4);
+  }
+  code {
+    border-radius: var(--layout-pkg-radius);
+  }
+
+  pre {
+    position: relative;
+    border-radius: var(--layout-pkg-radius);
+    background-color: var(--o-color-fill3);
+    padding: 0;
+    overflow: hidden;
+
+    code {
+      display: block;
+      overflow-x: auto;
+      padding: 16px;
+    }
+  }
+
+  table {
+    --table-padding: 12px 24px;
+    --table-radius: var(--layout-pkg-radius);
+    border-spacing: 0;
+
+    @include respond-to('<=laptop') {
+      --table-head-cell-padding: 8px 16px;
+    }
+
+    @include respond-to('<=pad') {
+      --table-head-cell-padding: 9px 12px;
+    }
+
+    @include respond-to('<=phone') {
+      --table-head-cell-padding: 7px 12px;
+    }
+
+    border-radius: var(--table-radius);
+
+    th {
+      background-color: var(--o-color-control3-light);
+      text-align: left;
+    }
+    th,
+    td {
+      border-color: var(--o-color-control4);
+      padding: var(--table-padding);
+    }
+
+    td {
+      box-sizing: border-box;
+    }
+  }
+
+  pre {
+    &:hover {
+      .pre-copy {
+        opacity: 1;
+      }
+    }
+  }
+
+  .pre-copy {
+    cursor: pointer;
+    position: absolute;
+    top: 0;
+    right: 0;
+    background-color: var(--o-color-fill3);
+    opacity: 0;
+    transition: all var(--o-duration-m1) var(--o-easing-standard-in);
+    padding: 12px 12px 0 0;
+    .icon-copy {
+      display: block;
+      width: 24px;
+      height: 24px;
+      -webkit-mask-image: url(@/assets/icon-copy.svg);
+      mask-image: url(@/assets/icon-copy.svg);
+      -webkit-mask-size: cover;
+      background-color: var(--o-color-info2);
+    }
+    &:hover {
+      .icon-copy {
+        background-color: var(--o-color-primary1);
+      }
+    }
+    @include respond-to('phone') {
+      top: 4px;
+    }
+  }
+}
