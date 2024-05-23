@@ -91,9 +91,7 @@ basicInfo.value = [
         <li>
           <span class="label">Homepage</span>
           <OInput v-model="dialogInput" round="0" clearable :placeholder="homepage" class="search-input">
-            <template #prefix>
-              <!-- <OIcon class="search-icon"><IconSearch /></OIcon> -->
-            </template>
+            <template #prefix> </template>
           </OInput>
         </li>
       </ul>
