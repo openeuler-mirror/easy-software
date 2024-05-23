@@ -147,15 +147,15 @@ const onChange = (v: string) => {
                   <p>> 基本信息</p>
                   <p class="ver">版本号：{{ version }}</p>
                 </div>
-                <ul class="basic-info">
-                  <li v-for="item in basicInfo" :key="item.name">
+                <div class="basic-info">
+                  <p v-for="item in basicInfo" :key="item.name">
                     <span class="label markdown download">{{ item.name }}</span>
                     <a :href="item.value" v-if="item.name === '所属仓库' || item.name === 'Repo源'" target="_blank">{{ item.type }}</a>
-                    <div class="markdown-body" v-dompurify-html="item.value" v-copy-code="true" v-else>
+                    <span class="markdown-body mymarkdown-body" v-dompurify-html="item.value" v-copy-code="true" >
                       <OTag v-if="item.name === '版本支持情况' && latestOsSupport" color="primary"> 最新版本</OTag>
-                    </div>
-                  </li>
-                </ul>
+                    </span>
+                  </p>
+                </div>
                 <p class="sp">> 安装指引</p>
                 <div v-if="imageUsage" v-dompurify-html="imageUsage" v-copy-code="true" class="markdown-body download"></div>
               </div>

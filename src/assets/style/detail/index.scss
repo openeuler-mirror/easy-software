@@ -82,22 +82,28 @@
 
 .basic-info {
   margin-top: 26px;
-  background: linear-gradient(to right, rgba(0, 47, 167, 0.05) 10%, white 15%);
-
-  li {
-    padding: 12px 24px;
+ 
+  p {
     @include tip1;
     color: var(--o-color-info2);
     display: flex;
     align-items: top;
-    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    border-right: 1px solid rgba(0, 0, 0, 0.1);
     border-left: 4px solid #002fa7;
+    &:first-child{
+      border-top: 1px solid rgba(0, 0, 0, 0.1);
+    }
     .label {
-      min-width: 100px;
+      background: rgba(0,47,167,0.05);
+      padding: 12px 24px;
+      min-width: 150px;
+      border-right: 1px solid rgba(0, 0, 0, 0.1);
     }
   }
   .mymarkdown-body {
     max-width: 600px;
+    padding: 12px 24px;
   }
 }
 .icon-img {
