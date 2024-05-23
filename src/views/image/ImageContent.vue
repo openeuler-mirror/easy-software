@@ -1,0 +1,302 @@
+<script lang="ts" setup>
+import { ref, watch, computed, onMounted } from 'vue';
+import { OTag, OLink, OIcon } from '@opensig/opendesign';
+
+import { getSearchData } from '@/api/api-search';
+import { useRoute } from 'vue-router';
+import { getSearchAllFiled, getSearchAllColumn } from '@/api/api-domain';
+import { useI18n } from 'vue-i18n';
+import { ElPagination } from 'element-plus';
+
+import FilterCheckbox from '@/components/filter/FilterCheckbox.vue';
+import IconOs from '~icons/pkg/icon-os.svg';
+import IconArch from '~icons/pkg/icon-arch.svg';
+import IconCategory from '~icons/pkg/icon-category.svg';
+
+const route = useRoute();
+const { t } = useI18n();
+
+// 软件包-表头
+const columns = [
+  { label: t('software.columns.imageName'), key: 'name' },
+  { label: 'Tag', key: 'appVer' },
+  { label: t('software.columns.os'), key: 'os' },
+  { label: t('software.columns.arch'), key: 'arch' },
+  { label: t('software.columns.category'), key: 'category' },
+  { label: t('software.columns.operation'), key: 'operation' },
+];
+
+//  ------------  main ------------
+const pkgData = ref([]);
+
+const tabName = ref('apppkg');
+const nameOrder = ref('');
+const keywordType = ref((route.query.key as string) || '');
+const isLoading = ref(false);
+
+const searchKey = ref((route.query.name as string) || '');
+
+const searchOs = ref<string[]>([]);
+const searchArch = ref<string[]>([]);
+const searchCategory = ref<string[]>([]);
+
+const searchParams = computed(() => {
+  return {
+    keyword: searchKey.value,
+    keywordType: keywordType.value,
+    pageNum: currentPage.value,
+    pageSize: pageSize.value,
+    dataType: tabName.value,
+    nameOrder: nameOrder.value,
+    os: searchOs.value.join(),
+    arch: searchArch.value.join(),
+    category: searchCategory.value.join(),
+  };
+});
+
+// es搜索
+const querySearch = () => {
+  isLoading.value = true;
+  getSearchData(searchParams.value)
+    .then((res) => {
+      if (res.code === 200) {
+        pkgData.value = res.data.apppkg;
+        total.value = res.data.total;
+        isSearch.value = true;
+      }
+      isLoading.value = false;
+      if (pkgData.value.length === 0) {
+        isSearchError.value = true;
+      }
+    })
+    .catch(() => {
+      pkgData.value = [];
+      isLoading.value = false;
+      isSearch.value = false;
+    });
+};
+
+// sql搜索
+const isSearchError = ref(false);
+const isSearch = ref(false);
+const queryAllpkg = () => {
+  const params = {
+    name: tabName.value,
+    pageNum: currentPage.value,
+    pageSize: pageSize.value,
+    os: searchOs.value.join(),
+    arch: searchArch.value.join(),
+    category: searchCategory.value.join(),
+    nameOrder: nameOrder.value,
+  };
+  isLoading.value = true;
+  getSearchAllFiled(params)
+    .then((res) => {
+      pkgData.value = res.data.list;
+      total.value = res.data.total;
+      isLoading.value = false;
+      if (pkgData.value.length === 0) {
+        isSearchError.value = true;
+      }
+    })
+    .catch(() => {
+      pkgData.value = [];
+      isLoading.value = false;
+    });
+};
+
+// 判断是走es还是sql
+const pageSearch = () => {
+  isSearchError.value = false;
+  if (tabName.value === 'apppkg') {
+    if (searchKey.value === '') {
+      queryAllpkg();
+    } else {
+      querySearch();
+    }
+  }
+};
+
+// ----------- 左侧菜单交互-------------
+// 获取筛选参数列表
+const filterArchList = ref<string[]>([]);
+const filterOsList = ref<string[]>([]);
+const filterCategoryList = ref<string[]>([]);
+const isFilterLoading = ref(false);
+const queryFilter = () => {
+  filterCategoryList.value = [];
+  filterOsList.value = [];
+  filterArchList.value = [];
+  isFilterLoading.value = true;
+  getSearchAllColumn({
+    name: tabName.value,
+    column: 'arch,os,category',
+  })
+    .then((res) => {
+      const { os, arch, category } = res.data;
+      filterCategoryList.value = category;
+      filterOsList.value = os;
+      filterArchList.value = arch;
+      isFilterLoading.value = false;
+    })
+    .catch(() => {
+      isFilterLoading.value = false;
+    });
+};
+
+const closeTag = (idx: string | number, type: string) => {
+  if (type === 'os') {
+    searchOs.value.splice(Number(idx), 1);
+  } else if (type === 'arch') {
+    searchArch.value.splice(Number(idx), 1);
+  } else if (type === 'category') {
+    searchCategory.value.splice(Number(idx), 1);
+  }
+};
+
+// 重置筛选结果
+const resetTag = () => {
+  searchArch.value = [];
+  searchOs.value = [];
+  searchCategory.value = [];
+  isSearch.value = false;
+};
+
+const filterList = computed(() => {
+  return [...searchArch.value, ...searchOs.value, ...searchCategory.value];
+});
+
+// 更新时间、字母排序
+const changeTimeOrder = (v: string[]) => {
+  if (v[0] === 'nameOrder') {
+    nameOrder.value = v[1];
+  }
+};
+
+// 分页
+const currentPage = ref(1);
+const pageSize = ref(10);
+const total = ref(0);
+const pageSizes = [10, 24, 48, 96];
+const handleSizeChange = (val: number) => {
+  pageSize.value = val;
+};
+const handleCurrentChange = (val: number) => {
+  currentPage.value = val;
+};
+
+onMounted(() => {
+  pageSearch();
+  queryFilter();
+});
+
+watch(
+  () => searchParams.value,
+  () => {
+    pageSearch();
+  },
+  { deep: true }
+);
+
+// 参数变化分页器还原
+watch(
+  () => [searchCategory.value, searchOs.value, searchArch.value, nameOrder.value],
+  () => {
+    currentPage.value = 1;
+  },
+  { deep: true }
+);
+
+watch(
+  () => route.query.name as string,
+  (v: string) => {
+    if (searchKey.value !== v && v !== undefined) {
+      searchKey.value = v;
+    }
+    if (v === '') {
+      isSearch.value = false;
+    }
+    currentPage.value = 1;
+  }
+);
+
+watch(
+  () => route.query.tab as string,
+  (v: string) => {
+    tabName.value = v;
+  }
+);
+
+watch(
+  () => route.query.key as string,
+  (v: string) => {
+    keywordType.value = v;
+  }
+);
+</script>
+
+<template>
+  <div class="pkg-wrap" :class="tabName">
+    <div class="filter-sidebar">
+      <FilterCheckbox v-if="filterOsList.length" v-model="searchOs" :options="filterOsList">
+        <template #header>
+          <div class="filter-title">
+            <OIcon><IconOs /></OIcon>{{ t('software.filterSider.os') }}
+          </div>
+        </template>
+      </FilterCheckbox>
+
+      <FilterCheckbox v-if="filterArchList.length" v-model="searchArch" :options="filterArchList">
+        <template #header>
+          <div class="filter-title">
+            <OIcon><IconArch /></OIcon>{{ t('software.filterSider.arch') }}
+          </div>
+        </template>
+      </FilterCheckbox>
+
+      <FilterCheckbox v-if="filterCategoryList.length" v-model="searchCategory" :options="filterCategoryList">
+        <template #header>
+          <div class="filter-title">
+            <OIcon><IconCategory /></OIcon>{{ t('software.filterSider.category') }}
+          </div>
+        </template>
+      </FilterCheckbox>
+    </div>
+
+    <div class="pkg-content">
+      <FilterHeader title="容器镜像" :isSort="false" @sort="changeTimeOrder" />
+      <div v-if="isSearch || filterList.length > 0" class="search-result">
+        <p class="text">
+          为您找到符合条件的筛选<span class="total">{{ total }}</span
+          >个
+        </p>
+        <div v-if="filterList.length > 0" class="search-filter-tags">
+          <OTag v-for="(item, index) in searchOs" :key="item" closable @Close="closeTag(index, 'os')">{{ item }}</OTag>
+          <OTag v-for="(item, index) in searchArch" :key="item" closable @Close="closeTag(index, 'arch')">{{ item }}</OTag>
+          <OTag v-for="(item, index) in searchCategory" :key="item" closable @Close="closeTag(index, 'category')">{{ item }}</OTag>
+          <OLink color="primary" class="resetting" @click="resetTag">{{ t('software.filterSider.clear') }}</OLink>
+        </div>
+      </div>
+      <ResultNotFound v-if="pkgData.length === 0 && isSearchError" />
+      <template v-else>
+        <OTableItemNew :data="pkgData" :columns="columns" :type="tabName" :loading="isLoading" />
+        <div class="pagination-box">
+          <el-pagination
+            v-model:current-page="currentPage"
+            v-model:page-size="pageSize"
+            background
+            layout="sizes, prev, pager, next, jumper"
+            :total="total"
+            :page-sizes="pageSizes"
+            @size-change="handleSizeChange"
+            @current-change="handleCurrentChange"
+          />
+        </div>
+      </template>
+    </div>
+  </div>
+</template>
+
+<style lang="scss" scoped>
+@import '@/assets/style/category/content/index.scss';
+</style>

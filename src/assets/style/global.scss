@@ -1,0 +1,76 @@
+html {
+  --layout-pkg-radius: 4px;
+}
+:root {
+  --o-radius_control-xs: 4px;
+  --o-radius_control-s: 4px;
+  --o-radius_control-m: 4px;
+  --o-radius_control-l: 4px;
+}
+
+.o-btn {
+  --btn-radius: var(--btn-height);
+}
+.o-tag {
+  border-radius: var(--layout-pkg-radius);
+}
+.o-icon {
+  svg {
+    fill: currentColor;
+  }
+}
+.o-card {
+  --card-cover-radius: 0;
+  --card-radius: 0;
+}
+
+.o-dialog {
+  --dlg-radius: var(--layout-pkg-radius);
+}
+
+// 分页器圆角重置
+.o-pagination-round-pill {
+  --pagination-radius: 4px;
+  .o-pagination-select {
+    --select-radius: 4px;
+  }
+  .o-pagination-input {
+    --input-radius: 4px;
+  }
+}
+.o-dropdown-list {
+  --dropdown-list-radius: 4px;
+}
+
+.o-table {
+  --table-head-bg: var(--o-color-primary1-light);
+}
+
+// tag
+.tags-box {
+  display: flex;
+  margin: 12px 0 0;
+  gap: 8px;
+  :deep(.o-tag-icon) {
+    width: 16px;
+    height: 16px;
+  }
+  .o-tag {
+    cursor: pointer;
+    &.image-icon .o-icon {
+      color: #007af0;
+    }
+    &.epkg-icon .o-icon {
+      color: #e00070;
+    }
+    &.rpm-icon .o-icon {
+      color: #00a7b3;
+    }
+
+    svg {
+      width: 16px;
+      height: 16px;
+      color: currentColor;
+    }
+  }
+}

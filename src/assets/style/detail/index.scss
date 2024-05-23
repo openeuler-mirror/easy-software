@@ -1,0 +1,134 @@
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  .detail-row-main {
+    width: 936px;
+  }
+  .detail-row-side {
+    padding-left: 32px;
+    flex: 1;
+  }
+}
+
+.installation {
+  :deep(li) {
+    margin: 12px 0;
+    color: var(--o-color-info1);
+    @include tip1;
+    > code {
+      display: block;
+    }
+    code {
+      background-color: var(--o-color-fill1);
+      padding: 2px 6px;
+      border-radius: 6px;
+      color: var(--o-color-info2);
+      font-size: 85%;
+    }
+  }
+}
+
+.domain-head {
+  background: var(--o-color-fill2);
+  height: 170px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+
+:deep(.domain-tabs) {
+  .o-tab-navs {
+    --tab-nav-justify: left;
+    margin-bottom: 20px;
+    margin-bottom: 20px;
+  }
+  .o-table {
+    word-break: break-word;
+    --table-edge-padding: 24px;
+  }
+}
+
+.code-box {
+  position: relative;
+}
+
+.basic-info {
+  margin-top: 26px;
+  background: linear-gradient(to right, rgba(0, 47, 167, 0.05) 10%, white 15%); 
+
+  li {
+   
+    padding: 12px 24px;
+    @include tip1;
+    color: var(--o-color-info2);
+    display: flex;
+    align-items: top;
+    border: 1px solid rgba(0,0,0,0.10);
+    border-left:4px solid #002FA7;
+    .label {
+      min-width: 100px;
+    }
+  }
+  .mymarkdown-body {
+    max-width: 600px;
+  }
+}
+.icon-img {
+  width: 24px;
+  cursor: pointer;
+  margin-left: 16px;
+}
+.slides2 {
+  width: 100%;
+  margin: auto;
+  height: 400px;
+  overflow: hidden;
+}
+.safe {
+  display: flex;
+  justify-content: center;
+  span {
+    margin-left: 60px;
+  }
+}
+
+.path {
+  margin-top: 40px;
+  .title {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #002fa7;
+    color: #fff;
+    padding: 10px 0px;
+  }
+}
+
+.detail {
+  display: flex;
+  align-items: center;
+}
+.nss-dialog {
+  &.o-layer {
+    align-items: end;
+    --dlg-margin: 0;
+    --dlg-width: 100%;
+    --dlg-radius: 16px 16px 0 0;
+    .o-dlg-body {
+      @include respond-to('<=pad_v') {
+        --dlg-body-padding: 16px 24px;
+      }
+    }
+  }
+}
+.sp {
+  margin-top: 40px;
+  margin-bottom: 24px;
+  @include h3;
+}
+.title {
+  display: flex;
+  justify-content: space-between;
+  @include h3;
+}
