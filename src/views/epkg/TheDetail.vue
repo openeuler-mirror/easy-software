@@ -7,13 +7,13 @@ import { useMarkdown } from '@/composables/useMarkdown';
 import type { AppInfoT } from '@/@types/app';
 import { useLocale } from '@/composables/useLocale';
 import { useI18n } from 'vue-i18n';
-import { getDetails} from '@/api/api-domain';
+import { getDetails } from '@/api/api-domain';
 import AppFeedback from '@/components/AppFeedback.vue';
 import DetailHead from '../applicationsPackage/components/DetailNewHead.vue';
 import ExternalLink from '@/components/ExternalLink.vue';
 import DetailAside from '../applicationsPackage/components/DetailAside.vue';
-import { moreColumns} from '@/data/detail/index';
-import defaultImg from '@/assets/default.png';
+import { moreColumns } from '@/data/detail/index';
+import defaultImg from '@/assets/default-logo.png';
 
 type MaintainerT = {
   maintainerId: string;

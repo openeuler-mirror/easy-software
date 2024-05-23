@@ -10,7 +10,7 @@ import { useLocale } from '@/composables/useLocale';
 import AppFeedback from '@/components/AppFeedback.vue';
 import DetailHead from '../applicationsPackage/components/DetailNewHead.vue';
 import DetailAside from '../applicationsPackage/components/DetailAside.vue';
-import defaultImg from '@/assets/default.png';
+import defaultImg from '@/assets/default-logo.png';
 import { columnTags, tabList } from '@/data/detail/index';
 type MaintainerT = {
   maintainerId: string;

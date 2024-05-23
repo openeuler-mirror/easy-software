@@ -7,7 +7,7 @@ import { useMarkdown } from '@/composables/useMarkdown';
 import type { AppInfoT } from '@/@types/app';
 import { useLocale } from '@/composables/useLocale';
 import { getDetails } from '@/api/api-domain';
-import defaultImg from '@/assets/default.png';
+import defaultImg from '@/assets/default-logo.png';
 import AppFeedback from '@/components/AppFeedback.vue';
 import DetailHead from '../applicationsPackage/components/DetailNewHead.vue';
 import DetailAside from '../applicationsPackage/components/DetailAside.vue';
