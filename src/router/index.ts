@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router';
 
 import { scrollToTop } from '@/utils/common';
-import { useLangStore } from '@/stores';
+import { useLangStore, useViewStore } from '@/stores/common';
 
 
 const routes = [
@@ -11,7 +11,6 @@ const routes = [
   },
   { path: '/zh/', component: () => import('@/views/home/TheHome.vue'), },
   { path: '/en/', component: () => import('@/views/home/TheHome.vue'), },
-
   {
     path: '/zh/applicationsPackage',
     name: 'applicationsPackage',
@@ -78,6 +77,15 @@ const routes = [
     alias: '/en/image/:name',
     component: () => import('@/views/image/TheDetail.vue'),
   },
+  // 默认路由
+  {
+    path: '/:path(.*)*',
+    name: 'notFound',
+    component: () => {
+      return import('@/components/ResultNotFound.vue');
+    },
+    meta: { title: '404' },
+  },
 ];
 
 const router = createRouter({
@@ -101,4 +109,9 @@ router.beforeEach((to, from, next) => {
 
   next();
 });
+
+router.afterEach(() => {
+  useViewStore().$patch({ notFoundPage: false });
+});
+
 export default router;

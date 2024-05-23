@@ -6,7 +6,11 @@ import { getSearchData } from '@/api/api-search';
 import { getSearchAllColumn, getSearchAllFiled } from '@/api/api-domain';
 import { useRoute } from 'vue-router';
 import { useI18n } from 'vue-i18n';
-import { ElPagination } from 'element-plus';
+import { useViewStore } from '@/stores/common';
+import { useLocale } from '@/composables/useLocale';
+import { ElPagination, ElConfigProvider } from 'element-plus';
+import zhCn from 'element-plus/es/locale/lang/zh-cn';
+import English from 'element-plus/es/locale/lang/en';
 
 import FilterCheckbox from '@/components/filter/FilterCheckbox.vue';
 import IconOs from '~icons/pkg/icon-os.svg';
@@ -15,6 +19,7 @@ import IconCategory from '~icons/pkg/icon-category.svg';
 
 const route = useRoute();
 const { t } = useI18n();
+const { isZh } = useLocale();
 
 // EPKG-表头
 const columns = [
@@ -78,6 +83,7 @@ const querySearch = () => {
       pkgData.value = [];
       isLoading.value = false;
       isSearch.value = false;
+      useViewStore().showNotFound();
     });
 };
 
@@ -108,6 +114,7 @@ const queryAllpkg = () => {
     .catch(() => {
       pkgData.value = [];
       isLoading.value = false;
+      useViewStore().showNotFound();
     });
 };
 
@@ -192,7 +199,11 @@ const handleCurrentChange = (val: number) => {
   currentPage.value = val;
 };
 
+// 判断是否是搜索页
+const isPageSearch = ref(false);
+
 onMounted(() => {
+  isPageSearch.value = route.name === 'search';
   pageSearch();
   queryFilter();
 });
@@ -270,9 +281,9 @@ watch(
     </div>
 
     <div class="pkg-content">
-      <FilterHeader title="EPKG" @sort="changeTimeOrder" />
+      <FilterHeader title="EPKG" @sort="changeTimeOrder" :total="total" />
       <div v-if="isSearch || searchArch.length > 0 || searchOs.length > 0 || searchCategory.length > 0" class="search-result">
-        <p class="text">
+        <p v-if="!isPageSearch" class="text">
           为您找到符合条件的筛选<span class="total">{{ total }}</span
           >个
         </p>
@@ -286,22 +297,24 @@ watch(
           }}</OLink>
         </div>
       </div>
-      <ResultNotFound v-if="pkgData.length === 0 && isSearchError" />
-      <template v-else>
+      <ResultNotApp v-if="pkgData.length === 0 && isSearchError" />
+      <div class="pkg-panel" v-else>
         <OTableItemNew :data="pkgData" :columns="columns" :type="tabName" :loading="isLoading" />
         <div class="pagination-box">
-          <el-pagination
-            v-model:current-page="currentPage"
-            v-model:page-size="pageSize"
-            background
-            layout="sizes, prev, pager, next, jumper"
-            :total="total"
-            :page-sizes="pageSizes"
-            @size-change="handleSizeChange"
-            @current-change="handleCurrentChange"
-          />
+          <el-config-provider :locale="isZh ? zhCn : English">
+            <el-pagination
+              v-model:current-page="currentPage"
+              v-model:page-size="pageSize"
+              background
+              layout="sizes, prev, pager, next, jumper"
+              :total="total"
+              :page-sizes="pageSizes"
+              @size-change="handleSizeChange"
+              @current-change="handleCurrentChange"
+            />
+          </el-config-provider>
         </div>
-      </template>
+      </div>
     </div>
   </div>
 </template>

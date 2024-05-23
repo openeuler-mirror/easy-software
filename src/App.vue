@@ -6,13 +6,14 @@ import { OScroller, OConfigProvider } from '@opensig/opendesign';
 import zhCN from '@opensig/opendesign/es/locale/lang/zh-cn';
 import enUS from '@opensig/opendesign/es/locale/lang/en-us';
 
-import { useLangStore } from '@/stores/';
+import { useLangStore, useViewStore } from '@/stores/common';
 import { useLocale } from '@/composables/useLocale';
 
 import AppHeader from '@/components/AppHeader.vue';
 import AppFooter from '@/components/AppFooter.vue';
 
 const langStore = useLangStore();
+const viewState = useViewStore();
 const { locale } = useI18n();
 
 watch(
@@ -30,7 +31,10 @@ const { isZh } = useLocale();
   <OConfigProvider :locale="isZh ? zhCN : enUS">
     <AppHeader class="app-header" />
     <OScroller show-type="hover">
-      <main class="ly-main"><RouterView></RouterView></main>
+      <main class="ly-main">
+        <RouterView v-if="!viewState.notFoundPage" />
+        <ResultNotFound v-else />
+      </main>
       <AppFooter />
     </OScroller>
   </OConfigProvider>
@@ -79,3 +83,4 @@ const { isZh } = useLocale();
   padding-top: var(--layout-header-height);
 }
 </style>
+@/stores/common

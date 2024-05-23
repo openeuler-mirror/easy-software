@@ -5,13 +5,18 @@ import { useI18n } from 'vue-i18n';
 import { useRoute } from 'vue-router';
 import { getUpstreamColumn, getUpstream } from '@/api/api-upstream';
 import { getSearchData } from '@/api/api-search';
-import { ElPagination } from 'element-plus';
+import { useLocale } from '@/composables/useLocale';
+import { useViewStore } from '@/stores/common';
+import { ElPagination, ElConfigProvider } from 'element-plus';
+import zhCn from 'element-plus/es/locale/lang/zh-cn';
+import English from 'element-plus/es/locale/lang/en';
 
 import FilterRadio from '@/components/filter/FilterRadio.vue';
 import IconOs from '~icons/pkg/icon-os.svg';
 
 const route = useRoute();
 const { t } = useI18n();
+const { isZh } = useLocale();
 
 // 软件包-表头
 const columns = [
@@ -48,6 +53,7 @@ const queryAppVersion = () => {
     .catch(() => {
       appData.value = [];
       isLoading.value = false;
+      useViewStore().showNotFound();
     });
 };
 
@@ -82,6 +88,7 @@ const querySearch = () => {
     .catch(() => {
       appData.value = [];
       isLoading.value = false;
+      useViewStore().showNotFound();
     });
 };
 
@@ -135,7 +142,12 @@ const handleCurrentChange = (val: number) => {
   queryAppVersion();
 };
 
+// 判断是否是搜索页
+const isPageSearch = ref(false);
+
 onMounted(() => {
+  isPageSearch.value = route.name === 'search';
+
   pageSearch();
   queryFilter();
 });
@@ -187,9 +199,9 @@ watch(
       </FilterRadio>
     </div>
     <div class="pkg-content">
-      <FilterHeader title="应用名称" :isSort="false" @sort="changeTimeOrder" />
+      <FilterHeader title="应用名称" :isSort="false" @sort="changeTimeOrder" :total="total" />
       <div v-if="searchOs || isSearch" class="search-result">
-        <p class="text">
+        <p v-if="!isPageSearch" class="text">
           为您找到符合条件的筛选<span class="total">{{ total }}</span
           >个
         </p>
@@ -198,8 +210,8 @@ watch(
           <OLink v-if="searchOs" color="primary" class="resetting" @click="handleResettingTag">{{ t('software.filterSider.clear') }}</OLink>
         </div>
       </div>
-      <ResultNotFound v-if="appData.length === 0 && isSearchError" />
-      <template v-else>
+      <ResultNotApp v-if="appData.length === 0 && isSearchError" />
+      <div class="pkg-panel" v-else>
         <OTable :columns="columns" :data="appData" :loading="isLoading" border="row-column">
           <template #td_name="{ row }">
             <span v-dompurify-html="row.name"></span>
@@ -215,18 +227,20 @@ watch(
           </template>
         </OTable>
         <div class="pagination-box">
-          <el-pagination
-            v-model:current-page="currentPage"
-            v-model:page-size="pageSize"
-            background
-            layout="sizes, prev, pager, next, jumper"
-            :total="total"
-            :page-sizes="pageSizes"
-            @size-change="handleSizeChange"
-            @current-change="handleCurrentChange"
-          />
+          <el-config-provider :locale="isZh ? zhCn : English">
+            <el-pagination
+              v-model:current-page="currentPage"
+              v-model:page-size="pageSize"
+              background
+              layout="sizes, prev, pager, next, jumper"
+              :total="total"
+              :page-sizes="pageSizes"
+              @size-change="handleSizeChange"
+              @current-change="handleCurrentChange"
+            />
+          </el-config-provider>
         </div>
-      </template>
+      </div>
     </div>
   </div>
 </template>

@@ -1,18 +1,18 @@
 <script lang="ts" setup>
 import { ref, onMounted } from 'vue';
-import { OBreadcrumb, OBreadcrumbItem, OTab, OTabPane,OTable, OLink } from '@opensig/opendesign';
+import { OBreadcrumb, OBreadcrumbItem, OTab, OTabPane, OTable, OLink } from '@opensig/opendesign';
 import { OPENEULER_CONTACT } from '@/data/config';
 import { useRoute } from 'vue-router';
 import { useMarkdown } from '@/composables/useMarkdown';
 import type { AppInfoT } from '@/@types/app';
 import { useLocale } from '@/composables/useLocale';
 import { getDetails } from '@/api/api-domain';
-import defaultImg from '@/assets/default.png';
+import defaultImg from '@/assets/default-logo.png';
 import AppFeedback from '@/components/AppFeedback.vue';
 import DetailHead from '../applicationsPackage/components/DetailNewHead.vue';
 import DetailAside from '../applicationsPackage/components/DetailAside.vue';
 import ExternalLink from '@/components/ExternalLink.vue';
-import { moreColumns} from '@/data/detail/index';
+import { moreColumns } from '@/data/detail/index';
 type MaintainerT = {
   maintainerId: string;
   maintainerEmail: string;
@@ -67,9 +67,9 @@ onMounted(() => {
   queryEntity();
   getTitle();
 });
+const summary = ref();
 const getDetailValue = (data: any) => {
   basicInfo.value = [
-    { name: '简介', value: data.summary },
     { name: 'Description', value: data?.description },
     { name: '版本支持情况', value: data.osSupport },
     { name: '架构', value: data.arch },
@@ -77,6 +77,7 @@ const getDetailValue = (data: any) => {
     { name: '所属仓库', value: JSON.parse(data?.repo).url, type: JSON.parse(data?.repo).type },
     { name: 'Repo源', value: JSON.parse(data?.repoType).url, type: JSON.parse(data?.repoType).type },
   ];
+  summary.value = data.summary;
   moreMessge.value = [
     { name: 'Requires', value: JSON.parse(data?.requires || '') },
     { name: 'Provides', value: JSON.parse(data?.provides || '') },
@@ -125,14 +126,14 @@ const onExternalDialog = (href: string) => {
       <OBreadcrumbItem :to="breadcrumbInfo.path">{{ breadcrumbInfo.name }}</OBreadcrumbItem>
       <OBreadcrumbItem>{{ appData.name }} </OBreadcrumbItem>
     </OBreadcrumb>
-    <DetailHead :data="appData" :basicInfo="basicInfo" :maintainer="maintainer" />
+    <DetailHead :data="appData" :basicInfo="summary" :maintainer="maintainer" />
 
     <div class="detail-row">
       <div class="detail-row-main">
         <AppSection>
           <div class="title">
-            <p>基本信息</p>
-            <p>软件包版本号：{{ version }}</p>
+            <p>> 基本信息</p>
+            <p class="ver">版本号：{{ version }}</p>
           </div>
           <ul class="basic-info">
             <li v-for="item in basicInfo" :key="item.name">
@@ -148,10 +149,10 @@ const onExternalDialog = (href: string) => {
               <span class="markdown-body installation mymarkdown-body" v-dompurify-html="item.value" v-copy-code="true" v-else></span>
             </li>
           </ul>
-          <p class="sp">安装指引</p>
+          <p class="sp">> 安装指引</p>
           <div v-if="installation" v-dompurify-html="installation" v-copy-code="true" class="markdown-body installation"></div>
-          <p class="sp">更多信息</p>
-          <OTab variant="text" :line="false" class="domain-tabs">
+          <p class="sp">> 更多信息</p>
+          <OTab variant="text" :line="false" class="domain-tabs switch">
             <template v-for="item in moreMessge" :key="item">
               <OTabPane class="tab-pane" v-if="item.value.length > 0" :label="item.name">
                 <OTable :columns="moreColumns" :data="item.value" :small="true"> </OTable>
