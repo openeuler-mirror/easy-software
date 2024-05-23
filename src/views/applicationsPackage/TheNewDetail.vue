@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { ref, onMounted } from 'vue';
-import { OBreadcrumb, OBreadcrumbItem, OTab, OTabPane, OTable, OLink, OIcon,OTag } from '@opensig/opendesign';
+import { OBreadcrumb, OBreadcrumbItem, OTab, OTabPane, OTable, OLink, OIcon, OTag } from '@opensig/opendesign';
 import { useRoute } from 'vue-router';
 import { getDetails, getDetail, getTags, getVer } from '@/api/api-domain';
 import { useMarkdown } from '@/composables/useMarkdown';
@@ -17,6 +17,7 @@ import IconImage from '~icons/pkg/image.svg';
 import IconRpm from '~icons/pkg/rpm.svg';
 import { columnTags } from '@/data/detail/index';
 import { useI18n } from 'vue-i18n';
+import { useViewStore } from '@/stores/common';
 type MaintainerT = {
   maintainerId: string;
   maintainerEmail: string;
@@ -74,14 +75,18 @@ const queryEntity = () => {
       appPkgId: (route.query.appPkgId as string) || '',
       epkgPkgId: (route.query.epkgPkgId as string) || '',
       rpmPkgId: (route.query.rpmPkgId as string) || '',
-    }).then((res) => {
-      const data = res.data;
-      tabList.value = data.tags;
-      epkgData.value = data['EPKG'];
-      rpmData.value = data['RPM'];
-      imgData.value = data['IMAGE'];
-      onChange(activeName.value);
-    });
+    })
+      .then((res) => {
+        const data = res.data;
+        tabList.value = data.tags;
+        epkgData.value = data['EPKG'];
+        rpmData.value = data['RPM'];
+        imgData.value = data['IMAGE'];
+        onChange(activeName.value);
+      })
+      .catch(() => {
+        useViewStore().showNotFound();
+      });
   } else {
     getChange(activeName.value);
     tabList.value = [activeName.value];
