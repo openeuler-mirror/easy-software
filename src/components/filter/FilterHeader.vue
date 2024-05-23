@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, watch } from 'vue';
 import { OLink, OInput } from '@opensig/opendesign';
 import { useLocale } from '@/composables/useLocale';
 import { useI18n } from 'vue-i18n';
@@ -17,6 +17,10 @@ defineProps({
   isSort: {
     type: Boolean,
     default: () => true,
+  },
+  total: {
+    type: Number,
+    default: () => 0,
   },
 });
 
@@ -67,15 +71,27 @@ const changeSortBy = (type: string) => {
 const isPageSearch = ref(false);
 
 onMounted(() => {
-  isPageSearch.value = route.name === 'search' ? true : false;
+  isPageSearch.value = route.name === 'search';
 });
+
+watch(
+  () => route.query.name as string,
+  (v: string) => {
+    searchValue.value = v;
+  }
+);
 </script>
 
 <template>
   <div class="filter-header">
     <div class="search-right">
+      <template v-if="isPageSearch">
+        <p class="text">
+          为您找到<span class="total">{{ total }}</span> 个与 <span>{{ searchValue }}</span> 匹配的搜索结果
+        </p>
+      </template>
       <OInput
-        v-if="!isPageSearch"
+        v-else
         :placeholder="`${t('software.filterPleaseEnter[0]')}${title}${t('software.filterPleaseEnter[1]')}`"
         :style="{ width: '348px' }"
         size="large"
@@ -111,12 +127,19 @@ onMounted(() => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 24px;
   .lable {
     @include text1;
     color: var(--o-color-info1);
-
     font-weight: 600;
+  }
+  .text {
+    @include tip1;
+    color: var(--o-color-info3);
+    .total {
+      color: var(--o-color-info1);
+      font-weight: 600;
+      margin: 0 4px;
+    }
   }
   .search-left {
     display: flex;

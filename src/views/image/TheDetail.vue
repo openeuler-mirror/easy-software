@@ -114,6 +114,12 @@ const getTitle = () => {
   breadcrumbInfo.value = { path: `/${locale.value}/image`, name: '容器镜像' };
 };
 const home = ref({ name: '软件市场', path: `/${locale.value}/` });
+
+// tags切换功能
+const isTags = ref(false);
+const onChange = (v: string) => {
+  isTags.value = v === 'Tags' ? true : false;
+};
 </script>
 
 <template>
@@ -126,9 +132,9 @@ const home = ref({ name: '软件市场', path: `/${locale.value}/` });
     <DetailHead :data="appData" :basicInfo="basicInfo" :maintainer="maintainer" />
 
     <div class="detail-row">
-      <div class="detail-row-main">
+      <div class="detail-row-main" :class="{ tags: isTags }">
         <AppSection>
-          <OTab variant="text" @change="onChange" :line="false" class="domain-tabs" v-model="activeName">
+          <OTab variant="text" @change="onChange" :line="false" class="domain-tabs switch" v-model="activeName">
             <OTabPane class="tab-pane" v-for="item in tabList" :key="item" :label="item">
               <div v-if="item === '概览'">
                 <div class="title">
@@ -145,15 +151,14 @@ const home = ref({ name: '软件市场', path: `/${locale.value}/` });
                 <div v-if="imageUsage" v-dompurify-html="imageUsage" v-copy-code="true" class="markdown-body download"></div>
               </div>
               <div v-else>
-                <!-- <OTable :data="tagsValue" :columns="columns" /> -->
                 <OTableItemNew :data="tagsValue" :columns="columnTags" />
               </div>
             </OTabPane>
           </OTab>
         </AppSection>
-        <AppFeedback :email="maintainer.maintainerEmail" />
+        <AppFeedback v-if="!isTags" :email="maintainer.maintainerEmail" />
       </div>
-      <div class="detail-row-side">
+      <div v-if="!isTags" class="detail-row-side">
         <DetailAside :data="appData" :basicInfo="basicInfo" :maintainer="maintainer" :type="'IMAGE'" :downloadData="downloadData" />
       </div>
     </div>
@@ -163,5 +168,3 @@ const home = ref({ name: '软件市场', path: `/${locale.value}/` });
 <style lang="scss" scoped>
 @import '@/assets/style/detail/index.scss';
 </style>
-
-

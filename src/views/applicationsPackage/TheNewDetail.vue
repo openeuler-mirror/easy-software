@@ -180,7 +180,7 @@ const getDetailValue = (data: any) => {
     appData.value.size = data.appSize || 0;
     latestOsSupport.value = data.latestOsSupport;
   }
-  tagVer.value = [data.osSupport,data.arch];
+  tagVer.value = [data.osSupport, data.arch];
   maintainer.value = {
     maintainerId: data?.maintainerId || 'openEuler community',
     maintainerEmail: data?.maintainerEmail || OPENEULER_CONTACT,
@@ -251,6 +251,12 @@ const queryVer = () => {
     verData.value = res.data.list;
   });
 };
+
+// tags切换功能
+const isTags = ref(false);
+const onChangeImage = (v: string) => {
+  isTags.value = v === 'Tags' ? true : false;
+};
 </script>
 <template>
   <ContentWrapper vertical-padding="24px">
@@ -265,7 +271,7 @@ const queryVer = () => {
       <OTabPane class="tab-pane" v-for="item in tabList" :key="item" :label="item">
         <template #nav><OIcon :icon="getTabIcon(item)" class="tabs-icon" /> {{ item }}</template>
         <div class="detail-row">
-          <div class="detail-row-main">
+          <div class="detail-row-main" :class="{ tags: isTags }">
             <AppSection v-if="item !== 'IMAGE'">
               <div class="title">
                 <p>> 基本信息</p>
@@ -298,7 +304,7 @@ const queryVer = () => {
               </OTab>
             </AppSection>
             <AppSection v-else>
-              <OTab variant="text" @change="onChange" :line="false" class="domain-tabs" v-model="imgName">
+              <OTab variant="text" @change="onChangeImage" :line="false" class="domain-tabs switch" v-model="imgName">
                 <OTabPane class="tab-pane" v-for="item in imgList" :key="item" :label="item">
                   <div v-if="item === '概览'">
                     <div class="title">
@@ -330,9 +336,9 @@ const queryVer = () => {
               </OTab>
             </AppSection>
             <ExternalLink v-if="showExternalDlg" :href="externalLink" @change="showExternalDlg = false" />
-            <AppFeedback :email="maintainer.maintainerEmail" />
+            <AppFeedback v-if="!isTags" :email="maintainer.maintainerEmail" />
           </div>
-          <div class="detail-row-side">
+          <div v-if="!isTags" class="detail-row-side">
             <DetailAside
               :data="appData"
               :basicInfo="basicInfo"
