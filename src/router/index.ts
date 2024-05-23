@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router';
 
 import { scrollToTop } from '@/utils/common';
-import { useLangStore } from '@/stores';
+import { useLangStore, useViewStore } from '@/stores/common';
 
 
 const routes = [
@@ -101,4 +101,9 @@ router.beforeEach((to, from, next) => {
 
   next();
 });
+
+router.afterEach(() => {
+  useViewStore().$patch({ notFoundPage: false });
+});
+
 export default router;
