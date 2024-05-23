@@ -185,7 +185,11 @@ const handleCurrentChange = (val: number) => {
   currentPage.value = val;
 };
 
+// 判断是否是搜索页
+const isPageSearch = ref(false);
+
 onMounted(() => {
+  isPageSearch.value = route.name === 'search';
   pageSearch();
   queryFilter();
 });
@@ -264,9 +268,9 @@ watch(
     </div>
 
     <div class="pkg-content">
-      <FilterHeader title="容器镜像" :isSort="false" @sort="changeTimeOrder" />
+      <FilterHeader title="容器镜像" :isSort="false" @sort="changeTimeOrder" :total="total" />
       <div v-if="isSearch || filterList.length > 0" class="search-result">
-        <p class="text">
+        <p v-if="!isPageSearch" class="text">
           为您找到符合条件的筛选<span class="total">{{ total }}</span
           >个
         </p>
@@ -278,7 +282,7 @@ watch(
         </div>
       </div>
       <ResultNotFound v-if="pkgData.length === 0 && isSearchError" />
-      <template v-else>
+      <div class="pkg-panel" v-else>
         <OTableItemNew :data="pkgData" :columns="columns" :type="tabName" :loading="isLoading" />
         <div class="pagination-box">
           <el-pagination
@@ -292,7 +296,7 @@ watch(
             @current-change="handleCurrentChange"
           />
         </div>
-      </template>
+      </div>
     </div>
   </div>
 </template>
