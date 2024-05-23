@@ -1,7 +1,5 @@
 <script lang="ts" setup>
 import { ref } from 'vue';
-
-import { useRoute } from 'vue-router';
 import { checkDomainLink, windowOpen } from '@/utils/common';
 
 import Email from '@/assets/email.svg';
@@ -30,8 +28,6 @@ defineProps({
     },
   },
 });
-const route = useRoute();
-const appName = ref((route.params.name as string) || '');
 
 const showExternalDlg = ref(false);
 const externalLink = ref('');
@@ -53,8 +49,8 @@ const onExternalDialog = (href: string) => {
           <div class="cover"><img :src="data.cover" alt="" /></div>
           <div class="box">
             <p class="title">
-              {{ appName }}
-              <a :href="data.repository" v-if="data.repository" target="_blank" rel="noopener noreferrer"><img :src="Home" class="icon-img" alt="" />主页</a>
+              {{ data.name }}
+              <a @click="onExternalDialog(data.repository)" v-if="data.repository" target="_blank" rel="noopener noreferrer"><img :src="Home" class="icon-img" alt="" />主页</a>
             </p>
             <p class="detail">{{ basicInfo }}</p>
           </div>

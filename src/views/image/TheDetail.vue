@@ -12,6 +12,7 @@ import DetailHead from '../applicationsPackage/components/DetailNewHead.vue';
 import DetailAside from '../applicationsPackage/components/DetailAside.vue';
 import defaultImg from '@/assets/default-logo.png';
 import { columnTags, tabList } from '@/data/detail/index';
+import { useViewStore } from '@/stores/common';
 type MaintainerT = {
   maintainerId: string;
   maintainerEmail: string;
@@ -49,7 +50,9 @@ const queryPkg = (tabValue: string, pkgId: any) => {
   getDetails(tabValue, pkgId).then((res) => {
     const data = res.data.list[0];
     getDetailValue(data);
-  });
+  }).catch(() => {
+      useViewStore().showNotFound();
+    });
 };
 
 // 获取tab分类
@@ -108,7 +111,7 @@ const tagsValue = ref();
 const queryTags = () => {
   getTags(appData.value.name).then((res) => {
     tagsValue.value = res.data.list;
-  });
+  })
 };
 const { locale } = useLocale();
 

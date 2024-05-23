@@ -14,7 +14,7 @@ import ExternalLink from '@/components/ExternalLink.vue';
 import DetailAside from '../applicationsPackage/components/DetailAside.vue';
 import { moreColumns } from '@/data/detail/index';
 import defaultImg from '@/assets/default-logo.png';
-
+import { useViewStore } from '@/stores/common';
 type MaintainerT = {
   maintainerId: string;
   maintainerEmail: string;
@@ -51,10 +51,14 @@ const appData = ref<AppInfoT>({
 });
 //详情请求
 const queryPkg = (tabValue: string, pkgId: any) => {
-  getDetails(tabValue, pkgId).then((res) => {
-    const data = res.data.list[0];
-    getDetailValue(data);
-  });
+  getDetails(tabValue, pkgId)
+    .then((res) => {
+      const data = res.data.list[0];
+      getDetailValue(data);
+    })
+    .catch(() => {
+      useViewStore().showNotFound();
+    });
 };
 
 // 获取tab分类

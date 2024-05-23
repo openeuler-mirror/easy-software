@@ -13,6 +13,7 @@ import DetailHead from '../applicationsPackage/components/DetailNewHead.vue';
 import DetailAside from '../applicationsPackage/components/DetailAside.vue';
 import ExternalLink from '@/components/ExternalLink.vue';
 import { moreColumns } from '@/data/detail/index';
+import { useViewStore } from '@/stores/common';
 type MaintainerT = {
   maintainerId: string;
   maintainerEmail: string;
@@ -48,7 +49,9 @@ const queryPkg = (tabValue: string, pkgId: any) => {
   getDetails(tabValue, pkgId).then((res) => {
     const data = res.data.list[0];
     getDetailValue(data);
-  });
+  }).catch(() => {
+      useViewStore().showNotFound();
+    });
 };
 
 const pkgId = route.query.pkgId;
