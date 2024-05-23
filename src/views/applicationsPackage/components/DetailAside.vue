@@ -9,7 +9,6 @@ import { verColumns } from '@/data/detail/index';
 import IconCopy from '~icons/app/icon-copy.svg';
 import { useLocale } from '@/composables/useLocale';
 import {  xssAllTag } from '@/utils/common';
-import DetailTag from './DetailTag.vue';
 const props = defineProps({
   data: {
     type: Object,
@@ -168,18 +167,18 @@ const jumpTo = (name: string, id: string) => {
     <OCodeCopy :code="getCode(downloadData)" v-if="type === 'IMAGE' && downloadData" />
     <div v-if="type !== 'IMAGE' && show">
       <div v-for="item in tableData" :key="item.name" class="bt">
-        <OButton variant="solid" color="primary" @click="onExternalDialog(item.download)" style="margin-bottom: 24px; width: 70%">{{
+        <OButton variant="solid" color="primary" @click="onExternalDialog(item.download)">{{
           item.name
         }}</OButton>
         <p @click="copyText($event, item.download)" style="margin-left: 30px; cursor: pointer" >
-          <IconCopy />
+          <IconCopy style="width: 24px; height: 24px;"/>
         </p>
       </div>
     </div>
   </AppSection>
   <AppSection title="软件合规" v-if="allShow && license">
     <div class="license">
-      <p>License ：</p>
+      <p>License</p>
       <p>{{ license }}</p>
     </div>
   </AppSection>
@@ -206,6 +205,16 @@ const jumpTo = (name: string, id: string) => {
 .bt {
   height: 100%;
   display: flex;
+  button{
+    height: 40px;
+    width: 240px;
+    margin-bottom: 24px
+  }
+  p{
+    height: 40px;
+    display: flex;
+    align-items: center;
+  }
 }
 .license {
   border-top: 1px rgba(0, 0, 0, 0.1) solid;
