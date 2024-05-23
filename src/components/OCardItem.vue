@@ -6,7 +6,7 @@ import { getTagsIcon, xssAllTag } from '@/utils/common';
 import { useLocale } from '@/composables/useLocale';
 import { useI18n } from 'vue-i18n';
 
-import defaultImg from '@/assets/default.png';
+import defaultImg from '@/assets/default-logo.png';
 
 defineProps({
   data: {

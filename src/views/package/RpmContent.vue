@@ -5,7 +5,11 @@ import { useI18n } from 'vue-i18n';
 import { getSearchData } from '@/api/api-search';
 import { useRoute } from 'vue-router';
 import { getSearchAllFiled } from '@/api/api-domain';
-import { ElPagination } from 'element-plus';
+import { useLocale } from '@/composables/useLocale';
+import { useViewStore } from '@/stores/common';
+import { ElPagination, ElConfigProvider } from 'element-plus';
+import zhCn from 'element-plus/es/locale/lang/zh-cn';
+import English from 'element-plus/es/locale/lang/en';
 
 import FilterCheckbox from '@/components/filter/FilterCheckbox.vue';
 import IconOs from '~icons/pkg/icon-os.svg';
@@ -14,6 +18,7 @@ import IconCategory from '~icons/pkg/icon-category.svg';
 
 const route = useRoute();
 const { t } = useI18n();
+const { isZh } = useLocale();
 
 const columns = [
   { label: t('software.columns.name'), key: 'name', style: 'width:15%' },
@@ -73,6 +78,7 @@ const querySearch = () => {
       pkgData.value = [];
       isLoading.value = false;
       isSearch.value = false;
+      useViewStore().showNotFound();
     });
 };
 
@@ -101,6 +107,7 @@ const queryAllpkg = () => {
     .catch(() => {
       pkgData.value = [];
       isLoading.value = false;
+      useViewStore().showNotFound();
     });
 };
 
@@ -306,21 +313,23 @@ watch(
           >
         </div>
       </div>
-      <ResultNotFound v-if="pkgData.length === 0 && isSearchError" />
+      <ResultNotApp v-if="pkgData.length === 0 && isSearchError" />
       <div class="pkg-panel" v-else>
         <OTableItemNew :data="pkgData" :columns="columns" :type="tabName" :loading="isLoading" />
 
         <div class="pagination-box">
-          <el-pagination
-            v-model:current-page="currentPage"
-            v-model:page-size="pageSize"
-            background
-            layout="sizes, prev, pager, next, jumper"
-            :total="total"
-            :page-sizes="pageSizes"
-            @size-change="handleSizeChange"
-            @current-change="handleCurrentChange"
-          />
+          <el-config-provider :locale="isZh ? zhCn : English">
+            <el-pagination
+              v-model:current-page="currentPage"
+              v-model:page-size="pageSize"
+              background
+              layout="sizes, prev, pager, next, jumper"
+              :total="total"
+              :page-sizes="pageSizes"
+              @size-change="handleSizeChange"
+              @current-change="handleCurrentChange"
+            />
+          </el-config-provider>
         </div>
       </div>
     </div>
