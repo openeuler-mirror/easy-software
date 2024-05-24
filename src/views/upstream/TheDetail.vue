@@ -90,7 +90,9 @@ basicInfo.value = [
       <ul class="basic-info">
         <li>
           <span class="label">Homepage</span>
-          <OInput v-model="dialogInput" round="0" clearable :placeholder="homepage" class="search-input"> </OInput>
+          <OInput v-model="dialogInput" round="0" clearable :placeholder="homepage" class="search-input">
+            <template #prefix> </template>
+          </OInput>
         </li>
       </ul>
     </div>
