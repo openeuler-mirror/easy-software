@@ -6,6 +6,8 @@ import { getSearchData } from '@/api/api-search';
 import { getSearchAllColumn, getSearchAllFiled } from '@/api/api-domain';
 import { useRoute } from 'vue-router';
 import { useI18n } from 'vue-i18n';
+import { getParamsRules } from '@/utils/common';
+
 import { useViewStore } from '@/stores/common';
 import { useLocale } from '@/composables/useLocale';
 import { ElPagination, ElConfigProvider } from 'element-plus';
@@ -42,7 +44,7 @@ const keywordType = ref((route.query.key as string) || '');
 const isLoading = ref(false);
 
 const searchKey = ref((route.query.name as string) || '');
-const timeOrder = ref('desc');
+const timeOrder = ref('');
 const nameOrder = ref('');
 
 const searchOs = ref<string[]>([]);
@@ -67,7 +69,10 @@ const searchParams = computed(() => {
 // es搜索
 const querySearch = () => {
   isLoading.value = true;
-  getSearchData(searchParams.value)
+  // 过滤空参数
+  const newData = getParamsRules(searchParams.value);
+
+  getSearchData(newData)
     .then((res) => {
       if (res.code === 200) {
         pkgData.value = res.data.epkgpkg;
@@ -102,7 +107,10 @@ const queryAllpkg = () => {
     category: searchCategory.value.join(),
   };
   isLoading.value = true;
-  getSearchAllFiled(params)
+  // 过滤空参数
+  const newData = getParamsRules(params);
+
+  getSearchAllFiled(newData)
     .then((res) => {
       pkgData.value = res.data.list;
       total.value = res.data.total;
@@ -173,6 +181,8 @@ const resetTag = () => {
   searchArch.value = [];
   searchCategory.value = [];
   isSearch.value = false;
+  nameOrder.value = '';
+  timeOrder.value = '';
 };
 
 // 更新时间排序

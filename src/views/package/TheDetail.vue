@@ -6,13 +6,14 @@ import { useRoute } from 'vue-router';
 import { useMarkdown } from '@/composables/useMarkdown';
 import type { AppInfoT } from '@/@types/app';
 import { useLocale } from '@/composables/useLocale';
-import { getDetails } from '@/api/api-domain';
+import { getDetails, getVer } from '@/api/api-domain';
 import defaultImg from '@/assets/default-logo.png';
 import AppFeedback from '@/components/AppFeedback.vue';
 import DetailHead from '../applicationsPackage/components/DetailNewHead.vue';
 import DetailAside from '../applicationsPackage/components/DetailAside.vue';
 import ExternalLink from '@/components/ExternalLink.vue';
 import { moreColumns } from '@/data/detail/index';
+import { useViewStore } from '@/stores/common';
 type MaintainerT = {
   maintainerId: string;
   maintainerEmail: string;
@@ -45,13 +46,17 @@ const appData = ref<AppInfoT>({
 
 //详情请求
 const queryPkg = (tabValue: string, pkgId: any) => {
-  getDetails(tabValue, pkgId).then((res) => {
-    const data = res.data.list[0];
-    getDetailValue(data);
-  });
+  getDetails(tabValue, pkgId)
+    .then((res) => {
+      const data = res.data.list[0];
+      getDetailValue(data);
+    })
+    .catch(() => {
+      useViewStore().showNotFound();
+    });
 };
 
-const pkgId = route.query.pkgId;
+const pkgId = encodeURIComponent(route.query.pkgId as string);
 const queryEntity = () => {
   getChange();
 };
@@ -66,8 +71,11 @@ const getPkg = (tabValue: string) => {
 onMounted(() => {
   queryEntity();
   getTitle();
+  
 });
 const summary = ref();
+const license = ref();
+const tagVer = ref();
 const getDetailValue = (data: any) => {
   basicInfo.value = [
     { name: 'Description', value: data?.description },
@@ -84,13 +92,14 @@ const getDetailValue = (data: any) => {
     { name: 'Conflicts', value: JSON.parse(data?.conflicts || '') },
   ];
   appData.value.size = data.rpmSize;
-
+  tagVer.value = [data.osSupport, data.arch];
   maintainer.value = {
     maintainerId: data?.maintainerId || 'openEuler community',
     maintainerEmail: data?.maintainerEmail || OPENEULER_CONTACT,
     maintainerGiteeId: data?.maintainerGiteeId || 'openeuler-ci-bot',
   };
   version.value = data?.version;
+  license.value = data.license;
   upStream.value = data?.upStream;
   security.value = data?.securityLevel;
   description.value = data?.description;
@@ -101,6 +110,7 @@ const getDetailValue = (data: any) => {
   appData.value.bin_code = data.binDownloadUrl;
   appData.value.cover = data?.iconUrl || defaultImg;
   appData.value.repository = data.srcRepo;
+  queryVer()
 };
 
 const { locale } = useLocale();
@@ -116,6 +126,14 @@ const externalLink = ref('');
 const onExternalDialog = (href: string) => {
   externalLink.value = href;
   showExternalDlg.value = true;
+};
+
+//获取支持
+const verData = ref();
+const queryVer = () => {
+  getVer('rpmpkg', appData.value.name).then((res) => {
+    verData.value = res.data.list;
+  });
 };
 </script>
 
@@ -135,8 +153,8 @@ const onExternalDialog = (href: string) => {
             <p>> 基本信息</p>
             <p class="ver">版本号：{{ version }}</p>
           </div>
-          <ul class="basic-info">
-            <li v-for="item in basicInfo" :key="item.name">
+          <div class="basic-info">
+            <p v-for="item in basicInfo" :key="item.name">
               <span class="label markdown download">{{ item.name }}</span>
               <OLink
                 @click="onExternalDialog(item.value)"
@@ -144,11 +162,12 @@ const onExternalDialog = (href: string) => {
                 v-if="item.name === '所属仓库' || item.name === 'Repo源'"
                 target="_blank"
                 rel="noopener noreferrer"
+                class="mymarkdown-body"
                 >{{ item.type }}</OLink
               >
               <span class="markdown-body installation mymarkdown-body" v-dompurify-html="item.value" v-copy-code="true" v-else></span>
-            </li>
-          </ul>
+            </p>
+          </div>
           <p class="sp">> 安装指引</p>
           <div v-if="installation" v-dompurify-html="installation" v-copy-code="true" class="markdown-body installation"></div>
           <p class="sp">> 更多信息</p>
@@ -164,7 +183,7 @@ const onExternalDialog = (href: string) => {
         <AppFeedback :email="maintainer.maintainerEmail" />
       </div>
       <div class="detail-row-side">
-        <DetailAside :data="appData" :basicInfo="basicInfo" :maintainer="maintainer" />
+        <DetailAside :data="appData" :basicInfo="basicInfo" :maintainer="maintainer" :ver-data="verData" :license="license" :tagVer="tagVer" :type="'RPM'"/>
       </div>
     </div>
   </ContentWrapper>

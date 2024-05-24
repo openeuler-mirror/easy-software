@@ -7,6 +7,8 @@ import { useRoute, useRouter } from 'vue-router';
 import { useLocale } from '@/composables/useLocale';
 import { useViewStore } from '@/stores/common';
 import { useI18n } from 'vue-i18n';
+import { getParamsRules } from '@/utils/common';
+
 import { ElPagination, ElConfigProvider } from 'element-plus';
 import zhCn from 'element-plus/es/locale/lang/zh-cn';
 import English from 'element-plus/es/locale/lang/en';
@@ -27,7 +29,6 @@ const keywordType = ref((route.query.key as string) || '');
 const isLoading = ref(false);
 
 const searchKey = ref((route.query.name as string) || '');
-const timeOrder = ref('desc');
 const nameOrder = ref('');
 
 const searchOs = ref('');
@@ -43,7 +44,6 @@ const searchParams = computed(() => {
     os: searchOs.value,
     arch: searchArch.value,
     category: searchCategory.value.join(),
-    timeOrder: timeOrder.value,
     nameOrder: nameOrder.value,
   };
 });
@@ -59,14 +59,15 @@ const queryAllpkg = () => {
     os: searchOs.value,
     arch: searchArch.value,
     category: searchCategory.value.join(),
-    timeOrder: timeOrder.value,
     nameOrder: nameOrder.value,
   };
   isLoading.value = true;
-  getSearchAllFiled(params)
+  // 过滤空参数
+  const newData = getParamsRules(params);
+
+  getSearchAllFiled(newData)
     .then((res) => {
       pkgData.value = res.data.list;
-
       total.value = res.data.total;
       isLoading.value = false;
       if (pkgData.value.length === 0) {
@@ -81,7 +82,9 @@ const queryAllpkg = () => {
 // es搜索
 const querySearch = () => {
   isLoading.value = true;
-  getSearchData(searchParams.value)
+  // 过滤空参数
+  const newData = getParamsRules(searchParams.value);
+  getSearchData(newData)
     .then((res) => {
       pkgData.value = res.data.all;
       total.value = res.data.total;
@@ -143,6 +146,7 @@ const onResetTag = () => {
   searchArch.value = '';
   searchCategory.value = [];
   isSearchDocs.value = false;
+  nameOrder.value = '';
   if (route.query.type) {
     router.push({
       path: `/${locale.value}/applicationsPackage`,
@@ -152,12 +156,8 @@ const onResetTag = () => {
 
 // 更新时间、字母排序
 const changeTimeOrder = (v: string[]) => {
-  if (v[0] === 'timeOrder') {
-    timeOrder.value = v[1];
-    nameOrder.value = '';
-  } else if (v[0] === 'nameOrder') {
+  if (v[0] === 'nameOrder') {
     nameOrder.value = v[1];
-    timeOrder.value = '';
   }
   currentPage.value = 1;
 };
@@ -211,7 +211,7 @@ watch(
 
 // 参数变化分页器还原
 watch(
-  () => [searchCategory.value, searchOs.value, searchArch.value, nameOrder.value, timeOrder.value],
+  () => [searchCategory.value, searchOs.value, searchArch.value, nameOrder.value],
   () => {
     currentPage.value = 1;
   },
@@ -319,4 +319,3 @@ watch(
 <style scoped lang="scss">
 @import '@/assets/style/category/content/index.scss';
 </style>
-@/stores/common

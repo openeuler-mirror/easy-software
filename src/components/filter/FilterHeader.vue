@@ -108,12 +108,12 @@ watch(
     </div>
     <div class="search-left">
       <template v-if="isSort">
-        <OLink @click="changeSortBy('timeOrder')" class="filter-sort" :class="isTimeOrder ? 'new' : ''">
+        <OLink @click="changeSortBy('timeOrder')" class="filter-sort">
           {{ t('software.timeOrder') }}
           <template #suffix><IconTimeOrder /></template>
         </OLink>
       </template>
-      <OLink @click="changeSortBy('nameOrder')" class="filter-sort" :class="isNameOrder ? 'new' : ''">
+      <OLink @click="changeSortBy('nameOrder')" class="filter-sort">
         {{ t('software.nameOrder') }}
         <template #suffix><IconTimeOrder /></template>
       </OLink>
