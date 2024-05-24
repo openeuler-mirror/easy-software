@@ -56,7 +56,7 @@ const queryPkg = (tabValue: string, pkgId: any) => {
     });
 };
 
-const pkgId = encodeURIComponent(route.query.pkgId as string);
+const pkgId = (route.query.pkgId as string);
 const queryEntity = () => {
   getChange();
 };
