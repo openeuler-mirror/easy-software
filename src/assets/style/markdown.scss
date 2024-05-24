@@ -53,11 +53,12 @@
       display: block;
       overflow-x: auto;
       padding: 16px;
+      @include scrollbar;
     }
   }
 
   table {
-    --table-padding: 12px 24px;
+    --table-padding: 2px 12px;
     --table-radius: var(--layout-pkg-radius);
     border-spacing: 0;
 
@@ -81,8 +82,12 @@
     }
     th,
     td {
+      box-sizing: border-box;
       border-color: var(--o-color-control4);
       padding: var(--table-padding);
+      height: 40px;
+      @include tip1;
+      color: var(--o-color-info2);
     }
 
     td {

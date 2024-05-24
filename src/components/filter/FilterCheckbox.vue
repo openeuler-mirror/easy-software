@@ -30,7 +30,7 @@ const onChange = (option: string[]) => {
   emits('change', option);
 };
 
-const DEFAULT_NUM = 8;
+const DEFAULT_NUM = 5;
 const showLen = ref(DEFAULT_NUM);
 const filterList = ref(props.options);
 const isAll = ref(false);

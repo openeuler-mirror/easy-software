@@ -1,15 +1,13 @@
 <script setup lang="ts">
 import { watch } from 'vue';
-import { ODivider, ODropdown, ODropdownItem, OIcon } from '@opensig/opendesign';
+import { ODivider } from '@opensig/opendesign';
 import { useRouter } from 'vue-router';
-import { useLangStore } from '@/stores';
+import { useLangStore } from '@/stores/common';
 import { OPENEULER } from '@/data/config';
-import { useLocale } from '@/composables/useLocale';
 import { useI18n } from 'vue-i18n';
 import HeaderNav from '@/components/HeaderNav.vue';
 
 import openeulerLogo from '@/assets/openeuler-logo.svg';
-import IconChevronDown from '~icons/app/icon-chevron-down.svg';
 
 const router = useRouter();
 const { locale, t } = useI18n();
@@ -20,19 +18,7 @@ const goHome = () => {
   });
 };
 
-const { isZh } = useLocale();
 const langStore = useLangStore();
-
-// 选择语言
-const changeLocale = (lang: string): void => {
-  locale.value = lang;
-
-  const { pathname, search } = window.location;
-  const newHref = pathname.split('/');
-  newHref[1] = lang;
-  langStore.setLangStore(lang);
-  window.location.href = newHref.join('/') + search;
-};
 
 watch(
   () => {
@@ -58,22 +44,7 @@ watch(
 
         <HeaderNav />
       </div>
-      <div class="header-right">
-        <div class="header-lang">
-          <ODropdown trigger="hover" optionPosition="bottom">
-            <div class="info-wrap hover-icon-rotate">
-              <span class="lang">{{ isZh ? '中文' : 'English' }}</span>
-              <OIcon class="icon"><IconChevronDown /></OIcon>
-            </div>
-
-            <template #dropdown>
-              <ODropdownItem @click="changeLocale('zh')">简体中文</ODropdownItem>
-              <ODivider :style="{ '--o-divider-gap': '2px' }" />
-              <ODropdownItem @click="changeLocale('en')">English</ODropdownItem>
-            </template>
-          </ODropdown>
-        </div>
-      </div>
+      <div class="header-right"></div>
     </div>
   </div>
 </template>
@@ -249,3 +220,4 @@ watch(
   }
 }
 </style>
+@/stores/common

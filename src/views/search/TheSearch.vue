@@ -69,7 +69,7 @@ watch(
 <template>
   <div class="layout">
     <div class="home-header">
-      <SearchFilter />
+      <SearchFilter :show="false" />
       <SearchTab :menu="menuData" />
     </div>
   </div>
@@ -91,18 +91,25 @@ watch(
 
 <style lang="scss" scoped>
 .layout {
-  background: var(--o-color-primary1) url(@/assets/banner.jpg) no-repeat top center/cover;
+  background: var(--o-color-primary1) url(@/assets/banner/search-banner.jpg) no-repeat top center/cover;
   .home-header {
-    padding: 92px 0 0;
+    padding: 32px 0 0;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: space-between;
-    height: 280px;
+    height: 140px;
+    :deep(.o-select) {
+      height: 40px;
+    }
+    :deep(.search-input) {
+      height: 40px;
+    }
   }
 
   :deep(.o-tab) {
     --tab-nav-anchor-color: #fff;
+    width: 800px;
     .o-tab-nav {
       line-height: 52px;
       --tab-nav-padding: 0;
