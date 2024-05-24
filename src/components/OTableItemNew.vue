@@ -41,7 +41,7 @@ const { locale } = useLocale();
 const jumpTo = (name: string, id: string) => {
   const type = props.type === 'apppkg' ? 'image' : props.type === 'rpmpkg' ? 'RPM' : 'EPKG';
   const detailType = props.type === 'apppkg' ? 'image' : props.type === 'rpmpkg' ? 'package' : 'epkg';
-  const newHref = `/${locale.value}/${detailType}/${xssAllTag(name)}?type=${type}&pkgId=${id}`;
+  const newHref = `/${locale.value}/${detailType}/${xssAllTag(name)}?type=${type}&pkgId=${encodeURIComponent(id)}`;
   return newHref;
 };
 
