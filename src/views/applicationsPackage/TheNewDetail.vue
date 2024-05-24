@@ -148,7 +148,7 @@ const summary = ref();
 const getDetailValue = (data: any) => {
   if (typePkg.value === 'RPM') {
     basicInfo.value = [
-      { name: 'Description', value: data?.description },
+      { name: '详细描述', value: data?.description },
       { name: '版本支持情况', value: data.osSupport },
       { name: '架构', value: data.arch },
       { name: '软件包分类', value: data.rpmCategory || '其他' },
@@ -165,7 +165,7 @@ const getDetailValue = (data: any) => {
     version.value = data?.version;
   } else if (typePkg.value === 'EPKG') {
     basicInfo.value = [
-      { name: 'Description', value: data?.description },
+      { name: '详细描述', value: data?.description },
       { name: '版本号', value: data.version },
       { name: '版本支持情况', value: data.osSupport },
       { name: '架构', value: data.arch },
