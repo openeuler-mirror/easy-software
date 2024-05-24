@@ -149,7 +149,7 @@ const onResetTag = () => {
   nameOrder.value = '';
   if (route.query.type) {
     router.push({
-      path: `/${locale.value}/applicationsPackage`,
+      path: `/${locale.value}/apppkg`,
     });
   }
 };

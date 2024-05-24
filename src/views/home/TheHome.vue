@@ -76,7 +76,7 @@ onMounted(() => {
               <template v-if="item.children?.length > 0">
                 <div class="domain-item-title">
                   <h3 :id="item.name">{{ item.name }}</h3>
-                  <OLink :href="`/${locale}/applicationsPackage?type=${item.name}`">
+                  <OLink :href="`/${locale}/apppkg?type=${item.name}`">
                     了解更多
                     <template #suffix
                       ><OIcon><IconChevronDown /></OIcon

@@ -8,12 +8,14 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     AppBanner: typeof import('./src/components/AppBanner.vue')['default']
+    AppBreadcrumb: typeof import('./src/components/AppBreadcrumb.vue')['default']
     AppFeedback: typeof import('./src/components/AppFeedback.vue')['default']
     AppFooter: typeof import('./src/components/AppFooter.vue')['default']
     AppHeader: typeof import('./src/components/AppHeader.vue')['default']
-    AppPagination: typeof import('./src/components/AppPagination.vue')['default']
     AppSection: typeof import('./src/components/AppSection.vue')['default']
     ContentWrapper: typeof import('./src/components/ContentWrapper.vue')['default']
+    DetailAside: typeof import('./src/components/DetailAside.vue')['default']
+    DetailHeader: typeof import('./src/components/DetailHeader.vue')['default']
     ExternalLink: typeof import('./src/components/ExternalLink.vue')['default']
     FilterCheckbox: typeof import('./src/components/filter/FilterCheckbox.vue')['default']
     FilterHeader: typeof import('./src/components/filter/FilterHeader.vue')['default']

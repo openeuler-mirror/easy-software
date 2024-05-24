@@ -13,7 +13,7 @@ export const resourceData = [
     name: '领域应用',
     desc: 'openEuler操作系统支持的软件包集合(包括RPM、容器镜像、EPKG软件包等）',
     icon: ApppkgIcon,
-    href: "/applicationsPackage"
+    href: "/apppkg"
   },
   {
     id: 'rpm',

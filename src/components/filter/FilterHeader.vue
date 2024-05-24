@@ -4,6 +4,7 @@ import { OLink, OInput } from '@opensig/opendesign';
 import { useLocale } from '@/composables/useLocale';
 import { useI18n } from 'vue-i18n';
 import { useRouter, useRoute } from 'vue-router';
+import type { SorT } from '@/@types/type-sort';
 import IconTimeOrder from '~icons/app/icon-time-order.svg';
 import IconSearch from '~icons/app/icon-search.svg';
 
@@ -57,7 +58,7 @@ const emits = defineEmits<{
 const isTimeOrder = ref(false);
 const isNameOrder = ref(false);
 const changeSortBy = (type: string) => {
-  let v = '';
+  let v: SorT = '';
   if (type === 'timeOrder') {
     isTimeOrder.value = !isTimeOrder.value;
     v = isTimeOrder.value ? 'asc' : 'desc';

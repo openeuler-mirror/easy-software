@@ -118,12 +118,19 @@ export function getUrlParams(url: string) {
 /**
  * 过滤空参数
  * @param {data} any 地址
- * @returns {object} 成功返回参数对象 
+ * @returns {object} 成功返回参数对象
  */
+import type { SearchSQLT, SearchESParamsT } from '@/@types/domain';
 export const getParamsRules = (data: any) => {
-  const newData = {} as any;
+  type ParamsKeyT = keyof SearchSQLT | SearchESParamsT;
+
+  type NewDataT = {
+    [x: string]: SearchSQLT | SearchESParamsT;
+  }
+
+  const newData: NewDataT = {};
   Object.keys(data).forEach((key) => {
-    const value = data[key as keyof any];
+    const value = data[key as keyof ParamsKeyT];
     if (value) {
       newData[key] = value;
     }

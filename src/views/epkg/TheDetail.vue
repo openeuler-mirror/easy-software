@@ -7,11 +7,11 @@ import { useMarkdown } from '@/composables/useMarkdown';
 import type { AppInfoT } from '@/@types/app';
 import { useLocale } from '@/composables/useLocale';
 import { useI18n } from 'vue-i18n';
-import { getDetails, getVer  } from '@/api/api-domain';
+import { getDetails, getVer } from '@/api/api-domain';
 import AppFeedback from '@/components/AppFeedback.vue';
-import DetailHead from '../applicationsPackage/components/DetailNewHead.vue';
+import DetailHead from '@/components/DetailHeader.vue';
 import ExternalLink from '@/components/ExternalLink.vue';
-import DetailAside from '../applicationsPackage/components/DetailAside.vue';
+import DetailAside from '@/components/DetailAside.vue';
 import { moreColumns } from '@/data/detail/index';
 import defaultImg from '@/assets/default-logo.png';
 import { useViewStore } from '@/stores/common';
@@ -116,7 +116,7 @@ const getDetailValue = (data: any) => {
   appData.value.bin_code = data.binDownloadUrl;
   appData.value.cover = data?.iconUrl || defaultImg;
   appData.value.repository = data.srcRepo;
-  queryVer()
+  queryVer();
 };
 
 const { locale } = useLocale();
@@ -189,7 +189,7 @@ const queryVer = () => {
         <AppFeedback :email="maintainer.maintainerEmail" />
       </div>
       <div class="detail-row-side">
-        <DetailAside :data="appData" :basicInfo="basicInfo" :maintainer="maintainer" :ver-data="verData" :license="license" :tagVer="tagVer" :type="'EPKG'"/>
+        <DetailAside :data="appData" :basicInfo="basicInfo" :maintainer="maintainer" :ver-data="verData" :license="license" :tagVer="tagVer" :type="'EPKG'" />
       </div>
     </div>
   </ContentWrapper>
