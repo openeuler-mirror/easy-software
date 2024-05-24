@@ -3,6 +3,7 @@ import { ref, watch, onMounted, computed } from 'vue';
 import { OTag, OLink, OIcon, OTable } from '@opensig/opendesign';
 import { useI18n } from 'vue-i18n';
 import { useRoute } from 'vue-router';
+import { getParamsRules } from '@/utils/common';
 import { getUpstreamColumn, getUpstream } from '@/api/api-upstream';
 import { getSearchData } from '@/api/api-search';
 import { useLocale } from '@/composables/useLocale';
@@ -44,7 +45,10 @@ const queryAppVersion = () => {
     nameOrder: nameOrder.value,
     pageSize: pageSize.value,
   };
-  getUpstream(params)
+
+  // 过滤空参数
+  const newData = getParamsRules(params);
+  getUpstream(newData)
     .then((res) => {
       appData.value = res.data.list;
       total.value = res.data.total;
@@ -73,7 +77,10 @@ const isSearchError = ref(false);
 const isSearch = ref(false);
 const querySearch = () => {
   isLoading.value = true;
-  getSearchData(searchParams.value)
+
+  // 过滤空参数
+  const newData = getParamsRules(searchParams.value);
+  getSearchData(newData)
     .then((res) => {
       if (res.code === 200) {
         appData.value = res.data.appversion;
@@ -118,6 +125,7 @@ const handleCloseTag = (type: string) => {
 // 重置筛选结果
 const handleResettingTag = () => {
   searchOs.value = '';
+  nameOrder.value = '';
   isSearch.value = false;
 };
 

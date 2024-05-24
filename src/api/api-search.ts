@@ -1,12 +1,7 @@
 import { request } from '@/shared/axios';
 import type { AxiosResponse } from '@/shared/axios';
+import type { SearchESParamsT } from '@/@types/domain';
 
-interface SearchT {
-  keyword: string;
-  pageNum: number;
-  pageSize: number;
-  dataType: string;
-}
 
 /**
  * 搜索
@@ -19,7 +14,7 @@ interface SearchT {
  * @return {Promise<ResponseT<string>>}  返回一个 Promise，解析为提交的反馈信息是否成功的反馈信息
  */
 
-export function getSearchData(params: SearchT) {
+export function getSearchData(params: SearchESParamsT) {
   const url = '/api-search/software/docs';
   return request.post(url, params).then((res: AxiosResponse) => res?.data);
 }
@@ -46,7 +41,7 @@ export function getSearchCount(params: {
 
 
 
-export function getSearchDataAll(params: SearchT) {
+export function getSearchDataAll(params: SearchESParamsT) {
   const url = '/api-search/software/docsAll';
   return request.post(url, params).then((res: AxiosResponse) => res?.data);
 }

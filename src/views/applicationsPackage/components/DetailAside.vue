@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { OTable, useMessage, OButton, OTag } from '@opensig/opendesign';
+import { OTable, useMessage, OButton, OTag, OIcon } from '@opensig/opendesign';
 import OCodeCopy from '@/components/OCodeCopy.vue';
 import { ref, computed, watch } from 'vue';
 import ExternalLink from '@/components/ExternalLink.vue';
@@ -167,9 +167,9 @@ const jumpTo = (name: string, id: string) => {
     <OCodeCopy :code="getCode(downloadData)" v-if="type === 'IMAGE' && downloadData" />
     <div v-if="type !== 'IMAGE' && show">
       <div v-for="item in tableData" :key="item.name" class="bt">
-        <OButton variant="solid" color="primary" @click="onExternalDialog(item.download)">{{ item.name }}</OButton>
-        <p @click="copyText($event, item.download)" style="margin-left: 30px; cursor: pointer">
-          <IconCopy style="width: 20px; height: 20px" />
+        <OButton variant="solid" color="primary" size="large" @click="onExternalDialog(item.download)">{{ item.name }}</OButton>
+        <p @click="copyText($event, item.download)" class="copy-icon">
+          <OIcon><IconCopy /></OIcon>
         </p>
       </div>
     </div>
@@ -180,7 +180,7 @@ const jumpTo = (name: string, id: string) => {
       <p>{{ license }}</p>
     </div>
   </AppSection>
-  <AppSection :title="`${data.name}版本支持情况`" >
+  <AppSection :title="`${data.name}版本支持情况`">
     <OTable :columns="verColumns" :data="verData" border="all" :cell-span="arraySpanMethod" :small="true">
       <template #td_flags="{ row }">
         <a :href="jumpTo(data.name, row.pkgId)" color="primary" target="_blank" rel="noopener noreferrer">
@@ -194,8 +194,11 @@ const jumpTo = (name: string, id: string) => {
 </template>
 
 <style lang="scss" scoped>
+.app-section {
+  padding: 32px 40px;
+}
 .detail {
-  margin: 24px 0;
+  margin: 0 0 24px;
 }
 .sp {
   margin-right: 20px;
@@ -203,10 +206,22 @@ const jumpTo = (name: string, id: string) => {
 .bt {
   height: 100%;
   display: flex;
+  margin-bottom: 24px;
+  align-items: center;
+
   button {
-    height: 40px;
     width: 240px;
-    margin-bottom: 24px;
+  }
+  .copy-icon {
+    margin-left: 24px;
+    cursor: pointer;
+
+    .o-icon {
+      font-size: 24px;
+      &:hover {
+        color: var(--o-color-primary1);
+      }
+    }
   }
   p {
     height: 40px;
@@ -221,14 +236,14 @@ const jumpTo = (name: string, id: string) => {
   display: flex;
   justify-content: space-between;
 }
-:deep(.o-table td) {
-  padding: 2px 4px;
-  text-align: center;
-  font-size: 14px !important;
-}
-:deep(.o-table th) {
-  padding: 2px 4px;
-  text-align: center;
-  font-size: 16px !important;
+:deep(.o-table) {
+  th,
+  td {
+    padding: 2px 12px;
+    font-size: 14px !important;
+  }
+  th {
+    font-weight: 600;
+  }
 }
 </style>

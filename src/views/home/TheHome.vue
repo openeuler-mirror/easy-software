@@ -19,6 +19,7 @@ const queryAllpkg = () => {
   const params = {
     name: 'mainPage',
     pageSize: 10,
+    pageNum: 1,
   };
   isLoading.value = true;
   getSearchAllFiled(params)

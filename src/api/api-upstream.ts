@@ -1,26 +1,13 @@
 import { request } from '@/shared/axios';
 import type { AxiosResponse } from '@/shared/axios';
-
-
-
-// export function getUpstream(name: string) {
-//   const url = `/monitoring/api/v2/projects/?name=${name}`;
-//   return request.get(url).then((res: AxiosResponse) => res?.data);
-// }
-
-export interface PkgPageSizeT {
-  pageNum?: number;
-  pageSize?: number;
-  eulerOsVersion: string;
-}
-
+import type { SearchUpstreamT } from '@/@types/domain';
 
 /**
  * 上游兼容应用全景
- * @name getUpstream 
+ * @name getUpstream
  */
 
-export function getUpstream(params: PkgPageSizeT) {
+export function getUpstream(params: SearchUpstreamT) {
   const url = `/api-query/appVersion`;
   return request.get(url, { params }).then((res: AxiosResponse) => res?.data);
 }
