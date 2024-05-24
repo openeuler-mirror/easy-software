@@ -71,11 +71,13 @@ const queryEntity = () => {
   activeName.value = route.query.type as string;
   if (pkgId.value) {
     getDetail({
-      appPkgId: encodeURIComponent(route.query.appPkgId as string) || '',
-      epkgPkgId: encodeURIComponent(route.query.epkgPkgId as string) || '',
-      rpmPkgId: encodeURIComponent(route.query.rpmPkgId as string) || '',
+      appPkgId: (route.query.appPkgId as string) || '',
+      epkgPkgId: (route.query.epkgPkgId as string) || '',
+      rpmPkgId:(route.query.rpmPkgId as string) || '',
     })
       .then((res) => {
+        
+        
         const data = res.data;
         tabList.value = data.tags;
         epkgData.value = data['EPKG'];
