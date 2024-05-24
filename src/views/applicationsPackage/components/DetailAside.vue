@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { OTable, useMessage, OButton } from '@opensig/opendesign';
+import { OTable, useMessage, OButton, OTag, OIcon } from '@opensig/opendesign';
 import OCodeCopy from '@/components/OCodeCopy.vue';
 import { ref, computed, watch } from 'vue';
 import ExternalLink from '@/components/ExternalLink.vue';
@@ -8,8 +8,7 @@ import { getCode } from '@/utils/common';
 import { verColumns } from '@/data/detail/index';
 import IconCopy from '~icons/app/icon-copy.svg';
 import { useLocale } from '@/composables/useLocale';
-import {  xssAllTag } from '@/utils/common';
-import DetailTag from './DetailTag.vue';
+import { xssAllTag } from '@/utils/common';
 const props = defineProps({
   data: {
     type: Object,
@@ -168,27 +167,25 @@ const jumpTo = (name: string, id: string) => {
     <OCodeCopy :code="getCode(downloadData)" v-if="type === 'IMAGE' && downloadData" />
     <div v-if="type !== 'IMAGE' && show">
       <div v-for="item in tableData" :key="item.name" class="bt">
-        <OButton variant="solid" color="primary" @click="onExternalDialog(item.download)" style="margin-bottom: 24px; width: 70%">{{
-          item.name
-        }}</OButton>
-        <p @click="copyText($event, item.download)" style="margin-left: 30px; cursor: pointer" >
-          <IconCopy />
+        <OButton variant="solid" color="primary" size="large" @click="onExternalDialog(item.download)">{{ item.name }}</OButton>
+        <p @click="copyText($event, item.download)" class="copy-icon">
+          <OIcon><IconCopy /></OIcon>
         </p>
       </div>
     </div>
   </AppSection>
-  <AppSection title="软件合规" v-if="allShow && license">
+  <AppSection title="软件合规" v-if="license">
     <div class="license">
-      <p>License ：</p>
+      <p>License</p>
       <p>{{ license }}</p>
     </div>
   </AppSection>
-  <AppSection :title="`${data.name}版本支持情况`" v-if="allShow">
-    <OTable :columns="verColumns" :data="verData" border="all" :cell-span="arraySpanMethod">
+  <AppSection :title="`${data.name}版本支持情况`">
+    <OTable :columns="verColumns" :data="verData" border="all" :cell-span="arraySpanMethod" :small="true">
       <template #td_flags="{ row }">
-        <a :href="jumpTo(data.name, row.pkgId)" color="primary" target="_blank" rel="noopener noreferrer"
-          > <span v-if="row.os === tagVer[0] && row.arch === tagVer[1]"
-        >当前版本</span> <span v-else>查看</span></a>
+        <a :href="jumpTo(data.name, row.pkgId)" color="primary" target="_blank" rel="noopener noreferrer">
+          <OTag v-if="row.os === tagVer[0] && row.arch === tagVer[1]" color="primary" :size="'small'">当前版本</OTag> <span v-else>查看</span></a
+        >
       </template>
     </OTable>
   </AppSection>
@@ -197,8 +194,11 @@ const jumpTo = (name: string, id: string) => {
 </template>
 
 <style lang="scss" scoped>
+.app-section {
+  padding: 32px 40px;
+}
 .detail {
-  margin: 24px 0;
+  margin: 0 0 24px;
 }
 .sp {
   margin-right: 20px;
@@ -206,6 +206,28 @@ const jumpTo = (name: string, id: string) => {
 .bt {
   height: 100%;
   display: flex;
+  margin-bottom: 24px;
+  align-items: center;
+
+  button {
+    width: 240px;
+  }
+  .copy-icon {
+    margin-left: 24px;
+    cursor: pointer;
+
+    .o-icon {
+      font-size: 24px;
+      &:hover {
+        color: var(--o-color-primary1);
+      }
+    }
+  }
+  p {
+    height: 40px;
+    display: flex;
+    align-items: center;
+  }
 }
 .license {
   border-top: 1px rgba(0, 0, 0, 0.1) solid;
@@ -214,9 +236,14 @@ const jumpTo = (name: string, id: string) => {
   display: flex;
   justify-content: space-between;
 }
-:deep(.o-table td th) {
-    padding: 2px 4px;;
-    text-align: center;
-    height: 50px;
+:deep(.o-table) {
+  th,
+  td {
+    padding: 2px 12px;
+    font-size: 14px !important;
+  }
+  th {
+    font-weight: 600;
+  }
 }
 </style>

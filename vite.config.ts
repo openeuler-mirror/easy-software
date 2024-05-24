@@ -52,11 +52,6 @@ export default defineConfig({
   },
   server: {
     proxy: {
-      '/api-omapi/': {
-        target: 'https://omapi.osinfra.cn/',
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api-omapi/, ''),
-      },
       '/api-query/': {
         target: 'https://easysoftware-api.test.osinfra.cn/',
         changeOrigin: true,
@@ -67,11 +62,6 @@ export default defineConfig({
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/dsapi/, ''),
       },
-      '/monitoring/': {
-        target: 'https://easysoftware-monitoring.test.osinfra.cn/',
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/monitoring/, ''),
-      },
       '/api-search/': {
         target: 'https://doc-search.test.osinfra.cn/',
         changeOrigin: true,
@@ -79,8 +69,5 @@ export default defineConfig({
       },
     },
   },
-
-
-
 
 });

@@ -7,14 +7,14 @@ import { useMarkdown } from '@/composables/useMarkdown';
 import type { AppInfoT } from '@/@types/app';
 import { useLocale } from '@/composables/useLocale';
 import { useI18n } from 'vue-i18n';
-import { getDetails} from '@/api/api-domain';
+import { getDetails, getVer  } from '@/api/api-domain';
 import AppFeedback from '@/components/AppFeedback.vue';
 import DetailHead from '../applicationsPackage/components/DetailNewHead.vue';
 import ExternalLink from '@/components/ExternalLink.vue';
 import DetailAside from '../applicationsPackage/components/DetailAside.vue';
-import { moreColumns} from '@/data/detail/index';
-import defaultImg from '@/assets/default.png';
-
+import { moreColumns } from '@/data/detail/index';
+import defaultImg from '@/assets/default-logo.png';
+import { useViewStore } from '@/stores/common';
 type MaintainerT = {
   maintainerId: string;
   maintainerEmail: string;
@@ -51,14 +51,18 @@ const appData = ref<AppInfoT>({
 });
 //详情请求
 const queryPkg = (tabValue: string, pkgId: any) => {
-  getDetails(tabValue, pkgId).then((res) => {
-    const data = res.data.list[0];
-    getDetailValue(data);
-  });
+  getDetails(tabValue, pkgId)
+    .then((res) => {
+      const data = res.data.list[0];
+      getDetailValue(data);
+    })
+    .catch(() => {
+      useViewStore().showNotFound();
+    });
 };
 
 // 获取tab分类
-const pkgId = route.query.pkgId;
+const pkgId = encodeURIComponent(route.query.pkgId as string);
 const queryEntity = () => {
   getChange();
 };
@@ -74,9 +78,11 @@ onMounted(() => {
   queryEntity();
   getTitle();
 });
+const summary = ref();
+const license = ref();
+const tagVer = ref();
 const getDetailValue = (data: any) => {
   basicInfo.value = [
-    { name: '简介', value: data.summary },
     { name: 'Description', value: data?.description },
     { name: '版本支持情况', value: data.osSupport },
     { name: '架构', value: data.arch },
@@ -85,19 +91,21 @@ const getDetailValue = (data: any) => {
     { name: 'Repo源', value: JSON.parse(data?.repoType).url, type: JSON.parse(data?.repoType).type },
   ];
   files.value = JSON.parse(data?.files);
+  summary.value = data.summary;
   moreMessge.value = [
     { name: 'Requires', value: JSON.parse(data?.requires || '') },
     { name: 'Provides', value: JSON.parse(data?.provides || '') },
     { name: 'Conflicts', value: JSON.parse(data?.conflicts || '') },
   ];
   appData.value.size = data.epkgSize;
-
+  tagVer.value = [data.osSupport, data.arch];
   maintainer.value = {
     maintainerId: data?.maintainerId || 'openEuler community',
     maintainerEmail: data?.maintainerEmail || OPENEULER_CONTACT,
     maintainerGiteeId: data?.maintainerGiteeId || 'openeuler-ci-bot',
   };
   version.value = data?.version;
+  license.value = data.license;
   upStream.value = data?.upStream;
   security.value = data?.securityLevel;
   description.value = data?.description;
@@ -108,6 +116,7 @@ const getDetailValue = (data: any) => {
   appData.value.bin_code = data.binDownloadUrl;
   appData.value.cover = data?.iconUrl || defaultImg;
   appData.value.repository = data.srcRepo;
+  queryVer()
 };
 
 const { locale } = useLocale();
@@ -124,6 +133,14 @@ const onExternalDialog = (href: string) => {
   externalLink.value = href;
   showExternalDlg.value = true;
 };
+
+//获取支持
+const verData = ref();
+const queryVer = () => {
+  getVer('epkgpkg', appData.value.name).then((res) => {
+    verData.value = res.data.list;
+  });
+};
 </script>
 
 <template>
@@ -133,46 +150,46 @@ const onExternalDialog = (href: string) => {
       <OBreadcrumbItem :to="breadcrumbInfo.path">{{ breadcrumbInfo.name }}</OBreadcrumbItem>
       <OBreadcrumbItem>{{ appData.name }} </OBreadcrumbItem>
     </OBreadcrumb>
-    <DetailHead :data="appData" :basicInfo="basicInfo" :maintainer="maintainer" />
+    <DetailHead :data="appData" :basicInfo="summary" :maintainer="maintainer" />
     <div class="detail-row">
       <div class="detail-row-main">
         <AppSection>
           <div class="title">
-            <p>基本信息</p>
-            <p>软件包版本号：{{ version }}</p>
+            <p>> 基本信息</p>
+            <p class="ver">版本号：{{ version }}</p>
           </div>
-          <ul class="basic-info">
-            <li v-for="item in basicInfo" :key="item.name">
-              <span class="label download">{{ item.name }}</span>
+          <div class="basic-info">
+            <p v-for="item in basicInfo" :key="item.name">
+              <span class="label markdown download">{{ item.name }}</span>
               <OLink
                 @click="onExternalDialog(item.value)"
                 color="primary"
                 v-if="item.name === '所属仓库' || item.name === 'Repo源'"
                 target="_blank"
                 rel="noopener noreferrer"
+                class="mymarkdown-body"
                 >{{ item.type }}</OLink
               >
               <span class="markdown-body installation mymarkdown-body" v-dompurify-html="item.value" v-copy-code="true" v-else></span>
-            </li>
-          </ul>
-          <p class="sp">安装指引</p>
+            </p>
+          </div>
+          <p class="sp">> 安装指引</p>
           <div v-if="downloadData" v-dompurify-html="downloadData" v-copy-code="true" class="markdown-body download"></div>
           <div v-if="installation" v-dompurify-html="installation" v-copy-code="true" class="markdown-body installation"></div>
-          <p class="sp">更多信息</p>
-          <OTab variant="text" :line="false" class="domain-tabs">
+          <p class="sp">> 更多信息</p>
+          <OTab variant="text" :line="false" class="domain-tabs switch">
             <template v-for="item in moreMessge" :key="item">
-              <OTabPane class="tab-pane" v-if="item.value.length > 0" :label="item.name">
+              <OTabPane class="tab-pane switch" v-if="item.value.length > 0" :label="item.name">
                 <OTable :columns="moreColumns" :data="item.value"> </OTable>
               </OTabPane>
             </template>
-            <!-- <OTabPane label="Description">{{ description }}</OTabPane> -->
           </OTab>
         </AppSection>
         <ExternalLink v-if="showExternalDlg" :href="externalLink" @change="showExternalDlg = false" />
         <AppFeedback :email="maintainer.maintainerEmail" />
       </div>
       <div class="detail-row-side">
-        <DetailAside :data="appData" :basicInfo="basicInfo" :maintainer="maintainer" />
+        <DetailAside :data="appData" :basicInfo="basicInfo" :maintainer="maintainer" :ver-data="verData" :license="license" :tagVer="tagVer" :type="'EPKG'"/>
       </div>
     </div>
   </ContentWrapper>

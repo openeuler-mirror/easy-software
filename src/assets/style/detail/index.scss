@@ -3,6 +3,9 @@
   justify-content: space-between;
   .detail-row-main {
     width: 936px;
+    &.tags {
+      width: 100%;
+    }
   }
   .detail-row-side {
     padding-left: 32px;
@@ -36,7 +39,6 @@
   justify-content: space-between;
 }
 
-
 :deep(.domain-tabs) {
   .o-tab-navs {
     --tab-nav-justify: left;
@@ -47,6 +49,31 @@
     word-break: break-word;
     --table-edge-padding: 24px;
   }
+  // 容器镜像样式
+  &.switch {
+    .o-tab-nav-list {
+      background: #ededf0;
+      border-radius: 8px;
+      height: 40px;
+      padding: 4px;
+      .o-tab-nav {
+        margin: 0 !important;
+        position: relative;
+        padding: 2px 12px;
+        z-index: 3;
+      }
+    }
+    .o-tab-nav-anchor {
+      top: 0;
+      padding: 4px 0;
+      .o-tab-nav-anchor-line {
+        box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.1);
+        border-radius: 4px;
+        height: 100%;
+        background: var(--o-color-fill2);
+      }
+    }
+  }
 }
 
 .code-box {
@@ -55,23 +82,28 @@
 
 .basic-info {
   margin-top: 26px;
-  background: linear-gradient(to right, rgba(0, 47, 167, 0.05) 10%, white 15%); 
-
-  li {
-   
-    padding: 12px 24px;
+ 
+  p {
     @include tip1;
     color: var(--o-color-info2);
     display: flex;
     align-items: top;
-    border: 1px solid rgba(0,0,0,0.10);
-    border-left:4px solid #002FA7;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    border-right: 1px solid rgba(0, 0, 0, 0.1);
+    border-left: 4px solid #002fa7;
+    &:first-child{
+      border-top: 1px solid rgba(0, 0, 0, 0.1);
+    }
     .label {
-      min-width: 100px;
+      background: rgba(0,47,167,0.05);
+      padding: 12px 24px;
+      min-width: 150px;
+      border-right: 1px solid rgba(0, 0, 0, 0.1);
     }
   }
   .mymarkdown-body {
     max-width: 600px;
+    padding: 12px 24px;
   }
 }
 .icon-img {
@@ -131,4 +163,13 @@
   display: flex;
   justify-content: space-between;
   @include h3;
+}
+
+.ver{
+  background: #F2F4FA;
+border: 1px solid rgba(0,47,167,0.20);
+border-radius: 4px;
+font-size: 18px;
+color: #002FA7;
+padding: 6px 24px;
 }

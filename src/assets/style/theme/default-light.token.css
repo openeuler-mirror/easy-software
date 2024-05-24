@@ -867,7 +867,7 @@
    * @group mixedgray
    * @description 
    */
-  --o-mixedgray-2: 240, 243, 245;
+  --o-mixedgray-2: 243, 243, 245;
   /**
    * @name 
    * @type palette
@@ -1532,14 +1532,14 @@
    * @group control
    * @description 悬浮-浅，常用于背景
    */
-  --o-color-control2-light: rgb(var(--o-mixedgray-3), 1);
+  --o-color-control2-light: rgba(var(--o-kleinblue-1), 1);
   /**
    * @name 
    * @type color
    * @group control
    * @description 激活-浅，常用于背景
    */
-  --o-color-control3-light: rgb(var(--o-mixedgray-4), 1);
+  --o-color-control3-light: rgba(var(--o-kleinblue-2), 1);
   /**
    * @name 
    * @type color
