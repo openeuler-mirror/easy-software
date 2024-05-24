@@ -3,7 +3,7 @@ export interface AppItemT {
   description: string | null;
   iconUrl: string | null;
   name: string;
-  tags: string[];
+  tags: PkgTypeT[];
   pkgIds: PkgIdsT;
 }
 export interface PkgIdsT {
@@ -25,3 +25,7 @@ export interface AppInfoT {
   source_code: string;
   bin_code: string;
 }
+
+
+
+export type PkgTypeT = 'RPM' | 'IMAGE' | 'EPKG';

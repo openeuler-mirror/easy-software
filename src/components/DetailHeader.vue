@@ -50,7 +50,9 @@ const onExternalDialog = (href: string) => {
           <div class="box">
             <p class="title">
               {{ data.name }}
-              <a @click="onExternalDialog(data.repository)" v-if="data.repository" target="_blank" rel="noopener noreferrer"><img :src="Home" class="icon-img" alt="" />主页</a>
+              <a @click="onExternalDialog(data.repository)" v-if="data.repository" target="_blank" rel="noopener noreferrer"
+                ><img :src="Home" class="icon-img" alt="" />主页</a
+              >
             </p>
             <p class="detail">{{ basicInfo }}</p>
           </div>
@@ -143,7 +145,7 @@ const onExternalDialog = (href: string) => {
       padding: 12px;
       img {
         max-width: 100%;
-        max-height: 100%;
+        max-height: 86px;
       }
     }
 

@@ -1,16 +1,15 @@
 <script lang="ts" setup>
 import { ref, onMounted } from 'vue';
-import { OBreadcrumb, OBreadcrumbItem, OTab, OTabPane, OTable, OLink, OIcon, OTag } from '@opensig/opendesign';
+import { OTab, OTabPane, OTable, OLink, OIcon, OTag } from '@opensig/opendesign';
 import { useRoute } from 'vue-router';
 import { getDetails, getDetail, getTags, getVer } from '@/api/api-domain';
 import { useMarkdown } from '@/composables/useMarkdown';
 import type { AppInfoT } from '@/@types/app';
 import { OPENEULER_CONTACT } from '@/data/config';
-import { useLocale } from '@/composables/useLocale';
 import AppFeedback from '@/components/AppFeedback.vue';
-import DetailHead from '../applicationsPackage/components/DetailNewHead.vue';
+import DetailHead from '@/components/DetailHeader.vue';
 import ExternalLink from '@/components/ExternalLink.vue';
-import DetailAside from '../applicationsPackage/components/DetailAside.vue';
+import DetailAside from '@/components/DetailAside.vue';
 import defaultImg from '@/assets/default-logo.png';
 import IconEpkg from '~icons/pkg/epkg.svg';
 import IconImage from '~icons/pkg/image.svg';
@@ -59,7 +58,6 @@ const queryPkg = (tabValue: string, pkgId: any) => {
   getDetails(tabValue, pkgId).then((res) => {
     const data = res.data.list[0];
     getDetailValue(data);
-    
   });
 };
 
@@ -75,7 +73,7 @@ const queryEntity = () => {
     getDetail({
       appPkgId: encodeURIComponent(route.query.appPkgId as string) || '',
       epkgPkgId: encodeURIComponent(route.query.epkgPkgId as string) || '',
-      rpmPkgId:encodeURIComponent(route.query.rpmPkgId as string) || '',
+      rpmPkgId: encodeURIComponent(route.query.rpmPkgId as string) || '',
     })
       .then((res) => {
         const data = res.data;
@@ -102,7 +100,6 @@ const onChange = (tab: string) => {
     typePkg.value = 'RPM';
     getDetailValue(rpmData.value);
     queryVer();
-    
   } else if (tab === 'EPKG') {
     tabValue.value = 'epkgpkg';
     typePkg.value = 'EPKG';
@@ -116,7 +113,6 @@ const onChange = (tab: string) => {
   } else {
     useViewStore().showNotFound();
   }
- 
 };
 const getChange = (tab: string) => {
   if (tab === 'RPM') {
@@ -138,7 +134,6 @@ const getPkg = (tabValue: string) => {
 onMounted(() => {
   pkgId.value = location.pathname.split('/')[3];
   queryEntity();
-  getTitle();
 });
 const imageUsage = ref();
 const license = ref();
@@ -148,7 +143,7 @@ const summary = ref();
 const getDetailValue = (data: any) => {
   if (typePkg.value === 'RPM') {
     basicInfo.value = [
-      { name: '详细描述', value: data?.description },
+      { name: 'Description', value: data?.description },
       { name: '版本支持情况', value: data.osSupport },
       { name: '架构', value: data.arch },
       { name: '软件包分类', value: data.rpmCategory || '其他' },
@@ -165,7 +160,7 @@ const getDetailValue = (data: any) => {
     version.value = data?.version;
   } else if (typePkg.value === 'EPKG') {
     basicInfo.value = [
-      { name: '详细描述', value: data?.description },
+      { name: 'Description', value: data?.description },
       { name: '版本号', value: data.version },
       { name: '版本支持情况', value: data.osSupport },
       { name: '架构', value: data.arch },
@@ -235,12 +230,6 @@ const queryTags = () => {
     tagsValue.value = res.data.list;
   });
 };
-const { locale } = useLocale();
-const breadcrumbInfo = ref({ name: '', path: '' });
-const getTitle = () => {
-  breadcrumbInfo.value = { path: `/${locale.value}/applicationsPackage`, name: '领域应用' };
-};
-const home = ref({ name: '软件市场', path: `/${locale.value}/` });
 
 const showExternalDlg = ref(false);
 const externalLink = ref('');
@@ -279,11 +268,8 @@ const repeatTags = (v: string) => {
 </script>
 <template>
   <ContentWrapper vertical-padding="24px">
-    <OBreadcrumb>
-      <OBreadcrumbItem :to="home.path">{{ home.name }}</OBreadcrumbItem>
-      <OBreadcrumbItem :to="breadcrumbInfo.path">{{ breadcrumbInfo.name }}</OBreadcrumbItem>
-      <OBreadcrumbItem>{{ appData.name }} </OBreadcrumbItem>
-    </OBreadcrumb>
+    <AppBreadcrumb id="apppkg" :name="appData.name" />
+
     <DetailHead :data="appData" :basicInfo="summary" :maintainer="maintainer" />
 
     <OTab variant="text" @change="onChange" :line="false" class="domain-tabs" v-model="activeName" size="large">
@@ -309,7 +295,7 @@ const repeatTags = (v: string) => {
                     >{{ item.type }}</OLink
                   >
                   <span class="markdown-body installation mymarkdown-body" v-dompurify-html="item.value" v-copy-code="true" v-else></span>
-               </p>
+                </p>
               </div>
               <p class="sp">> 安装指引</p>
               <div v-if="installation" v-dompurify-html="installation" v-copy-code="true" class="markdown-body installation"></div>

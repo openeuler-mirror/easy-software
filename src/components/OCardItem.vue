@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import type { PropType } from 'vue';
 import { OCard, OTag, OIcon } from '@opensig/opendesign';
-import type { AppItemT, PkgIdsT } from '@/@types/app';
+import type { AppItemT, PkgIdsT, PkgTypeT } from '@/@types/app';
 import { getTagsIcon, xssAllTag } from '@/utils/common';
 import { useLocale } from '@/composables/useLocale';
 import { useI18n } from 'vue-i18n';
@@ -17,10 +17,10 @@ defineProps({
 
 const { locale } = useLocale();
 const { t } = useI18n();
-const jumpTo = (name: string, id: PkgIdsT, type: string) => {
-  return `/${locale.value}/applicationsPackage/${xssAllTag(name)}?type=${type}${id.IMAGE ? `&appPkgId=${id.IMAGE}` : ''}${
-    id.EPKG ? `&epkgPkgId=${id.EPKG}` : ''
-  }${id.RPM ? `&rpmPkgId=${id.RPM}` : ''}`;
+const jumpTo = (name: string, id: PkgIdsT, type: PkgTypeT) => {
+  return `/${locale.value}/apppkg/${xssAllTag(name)}?type=${type}${id.IMAGE ? `&appPkgId=${id.IMAGE}` : ''}${id.EPKG ? `&epkgPkgId=${id.EPKG}` : ''}${
+    id.RPM ? `&rpmPkgId=${id.RPM}` : ''
+  }`;
 };
 
 const repeatTags = (v: string) => {

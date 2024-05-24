@@ -8,12 +8,12 @@ export const navs = [
     href: '/',
   },
   {
-    id: 'applicationsPackage',
+    id: 'apppkg',
     label: {
       zh: '领域应用',
       en: 'applications Package'
     },
-    href: '/applicationsPackage',
+    href: '/apppkg',
   },
   {
     id: 'rpm',
