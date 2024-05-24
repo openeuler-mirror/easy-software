@@ -183,7 +183,7 @@ const jumpTo = (name: string, id: string) => {
   <AppSection :title="`${data.name}版本支持情况`">
     <OTable :columns="verColumns" :data="verData" border="all" :cell-span="arraySpanMethod" :small="true">
       <template #td_flags="{ row }">
-        <a :href="jumpTo(data.name, row.pkgId)" color="primary" target="_blank" rel="noopener noreferrer">
+        <a :href="jumpTo(data.name, row.pkgId)" color="primary" rel="noopener noreferrer">
           <OTag v-if="row.os === tagVer[0] && row.arch === tagVer[1]" color="primary" :size="'small'">当前版本</OTag> <span v-else>查看</span></a
         >
       </template>

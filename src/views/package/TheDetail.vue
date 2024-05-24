@@ -78,7 +78,7 @@ const license = ref();
 const tagVer = ref();
 const getDetailValue = (data: any) => {
   basicInfo.value = [
-    { name: 'Description', value: data?.description },
+    { name: '详细描述', value: data?.description },
     { name: '版本支持情况', value: data.osSupport },
     { name: '架构', value: data.arch },
     { name: '软件包分类', value: data.epkgCategory || '其他' },
