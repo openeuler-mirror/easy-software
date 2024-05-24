@@ -58,7 +58,7 @@ const queryPkg = (tabValue: string, pkgId: any) => {
 };
 
 // 获取tab分类
-const pkgId = encodeURIComponent(route.query.pkgId as string);
+const pkgId = (route.query.pkgId as string);
 const queryEntity = () => {
   getChange();
 };
