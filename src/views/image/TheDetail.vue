@@ -1,10 +1,10 @@
 <script lang="ts" setup>
 import { ref, onMounted } from 'vue';
-import { OBreadcrumb, OBreadcrumbItem, OTab, OTabPane,OTag } from '@opensig/opendesign';
+import { OBreadcrumb, OBreadcrumbItem, OTab, OTabPane, OTag } from '@opensig/opendesign';
 import { useRoute } from 'vue-router';
 import { useMarkdown } from '@/composables/useMarkdown';
 import type { AppInfoT } from '@/@types/app';
-import { getDetails, getTags, getVer  } from '@/api/api-domain';
+import { getDetails, getTags, getVer } from '@/api/api-domain';
 import { OPENEULER_CONTACT } from '@/data/config';
 import { useLocale } from '@/composables/useLocale';
 import AppFeedback from '@/components/AppFeedback.vue';
@@ -47,10 +47,12 @@ const appData = ref<AppInfoT>({
 
 //详情请求
 const queryPkg = (tabValue: string, pkgId: any) => {
-  getDetails(tabValue, pkgId).then((res) => {
-    const data = res.data.list[0];
-    getDetailValue(data);
-  }).catch(() => {
+  getDetails(tabValue, pkgId)
+    .then((res) => {
+      const data = res.data.list[0];
+      getDetailValue(data);
+    })
+    .catch(() => {
       useViewStore().showNotFound();
     });
 };
@@ -81,9 +83,9 @@ const tagVer = ref();
 const getDetailValue = (data: any) => {
   basicInfo.value = [
     { name: '架构', value: data.arch || '' },
-    { name: '分类', value: data.category || '' },
-    { name: 'License', value: data.license || '' },
-    { name: 'Tag', value: data.appVer || '' },
+
+    { name: '软件包分类', value: data.category || '' },
+
     { name: '版本支持情况', value: data.osSupport || '' },
   ];
   summary.value = data.description;
@@ -116,7 +118,7 @@ const tagsValue = ref();
 const queryTags = () => {
   getTags(appData.value.name).then((res) => {
     tagsValue.value = res.data.list;
-  })
+  });
 };
 const { locale } = useLocale();
 
@@ -164,7 +166,7 @@ const queryVer = () => {
                   <p v-for="item in basicInfo" :key="item.name">
                     <span class="label markdown download">{{ item.name }}</span>
                     <a :href="item.value" v-if="item.name === '所属仓库' || item.name === 'Repo源'" target="_blank">{{ item.type }}</a>
-                    <span class="markdown-body mymarkdown-body" v-dompurify-html="item.value" v-copy-code="true" >
+                    <span class="markdown-body mymarkdown-body" v-dompurify-html="item.value" v-copy-code="true">
                       <OTag v-if="item.name === '版本支持情况' && latestOsSupport" color="primary"> 最新版本</OTag>
                     </span>
                   </p>
@@ -181,7 +183,16 @@ const queryVer = () => {
         <AppFeedback v-if="!isTags" :email="maintainer.maintainerEmail" />
       </div>
       <div v-if="!isTags" class="detail-row-side">
-        <DetailAside :data="appData" :basicInfo="basicInfo" :maintainer="maintainer" :type="'IMAGE'" :downloadData="downloadData" :ver-data="verData" :license="license" :tagVer="tagVer"/>
+        <DetailAside
+          :data="appData"
+          :basicInfo="basicInfo"
+          :maintainer="maintainer"
+          :type="'IMAGE'"
+          :downloadData="downloadData"
+          :ver-data="verData"
+          :license="license"
+          :tagVer="tagVer"
+        />
       </div>
     </div>
   </ContentWrapper>
