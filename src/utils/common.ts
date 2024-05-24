@@ -81,9 +81,9 @@ export const getCode = (code: string) => {
   const match = JSON.stringify(code).match(codeRegex);
   if (match) {
     // 如果匹配成功，则输出匹配到的内容
-    const codeContent =match[1].replace(/\\n/g,'')
+    const codeContent = match[1].replace(/\\n/g, '')
     return codeContent;
-  } 
+  }
 };
 
 // 检查是否是同域名
@@ -112,4 +112,21 @@ export function getUrlParams(url: string) {
     }
     return list;
   }
+}
+
+
+/**
+ * 过滤空参数
+ * @param {data} any 地址
+ * @returns {object} 成功返回参数对象 
+ */
+export const getParamsRules = (data: any) => {
+  const newData = {} as any;
+  Object.keys(data).forEach((key) => {
+    const value = data[key as keyof any];
+    if (value) {
+      newData[key] = value;
+    }
+  });
+  return newData
 }

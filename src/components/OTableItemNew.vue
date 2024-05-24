@@ -105,10 +105,6 @@ const onExternalDialog = (href: string) => {
         <div class="operation-box">
           <!-- 容器镜像 -->
           <template v-if="props.type === 'apppkg'">
-            <!-- <OLink color="primary" arget="_blank" rel="noopener noreferrer" class="code-repo">
-              Dockerfile
-              <template #suffix><IconOutlink /></template>
-            </OLink> -->
             <OLink color="primary" hover-underline @click="openDownloadDialog(row.name, row.appVer)">{{ t('software.columns.download') }}</OLink>
           </template>
           <template v-else>

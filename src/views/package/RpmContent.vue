@@ -6,6 +6,8 @@ import { getSearchData } from '@/api/api-search';
 import { useRoute } from 'vue-router';
 import { getSearchAllFiled } from '@/api/api-domain';
 import { useLocale } from '@/composables/useLocale';
+
+import { getParamsRules } from '@/utils/common';
 import { useViewStore } from '@/stores/common';
 import { ElPagination, ElConfigProvider } from 'element-plus';
 import zhCn from 'element-plus/es/locale/lang/zh-cn';
@@ -37,7 +39,7 @@ const pkgData = ref([]);
 const tabName = ref('rpmpkg');
 const keywordType = ref((route.query.key as string) || '');
 const isLoading = ref(false);
-const timeOrder = ref('desc');
+const timeOrder = ref('');
 const nameOrder = ref('');
 
 const searchKey = ref((route.query.name as string) || '');
@@ -61,10 +63,13 @@ const searchParams = computed(() => {
 });
 const isSearchError = ref(false);
 const isSearch = ref(false);
+// es搜索
 const querySearch = () => {
   isLoading.value = true;
 
-  getSearchData(searchParams.value)
+  // 过滤空参数
+  const newData = getParamsRules(searchParams.value);
+  getSearchData(newData)
     .then((res) => {
       pkgData.value = res.data.rpmpkg;
       total.value = res.data.total;
@@ -95,7 +100,11 @@ const queryAllpkg = () => {
     category: searchCategory.value.join(),
   };
   isLoading.value = true;
-  getSearchAllFiled(params)
+
+  // 过滤空参数
+  const newData = getParamsRules(params);
+
+  getSearchAllFiled(newData)
     .then((res) => {
       pkgData.value = res.data.list;
       total.value = res.data.total;
@@ -180,7 +189,8 @@ const handleResettingTag = () => {
   searchOs.value = [];
   searchArch.value = [];
   searchCategory.value = [];
-
+  timeOrder.value = '';
+  nameOrder.value = '';
   isSearch.value = false;
 };
 
