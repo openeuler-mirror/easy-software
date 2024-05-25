@@ -11,12 +11,13 @@ import AppFeedback from '@/components/AppFeedback.vue';
 import DetailHead from '@/components/DetailHeader.vue';
 import DetailAside from '@/components/DetailAside.vue';
 import defaultImg from '@/assets/default-logo.png';
-import { columnTags, tabList } from '@/data/detail/index';
+import { columnTags, tagList } from '@/data/detail/index';
 import { useViewStore } from '@/stores/common';
-
+import { useI18n } from 'vue-i18n';
+const { t } = useI18n();
 const route = useRoute();
 const { mkit } = useMarkdown();
-const activeName = ref(tabList[0]);
+const activeName = ref(tagList[0].lable);
 const basicInfo = ref<DetailItemT[]>([]);
 const version = ref();
 const installation = ref('');
@@ -135,8 +136,8 @@ const queryVer = () => {
       <div class="detail-row-main" :class="{ tags: isTags }">
         <AppSection>
           <OTab variant="text" @change="onChange" :line="false" class="domain-tabs tabs-switch" v-model="activeName">
-            <OTabPane class="tab-pane" v-for="item in tabList" :key="item" :label="item">
-              <div v-if="item === '概览'">
+            <OTabPane class="tab-pane" v-for="item in tagList" :key="item" :label="item.lable">
+              <div v-if="item.lable === tagList[0].lable">
                 <div class="title">
                   <p>> 基本信息</p>
                   <p v-if="version" class="ver">版本号：{{ version }}</p>
@@ -144,9 +145,10 @@ const queryVer = () => {
                 <div class="basic-info">
                   <p v-for="item in basicInfo" :key="item.name">
                     <span class="label markdown download">{{ item.name }}</span>
-                    <a :href="item.value" v-if="item.name === '所属仓库' || item.name === 'Repo源'" target="_blank">{{ item.type }}</a>
-                    <span class="markdown-body mymarkdown-body" v-dompurify-html="item.value" v-copy-code="true">
-                      <OTag v-if="item.name === '版本支持情况' && latestOsSupport" color="primary"> 最新版本</OTag>
+
+                    <span class="markdown-body mymarkdown-body">
+                      {{ item.value }}
+                      <OTag v-if="item.name === t('detail.support') && latestOsSupport" color="primary" size="small" > 最新版本</OTag>
                     </span>
                   </p>
                 </div>
