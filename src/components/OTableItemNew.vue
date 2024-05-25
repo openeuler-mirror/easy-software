@@ -39,9 +39,8 @@ const props = defineProps({
 const { t } = useI18n();
 const { locale } = useLocale();
 const jumpTo = (id: string) => {
-  const type = props.type === 'apppkg' ? 'image' : props.type === 'rpmpkg' ? 'RPM' : 'EPKG';
   const detailType = props.type === 'apppkg' ? 'image' : props.type === 'rpmpkg' ? 'package' : 'epkg';
-  const newHref = `/${locale.value}/${detailType}/detail?type=${type}&pkgId=${encodeURIComponent(id)}`;
+  const newHref = `/${locale.value}/${detailType}/detail?pkgId=${encodeURIComponent(id)}`;
   return newHref;
 };
 

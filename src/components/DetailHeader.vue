@@ -50,24 +50,24 @@ const onExternalDialog = (href: string) => {
           <div class="box">
             <p class="title">
               {{ data.name }}
-              <a @click="onExternalDialog(data.repository)" v-if="data.repository" target="_blank" rel="noopener noreferrer"
-                ><img :src="Home" class="icon-img" alt="" />主页</a
+              <a @click="onExternalDialog(data.repository)" v-if="data.repository" target="_blank" rel="noopener noreferrer">
+                <img :src="Home" class="icon-img" alt="" />主页</a
               >
             </p>
-            <p class="detail">{{ basicInfo }}</p>
+            <p v-if="basicInfo" class="detail">{{ basicInfo }}</p>
           </div>
         </div>
 
         <div class="right">
           <p class="sp">维护者信息</p>
-          <p class="title">维护者：{{ maintainer.maintainerId }}</p>
-          <p class="text">
+          <p v-if="maintainer.maintainerId" class="title">维护者：{{ maintainer.maintainerId }}</p>
+          <p v-if="maintainer.maintainerEmail" class="text">
             <a class="email" :href="`mailto:${maintainer.maintainerEmail}`">
               <img :src="Email" class="icon-img" alt="" />
               <span>{{ `mailto:${maintainer.maintainerEmail}` }}</span>
             </a>
           </p>
-          <p class="text">
+          <p v-if="maintainer.maintainerGiteeId" class="text">
             <a class="gitee" @click="onExternalDialog(`${GITEE}/${maintainer.maintainerGiteeId}`)">
               <img :src="Gitee" class="icon-img" alt="" />
               <span>{{ `${GITEE}/${maintainer.maintainerGiteeId}` }}</span>

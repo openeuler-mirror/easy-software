@@ -7,6 +7,7 @@ import type { RecommendItemT } from '@/@types/search';
 import { onClickOutside } from '@vueuse/core';
 import { useLocale } from '@/composables/useLocale';
 import { useI18n } from 'vue-i18n';
+import { FLITERMENUOPTIONS } from '@/data/query';
 
 import SearchRecommend from '@/components/search/SearchRecommend.vue';
 
@@ -27,26 +28,6 @@ const router = useRouter();
 const route = useRoute();
 const { locale } = useLocale();
 const { t } = useI18n();
-
-// 筛选菜单
-const flitermenuItem = [
-  {
-    id: 'all',
-    name: t('software.filterAll'),
-  },
-  {
-    id: 'name',
-    name: t('software.filterName'),
-  },
-  {
-    id: 'summary',
-    name: t('software.filterSummary'),
-  },
-  {
-    id: 'file',
-    name: t('software.filterFile'),
-  },
-];
 
 const defaultValue = ref('all');
 const searchInput = ref('');
@@ -179,13 +160,13 @@ onMounted(() => {
     <OSelect
       v-model="defaultValue"
       style="width: 120px"
-      :placeholder="flitermenuItem[0].name"
+      :placeholder="FLITERMENUOPTIONS[0].name"
       variant="text"
       :size="show ? 'large' : 'medium'"
       round="0"
       @change="(v) => changeFilter(v)"
     >
-      <OOption v-for="item in flitermenuItem" :key="item.id" :label="item.name" :value="item.id" />
+      <OOption v-for="item in FLITERMENUOPTIONS" :key="item.id" :label="item.name" :value="item.id" />
     </OSelect>
     <div class="search-box">
       <OInput
