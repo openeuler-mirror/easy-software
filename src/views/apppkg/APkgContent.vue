@@ -8,6 +8,8 @@ import { useLocale } from '@/composables/useLocale';
 import { useViewStore } from '@/stores/common';
 import { useI18n } from 'vue-i18n';
 import { getParamsRules } from '@/utils/common';
+import { isValidSearchTabName, isValidSearchKey } from '@/utils/query';
+import { TABNAME_OPTIONS, FLITERMENUOPTIONS } from '@/data/query';
 
 import { ElPagination, ElConfigProvider } from 'element-plus';
 import zhCn from 'element-plus/es/locale/lang/zh-cn';
@@ -64,7 +66,7 @@ const queryAllpkg = () => {
   isLoading.value = true;
   // 过滤空参数
   const newData = getParamsRules(params);
-
+  
   getSearchAllFiled(newData)
     .then((res) => {
       pkgData.value = res.data.list;
@@ -195,8 +197,6 @@ onMounted(() => {
   const homeType = route.query.type as string;
   if (homeType) {
     searchCategory.value.push(homeType);
-  } else {
-    pageSearch();
   }
   queryFilter();
 });
@@ -209,7 +209,7 @@ watch(
   { deep: true }
 );
 
-// 参数变化分页器还原
+// -------------------- 除分页器相关请求参数变化，发请求获取新数据 --------------------
 watch(
   () => [searchCategory.value, searchOs.value, searchArch.value, nameOrder.value],
   () => {
@@ -222,17 +222,25 @@ watch(
 const handleQueryData = () => {
   const query = route.query;
   const { name, tab, key } = query;
+
   if (!isUndefined(name) && name) {
     searchKey.value = name?.toString();
     currentPage.value = 1;
   } else if (name === '') {
+    searchKey.value = '';
     isSearchDocs.value = false;
   }
-  if (isString(tab) && tab) {
-    tabName.value = tab?.toString();
+
+  if (isValidSearchTabName(tab) && tab) {
+    tabName.value = tab as string;
+  } else {
+    tabName.value = TABNAME_OPTIONS[0];
   }
-  if (isString(key) && key) {
-    keywordType.value = key?.toString();
+  // 判断key参数
+  if (isValidSearchKey(key) && key) {
+    keywordType.value = encodeURIComponent(key as string);
+  } else {
+    keywordType.value = FLITERMENUOPTIONS[0].id;
   }
 };
 handleQueryData();
