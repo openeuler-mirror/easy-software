@@ -40,14 +40,18 @@ const appData = ref<AppInfoT>({
 
 //详情请求
 const queryPkg = () => {
-  getDetails(tabValue.value, pkgId.value)
-    .then((res) => {
-      const data = res.data.list[0];
-      getDetailValue(data);
-    })
-    .catch(() => {
-      useViewStore().showNotFound();
-    });
+  if (pkgId.value !== '') {
+    getDetails(tabValue.value, pkgId.value)
+      .then((res) => {
+        const data = res.data.list[0];
+        getDetailValue(data);
+      })
+      .catch(() => {
+        useViewStore().showNotFound();
+      });
+  } else {
+    useViewStore().showNotFound();
+  }
 };
 const pkgId = ref('');
 if (isString(route.query?.pkgId)) {

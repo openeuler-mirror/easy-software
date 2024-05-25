@@ -17,7 +17,7 @@ const { locale } = useLocale();
         </slot>
       </template>
       <template #extra>
-        <p class="text404">404</p>
+        <p class="text404">暂无数据</p>
         <RouterLink :to="`/${locale}/`">
           <OButton variant="solid" color="primary">返回首页</OButton>
         </RouterLink>
