@@ -1,10 +1,10 @@
 <script lang="ts" setup>
 import { ref, onMounted } from 'vue';
-import { OTab, OTabPane, OTable, OLink, OIcon, OTag } from '@opensig/opendesign';
+import { OTab, OTabPane, OTable, OLink, OIcon, OTag, isString } from '@opensig/opendesign';
 import { useRoute } from 'vue-router';
 import { getDetails, getDetail, getTags, getVer } from '@/api/api-domain';
 import { useMarkdown } from '@/composables/useMarkdown';
-import type { AppInfoT, MaintainerT, DetailItemT, MoreMessgeT } from '@/@types/app';
+import type { AppInfoT, MaintainerT, DetailItemT, MoreMessgeT, PkgTypeT } from '@/@types/app';
 
 import { OPENEULER_CONTACT } from '@/data/config';
 import AppFeedback from '@/components/AppFeedback.vue';
@@ -44,14 +44,6 @@ const appData = ref<AppInfoT>({
   bin_code: '',
 });
 
-//详情请求
-const queryPkg = (tabValue: string, pkgId: any) => {
-  getDetails(tabValue, pkgId).then((res) => {
-    const data = res.data.list[0];
-    getDetailValue(data);
-  });
-};
-
 // 获取tab分类
 const tabList = ref<string[]>([]);
 const pkgId = ref('');
@@ -61,31 +53,31 @@ const imgData = ref();
 const queryEntity = () => {
   const query = route.query;
   const { type, appPkgId, epkgPkgId, rpmPkgId } = query;
-  activeName.value = type as string;
-
-  if (pkgId.value) {
-    getDetail(
-      getDetailRules({
-        appPkgId: (appPkgId as string) || '',
-        epkgPkgId: (epkgPkgId as string) || '',
-        rpmPkgId: (rpmPkgId as string) || '',
-      })
-    )
-      .then((res) => {
-        const data = res.data;
-        tabList.value = data.tags;
-        epkgData.value = data['EPKG'];
-        rpmData.value = data['RPM'];
-        imgData.value = data['IMAGE'];
-        onChange(activeName.value);
-      })
-      .catch(() => {
-        useViewStore().showNotFound();
-      });
-  } else {
-    getChange(activeName.value);
-    tabList.value = [activeName.value];
+  if (isString(type) && (type as PkgTypeT)) {
+    activeName.value = type as string;
   }
+
+  getDetail(
+    getDetailRules({
+      appPkgId: (appPkgId as string) || '',
+      epkgPkgId: (epkgPkgId as string) || '',
+      rpmPkgId: (rpmPkgId as string) || '',
+    })
+  )
+    .then((res) => {
+      const data = res.data;
+      tabList.value = data.tags;
+      epkgData.value = data['EPKG'];
+      rpmData.value = data['RPM'];
+      imgData.value = data['IMAGE'];
+      pkgId.value = data[data.tags[0]].name;
+
+      onChange(activeName.value);
+      queryVer();
+    })
+    .catch(() => {
+      useViewStore().showNotFound();
+    });
 };
 
 //tab切换
@@ -95,40 +87,20 @@ const onChange = (tab: string) => {
     tabValue.value = 'rpmpkg';
     typePkg.value = 'RPM';
     getDetailValue(rpmData.value);
-    queryVer();
   } else if (tab === 'EPKG') {
     tabValue.value = 'epkgpkg';
     typePkg.value = 'EPKG';
     getDetailValue(epkgData.value);
-    queryVer();
   } else if (tab === 'IMAGE') {
     tabValue.value = 'apppkg';
     typePkg.value = 'IMAGE';
     getDetailValue(imgData.value);
-    queryVer();
   } else {
     useViewStore().showNotFound();
   }
 };
-const getChange = (tab: string) => {
-  if (tab === 'RPM') {
-    tabValue.value = 'rpmpkg';
-    typePkg.value = 'RPM';
-  } else if (tab === 'EPKG') {
-    tabValue.value = 'epkgpkg';
-    typePkg.value = 'EPKG';
-  } else if (tab === 'IMAGE') {
-    tabValue.value = 'apppkg';
-    typePkg.value = 'IMAGE';
-  }
-  getPkg(tabValue.value);
-};
-const getPkg = (tabValue: string) => {
-  queryPkg(tabValue, pkgId.value);
-};
 
 onMounted(() => {
-  pkgId.value = location.pathname.split('/')[3];
   queryEntity();
 });
 const imageUsage = ref();
@@ -181,19 +153,19 @@ const getDetailValue = (data: any) => {
     appData.value.size = data.epkgSize || 0;
     summary.value = data.summary;
     version.value = data?.version;
-  } else {
+  } else if (typePkg.value === 'IMAGE') {
     basicInfo.value = [
       { name: '架构', value: data.arch || '' },
-
       { name: '软件包分类', value: data.category || '' },
-
       { name: '版本支持情况', value: data.osSupport || '' },
     ];
     appData.value.size = data.appSize || 0;
     latestOsSupport.value = data.latestOsSupport;
     summary.value = data.description;
     version.value = data?.appVer;
-    queryTags();
+    if (tagsValue.value.length === 0) {
+      queryTags();
+    }
   }
   tagVer.value = [data.osSupport, data.arch];
   maintainer.value = {
@@ -215,7 +187,6 @@ const getDetailValue = (data: any) => {
   appData.value.bin_code = data.binDownloadUrl;
   appData.value.cover = data?.iconUrl || defaultImg;
   appData.value.repository = data.srcRepo;
- 
 };
 
 // 更多信息表头
@@ -229,9 +200,9 @@ const moreColumns = [
 // 获取img分类
 const imgList = ref<string[]>(['概览', 'Tags']);
 const imgName = ref('概览');
-const tagsValue = ref();
+const tagsValue = ref([]);
 const queryTags = () => {
-  getTags(encodeURIComponent(appData.value.name as string)).then((res) => {
+  getTags(encodeURIComponent(pkgId.value)).then((res) => {
     tagsValue.value = res.data.list;
   });
 };
@@ -256,7 +227,7 @@ const getTabIcon = (tab: string) => {
 //获取支持
 const verData = ref();
 const queryVer = () => {
-  getVer(tabValue.value, encodeURIComponent(appData.value.name as string)).then((res) => {
+  getVer(tabValue.value, encodeURIComponent(pkgId.value)).then((res) => {
     verData.value = res.data.list;
   });
 };
@@ -320,7 +291,7 @@ const repeatTags = (v: string) => {
               </OTab>
             </AppSection>
             <AppSection v-else>
-              <OTab variant="text" @change="onChangeImage" :line="false" class="domain-tabs switch" v-model="imgName">
+              <OTab variant="text" @change="onChangeImage" :line="false" class="domain-tabs tabs-switch" v-model="imgName">
                 <OTabPane class="tab-pane" v-for="item in imgList" :key="item" :label="item">
                   <div v-if="item === '概览'">
                     <div class="title">

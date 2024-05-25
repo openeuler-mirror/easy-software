@@ -17,10 +17,10 @@ defineProps({
 
 const { locale } = useLocale();
 const { t } = useI18n();
-const jumpTo = (name: string, id: PkgIdsT, type: PkgTypeT) => {
-  return `/${locale.value}/apppkg/${xssAllTag(name)}?type=${type}${id.IMAGE ? `&appPkgId=${encodeURIComponent(id.IMAGE)}` : ''}${id.EPKG ? `&epkgPkgId=${encodeURIComponent(id.EPKG)}` : ''}${
-    id.RPM ? `&rpmPkgId=${encodeURIComponent(id.RPM)}` : ''
-  }`;
+const jumpTo = (id: PkgIdsT, type: PkgTypeT) => {
+  return `/${locale.value}/apppkg/detail?type=${type}${id.IMAGE ? `&appPkgId=${encodeURIComponent(id.IMAGE)}` : ''}${
+    id.EPKG ? `&epkgPkgId=${encodeURIComponent(id.EPKG)}` : ''
+  }${id.RPM ? `&rpmPkgId=${encodeURIComponent(id.RPM)}` : ''}`;
 };
 
 const repeatTags = (v: string) => {
@@ -38,18 +38,12 @@ const repeatTags = (v: string) => {
   >
     <template #main>
       <div class="pkg-info">
-        <a
-          :href="jumpTo(data.name, (data.pkgIds), data.tags[0])"
-          target="_blank"
-          rel="noopener noreferrer"
-          v-dompurify-html="data.name"
-          class="name"
-        ></a>
+        <a :href="jumpTo(data.pkgIds, data.tags[0])" target="_blank" rel="noopener noreferrer" v-dompurify-html="data.name" class="name"></a>
         <div class="pkg-icon"><img :src="data.iconUrl || defaultImg" class="icon" :class="{ 'default-img': !data.iconUrl }" /></div>
       </div>
       <div class="pkg-box">
         <div v-if="data.tags && data.tags.length > 0" class="tags-box">
-          <a :href="jumpTo(data.name, data.pkgIds, tag)" v-for="tag in data.tags" :key="tag" target="_blank" rel="noopener noreferrer">
+          <a :href="jumpTo(data.pkgIds, tag)" v-for="tag in data.tags" :key="tag" target="_blank" rel="noopener noreferrer">
             <OTag style="--o-icon_size_control-xs: 0" variant="outline" :class="`${tag.toLocaleLowerCase()}-icon`">
               <template #icon>
                 <OIcon><component :is="getTagsIcon(tag)" /></OIcon>
