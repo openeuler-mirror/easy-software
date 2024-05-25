@@ -226,6 +226,7 @@ onMounted(() => {
   isPageSearch.value = route.name === 'search';
 
   queryFilter();
+  handleQueryData();
 });
 
 watch(
@@ -268,7 +269,6 @@ const handleQueryData = () => {
     keywordType.value = FLITERMENUOPTIONS[0].id;
   }
 };
-handleQueryData();
 
 watch(
   () => route.query,
@@ -311,7 +311,7 @@ watch(
 
     <div class="pkg-content">
       <FilterHeader title="RPM" @sort="changeTimeOrder" :total="total" />
-      <div v-if="isSearch || searchArch.length > 0 || searchOs.length > 0 || searchCategory.length > 0" class="search-result">
+      <div v-if="isSearchDocs || searchArch.length > 0 || searchOs.length > 0 || searchCategory.length > 0" class="search-result">
         <p v-if="!isPageSearch" class="text">
           为您找到符合条件的筛选<span class="total">{{ total }}</span
           >个

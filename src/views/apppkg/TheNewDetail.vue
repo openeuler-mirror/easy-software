@@ -7,6 +7,11 @@ import { useMarkdown } from '@/composables/useMarkdown';
 import type { AppInfoT, MaintainerT, DetailItemT, MoreMessgeT, PkgTypeT } from '@/@types/app';
 import { OPENEULER_CONTACT } from '@/data/config';
 import { isValidTags } from '@/utils/query';
+import { columnTags, tagList } from '@/data/detail/index';
+import { useI18n } from 'vue-i18n';
+import { useViewStore } from '@/stores/common';
+import { getDetailRules } from '@/utils/common';
+
 import AppFeedback from '@/components/AppFeedback.vue';
 import DetailHead from '@/components/DetailHeader.vue';
 import ExternalLink from '@/components/ExternalLink.vue';
@@ -15,10 +20,7 @@ import defaultImg from '@/assets/default-logo.png';
 import IconEpkg from '~icons/pkg/epkg.svg';
 import IconImage from '~icons/pkg/image.svg';
 import IconRpm from '~icons/pkg/rpm.svg';
-import { columnTags, tagList } from '@/data/detail/index';
-import { useI18n } from 'vue-i18n';
-import { useViewStore } from '@/stores/common';
-import { getDetailRules } from '@/utils/common';
+
 const { t } = useI18n();
 const route = useRoute();
 const { mkit } = useMarkdown();
@@ -122,11 +124,19 @@ const getDetailValue = (data: any) => {
       { name: '所属仓库', value: JSON.parse(data?.repo).url, type: JSON.parse(data?.repo).type },
       { name: 'Repo源', value: JSON.parse(data?.repoType).url, type: JSON.parse(data?.repoType).type },
     ];
-    moreMessge.value = [
+    const newData = [
       { name: 'Requires', value: JSON.parse(data?.requires || '') },
       { name: 'Provides', value: JSON.parse(data?.provides || '') },
       { name: 'Conflicts', value: JSON.parse(data?.conflicts || '') },
     ];
+    moreMessge.value = [];
+    // 过滤空数据
+    newData.forEach((item) => {
+      if (item.value.length > 0) {
+        moreMessge.value.push(item);
+      }
+    });
+
     appData.value.size = data.rpmSize || 0;
     summary.value = data.summary;
     version.value = data?.version;
@@ -145,7 +155,7 @@ const getDetailValue = (data: any) => {
       { name: 'Provides', value: JSON.parse(data?.provides || '') },
       { name: 'Conflicts', value: JSON.parse(data?.conflicts || '') },
     ];
-
+    moreMessge.value = [];
     // 过滤空数据
     newData.forEach((item) => {
       if (item.value.length > 0) {
@@ -278,13 +288,7 @@ const repeatTags = (v: string) => {
               <p class="sp">> 安装指引</p>
               <div v-if="installation" v-dompurify-html="installation" v-copy-code="true" class="markdown-body installation"></div>
               <p class="sp" v-if="item !== 'IMAGE'">> 更多信息</p>
-              <OTab
-                variant="text"
-                :line="false"
-                class="domain-tabs tabs-switch"
-                v-if="item !== 'IMAGE'"
-                :class="moreMessge.length > 1 ? 'tabs-switch' : 'tabs-one'"
-              >
+              <OTab variant="text" :line="false" class="domain-tabs" v-if="item !== 'IMAGE'" :class="moreMessge.length > 1 ? 'tabs-switch' : 'tabs-one'">
                 <template v-for="it in moreMessge" :key="it">
                   <OTabPane class="tab-pane" v-if="it.value.length > 0" :label="it.name">
                     <OTable :columns="moreColumns" :data="it.value" :small="true" border="all"> </OTable>
