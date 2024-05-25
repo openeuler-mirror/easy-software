@@ -3,7 +3,7 @@ export interface AppItemT {
   description: string | null;
   iconUrl: string | null;
   name: string;
-  tags: string[];
+  tags: PkgTypeT[];
   pkgIds: PkgIdsT;
 }
 export interface PkgIdsT {
@@ -25,3 +25,41 @@ export interface AppInfoT {
   source_code: string;
   bin_code: string;
 }
+
+
+export interface MaintainerT {
+  maintainerId: string;
+  maintainerEmail: string;
+  maintainerGiteeId: string;
+};
+
+export interface DetailItemT {
+  name: string;
+  value: string | any;
+  type?: string;
+}
+
+
+export interface HomeInfoT {
+  id: string;
+  name: string;
+  desc: string;
+  icon: string;
+  href: string;
+}
+
+export interface MoreMessgeT {
+  name: string;
+  value: MoreMessgeItemT[];
+}
+export interface MoreMessgeItemT {
+  name: string;
+  flags: string;
+  rel: string;
+  ver: string;
+  epoch: string;
+}
+
+
+
+export type PkgTypeT = 'RPM' | 'IMAGE' | 'EPKG';

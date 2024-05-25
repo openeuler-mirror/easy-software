@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { ref, watch, computed, onMounted } from 'vue';
-import { OTag, vLoading, OLink, OIcon } from '@opensig/opendesign';
+import { OTag, vLoading, OLink, OIcon, isUndefined, isString } from '@opensig/opendesign';
 import { useI18n } from 'vue-i18n';
 import { getSearchData } from '@/api/api-search';
 import { useRoute } from 'vue-router';
@@ -62,7 +62,7 @@ const searchParams = computed(() => {
   };
 });
 const isSearchError = ref(false);
-const isSearch = ref(false);
+const isSearchDocs = ref(false);
 // es搜索
 const querySearch = () => {
   isLoading.value = true;
@@ -74,7 +74,7 @@ const querySearch = () => {
       pkgData.value = res.data.rpmpkg;
       total.value = res.data.total;
       isLoading.value = false;
-      isSearch.value = true;
+      isSearchDocs.value = true;
       if (pkgData.value.length === 0) {
         isSearchError.value = true;
       }
@@ -82,7 +82,7 @@ const querySearch = () => {
     .catch(() => {
       pkgData.value = [];
       isLoading.value = false;
-      isSearch.value = false;
+      isSearchDocs.value = false;
       useViewStore().showNotFound();
     });
 };
@@ -191,7 +191,7 @@ const handleResettingTag = () => {
   searchCategory.value = [];
   timeOrder.value = '';
   nameOrder.value = '';
-  isSearch.value = false;
+  isSearchDocs.value = false;
 };
 
 // 更新时间、字母排序
@@ -245,31 +245,31 @@ watch(
   { deep: true }
 );
 
-watch(
-  () => route.query.name as string,
-  (v: string) => {
-    if (searchKey.value !== v && v !== undefined) {
-      searchKey.value = v;
-    }
-    if (v === '') {
-      isSearch.value = false;
-    }
+// -------------------- 监听 url query 变化 触发搜索 ---------------------
+const handleQueryData = () => {
+  const query = route.query;
+  const { name, tab, key } = query;
+  if (!isUndefined(name) && name) {
+    searchKey.value = name?.toString();
     currentPage.value = 1;
+  } else if (name === '') {
+    isSearchDocs.value = false;
   }
-);
+  if (isString(tab) && tab) {
+    tabName.value = tab?.toString();
+  }
+  if (isString(key) && key) {
+    keywordType.value = key?.toString();
+  }
+};
+handleQueryData();
 
 watch(
-  () => route.query.tab as string,
-  (v: string) => {
-    tabName.value = v;
-  }
-);
-
-watch(
-  () => route.query.key as string,
-  (v: string) => {
-    keywordType.value = v;
-  }
+  () => route.query,
+  () => {
+    handleQueryData();
+  },
+  { deep: true }
 );
 </script>
 

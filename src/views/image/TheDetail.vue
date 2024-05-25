@@ -1,34 +1,23 @@
 <script lang="ts" setup>
 import { ref, onMounted } from 'vue';
-import { OBreadcrumb, OBreadcrumbItem, OTab, OTabPane,OTag } from '@opensig/opendesign';
+import { OTab, OTabPane, OTag } from '@opensig/opendesign';
 import { useRoute } from 'vue-router';
 import { useMarkdown } from '@/composables/useMarkdown';
-import type { AppInfoT } from '@/@types/app';
-import { getDetails, getTags, getVer  } from '@/api/api-domain';
+import type { AppInfoT, MaintainerT, DetailItemT } from '@/@types/app';
+import type { ImageDetailT } from '@/@types/detail';
+import { getDetails, getTags, getVer } from '@/api/api-domain';
 import { OPENEULER_CONTACT } from '@/data/config';
-import { useLocale } from '@/composables/useLocale';
 import AppFeedback from '@/components/AppFeedback.vue';
-import DetailHead from '../applicationsPackage/components/DetailNewHead.vue';
-import DetailAside from '../applicationsPackage/components/DetailAside.vue';
+import DetailHead from '@/components/DetailHeader.vue';
+import DetailAside from '@/components/DetailAside.vue';
 import defaultImg from '@/assets/default-logo.png';
 import { columnTags, tabList } from '@/data/detail/index';
 import { useViewStore } from '@/stores/common';
-type MaintainerT = {
-  maintainerId: string;
-  maintainerEmail: string;
-  maintainerGiteeId: string;
-};
-
-interface DetailItem {
-  name: string;
-  value: string | any;
-  type?: string;
-}
 
 const route = useRoute();
 const { mkit } = useMarkdown();
 const activeName = ref(tabList[0]);
-const basicInfo = ref<DetailItem[]>([]);
+const basicInfo = ref<DetailItemT[]>([]);
 const version = ref();
 const installation = ref('');
 const downloadData = ref('');
@@ -46,17 +35,19 @@ const appData = ref<AppInfoT>({
 });
 
 //详情请求
-const queryPkg = (tabValue: string, pkgId: any) => {
-  getDetails(tabValue, pkgId).then((res) => {
-    const data = res.data.list[0];
-    getDetailValue(data);
-  }).catch(() => {
+const queryPkg = (tabValue: string, pkgId: string) => {
+  getDetails(tabValue, pkgId)
+    .then((res) => {
+      const data = res.data.list[0];
+      getDetailValue(data);
+    })
+    .catch(() => {
       useViewStore().showNotFound();
     });
 };
 
 // 获取tab分类
-const pkgId = encodeURIComponent(route.query.pkgId as string);
+const pkgId = route.query.pkgId as string;
 const queryEntity = () => {
   getChange();
 };
@@ -71,23 +62,22 @@ const getPkg = (tabValue: string) => {
 
 onMounted(() => {
   queryEntity();
-  getTitle();
 });
 const imageUsage = ref();
 const summary = ref();
 const latestOsSupport = ref();
 const license = ref();
 const tagVer = ref();
-const getDetailValue = (data: any) => {
+const getDetailValue = (data: ImageDetailT) => {
   basicInfo.value = [
     { name: '架构', value: data.arch || '' },
-    { name: '分类', value: data.category || '' },
-    { name: 'License', value: data.license || '' },
-    { name: 'Tag', value: data.appVer || '' },
+
+    { name: '软件包分类', value: data.category || '' },
+
     { name: '版本支持情况', value: data.osSupport || '' },
   ];
   summary.value = data.description;
-  appData.value.size = data.appSize || 0;
+  appData.value.size = data.appSize || '';
   maintainer.value = {
     maintainerId: data?.maintainerId || 'openEuler community',
     maintainerEmail: data?.maintainerEmail || OPENEULER_CONTACT,
@@ -114,17 +104,10 @@ const getDetailValue = (data: any) => {
 
 const tagsValue = ref();
 const queryTags = () => {
-  getTags(appData.value.name).then((res) => {
+  getTags(encodeURIComponent(appData.value.name as string)).then((res) => {
     tagsValue.value = res.data.list;
-  })
+  });
 };
-const { locale } = useLocale();
-
-const breadcrumbInfo = ref({ name: '', path: '' });
-const getTitle = () => {
-  breadcrumbInfo.value = { path: `/${locale.value}/image`, name: '容器镜像' };
-};
-const home = ref({ name: '软件市场', path: `/${locale.value}/` });
 
 // tags切换功能
 const isTags = ref(false);
@@ -135,7 +118,7 @@ const onChange = (v: string) => {
 //获取支持
 const verData = ref();
 const queryVer = () => {
-  getVer('apppkg', appData.value.name).then((res) => {
+  getVer('apppkg', encodeURIComponent(appData.value.name as string)).then((res) => {
     verData.value = res.data.list;
   });
 };
@@ -143,28 +126,26 @@ const queryVer = () => {
 
 <template>
   <ContentWrapper vertical-padding="24px">
-    <OBreadcrumb>
-      <OBreadcrumbItem :to="home.path">{{ home.name }}</OBreadcrumbItem>
-      <OBreadcrumbItem :to="breadcrumbInfo.path">{{ breadcrumbInfo.name }}</OBreadcrumbItem>
-      <OBreadcrumbItem>{{ appData.name }} </OBreadcrumbItem>
-    </OBreadcrumb>
+    <!-- 锚点 -->
+    <AppBreadcrumb id="image" :name="appData.name" />
+
     <DetailHead :data="appData" :basicInfo="summary" :maintainer="maintainer" />
 
     <div class="detail-row">
       <div class="detail-row-main" :class="{ tags: isTags }">
         <AppSection>
-          <OTab variant="text" @change="onChange" :line="false" class="domain-tabs switch" v-model="activeName">
+          <OTab variant="text" @change="onChange" :line="false" class="domain-tabs tabs-switch" v-model="activeName">
             <OTabPane class="tab-pane" v-for="item in tabList" :key="item" :label="item">
               <div v-if="item === '概览'">
                 <div class="title">
                   <p>> 基本信息</p>
-                  <p class="ver">版本号：{{ version }}</p>
+                  <p v-if="version" class="ver">版本号：{{ version }}</p>
                 </div>
                 <div class="basic-info">
                   <p v-for="item in basicInfo" :key="item.name">
                     <span class="label markdown download">{{ item.name }}</span>
                     <a :href="item.value" v-if="item.name === '所属仓库' || item.name === 'Repo源'" target="_blank">{{ item.type }}</a>
-                    <span class="markdown-body mymarkdown-body" v-dompurify-html="item.value" v-copy-code="true" >
+                    <span class="markdown-body mymarkdown-body" v-dompurify-html="item.value" v-copy-code="true">
                       <OTag v-if="item.name === '版本支持情况' && latestOsSupport" color="primary"> 最新版本</OTag>
                     </span>
                   </p>
@@ -181,7 +162,16 @@ const queryVer = () => {
         <AppFeedback v-if="!isTags" :email="maintainer.maintainerEmail" />
       </div>
       <div v-if="!isTags" class="detail-row-side">
-        <DetailAside :data="appData" :basicInfo="basicInfo" :maintainer="maintainer" :type="'IMAGE'" :downloadData="downloadData" :ver-data="verData" :license="license" :tagVer="tagVer"/>
+        <DetailAside
+          :data="appData"
+          :basicInfo="basicInfo"
+          :maintainer="maintainer"
+          :type="'IMAGE'"
+          :downloadData="downloadData"
+          :ver-data="verData"
+          :license="license"
+          :tagVer="tagVer"
+        />
       </div>
     </div>
   </ContentWrapper>
