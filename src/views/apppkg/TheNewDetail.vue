@@ -18,7 +18,7 @@ import IconRpm from '~icons/pkg/rpm.svg';
 import { columnTags } from '@/data/detail/index';
 import { useI18n } from 'vue-i18n';
 import { useViewStore } from '@/stores/common';
-
+import { getDetailRules } from '@/utils/common';
 const { t } = useI18n();
 const route = useRoute();
 const { mkit } = useMarkdown();
@@ -64,11 +64,13 @@ const queryEntity = () => {
   activeName.value = type as string;
 
   if (pkgId.value) {
-    getDetail({
-      appPkgId: (appPkgId as string) || '',
-      epkgPkgId: (epkgPkgId as string) || '',
-      rpmPkgId: (rpmPkgId as string) || '',
-    })
+    getDetail(
+      getDetailRules({
+        appPkgId: (appPkgId as string) || '',
+        epkgPkgId: (epkgPkgId as string) || '',
+        rpmPkgId: (rpmPkgId as string) || '',
+      })
+    )
       .then((res) => {
         const data = res.data;
         tabList.value = data.tags;
@@ -220,7 +222,7 @@ const imgList = ref<string[]>(['概览', 'Tags']);
 const imgName = ref('概览');
 const tagsValue = ref();
 const queryTags = () => {
-  getTags(appData.value.name).then((res) => {
+  getTags(encodeURIComponent(appData.value.name as string)).then((res) => {
     tagsValue.value = res.data.list;
   });
 };
@@ -245,7 +247,7 @@ const getTabIcon = (tab: string) => {
 //获取支持
 const verData = ref();
 const queryVer = () => {
-  getVer(tabValue.value, appData.value.name).then((res) => {
+  getVer(tabValue.value, encodeURIComponent(appData.value.name as string)).then((res) => {
     verData.value = res.data.list;
   });
 };

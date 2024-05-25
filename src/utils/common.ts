@@ -137,3 +137,14 @@ export const getParamsRules = (data: any) => {
   });
   return newData
 }
+import type { ParamsKeyT } from '@/@types/detail';
+export const getDetailRules = (data: any) => {
+  const newData = {} as any;
+  Object.keys(data).forEach((key) => {
+    const value = data[key as keyof ParamsKeyT];
+    if (value) {
+      newData[key] = value;
+    }
+  });
+  return newData
+}

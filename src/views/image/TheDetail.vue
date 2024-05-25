@@ -104,7 +104,7 @@ const getDetailValue = (data: ImageDetailT) => {
 
 const tagsValue = ref();
 const queryTags = () => {
-  getTags(appData.value.name).then((res) => {
+  getTags(encodeURIComponent(appData.value.name as string)).then((res) => {
     tagsValue.value = res.data.list;
   });
 };
@@ -118,7 +118,7 @@ const onChange = (v: string) => {
 //获取支持
 const verData = ref();
 const queryVer = () => {
-  getVer('apppkg', appData.value.name).then((res) => {
+  getVer('apppkg', encodeURIComponent(appData.value.name as string)).then((res) => {
     verData.value = res.data.list;
   });
 };
