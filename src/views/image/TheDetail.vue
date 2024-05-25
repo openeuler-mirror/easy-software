@@ -45,7 +45,7 @@ const queryPkg = () => {
       getDetailValue(data);
     })
     .catch(() => {
-      useViewStore().showNotFound();
+      // useViewStore().showNotFound();
     });
 };
 
