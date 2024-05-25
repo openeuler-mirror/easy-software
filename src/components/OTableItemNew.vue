@@ -38,10 +38,10 @@ const props = defineProps({
 
 const { t } = useI18n();
 const { locale } = useLocale();
-const jumpTo = (name: string, id: string) => {
+const jumpTo = (id: string) => {
   const type = props.type === 'apppkg' ? 'image' : props.type === 'rpmpkg' ? 'RPM' : 'EPKG';
   const detailType = props.type === 'apppkg' ? 'image' : props.type === 'rpmpkg' ? 'package' : 'epkg';
-  const newHref = `/${locale.value}/${detailType}/${xssAllTag(name)}?type=${type}&pkgId=${encodeURIComponent(id)}`;
+  const newHref = `/${locale.value}/${detailType}/detail?type=${type}&pkgId=${encodeURIComponent(id)}`;
   return newHref;
 };
 
@@ -72,7 +72,7 @@ const onExternalDialog = (href: string) => {
         <th v-for="item in columns" :key="item.key" :class="item.key">{{ item.label }}</th>
       </template>
       <template #td_name="{ row }">
-        <a :href="jumpTo(row.name, row.pkgId)" color="primary" target="_blank" rel="noopener noreferrer"><span v-dompurify-html="row.name"></span></a>
+        <a :href="jumpTo(row.pkgId)" color="primary" target="_blank" rel="noopener noreferrer"><span v-dompurify-html="row.name"></span></a>
       </template>
       <template #td_epkgUpdateAt="{ row }">
         {{ formatDateTime(row.epkgUpdateAt) }}
