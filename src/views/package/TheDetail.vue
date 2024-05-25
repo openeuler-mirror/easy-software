@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { ref, onMounted } from 'vue';
-import { OTab, OTabPane, OTable, OLink } from '@opensig/opendesign';
+import { OTab, OTabPane, OTable, OLink, isString } from '@opensig/opendesign';
 import { OPENEULER_CONTACT } from '@/data/config';
 import { useRoute } from 'vue-router';
 import { useMarkdown } from '@/composables/useMarkdown';
@@ -35,8 +35,8 @@ const appData = ref<AppInfoT>({
 });
 
 //详情请求
-const queryPkg = (tabValue: string, pkgId: any) => {
-  getDetails(tabValue, pkgId)
+const queryPkg = (tabValue: string) => {
+  getDetails(tabValue, pkgId.value)
     .then((res) => {
       const data = res.data.list[0];
       getDetailValue(data);
@@ -45,8 +45,11 @@ const queryPkg = (tabValue: string, pkgId: any) => {
       useViewStore().showNotFound();
     });
 };
+const pkgId = ref('');
+if (isString(route.query?.pkgId)) {
+  pkgId.value = encodeURIComponent(route.query?.pkgId.toString());
+}
 
-const pkgId = route.query.pkgId as string;
 const queryEntity = () => {
   getChange();
 };
@@ -55,7 +58,7 @@ const getChange = () => {
   getPkg('rpmpkg');
 };
 const getPkg = (tabValue: string) => {
-  queryPkg(tabValue, pkgId);
+  queryPkg(tabValue);
 };
 
 onMounted(() => {

@@ -11,7 +11,7 @@ import { useLocale } from '@/composables/useLocale';
 import { getTagsIcon } from '@/utils/common';
 import { useScreen } from '@/composables/useScreen';
 import IconChevronDown from '~icons/app/icon-chevron-right.svg';
-const { gtLaptop } = useScreen();
+const { size } = useScreen();
 const { locale } = useLocale();
 const pkgData = ref<AppT[]>([]);
 const isLoading = ref(false);
@@ -57,7 +57,7 @@ onMounted(() => {
     <HomeHeader />
     <ContentWrapper vertical-padding="72px">
       <div ref="pkgRef" v-loading.nomask="isLoading" class="pkg-wrap">
-        <div v-if="gtLaptop" class="anchor">
+        <div v-if="size.width > 1900" class="anchor">
           <OAnchor :target-offset="100">
             <OAnchorItem href="#all" title="领域应用">
               <template v-for="item in pkgData">
@@ -208,7 +208,7 @@ onMounted(() => {
   overflow: visible;
   position: sticky;
   top: 0;
-  transform: translate(-250px, 70px);
+  transform: translate(-180px, 70px);
   width: -moz-max-content;
   width: max-content;
   left: 5%;
