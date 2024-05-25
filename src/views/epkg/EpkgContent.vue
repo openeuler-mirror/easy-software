@@ -7,7 +7,8 @@ import { getSearchAllColumn, getSearchAllFiled } from '@/api/api-domain';
 import { useRoute } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { getParamsRules } from '@/utils/common';
-
+import { isValidSearchTabName, isValidSearchKey } from '@/utils/query';
+import { TABNAME_OPTIONS, FLITERMENUOPTIONS } from '@/data/query';
 import { useViewStore } from '@/stores/common';
 import { useLocale } from '@/composables/useLocale';
 import { ElPagination, ElConfigProvider } from 'element-plus';
@@ -39,7 +40,7 @@ const columns = [
 
 const pkgData = ref([]);
 
-const tabName = ref('epkgpkg');
+const tabName = ref(TABNAME_OPTIONS[3]);
 const keywordType = ref((route.query.key as string) || '');
 const isLoading = ref(false);
 
@@ -129,7 +130,7 @@ const queryAllpkg = () => {
 // 判断是走es还是sql
 const pageSearch = () => {
   isSearchError.value = false;
-  if (tabName.value === 'epkgpkg') {
+  if (tabName.value === TABNAME_OPTIONS[3]) {
     if (searchKey.value === '') {
       queryAllpkg();
     } else {
@@ -214,7 +215,7 @@ const isPageSearch = ref(false);
 
 onMounted(() => {
   isPageSearch.value = route.name === 'search';
-  pageSearch();
+
   queryFilter();
 });
 
@@ -226,7 +227,7 @@ watch(
   { deep: true }
 );
 
-// 参数变化分页器还原
+// 除分页器相关请求参数变化，发请求获取新数据
 watch(
   () => [searchCategory.value, searchOs.value, searchArch.value, nameOrder.value, timeOrder.value],
   () => {
@@ -243,13 +244,19 @@ const handleQueryData = () => {
     searchKey.value = name?.toString();
     currentPage.value = 1;
   } else if (name === '') {
+    searchKey.value = '';
     isSearchDocs.value = false;
   }
-  if (isString(tab) && tab) {
-    tabName.value = tab?.toString();
+  if (isValidSearchTabName(tab) && tab) {
+    tabName.value = tab as string;
+  } else {
+    tabName.value = TABNAME_OPTIONS[3];
   }
-  if (isString(key) && key) {
-    keywordType.value = key?.toString();
+  // 判断key参数
+  if (isValidSearchKey(key) && key) {
+    keywordType.value = encodeURIComponent(key as string);
+  } else {
+    keywordType.value = FLITERMENUOPTIONS[0].id;
   }
 };
 handleQueryData();

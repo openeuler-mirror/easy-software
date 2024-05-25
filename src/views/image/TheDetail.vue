@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { ref, onMounted } from 'vue';
-import { OTab, OTabPane, OTag } from '@opensig/opendesign';
+import { OTab, OTabPane, OTag, isString } from '@opensig/opendesign';
 import { useRoute } from 'vue-router';
 import { useMarkdown } from '@/composables/useMarkdown';
 import type { AppInfoT, MaintainerT, DetailItemT } from '@/@types/app';
@@ -14,6 +14,8 @@ import defaultImg from '@/assets/default-logo.png';
 import { columnTags, tagList } from '@/data/detail/index';
 import { useViewStore } from '@/stores/common';
 import { useI18n } from 'vue-i18n';
+
+const tabValue = ref('apppkg');
 const { t } = useI18n();
 const route = useRoute();
 const { mkit } = useMarkdown();
@@ -36,34 +38,25 @@ const appData = ref<AppInfoT>({
 });
 
 //详情请求
-const queryPkg = (tabValue: string, pkgId: string) => {
-  getDetails(tabValue, pkgId)
+const queryPkg = () => {
+  getDetails(tabValue.value, pkgId.value)
     .then((res) => {
       const data = res.data.list[0];
       getDetailValue(data);
     })
     .catch(() => {
-      useViewStore().showNotFound();
+      // useViewStore().showNotFound();
     });
 };
 
-// 获取tab分类
-const pkgId = route.query.pkgId as string;
-const queryEntity = () => {
-  getChange();
-};
-//tab切换
-
-const getChange = () => {
-  getPkg('apppkg');
-};
-const getPkg = (tabValue: string) => {
-  queryPkg(tabValue, pkgId);
-};
-
+const pkgId = ref('');
+if (isString(route.query?.pkgId)) {
+  pkgId.value = encodeURIComponent(route.query?.pkgId.toString());
+}
 onMounted(() => {
-  queryEntity();
+  queryPkg();
 });
+
 const imageUsage = ref();
 const summary = ref();
 const latestOsSupport = ref();
@@ -72,9 +65,7 @@ const tagVer = ref();
 const getDetailValue = (data: ImageDetailT) => {
   basicInfo.value = [
     { name: '架构', value: data.arch || '' },
-
     { name: '软件包分类', value: data.category || '' },
-
     { name: '版本支持情况', value: data.osSupport || '' },
   ];
   summary.value = data.description;
@@ -99,13 +90,14 @@ const getDetailValue = (data: ImageDetailT) => {
   appData.value.bin_code = data.binDownloadUrl;
   appData.value.cover = data?.iconUrl || defaultImg;
   appData.value.repository = data.srcRepo;
-  queryTags();
-  queryVer();
+  if (data.name) {
+    queryVer();
+  }
 };
 
-const tagsValue = ref();
+const tagsValue = ref([]);
 const queryTags = () => {
-  getTags(encodeURIComponent(appData.value.name as string)).then((res) => {
+  getTags(encodeURIComponent(appData.value.name)).then((res) => {
     tagsValue.value = res.data.list;
   });
 };
@@ -114,12 +106,16 @@ const queryTags = () => {
 const isTags = ref(false);
 const onChange = (v: string) => {
   isTags.value = v === 'Tags' ? true : false;
+
+  if (tagsValue.value.length === 0) {
+    queryTags();
+  }
 };
 
 //获取支持
 const verData = ref();
 const queryVer = () => {
-  getVer('apppkg', encodeURIComponent(appData.value.name as string)).then((res) => {
+  getVer('apppkg', encodeURIComponent(appData.value.name)).then((res) => {
     verData.value = res.data.list;
   });
 };
@@ -148,7 +144,7 @@ const queryVer = () => {
 
                     <span class="markdown-body mymarkdown-body">
                       {{ item.value }}
-                      <OTag v-if="item.name === t('detail.support') && latestOsSupport" color="primary" size="small" > 最新版本</OTag>
+                      <OTag v-if="item.name === t('detail.support') && latestOsSupport" color="primary" size="small"> 最新版本</OTag>
                     </span>
                   </p>
                 </div>
