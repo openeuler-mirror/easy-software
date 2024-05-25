@@ -71,7 +71,7 @@ const goDetail = (key: string, id: string, name: string) => {
     pathName = 'package';
   }
   router.push({
-    path: `/${locale.value}/${pathName}/${xssAllTag(name)}`,
+    path: `/${locale.value}/${pathName}/detail`,
     query: { type: type, pkgId: id },
   });
 };

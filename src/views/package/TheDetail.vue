@@ -16,6 +16,7 @@ import { useViewStore } from '@/stores/common';
 
 const route = useRoute();
 const { mkit } = useMarkdown();
+const tabValue = ref('rpmpkg');
 const basicInfo = ref<DetailItemT[]>([]);
 const version = ref();
 const installation = ref('');
@@ -35,8 +36,8 @@ const appData = ref<AppInfoT>({
 });
 
 //详情请求
-const queryPkg = (tabValue: string) => {
-  getDetails(tabValue, pkgId.value)
+const queryPkg = () => {
+  getDetails(tabValue.value, pkgId.value)
     .then((res) => {
       const data = res.data.list[0];
       getDetailValue(data);
@@ -50,19 +51,8 @@ if (isString(route.query?.pkgId)) {
   pkgId.value = encodeURIComponent(route.query?.pkgId.toString());
 }
 
-const queryEntity = () => {
-  getChange();
-};
-
-const getChange = () => {
-  getPkg('rpmpkg');
-};
-const getPkg = (tabValue: string) => {
-  queryPkg(tabValue);
-};
-
 onMounted(() => {
-  queryEntity();
+  queryPkg();
 });
 
 const summary = ref();
@@ -122,7 +112,7 @@ const onExternalDialog = (href: string) => {
 //获取支持
 const verData = ref();
 const queryVer = () => {
-  getVer('rpmpkg', encodeURIComponent(appData.value.name as string)).then((res) => {
+  getVer(tabValue.value, encodeURIComponent(appData.value.name)).then((res) => {
     verData.value = res.data.list;
   });
 };
