@@ -3,7 +3,7 @@ import { createI18n } from 'vue-i18n';
 import common from './common';
 import software from './software';
 import upstream from './upstream';
-
+import detail from '@/i18n/detail';
 import { getCurrentLocale } from '@/utils/locale';
 
 const messages = {
@@ -11,11 +11,13 @@ const messages = {
     common: common.zh,
     software: software.zh,
     upstream: upstream.zh,
+    detail: detail.zh,
   },
   en: {
     common: common.en,
     software: software.en,
     upstream: upstream.en,
+    detail: detail.en,
   },
 };
 
