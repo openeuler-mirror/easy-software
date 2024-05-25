@@ -1,34 +1,23 @@
 <script lang="ts" setup>
 import { ref, onMounted } from 'vue';
-import { OBreadcrumb, OBreadcrumbItem, OTab, OTabPane, OTag } from '@opensig/opendesign';
+import { OTab, OTabPane, OTag } from '@opensig/opendesign';
 import { useRoute } from 'vue-router';
 import { useMarkdown } from '@/composables/useMarkdown';
-import type { AppInfoT } from '@/@types/app';
+import type { AppInfoT, MaintainerT, DetailItemT } from '@/@types/app';
+import type { ImageDetailT } from '@/@types/detail';
 import { getDetails, getTags, getVer } from '@/api/api-domain';
 import { OPENEULER_CONTACT } from '@/data/config';
-import { useLocale } from '@/composables/useLocale';
 import AppFeedback from '@/components/AppFeedback.vue';
 import DetailHead from '@/components/DetailHeader.vue';
 import DetailAside from '@/components/DetailAside.vue';
 import defaultImg from '@/assets/default-logo.png';
 import { columnTags, tabList } from '@/data/detail/index';
 import { useViewStore } from '@/stores/common';
-type MaintainerT = {
-  maintainerId: string;
-  maintainerEmail: string;
-  maintainerGiteeId: string;
-};
-
-interface DetailItem {
-  name: string;
-  value: string | any;
-  type?: string;
-}
 
 const route = useRoute();
 const { mkit } = useMarkdown();
 const activeName = ref(tabList[0]);
-const basicInfo = ref<DetailItem[]>([]);
+const basicInfo = ref<DetailItemT[]>([]);
 const version = ref();
 const installation = ref('');
 const downloadData = ref('');
@@ -46,7 +35,7 @@ const appData = ref<AppInfoT>({
 });
 
 //详情请求
-const queryPkg = (tabValue: string, pkgId: any) => {
+const queryPkg = (tabValue: string, pkgId: string) => {
   getDetails(tabValue, pkgId)
     .then((res) => {
       const data = res.data.list[0];
@@ -58,7 +47,7 @@ const queryPkg = (tabValue: string, pkgId: any) => {
 };
 
 // 获取tab分类
-const pkgId = (route.query.pkgId as string);
+const pkgId = route.query.pkgId as string;
 const queryEntity = () => {
   getChange();
 };
@@ -73,14 +62,13 @@ const getPkg = (tabValue: string) => {
 
 onMounted(() => {
   queryEntity();
-  getTitle();
 });
 const imageUsage = ref();
 const summary = ref();
 const latestOsSupport = ref();
 const license = ref();
 const tagVer = ref();
-const getDetailValue = (data: any) => {
+const getDetailValue = (data: ImageDetailT) => {
   basicInfo.value = [
     { name: '架构', value: data.arch || '' },
 
@@ -89,7 +77,7 @@ const getDetailValue = (data: any) => {
     { name: '版本支持情况', value: data.osSupport || '' },
   ];
   summary.value = data.description;
-  appData.value.size = data.appSize || 0;
+  appData.value.size = data.appSize || '';
   maintainer.value = {
     maintainerId: data?.maintainerId || 'openEuler community',
     maintainerEmail: data?.maintainerEmail || OPENEULER_CONTACT,
@@ -120,13 +108,6 @@ const queryTags = () => {
     tagsValue.value = res.data.list;
   });
 };
-const { locale } = useLocale();
-
-const breadcrumbInfo = ref({ name: '', path: '' });
-const getTitle = () => {
-  breadcrumbInfo.value = { path: `/${locale.value}/image`, name: '容器镜像' };
-};
-const home = ref({ name: '软件市场', path: `/${locale.value}/` });
 
 // tags切换功能
 const isTags = ref(false);
@@ -145,11 +126,9 @@ const queryVer = () => {
 
 <template>
   <ContentWrapper vertical-padding="24px">
-    <OBreadcrumb>
-      <OBreadcrumbItem :to="home.path">{{ home.name }}</OBreadcrumbItem>
-      <OBreadcrumbItem :to="breadcrumbInfo.path">{{ breadcrumbInfo.name }}</OBreadcrumbItem>
-      <OBreadcrumbItem>{{ appData.name }} </OBreadcrumbItem>
-    </OBreadcrumb>
+    <!-- 锚点 -->
+    <AppBreadcrumb id="image" :name="appData.name" />
+
     <DetailHead :data="appData" :basicInfo="summary" :maintainer="maintainer" />
 
     <div class="detail-row">
@@ -160,7 +139,7 @@ const queryVer = () => {
               <div v-if="item === '概览'">
                 <div class="title">
                   <p>> 基本信息</p>
-                  <p class="ver">版本号：{{ version }}</p>
+                  <p v-if="version" class="ver">版本号：{{ version }}</p>
                 </div>
                 <div class="basic-info">
                   <p v-for="item in basicInfo" :key="item.name">

@@ -67,7 +67,7 @@ const onExternalDialog = (href: string) => {
 
 <template>
   <div class="table-main">
-    <OTable :columns="columns" :data="data" :loading="loading" border="row-column">
+    <OTable :columns="columns" :data="data" :loading="loading" border="all">
       <template #head="{ columns }">
         <th v-for="item in columns" :key="item.key" :class="item.key">{{ item.label }}</th>
       </template>

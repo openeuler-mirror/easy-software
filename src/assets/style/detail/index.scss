@@ -82,7 +82,7 @@
 
 .basic-info {
   margin-top: 26px;
- 
+
   p {
     @include tip1;
     color: var(--o-color-info2);
@@ -90,12 +90,12 @@
     align-items: top;
     border-bottom: 1px solid rgba(0, 0, 0, 0.1);
     border-right: 1px solid rgba(0, 0, 0, 0.1);
-    border-left: 4px solid #002fa7;
-    &:first-child{
+    border-left: 4px solid var(--o-color-primary1);
+    &:first-child {
       border-top: 1px solid rgba(0, 0, 0, 0.1);
     }
     .label {
-      background: rgba(0,47,167,0.05);
+      background: rgba(0, 47, 167, 0.05);
       padding: 12px 24px;
       min-width: 150px;
       border-right: 1px solid rgba(0, 0, 0, 0.1);
@@ -131,7 +131,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: #002fa7;
+    background-color: var(--o-color-primary1);
     color: #fff;
     padding: 10px 0px;
   }
@@ -162,14 +162,15 @@
 .title {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   @include h3;
 }
 
-.ver{
-  background: #F2F4FA;
-border: 1px solid rgba(0,47,167,0.20);
-border-radius: 4px;
-font-size: 18px;
-color: #002FA7;
-padding: 6px 24px;
+.ver {
+  background: #f2f4fa;
+  @include text2;
+  border: 1px solid rgba(0, 47, 167, 0.2);
+  border-radius: var(--layout-pkg-radius);
+  color: var(--o-color-primary1);
+  padding: 6px 24px;
 }

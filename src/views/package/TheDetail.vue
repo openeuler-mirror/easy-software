@@ -1,11 +1,10 @@
 <script lang="ts" setup>
 import { ref, onMounted } from 'vue';
-import { OBreadcrumb, OBreadcrumbItem, OTab, OTabPane, OTable, OLink } from '@opensig/opendesign';
+import { OTab, OTabPane, OTable, OLink } from '@opensig/opendesign';
 import { OPENEULER_CONTACT } from '@/data/config';
 import { useRoute } from 'vue-router';
 import { useMarkdown } from '@/composables/useMarkdown';
-import type { AppInfoT } from '@/@types/app';
-import { useLocale } from '@/composables/useLocale';
+import type { AppInfoT, MaintainerT, DetailItemT } from '@/@types/app';
 import { getDetails, getVer } from '@/api/api-domain';
 import defaultImg from '@/assets/default-logo.png';
 import AppFeedback from '@/components/AppFeedback.vue';
@@ -14,26 +13,17 @@ import DetailAside from '@/components/DetailAside.vue';
 import ExternalLink from '@/components/ExternalLink.vue';
 import { moreColumns } from '@/data/detail/index';
 import { useViewStore } from '@/stores/common';
-type MaintainerT = {
-  maintainerId: string;
-  maintainerEmail: string;
-  maintainerGiteeId: string;
-};
-interface DetailItem {
-  name: string;
-  value: string | any;
-  type?: string;
-}
+
 const route = useRoute();
 const { mkit } = useMarkdown();
-const basicInfo = ref<DetailItem[]>([]);
+const basicInfo = ref<DetailItemT[]>([]);
 const version = ref();
 const installation = ref('');
 const downloadData = ref('');
 const maintainer = ref<MaintainerT>({ maintainerId: '', maintainerEmail: '', maintainerGiteeId: '' });
 const upStream = ref();
 const security = ref();
-const moreMessge = ref<DetailItem[]>([]);
+const moreMessge = ref<DetailItemT[]>([]);
 const description = ref();
 const appData = ref<AppInfoT>({
   name: '',
@@ -56,7 +46,7 @@ const queryPkg = (tabValue: string, pkgId: any) => {
     });
 };
 
-const pkgId = (route.query.pkgId as string);
+const pkgId = route.query.pkgId as string;
 const queryEntity = () => {
   getChange();
 };
@@ -70,7 +60,6 @@ const getPkg = (tabValue: string) => {
 
 onMounted(() => {
   queryEntity();
-  getTitle();
 });
 const summary = ref();
 const license = ref();
@@ -112,14 +101,6 @@ const getDetailValue = (data: any) => {
   queryVer();
 };
 
-const { locale } = useLocale();
-
-const breadcrumbInfo = ref({ name: '', path: '' });
-const getTitle = () => {
-  breadcrumbInfo.value = { path: `/${locale.value}/package`, name: 'RPM' };
-};
-const home = ref({ name: '软件市场', path: `/${locale.value}/` });
-
 const showExternalDlg = ref(false);
 const externalLink = ref('');
 const onExternalDialog = (href: string) => {
@@ -138,11 +119,8 @@ const queryVer = () => {
 
 <template>
   <ContentWrapper vertical-padding="24px">
-    <OBreadcrumb>
-      <OBreadcrumbItem :to="home.path">{{ home.name }}</OBreadcrumbItem>
-      <OBreadcrumbItem :to="breadcrumbInfo.path">{{ breadcrumbInfo.name }}</OBreadcrumbItem>
-      <OBreadcrumbItem>{{ appData.name }} </OBreadcrumbItem>
-    </OBreadcrumb>
+    <!-- 锚点 -->
+    <AppBreadcrumb id="rpm" :name="appData.name" />
     <DetailHead :data="appData" :basicInfo="summary" :maintainer="maintainer" />
 
     <div class="detail-row">
@@ -150,7 +128,7 @@ const queryVer = () => {
         <AppSection>
           <div class="title">
             <p>> 基本信息</p>
-            <p class="ver">版本号：{{ version }}</p>
+            <p v-if="version" class="ver">版本号：{{ version }}</p>
           </div>
           <div class="basic-info">
             <p v-for="item in basicInfo" :key="item.name">
@@ -173,7 +151,7 @@ const queryVer = () => {
           <OTab variant="text" :line="false" class="domain-tabs switch">
             <template v-for="item in moreMessge" :key="item">
               <OTabPane class="tab-pane" v-if="item.value.length > 0" :label="item.name">
-                <OTable :columns="moreColumns" :data="item.value" :small="true"> </OTable>
+                <OTable :columns="moreColumns" :data="item.value" :small="true" border="all"> </OTable>
               </OTabPane>
             </template>
           </OTab>

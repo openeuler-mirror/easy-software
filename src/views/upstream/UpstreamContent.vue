@@ -220,7 +220,7 @@ watch(
       </div>
       <ResultNotApp v-if="appData.length === 0 && isSearchError" />
       <div class="pkg-panel" v-else>
-        <OTable :columns="columns" :data="appData" :loading="isLoading" border="row-column">
+        <OTable :columns="columns" :data="appData" :loading="isLoading" border="all">
           <template #td_name="{ row }">
             <span v-dompurify-html="row.name"></span>
           </template>

@@ -153,9 +153,11 @@ const arraySpanMethod = (rowIndex: number, colIdx: number, row: any, column: any
 
 const { locale } = useLocale();
 const jumpTo = (name: string, id: string) => {
-  const detailType = props.type === 'IMAGE' ? 'image' : props.type === 'RPM' ? 'package' : 'epkg';
-  const newHref = `/${locale.value}/${detailType}/${xssAllTag(name)}?type=${props.type}&pkgId=${id}`;
-  return newHref;
+  if (props.type) {
+    const detailType = props.type === 'IMAGE' ? 'image' : props.type === 'RPM' ? 'package' : 'epkg';
+    const newHref = `/${locale.value}/${detailType}/${xssAllTag(name)}?type=${props.type}&pkgId=${id}`;
+    return newHref;
+  }
 };
 </script>
 
@@ -241,9 +243,6 @@ const jumpTo = (name: string, id: string) => {
   td {
     padding: 2px 12px;
     font-size: 14px !important;
-  }
-  th {
-    font-weight: 600;
   }
 }
 </style>
