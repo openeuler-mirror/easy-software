@@ -49,6 +49,11 @@
     word-break: break-word;
     --table-edge-padding: 24px;
   }
+  &.apppkg {
+    .o-tab-navs-wrap {
+      display: none;
+    }
+  }
   // 容器镜像样式
   &.tabs-switch {
     .o-tab-nav-list {
