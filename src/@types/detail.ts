@@ -32,12 +32,15 @@ interface PackageDetailT {
   license: string;
 }
 
-
 interface RequiresT {
-  name: string; flags: string; rel: string; ver: string; epoch: string
+  name: string;
+  flags: string;
+  rel: string;
+  ver: string;
+  epoch: string;
 }
 interface FilesT {
-  fileName: string
+  fileName: string;
 }
 
 export interface EpkgDetailT extends PackageDetailT {
@@ -47,14 +50,11 @@ export interface EpkgDetailT extends PackageDetailT {
   securityLevel: string | null;
 }
 
-
-
 export interface RpmDetailT extends PackageDetailT {
   id: string;
   rpmSize: string;
   rpmUpdateAt: string;
 }
-
 
 export interface ImageDetailT extends PackageDetailT {
   id: string;
@@ -72,3 +72,8 @@ export interface ImageDetailT extends PackageDetailT {
   latestOsSupport: boolean;
 }
 
+export interface ParamsKeyT {
+  appPkgId: string | null;
+  epkgPkgId: string | null;
+  rpmPkgId: string | null;
+}
