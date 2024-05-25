@@ -153,9 +153,11 @@ const arraySpanMethod = (rowIndex: number, colIdx: number, row: any, column: any
 
 const { locale } = useLocale();
 const jumpTo = (name: string, id: string) => {
-  const detailType = props.type === 'IMAGE' ? 'image' : props.type === 'RPM' ? 'package' : 'epkg';
-  const newHref = `/${locale.value}/${detailType}/${xssAllTag(name)}?type=${props.type}&pkgId=${id}`;
-  return newHref;
+  if (props.type) {
+    const detailType = props.type === 'IMAGE' ? 'image' : props.type === 'RPM' ? 'package' : 'epkg';
+    const newHref = `/${locale.value}/${detailType}/${xssAllTag(name)}?type=${props.type}&pkgId=${id}`;
+    return newHref;
+  }
 };
 </script>
 
@@ -183,7 +185,7 @@ const jumpTo = (name: string, id: string) => {
   <AppSection :title="`${data.name}版本支持情况`">
     <OTable :columns="verColumns" :data="verData" border="all" :cell-span="arraySpanMethod" :small="true">
       <template #td_flags="{ row }">
-        <a :href="jumpTo(data.name, row.pkgId)" color="primary" target="_blank" rel="noopener noreferrer">
+        <a :href="jumpTo(data.name, row.pkgId)" color="primary" rel="noopener noreferrer">
           <OTag v-if="row.os === tagVer[0] && row.arch === tagVer[1]" color="primary" :size="'small'">当前版本</OTag> <span v-else>查看</span></a
         >
       </template>
@@ -241,9 +243,6 @@ const jumpTo = (name: string, id: string) => {
   td {
     padding: 2px 12px;
     font-size: 14px !important;
-  }
-  th {
-    font-weight: 600;
   }
 }
 </style>

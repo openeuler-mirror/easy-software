@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, watch, computed, onMounted } from 'vue';
-import { ORow, OCol, OTag, vLoading, OLink, OIcon } from '@opensig/opendesign';
+import { ORow, OCol, OTag, vLoading, OLink, OIcon, isUndefined, isString } from '@opensig/opendesign';
 import { getSearchData } from '@/api/api-search';
 import { getSearchAllColumn, getSearchAllFiled } from '@/api/api-domain';
 import { useRoute, useRouter } from 'vue-router';
@@ -149,7 +149,7 @@ const onResetTag = () => {
   nameOrder.value = '';
   if (route.query.type) {
     router.push({
-      path: `/${locale.value}/applicationsPackage`,
+      path: `/${locale.value}/apppkg`,
     });
   }
 };
@@ -218,31 +218,31 @@ watch(
   { deep: true }
 );
 
-watch(
-  () => route.query.name as string,
-  (v: string) => {
-    if (searchKey.value !== v && v !== undefined) {
-      searchKey.value = v;
-    }
-    if (v === '') {
-      isSearchDocs.value = false;
-    }
+// -------------------- 监听 url query 变化 触发搜索 ---------------------
+const handleQueryData = () => {
+  const query = route.query;
+  const { name, tab, key } = query;
+  if (!isUndefined(name) && name) {
+    searchKey.value = name?.toString();
     currentPage.value = 1;
+  } else if (name === '') {
+    isSearchDocs.value = false;
   }
-);
+  if (isString(tab) && tab) {
+    tabName.value = tab?.toString();
+  }
+  if (isString(key) && key) {
+    keywordType.value = key?.toString();
+  }
+};
+handleQueryData();
 
 watch(
-  () => route.query.tab as string,
-  (v: string) => {
-    tabName.value = v;
-  }
-);
-
-watch(
-  () => route.query.key as string,
-  (v: string) => {
-    keywordType.value = v;
-  }
+  () => route.query,
+  () => {
+    handleQueryData();
+  },
+  { deep: true }
 );
 </script>
 
