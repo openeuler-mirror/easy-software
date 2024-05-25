@@ -5,7 +5,8 @@ import { getSearchData } from '@/api/api-search';
 import { useRoute } from 'vue-router';
 import { getSearchAllFiled, getSearchAllColumn } from '@/api/api-domain';
 import { useI18n } from 'vue-i18n';
-
+import { isValidSearchTabName, isValidSearchKey } from '@/utils/query';
+import { TABNAME_OPTIONS, FLITERMENUOPTIONS } from '@/data/query';
 import { getParamsRules } from '@/utils/common';
 import { useLocale } from '@/composables/useLocale';
 import { useViewStore } from '@/stores/common';
@@ -35,7 +36,7 @@ const columns = [
 //  ------------  main ------------
 const pkgData = ref([]);
 
-const tabName = ref('apppkg');
+const tabName = ref(TABNAME_OPTIONS[2]);
 const nameOrder = ref('');
 const keywordType = ref((route.query.key as string) || '');
 const isLoading = ref(false);
@@ -122,7 +123,7 @@ const queryAllpkg = () => {
 // 判断是走es还是sql
 const pageSearch = () => {
   isSearchError.value = false;
-  if (tabName.value === 'apppkg') {
+  if (tabName.value === TABNAME_OPTIONS[2]) {
     if (searchKey.value === '') {
       queryAllpkg();
     } else {
@@ -205,7 +206,6 @@ const isPageSearch = ref(false);
 
 onMounted(() => {
   isPageSearch.value = route.name === 'search';
-  pageSearch();
   queryFilter();
 });
 
@@ -234,13 +234,19 @@ const handleQueryData = () => {
     searchKey.value = name?.toString();
     currentPage.value = 1;
   } else if (name === '') {
+    searchKey.value = '';
     isSearchDocs.value = false;
   }
-  if (isString(tab) && tab) {
-    tabName.value = tab?.toString();
+  if (isValidSearchTabName(tab) && tab) {
+    tabName.value = tab as string;
+  } else {
+    tabName.value = TABNAME_OPTIONS[2];
   }
-  if (isString(key) && key) {
-    keywordType.value = key?.toString();
+  // 判断key参数
+  if (isValidSearchKey(key) && key) {
+    keywordType.value = encodeURIComponent(key as string);
+  } else {
+    keywordType.value = FLITERMENUOPTIONS[0].id;
   }
 };
 handleQueryData();

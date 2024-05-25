@@ -1,11 +1,12 @@
 <script lang="ts" setup>
-import { ref, onMounted } from 'vue';
-import { OTab, OTabPane, OTable, OLink, OIcon, OTag, isString } from '@opensig/opendesign';
+import { ref, onMounted, type PropType } from 'vue';
+import { OTab, OTabPane, OTable, OLink, OIcon, OTag } from '@opensig/opendesign';
 import { useRoute } from 'vue-router';
 import { getDetail, getTags, getVer } from '@/api/api-domain';
 import { useMarkdown } from '@/composables/useMarkdown';
 import type { AppInfoT, MaintainerT, DetailItemT, MoreMessgeT, PkgTypeT } from '@/@types/app';
 import { OPENEULER_CONTACT } from '@/data/config';
+import { isValidTags } from '@/utils/query';
 import AppFeedback from '@/components/AppFeedback.vue';
 import DetailHead from '@/components/DetailHeader.vue';
 import ExternalLink from '@/components/ExternalLink.vue';
@@ -44,7 +45,7 @@ const appData = ref<AppInfoT>({
 });
 
 // 获取tab分类
-const tabList = ref<string[]>([]);
+const tabList = ref([] as PropType<PkgTypeT>);
 const pkgId = ref('');
 const epkgData = ref();
 const rpmData = ref();
@@ -52,9 +53,6 @@ const imgData = ref();
 const queryEntity = () => {
   const query = route.query;
   const { type, appPkgId, epkgPkgId, rpmPkgId } = query;
-  if (isString(type) && (type as PkgTypeT)) {
-    activeName.value = type as string;
-  }
 
   getDetail(
     getDetailRules({
@@ -70,9 +68,13 @@ const queryEntity = () => {
       rpmData.value = data['RPM'];
       imgData.value = data['IMAGE'];
       pkgId.value = data[data.tags[0]].name;
+      if (isValidTags(type)) {
+        activeName.value = type?.toString();
+      } else {
+        activeName.value = data.tags[0];
+      }
 
       onChange(activeName.value);
-      queryVer();
     })
     .catch(() => {
       useViewStore().showNotFound();
@@ -85,14 +87,17 @@ const onChange = (tab: string) => {
   if (tab === 'RPM') {
     tabValue.value = 'rpmpkg';
     typePkg.value = 'RPM';
+    queryVer();
     getDetailValue(rpmData.value);
   } else if (tab === 'EPKG') {
     tabValue.value = 'epkgpkg';
     typePkg.value = 'EPKG';
+    queryVer();
     getDetailValue(epkgData.value);
   } else if (tab === 'IMAGE') {
     tabValue.value = 'apppkg';
     typePkg.value = 'IMAGE';
+    queryVer();
     getDetailValue(imgData.value);
   } else {
     useViewStore().showNotFound();
@@ -161,9 +166,6 @@ const getDetailValue = (data: any) => {
     latestOsSupport.value = data.latestOsSupport;
     summary.value = data.description;
     version.value = data?.appVer;
-    if (tagsValue.value.length === 0) {
-      queryTags();
-    }
   }
   tagVer.value = [data.osSupport, data.arch];
   maintainer.value = {
@@ -233,6 +235,9 @@ const queryVer = () => {
 const isTags = ref(false);
 const onChangeImage = (v: string) => {
   isTags.value = v === 'Tags' ? true : false;
+  if (tagsValue.value.length === 0) {
+    queryTags();
+  }
 };
 
 const repeatTags = (v: string) => {
