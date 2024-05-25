@@ -7,13 +7,13 @@ import ImageIcon from '~icons/pkg/image.svg';
 import RpmIcon from '~icons/pkg/rpm.svg';
 
 
-export const resourceData = [
+export const homeData = [
   {
     id: 'apppkg',
     name: '领域应用',
     desc: 'openEuler操作系统支持的软件包集合(包括RPM、容器镜像、EPKG软件包等）',
     icon: ApppkgIcon,
-    href: "/applicationsPackage"
+    href: "/apppkg"
   },
   {
     id: 'rpm',

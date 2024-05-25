@@ -6,7 +6,7 @@ import { getSearchCount } from '@/api/api-search';
 import type { MenuCountT } from '@/@types/search';
 
 import SearchTab from '@/components/search/SearchTab.vue';
-import AppPkgContent from '@/views/applicationsPackage/APkgContent.vue';
+import AppPkgContent from '@/views/apppkg/APkgContent.vue';
 import EpkgContent from '@/views/epkg/EpkgContent.vue';
 import ImageContent from '@/views/image/ImageContent.vue';
 import RpmContent from '@/views/package/RpmContent.vue';

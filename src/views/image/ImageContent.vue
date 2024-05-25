@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { ref, watch, computed, onMounted } from 'vue';
-import { OTag, OLink, OIcon } from '@opensig/opendesign';
+import { OTag, OLink, OIcon, isUndefined, isString } from '@opensig/opendesign';
 import { getSearchData } from '@/api/api-search';
 import { useRoute } from 'vue-router';
 import { getSearchAllFiled, getSearchAllColumn } from '@/api/api-domain';
@@ -71,7 +71,7 @@ const querySearch = () => {
       if (res.code === 200) {
         pkgData.value = res.data.apppkg;
         total.value = res.data.total;
-        isSearch.value = true;
+        isSearchDocs.value = true;
       }
       isLoading.value = false;
       if (pkgData.value.length === 0) {
@@ -81,14 +81,14 @@ const querySearch = () => {
     .catch(() => {
       pkgData.value = [];
       isLoading.value = false;
-      isSearch.value = false;
+      isSearchDocs.value = false;
       useViewStore().showNotFound();
     });
 };
 
 // sql搜索
 const isSearchError = ref(false);
-const isSearch = ref(false);
+const isSearchDocs = ref(false);
 const queryAllpkg = () => {
   const params = {
     name: tabName.value,
@@ -173,7 +173,7 @@ const resetTag = () => {
   searchArch.value = [];
   searchOs.value = [];
   searchCategory.value = [];
-  isSearch.value = false;
+  isSearchDocs.value = false;
   nameOrder.value = '';
 };
 
@@ -226,31 +226,31 @@ watch(
   { deep: true }
 );
 
-watch(
-  () => route.query.name as string,
-  (v: string) => {
-    if (searchKey.value !== v && v !== undefined) {
-      searchKey.value = v;
-    }
-    if (v === '') {
-      isSearch.value = false;
-    }
+// -------------------- 监听 url query 变化 触发搜索 ---------------------
+const handleQueryData = () => {
+  const query = route.query;
+  const { name, tab, key } = query;
+  if (!isUndefined(name) && name) {
+    searchKey.value = name?.toString();
     currentPage.value = 1;
+  } else if (name === '') {
+    isSearchDocs.value = false;
   }
-);
+  if (isString(tab) && tab) {
+    tabName.value = tab?.toString();
+  }
+  if (isString(key) && key) {
+    keywordType.value = key?.toString();
+  }
+};
+handleQueryData();
 
 watch(
-  () => route.query.tab as string,
-  (v: string) => {
-    tabName.value = v;
-  }
-);
-
-watch(
-  () => route.query.key as string,
-  (v: string) => {
-    keywordType.value = v;
-  }
+  () => route.query,
+  () => {
+    handleQueryData();
+  },
+  { deep: true }
 );
 </script>
 

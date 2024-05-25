@@ -41,7 +41,7 @@ const { locale } = useLocale();
 const jumpTo = (name: string, id: string) => {
   const type = props.type === 'apppkg' ? 'image' : props.type === 'rpmpkg' ? 'RPM' : 'EPKG';
   const detailType = props.type === 'apppkg' ? 'image' : props.type === 'rpmpkg' ? 'package' : 'epkg';
-  const newHref = `/${locale.value}/${detailType}/${xssAllTag(name)}?type=${type}&pkgId=${id}`;
+  const newHref = `/${locale.value}/${detailType}/${xssAllTag(name)}?type=${type}&pkgId=${encodeURIComponent(id)}`;
   return newHref;
 };
 
@@ -67,7 +67,7 @@ const onExternalDialog = (href: string) => {
 
 <template>
   <div class="table-main">
-    <OTable :columns="columns" :data="data" :loading="loading" border="row-column">
+    <OTable :columns="columns" :data="data" :loading="loading" border="all">
       <template #head="{ columns }">
         <th v-for="item in columns" :key="item.key" :class="item.key">{{ item.label }}</th>
       </template>

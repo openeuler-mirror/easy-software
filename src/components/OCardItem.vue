@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import type { PropType } from 'vue';
 import { OCard, OTag, OIcon } from '@opensig/opendesign';
-import type { AppItemT, PkgIdsT } from '@/@types/app';
+import type { AppItemT, PkgIdsT, PkgTypeT } from '@/@types/app';
 import { getTagsIcon, xssAllTag } from '@/utils/common';
 import { useLocale } from '@/composables/useLocale';
 import { useI18n } from 'vue-i18n';
@@ -17,10 +17,10 @@ defineProps({
 
 const { locale } = useLocale();
 const { t } = useI18n();
-const jumpTo = (name: string, id: PkgIdsT, type: string) => {
-  return `/${locale.value}/applicationsPackage/${xssAllTag(name)}?type=${type}${id.IMAGE ? `&appPkgId=${id.IMAGE}` : ''}${
-    id.EPKG ? `&epkgPkgId=${id.EPKG}` : ''
-  }${id.RPM ? `&rpmPkgId=${id.RPM}` : ''}`;
+const jumpTo = (name: string, id: PkgIdsT, type: PkgTypeT) => {
+  return `/${locale.value}/apppkg/${xssAllTag(name)}?type=${type}${id.IMAGE ? `&appPkgId=${encodeURIComponent(id.IMAGE)}` : ''}${id.EPKG ? `&epkgPkgId=${encodeURIComponent(id.EPKG)}` : ''}${
+    id.RPM ? `&rpmPkgId=${encodeURIComponent(id.RPM)}` : ''
+  }`;
 };
 
 const repeatTags = (v: string) => {
@@ -38,7 +38,13 @@ const repeatTags = (v: string) => {
   >
     <template #main>
       <div class="pkg-info">
-        <a :href="jumpTo(data.name, data.pkgIds, data.tags[0])" target="_blank" rel="noopener noreferrer" v-dompurify-html="data.name" class="name"></a>
+        <a
+          :href="jumpTo(data.name, (data.pkgIds), data.tags[0])"
+          target="_blank"
+          rel="noopener noreferrer"
+          v-dompurify-html="data.name"
+          class="name"
+        ></a>
         <div class="pkg-icon"><img :src="data.iconUrl || defaultImg" class="icon" :class="{ 'default-img': !data.iconUrl }" /></div>
       </div>
       <div class="pkg-box">
