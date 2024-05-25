@@ -1,14 +1,14 @@
 <script lang="ts" setup>
 import { OTable, useMessage, OButton, OTag, OIcon } from '@opensig/opendesign';
 import OCodeCopy from '@/components/OCodeCopy.vue';
-import { ref, computed, watch } from 'vue';
+import { ref, computed, watch, type PropType } from 'vue';
 import ExternalLink from '@/components/ExternalLink.vue';
 import { useClipboard } from '@/composables/useClipboard';
 import { getCode } from '@/utils/common';
 import { verColumns } from '@/data/detail/index';
 import IconCopy from '~icons/app/icon-copy.svg';
 import { useLocale } from '@/composables/useLocale';
-import { xssAllTag } from '@/utils/common';
+import type { PkgTypeT } from '@/@types/app';
 const props = defineProps({
   data: {
     type: Object,
@@ -29,8 +29,9 @@ const props = defineProps({
     },
   },
   type: {
+    type: String as PropType<PkgTypeT>,
     default: () => {
-      return '';
+      return 'RPM';
     },
   },
   downloadData: {
@@ -152,10 +153,10 @@ const arraySpanMethod = (rowIndex: number, colIdx: number, row: any, column: any
 };
 
 const { locale } = useLocale();
-const jumpTo = (name: string, id: string) => {
+const jumpTo = (id: string) => {
   if (props.type) {
     const detailType = props.type === 'IMAGE' ? 'image' : props.type === 'RPM' ? 'package' : 'epkg';
-    const newHref = `/${locale.value}/${detailType}/${xssAllTag(name)}?type=${props.type}&pkgId=${id}`;
+    const newHref = `/${locale.value}/${detailType}/detail?type=${props.type}&pkgId=${encodeURIComponent(id)}`;
     return newHref;
   }
 };
@@ -185,7 +186,7 @@ const jumpTo = (name: string, id: string) => {
   <AppSection :title="`${data.name}版本支持情况`">
     <OTable :columns="verColumns" :data="verData" border="all" :cell-span="arraySpanMethod" :small="true">
       <template #td_flags="{ row }">
-        <a :href="jumpTo(data.name, row.pkgId)" color="primary" rel="noopener noreferrer">
+        <a :href="jumpTo(row.pkgId)" color="primary" rel="noopener noreferrer">
           <OTag v-if="row.os === tagVer[0] && row.arch === tagVer[1]" color="primary" :size="'small'">当前版本</OTag> <span v-else>查看</span></a
         >
       </template>
@@ -234,9 +235,10 @@ const jumpTo = (name: string, id: string) => {
 .license {
   border-top: 1px rgba(0, 0, 0, 0.1) solid;
   padding-top: 25px;
-  width: 90%;
+  width: 100%;
   display: flex;
   justify-content: space-between;
+  gap: 24px;
 }
 :deep(.o-table) {
   th,
