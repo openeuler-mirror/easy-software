@@ -195,10 +195,11 @@ onMounted(() => {
 
   //判断主页领域应用跳转
   const homeType = route.query.type as string;
-  if (homeType) {
+  if (isString(homeType) && homeType) {
     searchCategory.value.push(homeType);
   }
   queryFilter();
+  handleQueryData();
 });
 
 watch(
@@ -243,7 +244,6 @@ const handleQueryData = () => {
     keywordType.value = FLITERMENUOPTIONS[0].id;
   }
 };
-handleQueryData();
 
 watch(
   () => route.query,

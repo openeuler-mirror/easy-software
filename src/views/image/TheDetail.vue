@@ -115,9 +115,11 @@ const onChange = (v: string) => {
 //获取支持
 const verData = ref();
 const queryVer = () => {
-  getVer('apppkg', encodeURIComponent(appData.value.name)).then((res) => {
-    verData.value = res.data.list;
-  });
+  if (appData.value.name) {
+    getVer(tabValue.value, encodeURIComponent(appData.value.name)).then((res) => {
+      verData.value = res.data.list;
+    });
+  }
 };
 </script>
 
