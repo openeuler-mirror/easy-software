@@ -17,8 +17,8 @@ defineProps({
 
 const { locale } = useLocale();
 const { t } = useI18n();
-const jumpTo = (id: PkgIdsT, type: PkgTypeT) => {
-  return `/${locale.value}/apppkg/detail?type=${type}${id.IMAGE ? `&appPkgId=${encodeURIComponent(id.IMAGE)}` : ''}${
+const jumpTo = (id: PkgIdsT, type?: PkgTypeT) => {
+  return `/${locale.value}/apppkg/detail?${type ? `type=${type}` : ''}${id.IMAGE ? `&appPkgId=${encodeURIComponent(id.IMAGE)}` : ''}${
     id.EPKG ? `&epkgPkgId=${encodeURIComponent(id.EPKG)}` : ''
   }${id.RPM ? `&rpmPkgId=${encodeURIComponent(id.RPM)}` : ''}`;
 };
@@ -38,7 +38,7 @@ const repeatTags = (v: string) => {
   >
     <template #main>
       <div class="pkg-info">
-        <a :href="jumpTo(data.pkgIds, data.tags[0])" target="_blank" rel="noopener noreferrer" v-dompurify-html="data.name" class="name"></a>
+        <a :href="jumpTo(data.pkgIds)" target="_blank" rel="noopener noreferrer" v-dompurify-html="data.name" class="name"></a>
         <div class="pkg-icon"><img :src="data.iconUrl || defaultImg" class="icon" :class="{ 'default-img': !data.iconUrl }" /></div>
       </div>
       <div class="pkg-box">

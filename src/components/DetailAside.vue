@@ -156,7 +156,7 @@ const { locale } = useLocale();
 const jumpTo = (id: string) => {
   if (props.type) {
     const detailType = props.type === 'IMAGE' ? 'image' : props.type === 'RPM' ? 'package' : 'epkg';
-    const newHref = `/${locale.value}/${detailType}/detail?type=${props.type}&pkgId=${encodeURIComponent(id)}`;
+    const newHref = `/${locale.value}/${detailType}/detail?pkgId=${encodeURIComponent(id)}`;
     return newHref;
   }
 };
