@@ -6,7 +6,7 @@ import type { AppT } from '@/@types/app';
 import HomeHeader from './HomeHeader.vue';
 import HomeNews from './HomeNews.vue';
 import HomeSkeleton from './HomeSkeleton.vue';
-import { solutionData, resourceData } from '@/data/home/index';
+import { solutionData, homeData } from '@/data/home/index';
 import { useLocale } from '@/composables/useLocale';
 import { getTagsIcon } from '@/utils/common';
 import { useScreen } from '@/composables/useScreen';
@@ -108,7 +108,7 @@ onMounted(() => {
             <div class="resource-content">
               <ORow flex-wrap="wrap">
                 <OCol
-                  v-for="item in resourceData"
+                  v-for="item in homeData"
                   :key="item.name"
                   flex="0 1 25%"
                   :laptop="{ flex: '0 1 25%' }"

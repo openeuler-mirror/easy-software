@@ -7,7 +7,7 @@ import ImageIcon from '~icons/pkg/image.svg';
 import RpmIcon from '~icons/pkg/rpm.svg';
 
 
-export const resourceData = [
+export const homeData = [
   {
     id: 'apppkg',
     name: '领域应用',

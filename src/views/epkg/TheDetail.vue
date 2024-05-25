@@ -1,11 +1,10 @@
 <script lang="ts" setup>
 import { ref, onMounted } from 'vue';
-import { OBreadcrumb, OBreadcrumbItem, OTab, OTabPane, OTable, OLink } from '@opensig/opendesign';
+import { OTab, OTabPane, OTable, OLink } from '@opensig/opendesign';
 import { OPENEULER_CONTACT } from '@/data/config';
 import { useRoute } from 'vue-router';
 import { useMarkdown } from '@/composables/useMarkdown';
-import type { AppInfoT } from '@/@types/app';
-import { useLocale } from '@/composables/useLocale';
+import type { AppInfoT, MaintainerT, DetailItemT } from '@/@types/app';
 import { useI18n } from 'vue-i18n';
 import { getDetails, getVer } from '@/api/api-domain';
 import AppFeedback from '@/components/AppFeedback.vue';
@@ -15,23 +14,12 @@ import DetailAside from '@/components/DetailAside.vue';
 import { moreColumns } from '@/data/detail/index';
 import defaultImg from '@/assets/default-logo.png';
 import { useViewStore } from '@/stores/common';
-type MaintainerT = {
-  maintainerId: string;
-  maintainerEmail: string;
-  maintainerGiteeId: string;
-};
-
-interface DetailItem {
-  name: string;
-  value: string | any;
-  type?: string;
-}
 
 const route = useRoute();
 const { mkit } = useMarkdown();
 const { t } = useI18n();
 
-const basicInfo = ref<DetailItem[]>([]);
+const basicInfo = ref<DetailItemT[]>([]);
 const version = ref();
 const installation = ref('');
 const downloadData = ref('');
@@ -39,7 +27,7 @@ const files = ref([]);
 const maintainer = ref<MaintainerT>({ maintainerId: '', maintainerEmail: '', maintainerGiteeId: '' });
 const upStream = ref();
 const security = ref();
-const moreMessge = ref<DetailItem[]>([]);
+const moreMessge = ref<DetailItemT[]>([]);
 const description = ref();
 const appData = ref<AppInfoT>({
   name: '',
@@ -50,7 +38,7 @@ const appData = ref<AppInfoT>({
   bin_code: '',
 });
 //详情请求
-const queryPkg = (tabValue: string, pkgId: any) => {
+const queryPkg = (tabValue: string, pkgId: string) => {
   getDetails(tabValue, pkgId)
     .then((res) => {
       const data = res.data.list[0];
@@ -62,7 +50,7 @@ const queryPkg = (tabValue: string, pkgId: any) => {
 };
 
 // 获取tab分类
-const pkgId = (route.query.pkgId as string);
+const pkgId = route.query.pkgId as string;
 const queryEntity = () => {
   getChange();
 };
@@ -76,20 +64,21 @@ const getPkg = (tabValue: string) => {
 
 onMounted(() => {
   queryEntity();
-  getTitle();
 });
 const summary = ref();
 const license = ref();
 const tagVer = ref();
 const getDetailValue = (data: any) => {
-  basicInfo.value = [
-    { name: '详细描述', value: data?.description },
-    { name: '版本支持情况', value: data.osSupport },
-    { name: '架构', value: data.arch },
-    { name: '软件包分类', value: data.epkgCategory || '其他' },
-    { name: '所属仓库', value: JSON.parse(data?.repo).url, type: JSON.parse(data?.repo).type },
-    { name: 'Repo源', value: JSON.parse(data?.repoType).url, type: JSON.parse(data?.repoType).type },
-  ];
+  try {
+    basicInfo.value = [
+      { name: '详细描述', value: data?.description },
+      { name: '版本支持情况', value: data.osSupport },
+      { name: '架构', value: data.arch },
+      { name: '软件包分类', value: data.epkgCategory || '其他' },
+      { name: '所属仓库', value: JSON.parse(data?.repo).url, type: JSON.parse(data?.repo).type },
+      { name: 'Repo源', value: JSON.parse(data?.repoType).url, type: JSON.parse(data?.repoType).type },
+    ];
+  } catch (res) {}
   files.value = JSON.parse(data?.files);
   summary.value = data.summary;
   moreMessge.value = [
@@ -119,14 +108,6 @@ const getDetailValue = (data: any) => {
   queryVer();
 };
 
-const { locale } = useLocale();
-
-const breadcrumbInfo = ref({ name: '', path: '' });
-const getTitle = () => {
-  breadcrumbInfo.value = { path: `/${locale.value}/epkg`, name: 'EPKG' };
-};
-const home = ref({ name: t('software.softwareHome'), path: `/${locale.value}/` });
-
 const showExternalDlg = ref(false);
 const externalLink = ref('');
 const onExternalDialog = (href: string) => {
@@ -145,18 +126,17 @@ const queryVer = () => {
 
 <template>
   <ContentWrapper vertical-padding="24px">
-    <OBreadcrumb>
-      <OBreadcrumbItem :to="home.path">{{ home.name }}</OBreadcrumbItem>
-      <OBreadcrumbItem :to="breadcrumbInfo.path">{{ breadcrumbInfo.name }}</OBreadcrumbItem>
-      <OBreadcrumbItem>{{ appData.name }} </OBreadcrumbItem>
-    </OBreadcrumb>
+    <!-- 锚点 -->
+    <AppBreadcrumb id="epkg" :name="appData.name" />
+
     <DetailHead :data="appData" :basicInfo="summary" :maintainer="maintainer" />
+
     <div class="detail-row">
       <div class="detail-row-main">
         <AppSection>
           <div class="title">
             <p>> 基本信息</p>
-            <p class="ver">版本号：{{ version }}</p>
+            <p v-if="version" class="ver">版本号：{{ version }}</p>
           </div>
           <div class="basic-info">
             <p v-for="item in basicInfo" :key="item.name">
@@ -180,7 +160,7 @@ const queryVer = () => {
           <OTab variant="text" :line="false" class="domain-tabs switch">
             <template v-for="item in moreMessge" :key="item">
               <OTabPane class="tab-pane switch" v-if="item.value.length > 0" :label="item.name">
-                <OTable :columns="moreColumns" :data="item.value"> </OTable>
+                <OTable :columns="moreColumns" :data="item.value" :small="true" border="all"> </OTable>
               </OTabPane>
             </template>
           </OTab>

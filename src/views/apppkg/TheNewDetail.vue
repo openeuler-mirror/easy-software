@@ -4,7 +4,8 @@ import { OTab, OTabPane, OTable, OLink, OIcon, OTag } from '@opensig/opendesign'
 import { useRoute } from 'vue-router';
 import { getDetails, getDetail, getTags, getVer } from '@/api/api-domain';
 import { useMarkdown } from '@/composables/useMarkdown';
-import type { AppInfoT } from '@/@types/app';
+import type { AppInfoT, MaintainerT, DetailItemT } from '@/@types/app';
+
 import { OPENEULER_CONTACT } from '@/data/config';
 import AppFeedback from '@/components/AppFeedback.vue';
 import DetailHead from '@/components/DetailHeader.vue';
@@ -17,24 +18,14 @@ import IconRpm from '~icons/pkg/rpm.svg';
 import { columnTags } from '@/data/detail/index';
 import { useI18n } from 'vue-i18n';
 import { useViewStore } from '@/stores/common';
-type MaintainerT = {
-  maintainerId: string;
-  maintainerEmail: string;
-  maintainerGiteeId: string;
-};
 
-interface DetailItem {
-  name: string;
-  value: string | any;
-  type?: string;
-}
 const { t } = useI18n();
 const route = useRoute();
 const { mkit } = useMarkdown();
 
 const activeName = ref();
 const typePkg = ref();
-const basicInfo = ref<DetailItem[]>([]);
+const basicInfo = ref<DetailItemT[]>([]);
 const version = ref();
 const installation = ref('');
 const downloadData = ref('');
@@ -42,7 +33,7 @@ const files = ref([]);
 const maintainer = ref<MaintainerT>({ maintainerId: '', maintainerEmail: '', maintainerGiteeId: '' });
 const upStream = ref();
 const security = ref();
-const moreMessge = ref<DetailItem[]>([]);
+const moreMessge = ref<DetailItemT[]>([]);
 const description = ref();
 const appData = ref<AppInfoT>({
   name: '',
@@ -68,16 +59,17 @@ const epkgData = ref();
 const rpmData = ref();
 const imgData = ref();
 const queryEntity = () => {
-  activeName.value = route.query.type as string;
+  const query = route.query;
+  const { type, appPkgId, epkgPkgId, rpmPkgId } = query;
+  activeName.value = type as string;
+
   if (pkgId.value) {
     getDetail({
-      appPkgId: (route.query.appPkgId as string) || '',
-      epkgPkgId: (route.query.epkgPkgId as string) || '',
-      rpmPkgId:(route.query.rpmPkgId as string) || '',
+      appPkgId: (appPkgId as string) || '',
+      epkgPkgId: (epkgPkgId as string) || '',
+      rpmPkgId: (rpmPkgId as string) || '',
     })
       .then((res) => {
-        
-        
         const data = res.data;
         tabList.value = data.tags;
         epkgData.value = data['EPKG'];
@@ -282,7 +274,7 @@ const repeatTags = (v: string) => {
             <AppSection v-if="item !== 'IMAGE'">
               <div class="title">
                 <p>> 基本信息</p>
-                <p v-if="item === 'RPM'" class="ver">版本号：{{ version }}</p>
+                <p v-if="item === 'RPM' || version" class="ver">版本号：{{ version }}</p>
               </div>
               <div class="basic-info">
                 <p v-for="item in basicInfo" :key="item.name">
@@ -305,7 +297,7 @@ const repeatTags = (v: string) => {
               <OTab variant="text" :line="false" class="domain-tabs switch" v-if="item !== 'IMAGE'">
                 <template v-for="it in moreMessge" :key="it">
                   <OTabPane class="tab-pane" v-if="it.value.length > 0" :label="it.name">
-                    <OTable :columns="moreColumns" :data="it.value" :small="true"> </OTable>
+                    <OTable :columns="moreColumns" :data="it.value" :small="true" border="all"> </OTable>
                   </OTabPane>
                 </template>
               </OTab>
@@ -316,7 +308,7 @@ const repeatTags = (v: string) => {
                   <div v-if="item === '概览'">
                     <div class="title">
                       <p>> 基本信息</p>
-                      <p class="ver">版本号：{{ version }}</p>
+                      <p v-if="version" class="ver">版本号：{{ version }}</p>
                     </div>
                     <div class="basic-info">
                       <p v-for="item in basicInfo" :key="item.name">

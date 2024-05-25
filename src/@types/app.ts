@@ -27,5 +27,26 @@ export interface AppInfoT {
 }
 
 
+export interface MaintainerT {
+  maintainerId: string;
+  maintainerEmail: string;
+  maintainerGiteeId: string;
+};
+
+export interface DetailItemT {
+  name: string;
+  value: string | any;
+  type?: string;
+}
+
+
+export interface HomeInfoT {
+  id: string;
+  name: string;
+  desc: string;
+  icon: string;
+  href: string;
+}
+
 
 export type PkgTypeT = 'RPM' | 'IMAGE' | 'EPKG';
