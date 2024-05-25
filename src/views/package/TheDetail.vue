@@ -6,14 +6,17 @@ import { useRoute } from 'vue-router';
 import { useMarkdown } from '@/composables/useMarkdown';
 import type { AppInfoT, MaintainerT, DetailItemT, MoreMessgeT } from '@/@types/app';
 import { getDetails, getVer } from '@/api/api-domain';
+import { moreColumns } from '@/data/detail/index';
+import { useViewStore } from '@/stores/common';
+import { useI18n } from 'vue-i18n';
+
 import defaultImg from '@/assets/default-logo.png';
 import AppFeedback from '@/components/AppFeedback.vue';
 import DetailHead from '@/components/DetailHeader.vue';
 import DetailAside from '@/components/DetailAside.vue';
 import ExternalLink from '@/components/ExternalLink.vue';
-import { moreColumns } from '@/data/detail/index';
-import { useViewStore } from '@/stores/common';
 
+const { t } = useI18n();
 const route = useRoute();
 const { mkit } = useMarkdown();
 const tabValue = ref('rpmpkg');
@@ -99,7 +102,9 @@ const getDetailValue = (data: any) => {
   appData.value.bin_code = data.binDownloadUrl;
   appData.value.cover = data?.iconUrl || defaultImg;
   appData.value.repository = data.srcRepo;
-  queryVer();
+  if (data.name) {
+    queryVer();
+  }
 };
 
 const showExternalDlg = ref(false);
@@ -137,7 +142,7 @@ const queryVer = () => {
               <OLink
                 @click="onExternalDialog(item.value)"
                 color="primary"
-                v-if="item.name === '所属仓库' || item.name === 'Repo源'"
+                v-if="item.name === t('detail.warehouse') || item.name === t('detail.source')"
                 target="_blank"
                 rel="noopener noreferrer"
                 class="mymarkdown-body"

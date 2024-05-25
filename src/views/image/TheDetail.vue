@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { ref, onMounted } from 'vue';
-import { OTab, OTabPane, OTag } from '@opensig/opendesign';
+import { OTab, OTabPane, OTag, isString } from '@opensig/opendesign';
 import { useRoute } from 'vue-router';
 import { useMarkdown } from '@/composables/useMarkdown';
 import type { AppInfoT, MaintainerT, DetailItemT } from '@/@types/app';
@@ -11,12 +11,15 @@ import AppFeedback from '@/components/AppFeedback.vue';
 import DetailHead from '@/components/DetailHeader.vue';
 import DetailAside from '@/components/DetailAside.vue';
 import defaultImg from '@/assets/default-logo.png';
-import { columnTags, tabList } from '@/data/detail/index';
+import { columnTags, tagList } from '@/data/detail/index';
 import { useViewStore } from '@/stores/common';
+import { useI18n } from 'vue-i18n';
 
+const tabValue = ref('apppkg');
+const { t } = useI18n();
 const route = useRoute();
 const { mkit } = useMarkdown();
-const activeName = ref(tabList[0]);
+const activeName = ref(tagList[0].lable);
 const basicInfo = ref<DetailItemT[]>([]);
 const version = ref();
 const installation = ref('');
@@ -35,34 +38,25 @@ const appData = ref<AppInfoT>({
 });
 
 //详情请求
-const queryPkg = (tabValue: string, pkgId: string) => {
-  getDetails(tabValue, pkgId)
+const queryPkg = () => {
+  getDetails(tabValue.value, pkgId.value)
     .then((res) => {
       const data = res.data.list[0];
       getDetailValue(data);
     })
     .catch(() => {
-      useViewStore().showNotFound();
+      // useViewStore().showNotFound();
     });
 };
 
-// 获取tab分类
-const pkgId = route.query.pkgId as string;
-const queryEntity = () => {
-  getChange();
-};
-//tab切换
-
-const getChange = () => {
-  getPkg('apppkg');
-};
-const getPkg = (tabValue: string) => {
-  queryPkg(tabValue, pkgId);
-};
-
+const pkgId = ref('');
+if (isString(route.query?.pkgId)) {
+  pkgId.value = encodeURIComponent(route.query?.pkgId.toString());
+}
 onMounted(() => {
-  queryEntity();
+  queryPkg();
 });
+
 const imageUsage = ref();
 const summary = ref();
 const latestOsSupport = ref();
@@ -71,9 +65,7 @@ const tagVer = ref();
 const getDetailValue = (data: ImageDetailT) => {
   basicInfo.value = [
     { name: '架构', value: data.arch || '' },
-
     { name: '软件包分类', value: data.category || '' },
-
     { name: '版本支持情况', value: data.osSupport || '' },
   ];
   summary.value = data.description;
@@ -98,13 +90,14 @@ const getDetailValue = (data: ImageDetailT) => {
   appData.value.bin_code = data.binDownloadUrl;
   appData.value.cover = data?.iconUrl || defaultImg;
   appData.value.repository = data.srcRepo;
-  queryTags();
-  queryVer();
+  if (data.name) {
+    queryVer();
+  }
 };
 
-const tagsValue = ref();
+const tagsValue = ref([]);
 const queryTags = () => {
-  getTags(encodeURIComponent(appData.value.name as string)).then((res) => {
+  getTags(encodeURIComponent(appData.value.name)).then((res) => {
     tagsValue.value = res.data.list;
   });
 };
@@ -113,14 +106,20 @@ const queryTags = () => {
 const isTags = ref(false);
 const onChange = (v: string) => {
   isTags.value = v === 'Tags' ? true : false;
+
+  if (tagsValue.value.length === 0) {
+    queryTags();
+  }
 };
 
 //获取支持
 const verData = ref();
 const queryVer = () => {
-  getVer('apppkg', encodeURIComponent(appData.value.name as string)).then((res) => {
-    verData.value = res.data.list;
-  });
+  if (appData.value.name) {
+    getVer(tabValue.value, encodeURIComponent(appData.value.name)).then((res) => {
+      verData.value = res.data.list;
+    });
+  }
 };
 </script>
 
@@ -135,8 +134,8 @@ const queryVer = () => {
       <div class="detail-row-main" :class="{ tags: isTags }">
         <AppSection>
           <OTab variant="text" @change="onChange" :line="false" class="domain-tabs tabs-switch" v-model="activeName">
-            <OTabPane class="tab-pane" v-for="item in tabList" :key="item" :label="item">
-              <div v-if="item === '概览'">
+            <OTabPane class="tab-pane" v-for="item in tagList" :key="item" :label="item.lable">
+              <div v-if="item.lable === tagList[0].lable">
                 <div class="title">
                   <p>> 基本信息</p>
                   <p v-if="version" class="ver">版本号：{{ version }}</p>
@@ -144,9 +143,10 @@ const queryVer = () => {
                 <div class="basic-info">
                   <p v-for="item in basicInfo" :key="item.name">
                     <span class="label markdown download">{{ item.name }}</span>
-                    <a :href="item.value" v-if="item.name === '所属仓库' || item.name === 'Repo源'" target="_blank">{{ item.type }}</a>
-                    <span class="markdown-body mymarkdown-body" v-dompurify-html="item.value" v-copy-code="true">
-                      <OTag v-if="item.name === '版本支持情况' && latestOsSupport" color="primary"> 最新版本</OTag>
+
+                    <span class="markdown-body mymarkdown-body">
+                      {{ item.value }}
+                      <OTag v-if="item.name === t('detail.support') && latestOsSupport" color="primary" size="small"> 最新版本</OTag>
                     </span>
                   </p>
                 </div>

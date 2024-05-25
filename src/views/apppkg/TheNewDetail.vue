@@ -1,12 +1,17 @@
 <script lang="ts" setup>
-import { ref, onMounted } from 'vue';
-import { OTab, OTabPane, OTable, OLink, OIcon, OTag, isString } from '@opensig/opendesign';
+import { ref, onMounted, type PropType } from 'vue';
+import { OTab, OTabPane, OTable, OLink, OIcon, OTag } from '@opensig/opendesign';
 import { useRoute } from 'vue-router';
-import { getDetails, getDetail, getTags, getVer } from '@/api/api-domain';
+import { getDetail, getTags, getVer } from '@/api/api-domain';
 import { useMarkdown } from '@/composables/useMarkdown';
 import type { AppInfoT, MaintainerT, DetailItemT, MoreMessgeT, PkgTypeT } from '@/@types/app';
-
 import { OPENEULER_CONTACT } from '@/data/config';
+import { isValidTags } from '@/utils/query';
+import { columnTags, tagList } from '@/data/detail/index';
+import { useI18n } from 'vue-i18n';
+import { useViewStore } from '@/stores/common';
+import { getDetailRules } from '@/utils/common';
+
 import AppFeedback from '@/components/AppFeedback.vue';
 import DetailHead from '@/components/DetailHeader.vue';
 import ExternalLink from '@/components/ExternalLink.vue';
@@ -15,10 +20,7 @@ import defaultImg from '@/assets/default-logo.png';
 import IconEpkg from '~icons/pkg/epkg.svg';
 import IconImage from '~icons/pkg/image.svg';
 import IconRpm from '~icons/pkg/rpm.svg';
-import { columnTags } from '@/data/detail/index';
-import { useI18n } from 'vue-i18n';
-import { useViewStore } from '@/stores/common';
-import { getDetailRules } from '@/utils/common';
+
 const { t } = useI18n();
 const route = useRoute();
 const { mkit } = useMarkdown();
@@ -45,7 +47,7 @@ const appData = ref<AppInfoT>({
 });
 
 // 获取tab分类
-const tabList = ref<string[]>([]);
+const tabList = ref([] as PropType<PkgTypeT>);
 const pkgId = ref('');
 const epkgData = ref();
 const rpmData = ref();
@@ -53,9 +55,6 @@ const imgData = ref();
 const queryEntity = () => {
   const query = route.query;
   const { type, appPkgId, epkgPkgId, rpmPkgId } = query;
-  if (isString(type) && (type as PkgTypeT)) {
-    activeName.value = type as string;
-  }
 
   getDetail(
     getDetailRules({
@@ -71,9 +70,13 @@ const queryEntity = () => {
       rpmData.value = data['RPM'];
       imgData.value = data['IMAGE'];
       pkgId.value = data[data.tags[0]].name;
+      if (isValidTags(type)) {
+        activeName.value = type?.toString();
+      } else {
+        activeName.value = data.tags[0];
+      }
 
       onChange(activeName.value);
-      queryVer();
     })
     .catch(() => {
       useViewStore().showNotFound();
@@ -86,14 +89,17 @@ const onChange = (tab: string) => {
   if (tab === 'RPM') {
     tabValue.value = 'rpmpkg';
     typePkg.value = 'RPM';
+    queryVer();
     getDetailValue(rpmData.value);
   } else if (tab === 'EPKG') {
     tabValue.value = 'epkgpkg';
     typePkg.value = 'EPKG';
+    queryVer();
     getDetailValue(epkgData.value);
   } else if (tab === 'IMAGE') {
     tabValue.value = 'apppkg';
     typePkg.value = 'IMAGE';
+    queryVer();
     getDetailValue(imgData.value);
   } else {
     useViewStore().showNotFound();
@@ -118,18 +124,25 @@ const getDetailValue = (data: any) => {
       { name: '所属仓库', value: JSON.parse(data?.repo).url, type: JSON.parse(data?.repo).type },
       { name: 'Repo源', value: JSON.parse(data?.repoType).url, type: JSON.parse(data?.repoType).type },
     ];
-    moreMessge.value = [
+    const newData = [
       { name: 'Requires', value: JSON.parse(data?.requires || '') },
       { name: 'Provides', value: JSON.parse(data?.provides || '') },
       { name: 'Conflicts', value: JSON.parse(data?.conflicts || '') },
     ];
+    moreMessge.value = [];
+    // 过滤空数据
+    newData.forEach((item) => {
+      if (item.value.length > 0) {
+        moreMessge.value.push(item);
+      }
+    });
+
     appData.value.size = data.rpmSize || 0;
     summary.value = data.summary;
     version.value = data?.version;
   } else if (typePkg.value === 'EPKG') {
     basicInfo.value = [
       { name: '详细描述', value: data?.description },
-      { name: '版本号', value: data.version },
       { name: '版本支持情况', value: data.osSupport },
       { name: '架构', value: data.arch },
       { name: '软件包分类', value: data.epkgCategory || '其他' },
@@ -142,7 +155,7 @@ const getDetailValue = (data: any) => {
       { name: 'Provides', value: JSON.parse(data?.provides || '') },
       { name: 'Conflicts', value: JSON.parse(data?.conflicts || '') },
     ];
-
+    moreMessge.value = [];
     // 过滤空数据
     newData.forEach((item) => {
       if (item.value.length > 0) {
@@ -163,9 +176,6 @@ const getDetailValue = (data: any) => {
     latestOsSupport.value = data.latestOsSupport;
     summary.value = data.description;
     version.value = data?.appVer;
-    if (tagsValue.value.length === 0) {
-      queryTags();
-    }
   }
   tagVer.value = [data.osSupport, data.arch];
   maintainer.value = {
@@ -198,8 +208,7 @@ const moreColumns = [
   { label: 'Epoch', key: 'epoch' },
 ];
 // 获取img分类
-const imgList = ref<string[]>(['概览', 'Tags']);
-const imgName = ref('概览');
+const imgName = ref(tagList[0].lable);
 const tagsValue = ref([]);
 const queryTags = () => {
   getTags(encodeURIComponent(pkgId.value)).then((res) => {
@@ -236,6 +245,9 @@ const queryVer = () => {
 const isTags = ref(false);
 const onChangeImage = (v: string) => {
   isTags.value = v === 'Tags' ? true : false;
+  if (tagsValue.value.length === 0) {
+    queryTags();
+  }
 };
 
 const repeatTags = (v: string) => {
@@ -264,7 +276,7 @@ const repeatTags = (v: string) => {
                   <OLink
                     @click="onExternalDialog(item.value)"
                     color="primary"
-                    v-if="item.name === '所属仓库' || item.name === 'Repo源'"
+                    v-if="item.name === t('detail.warehouse') || item.name === t('detail.source')"
                     target="_blank"
                     rel="noopener noreferrer"
                     class="mymarkdown-body"
@@ -276,13 +288,7 @@ const repeatTags = (v: string) => {
               <p class="sp">> 安装指引</p>
               <div v-if="installation" v-dompurify-html="installation" v-copy-code="true" class="markdown-body installation"></div>
               <p class="sp" v-if="item !== 'IMAGE'">> 更多信息</p>
-              <OTab
-                variant="text"
-                :line="false"
-                class="domain-tabs tabs-switch"
-                v-if="item !== 'IMAGE'"
-                :class="moreMessge.length > 1 ? 'tabs-switch' : 'tabs-one'"
-              >
+              <OTab variant="text" :line="false" class="domain-tabs" v-if="item !== 'IMAGE'" :class="moreMessge.length > 1 ? 'tabs-switch' : 'tabs-one'">
                 <template v-for="it in moreMessge" :key="it">
                   <OTabPane class="tab-pane" v-if="it.value.length > 0" :label="it.name">
                     <OTable :columns="moreColumns" :data="it.value" :small="true" border="all"> </OTable>
@@ -292,8 +298,8 @@ const repeatTags = (v: string) => {
             </AppSection>
             <AppSection v-else>
               <OTab variant="text" @change="onChangeImage" :line="false" class="domain-tabs tabs-switch" v-model="imgName">
-                <OTabPane class="tab-pane" v-for="item in imgList" :key="item" :label="item">
-                  <div v-if="item === '概览'">
+                <OTabPane class="tab-pane" v-for="item in tagList" :key="item" :label="item.lable">
+                  <div v-if="item.lable === tagList[0].lable">
                     <div class="title">
                       <p>> 基本信息</p>
                       <p v-if="version" class="ver">版本号：{{ version }}</p>
@@ -301,17 +307,9 @@ const repeatTags = (v: string) => {
                     <div class="basic-info">
                       <p v-for="item in basicInfo" :key="item.name">
                         <span class="label markdown download">{{ item.name }}</span>
-                        <OLink
-                          @click="onExternalDialog(item.value)"
-                          color="primary"
-                          v-if="item.name === '所属仓库' || item.name === 'Repo源'"
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          class="markdown-body"
-                          >{{ item.type }}</OLink
-                        >
-                        <span class="markdown-body installation mymarkdown-body" v-dompurify-html="item.value" v-copy-code="true" v-else>
-                          <OTag v-if="item.name === '版本支持情况' && latestOsSupport" color="primary"> 最新版本</OTag>
+                        <span class="markdown-body mymarkdown-body">
+                          {{ item.value }}
+                          <OTag v-if="item.name === t('detail.support') && latestOsSupport" color="primary" size="small"> 最新版本</OTag>
                         </span>
                       </p>
                     </div>

@@ -1,9 +1,11 @@
 <script lang="ts" setup>
-import { ref, onMounted, watch } from 'vue';
+import { ref, watch, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import { getSearchCount } from '@/api/api-search';
-
+import { isUndefined } from '@opensig/opendesign';
 import type { MenuCountT } from '@/@types/search';
+import { isValidSearchTabName, isValidSearchKey } from '@/utils/query';
+import { TABNAME_OPTIONS, FLITERMENUOPTIONS } from '@/data/query';
 
 import SearchTab from '@/components/search/SearchTab.vue';
 import AppPkgContent from '@/views/apppkg/APkgContent.vue';
@@ -14,7 +16,7 @@ import UpstreamContent from '@/views/upstream/UpstreamContent.vue';
 
 const route = useRoute();
 
-const DATATYPE = ['all', 'rpmpkg', 'apppkg', 'epkgpkg', 'appversion'];
+const DATATYPE = TABNAME_OPTIONS;
 
 const tabName = ref('');
 const menuData = ref<MenuCountT[]>([]);
@@ -33,36 +35,35 @@ const querySearchCount = () => {
     }
   });
 };
+const handleQueryData = () => {
+  const query = route.query;
+  const { name, tab, key } = query;
 
-onMounted(() => {
-  tabName.value = route.query?.tab as string;
-  searchKey.value = route.query?.name as string;
-  keywordType.value = route.query?.key as string;
+  if (!isUndefined(name) && name) {
+    searchKey.value = encodeURIComponent(name as string);
+  }
+  // 判断key参数
+  if (isValidSearchKey(key)) {
+    keywordType.value = encodeURIComponent(key as string);
+  } else {
+    keywordType.value = FLITERMENUOPTIONS[0].id;
+  }
+
+  if (isValidSearchTabName(tab)) {
+    tabName.value = tab as string;
+  } else {
+    tabName.value = TABNAME_OPTIONS[0];
+  }
   querySearchCount();
-});
-
-// ---------------- 表格筛选值 ------------------
-
-watch(
-  () => route.query?.tab as string,
-  (v) => {
-    tabName.value = v;
-  }
-);
-watch(
-  () => route.query?.name as string,
-  (v) => {
-    searchKey.value = v;
-    querySearchCount();
-  }
-);
+};
+handleQueryData();
 
 watch(
-  () => route.query?.key as string,
-  (v) => {
-    keywordType.value = v;
-    querySearchCount();
-  }
+  () => route.query,
+  () => {
+    handleQueryData();
+  },
+  { deep: true }
 );
 </script>
 
@@ -109,7 +110,7 @@ watch(
 
   :deep(.o-tab) {
     --tab-nav-anchor-color: #fff;
-    width: 800px;
+    min-width: 800px;
     .o-tab-nav {
       line-height: 52px;
       --tab-nav-padding: 0;

@@ -12,7 +12,6 @@ FROM swr.cn-north-4.myhuaweicloud.com/opensourceway/openeuler/nginx:1.24.0-22.03
 
 FROM openeuler/openeuler:22.03-lts-sp1
 
-ENV PATH /usr/share/nginx/sbin:$PATH
 ENV NGINX_CONFIG_FILE /etc/nginx/nginx.conf
 ENV NGINX_CONFIG_PATH /etc/nginx/
 ENV NGINX_PID /var/run/nginx.pid
