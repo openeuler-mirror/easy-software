@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { ref, watch, computed, onMounted } from 'vue';
-import { OTag, vLoading, OLink, OIcon, isUndefined, isString } from '@opensig/opendesign';
+import { OTag, vLoading, OLink, OIcon, isUndefined } from '@opensig/opendesign';
 import { useI18n } from 'vue-i18n';
 import { getSearchData } from '@/api/api-search';
 import { useRoute } from 'vue-router';
@@ -224,6 +224,9 @@ const isPageSearch = ref(false);
 
 onMounted(() => {
   isPageSearch.value = route.name === 'search';
+  if (isPageSearch.value) {
+    pageSearch();
+  }
 
   queryFilter();
   handleQueryData();
@@ -280,7 +283,7 @@ watch(
 </script>
 
 <template>
-  <div class="pkg-wrap" :class="tabName">
+  <div v-loading.nomask="isLoading" class="pkg-wrap" :class="tabName">
     <div class="filter-sidebar">
       <div v-loading.nomask="isFilterLoading">
         <FilterCheckbox v-if="filterOsList.length" v-model="searchOs" :options="filterOsList">
@@ -331,7 +334,7 @@ watch(
       </div>
       <ResultNotApp v-if="pkgData.length === 0 && isSearchError" />
       <div class="pkg-panel" v-else>
-        <OTableItemNew :data="pkgData" :columns="columns" :type="tabName" :loading="isLoading" />
+        <OTableItemNew :data="pkgData" :columns="columns" :type="tabName" />
 
         <div class="pagination-box">
           <el-config-provider :locale="isZh ? zhCn : English">

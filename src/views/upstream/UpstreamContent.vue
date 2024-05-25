@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { ref, watch, onMounted, computed } from 'vue';
-import { OTag, OLink, OIcon, OTable } from '@opensig/opendesign';
+import { OTag, OLink, OIcon, OTable, vLoading } from '@opensig/opendesign';
 import { useI18n } from 'vue-i18n';
 import { useRoute } from 'vue-router';
 import { getParamsRules } from '@/utils/common';
@@ -39,6 +39,7 @@ const searchKey = ref((route.query.name as string) || '');
 const searchOs = ref('');
 
 const queryAppVersion = () => {
+  isLoading.value = true;
   const params = {
     eulerOsVersion: searchOs.value,
     pageNum: currentPage.value,
@@ -197,7 +198,7 @@ watch(
 </script>
 
 <template>
-  <div class="pkg-wrap" :class="tabName">
+  <div v-loading.nomask="isLoading" class="pkg-wrap" :class="tabName">
     <div class="filter-sidebar">
       <FilterRadio v-if="filterOsList.length" v-model="searchOs" :options="filterOsList">
         <template #header>
@@ -221,7 +222,7 @@ watch(
       </div>
       <ResultNotApp v-if="appData.length === 0 && isSearchError" />
       <div class="pkg-panel" v-else>
-        <OTable :columns="columns" :data="appData" :loading="isLoading" border="all">
+        <OTable :columns="columns" :data="appData" border="all">
           <template #td_name="{ row }">
             <span v-dompurify-html="row.name"></span>
           </template>
