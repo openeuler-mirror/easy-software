@@ -4,7 +4,7 @@ import { OTab, OTabPane, OTable, OLink, OIcon, OTag } from '@opensig/opendesign'
 import { useRoute } from 'vue-router';
 import { getDetails, getDetail, getTags, getVer } from '@/api/api-domain';
 import { useMarkdown } from '@/composables/useMarkdown';
-import type { AppInfoT, MaintainerT, DetailItemT } from '@/@types/app';
+import type { AppInfoT, MaintainerT, DetailItemT, MoreMessgeT } from '@/@types/app';
 
 import { OPENEULER_CONTACT } from '@/data/config';
 import AppFeedback from '@/components/AppFeedback.vue';
@@ -33,7 +33,7 @@ const files = ref([]);
 const maintainer = ref<MaintainerT>({ maintainerId: '', maintainerEmail: '', maintainerGiteeId: '' });
 const upStream = ref();
 const security = ref();
-const moreMessge = ref<DetailItemT[]>([]);
+const moreMessge = ref<MoreMessgeT[]>([]);
 const description = ref();
 const appData = ref<AppInfoT>({
   name: '',
@@ -165,11 +165,19 @@ const getDetailValue = (data: any) => {
       { name: 'Repo源', value: JSON.parse(data?.repoType).url, type: JSON.parse(data?.repoType).type },
     ];
     files.value = JSON.parse(data?.files);
-    moreMessge.value = [
+    const newData = [
       { name: 'Requires', value: JSON.parse(data?.requires || '') },
       { name: 'Provides', value: JSON.parse(data?.provides || '') },
       { name: 'Conflicts', value: JSON.parse(data?.conflicts || '') },
     ];
+
+    // 过滤空数据
+    newData.forEach((item) => {
+      if (item.value.length > 0) {
+        moreMessge.value.push(item);
+      }
+    });
+
     appData.value.size = data.epkgSize || 0;
     summary.value = data.summary;
     version.value = data?.version;
@@ -296,7 +304,13 @@ const repeatTags = (v: string) => {
               <p class="sp">> 安装指引</p>
               <div v-if="installation" v-dompurify-html="installation" v-copy-code="true" class="markdown-body installation"></div>
               <p class="sp" v-if="item !== 'IMAGE'">> 更多信息</p>
-              <OTab variant="text" :line="false" class="domain-tabs switch" v-if="item !== 'IMAGE'">
+              <OTab
+                variant="text"
+                :line="false"
+                class="domain-tabs tabs-switch"
+                v-if="item !== 'IMAGE'"
+                :class="moreMessge.length > 1 ? 'tabs-switch' : 'tabs-one'"
+              >
                 <template v-for="it in moreMessge" :key="it">
                   <OTabPane class="tab-pane" v-if="it.value.length > 0" :label="it.name">
                     <OTable :columns="moreColumns" :data="it.value" :small="true" border="all"> </OTable>

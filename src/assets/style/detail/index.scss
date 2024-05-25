@@ -50,7 +50,7 @@
     --table-edge-padding: 24px;
   }
   // 容器镜像样式
-  &.switch {
+  &.tabs-switch {
     .o-tab-nav-list {
       background: #ededf0;
       border-radius: 8px;
@@ -72,6 +72,15 @@
         height: 100%;
         background: var(--o-color-fill2);
       }
+    }
+  }
+  &.tabs-one {
+    .o-tab-nav-active {
+      color: var(--o-color-info1);
+      cursor: default;
+    }
+    .o-tab-nav-anchor {
+      display: none;
     }
   }
 }

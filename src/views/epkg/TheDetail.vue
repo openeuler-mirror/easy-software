@@ -4,7 +4,7 @@ import { OTab, OTabPane, OTable, OLink } from '@opensig/opendesign';
 import { OPENEULER_CONTACT } from '@/data/config';
 import { useRoute } from 'vue-router';
 import { useMarkdown } from '@/composables/useMarkdown';
-import type { AppInfoT, MaintainerT, DetailItemT } from '@/@types/app';
+import type { AppInfoT, MaintainerT, DetailItemT, MoreMessgeT } from '@/@types/app';
 import { useI18n } from 'vue-i18n';
 import { getDetails, getVer } from '@/api/api-domain';
 import AppFeedback from '@/components/AppFeedback.vue';
@@ -27,7 +27,7 @@ const files = ref([]);
 const maintainer = ref<MaintainerT>({ maintainerId: '', maintainerEmail: '', maintainerGiteeId: '' });
 const upStream = ref();
 const security = ref();
-const moreMessge = ref<DetailItemT[]>([]);
+const moreMessge = ref<MoreMessgeT[]>([]);
 const description = ref();
 const appData = ref<AppInfoT>({
   name: '',
@@ -81,11 +81,19 @@ const getDetailValue = (data: any) => {
   } catch (res) {}
   files.value = JSON.parse(data?.files);
   summary.value = data.summary;
-  moreMessge.value = [
-    { name: 'Requires', value: JSON.parse(data?.requires || '') },
-    { name: 'Provides', value: JSON.parse(data?.provides || '') },
-    { name: 'Conflicts', value: JSON.parse(data?.conflicts || '') },
+
+  const newData = [
+    { name: 'Requires', value: JSON.parse(data?.requires || []) },
+    { name: 'Provides', value: JSON.parse(data?.provides || []) },
+    { name: 'Conflicts', value: JSON.parse(data?.conflicts || []) },
   ];
+  // 过滤空数据
+  newData.forEach((item) => {
+    if (item.value.length > 0) {
+      moreMessge.value.push(item);
+    }
+  });
+
   appData.value.size = data.epkgSize;
   tagVer.value = [data.osSupport, data.arch];
   maintainer.value = {
@@ -157,9 +165,9 @@ const queryVer = () => {
           <div v-if="downloadData" v-dompurify-html="downloadData" v-copy-code="true" class="markdown-body download"></div>
           <div v-if="installation" v-dompurify-html="installation" v-copy-code="true" class="markdown-body installation"></div>
           <p class="sp">> 更多信息</p>
-          <OTab variant="text" :line="false" class="domain-tabs switch">
+          <OTab variant="text" :line="false" class="domain-tabs tabs-switch" :class="moreMessge.length > 1 ? 'tabs-switch' : 'tabs-one'">
             <template v-for="item in moreMessge" :key="item">
-              <OTabPane class="tab-pane switch" v-if="item.value.length > 0" :label="item.name">
+              <OTabPane class="tab-pane" v-if="item.value.length > 0" :label="item.name">
                 <OTable :columns="moreColumns" :data="item.value" :small="true" border="all"> </OTable>
               </OTabPane>
             </template>

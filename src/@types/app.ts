@@ -48,5 +48,18 @@ export interface HomeInfoT {
   href: string;
 }
 
+export interface MoreMessgeT {
+  name: string;
+  value: MoreMessgeItemT[];
+}
+export interface MoreMessgeItemT {
+  name: string;
+  flags: string;
+  rel: string;
+  ver: string;
+  epoch: string;
+}
+
+
 
 export type PkgTypeT = 'RPM' | 'IMAGE' | 'EPKG';

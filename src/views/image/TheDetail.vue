@@ -134,7 +134,7 @@ const queryVer = () => {
     <div class="detail-row">
       <div class="detail-row-main" :class="{ tags: isTags }">
         <AppSection>
-          <OTab variant="text" @change="onChange" :line="false" class="domain-tabs switch" v-model="activeName">
+          <OTab variant="text" @change="onChange" :line="false" class="domain-tabs tabs-switch" v-model="activeName">
             <OTabPane class="tab-pane" v-for="item in tabList" :key="item" :label="item">
               <div v-if="item === '概览'">
                 <div class="title">
