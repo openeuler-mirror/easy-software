@@ -18,9 +18,9 @@ const routes = [
     component: () => import('@/views/apppkg/TheAppPkg.vue'),
   },
   {
-    path: '/zh/apppkg/:name',
+    path: '/zh/apppkg/detail',
     name: 'apppkg-detail',
-    alias: '/en/apppkg/:name',
+    alias: '/en/apppkg/detail',
     component: () => import('@/views/apppkg/TheNewDetail.vue'),
   },
   {
@@ -42,9 +42,9 @@ const routes = [
     component: () => import('@/views/search/TheSearch.vue'),
   },
   {
-    path: '/zh/upstream/:name',
+    path: '/zh/upstream/detail',
     name: 'upstream-detail',
-    alias: '/en/upstream/:name',
+    alias: '/en/upstream/detail',
     component: () => import('@/views/upstream/TheDetail.vue'),
   },
   {
@@ -60,21 +60,21 @@ const routes = [
     component: () => import('@/views/epkg/TheEpkg.vue'),
   },
   {
-    path: '/zh/epkg/:name',
+    path: '/zh/epkg/detail',
     name: 'epkg-detail',
-    alias: '/en/epkg/:name',
+    alias: '/en/epkg/detail',
     component: () => import('@/views/epkg/TheDetail.vue'),
   },
   {
-    path: '/zh/package/:name',
+    path: '/zh/package/detail',
     name: 'package-detail',
-    alias: '/en/package/:name',
+    alias: '/en/package/detail',
     component: () => import('@/views/package/TheDetail.vue'),
   },
   {
-    path: '/zh/image/:name',
+    path: '/zh/image/detail',
     name: 'image-detail',
-    alias: '/en/image/:name',
+    alias: '/en/image/detail',
     component: () => import('@/views/image/TheDetail.vue'),
   },
   // 默认路由

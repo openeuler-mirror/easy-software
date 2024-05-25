@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { ref, onMounted } from 'vue';
-import { OTab, OTabPane, OTable, OLink } from '@opensig/opendesign';
+import { OTab, OTabPane, OTable, OLink, isString } from '@opensig/opendesign';
 import { OPENEULER_CONTACT } from '@/data/config';
 import { useRoute } from 'vue-router';
 import { useMarkdown } from '@/composables/useMarkdown';
@@ -16,6 +16,7 @@ import { useViewStore } from '@/stores/common';
 
 const route = useRoute();
 const { mkit } = useMarkdown();
+const tabValue = ref('rpmpkg');
 const basicInfo = ref<DetailItemT[]>([]);
 const version = ref();
 const installation = ref('');
@@ -35,8 +36,8 @@ const appData = ref<AppInfoT>({
 });
 
 //详情请求
-const queryPkg = (tabValue: string, pkgId: any) => {
-  getDetails(tabValue, pkgId)
+const queryPkg = () => {
+  getDetails(tabValue.value, pkgId.value)
     .then((res) => {
       const data = res.data.list[0];
       getDetailValue(data);
@@ -45,21 +46,13 @@ const queryPkg = (tabValue: string, pkgId: any) => {
       useViewStore().showNotFound();
     });
 };
-
-const pkgId = route.query.pkgId as string;
-const queryEntity = () => {
-  getChange();
-};
-
-const getChange = () => {
-  getPkg('rpmpkg');
-};
-const getPkg = (tabValue: string) => {
-  queryPkg(tabValue, pkgId);
-};
+const pkgId = ref('');
+if (isString(route.query?.pkgId)) {
+  pkgId.value = encodeURIComponent(route.query?.pkgId.toString());
+}
 
 onMounted(() => {
-  queryEntity();
+  queryPkg();
 });
 
 const summary = ref();
@@ -119,7 +112,7 @@ const onExternalDialog = (href: string) => {
 //获取支持
 const verData = ref();
 const queryVer = () => {
-  getVer('rpmpkg', encodeURIComponent(appData.value.name as string)).then((res) => {
+  getVer(tabValue.value, encodeURIComponent(appData.value.name)).then((res) => {
     verData.value = res.data.list;
   });
 };

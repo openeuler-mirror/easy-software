@@ -28,8 +28,8 @@ homeData.forEach((item) => {
 
 <template>
   <OBreadcrumb class="app-breadcrumb">
-    <OBreadcrumbItem :to="/${locale.value}/">软件市场</OBreadcrumbItem>
-    <OBreadcrumbItem :to="`/${locale.value}/${breadcrumbInfo.href}`">{{ breadcrumbInfo.name }}</OBreadcrumbItem>
+    <OBreadcrumbItem :to="`/${locale}/`">软件市场</OBreadcrumbItem>
+    <OBreadcrumbItem :to="`/${locale}${breadcrumbInfo.href}`">{{ breadcrumbInfo.name }}</OBreadcrumbItem>
     <OBreadcrumbItem>{{ name }} </OBreadcrumbItem>
   </OBreadcrumb>
 </template>
