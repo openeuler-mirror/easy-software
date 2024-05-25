@@ -193,6 +193,7 @@ const getDetailValue = (data: any) => {
     latestOsSupport.value = data.latestOsSupport;
     summary.value = data.description;
     version.value = data?.appVer;
+    queryTags();
   }
   tagVer.value = [data.osSupport, data.arch];
   maintainer.value = {
@@ -214,7 +215,7 @@ const getDetailValue = (data: any) => {
   appData.value.bin_code = data.binDownloadUrl;
   appData.value.cover = data?.iconUrl || defaultImg;
   appData.value.repository = data.srcRepo;
-  queryTags();
+ 
 };
 
 // 更多信息表头
