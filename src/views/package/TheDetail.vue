@@ -111,7 +111,7 @@ const onExternalDialog = (href: string) => {
 //获取支持
 const verData = ref();
 const queryVer = () => {
-  getVer('rpmpkg', appData.value.name).then((res) => {
+  getVer('rpmpkg', encodeURIComponent(appData.value.name as string)).then((res) => {
     verData.value = res.data.list;
   });
 };
