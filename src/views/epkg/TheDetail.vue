@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { ref, onMounted } from 'vue';
-import { OTab, OTabPane, OTable, OLink } from '@opensig/opendesign';
+import { OTab, OTabPane, OTable, OLink, isString } from '@opensig/opendesign';
 import { OPENEULER_CONTACT } from '@/data/config';
 import { useRoute } from 'vue-router';
 import { useMarkdown } from '@/composables/useMarkdown';
@@ -22,6 +22,7 @@ const { t } = useI18n();
 const basicInfo = ref<DetailItemT[]>([]);
 const version = ref();
 const installation = ref('');
+const tabValue = ref('epkgpkg');
 const downloadData = ref('');
 const files = ref([]);
 const maintainer = ref<MaintainerT>({ maintainerId: '', maintainerEmail: '', maintainerGiteeId: '' });
@@ -38,8 +39,8 @@ const appData = ref<AppInfoT>({
   bin_code: '',
 });
 //详情请求
-const queryPkg = (tabValue: string, pkgId: string) => {
-  getDetails(tabValue, pkgId)
+const queryPkg = () => {
+  getDetails(tabValue.value, pkgId.value)
     .then((res) => {
       const data = res.data.list[0];
       getDetailValue(data);
@@ -49,21 +50,13 @@ const queryPkg = (tabValue: string, pkgId: string) => {
     });
 };
 
-// 获取tab分类
-const pkgId = route.query.pkgId as string;
-const queryEntity = () => {
-  getChange();
-};
-//tab切换
-const getChange = () => {
-  getPkg('epkgpkg');
-};
-const getPkg = (tabValue: string) => {
-  queryPkg(tabValue, pkgId);
-};
+const pkgId = ref('');
+if (isString(route.query?.pkgId)) {
+  pkgId.value = encodeURIComponent(route.query?.pkgId.toString());
+}
 
 onMounted(() => {
-  queryEntity();
+  queryPkg();
 });
 const summary = ref();
 const license = ref();
@@ -126,9 +119,11 @@ const onExternalDialog = (href: string) => {
 //获取支持
 const verData = ref();
 const queryVer = () => {
-  getVer('epkgpkg', encodeURIComponent(appData.value.name as string)).then((res) => {
-    verData.value = res.data.list;
-  });
+  if (appData.value.name) {
+    getVer(tabValue.value, encodeURIComponent(appData.value.name)).then((res) => {
+      verData.value = res.data.list;
+    });
+  }
 };
 </script>
 
@@ -165,7 +160,7 @@ const queryVer = () => {
           <div v-if="downloadData" v-dompurify-html="downloadData" v-copy-code="true" class="markdown-body download"></div>
           <div v-if="installation" v-dompurify-html="installation" v-copy-code="true" class="markdown-body installation"></div>
           <p class="sp">> 更多信息</p>
-          <OTab variant="text" :line="false" class="domain-tabs tabs-switch" :class="moreMessge.length > 1 ? 'tabs-switch' : 'tabs-one'">
+          <OTab variant="text" :line="false" class="domain-tabs" :class="moreMessge.length > 1 ? 'tabs-switch' : 'tabs-one'">
             <template v-for="item in moreMessge" :key="item">
               <OTabPane class="tab-pane" v-if="item.value.length > 0" :label="item.name">
                 <OTable :columns="moreColumns" :data="item.value" :small="true" border="all"> </OTable>

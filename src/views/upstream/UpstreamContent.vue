@@ -187,6 +187,7 @@ watch(
       searchKey.value = v;
     }
     if (v === '') {
+      searchKey.value = '';
       isSearch.value = false;
     }
     currentPage.value = 1;
