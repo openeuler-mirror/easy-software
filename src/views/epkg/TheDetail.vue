@@ -152,7 +152,7 @@ const queryVer = () => {
               <OLink
                 @click="onExternalDialog(item.value)"
                 color="primary"
-                v-if="item.name === '所属仓库' || item.name === 'Repo源'"
+                v-if="item.name === t('detail.warehouse') || item.name === t('detail.source')"
                 target="_blank"
                 rel="noopener noreferrer"
                 class="mymarkdown-body"

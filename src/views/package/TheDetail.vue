@@ -13,7 +13,8 @@ import DetailAside from '@/components/DetailAside.vue';
 import ExternalLink from '@/components/ExternalLink.vue';
 import { moreColumns } from '@/data/detail/index';
 import { useViewStore } from '@/stores/common';
-
+import { useI18n } from 'vue-i18n';
+const { t } = useI18n();
 const route = useRoute();
 const { mkit } = useMarkdown();
 const tabValue = ref('rpmpkg');
@@ -137,7 +138,7 @@ const queryVer = () => {
               <OLink
                 @click="onExternalDialog(item.value)"
                 color="primary"
-                v-if="item.name === '所属仓库' || item.name === 'Repo源'"
+                v-if="item.name === t('detail.warehouse') || item.name === t('detail.source')"
                 target="_blank"
                 rel="noopener noreferrer"
                 class="mymarkdown-body"
