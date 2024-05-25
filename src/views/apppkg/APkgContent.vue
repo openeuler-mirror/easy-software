@@ -192,6 +192,9 @@ const isPageSearch = ref(false);
 
 onMounted(() => {
   isPageSearch.value = route.name === 'search';
+  if (isPageSearch.value) {
+    pageSearch();
+  }
 
   //判断主页领域应用跳转
   const homeType = route.query.type as string;
@@ -255,7 +258,7 @@ watch(
 </script>
 
 <template>
-  <div class="pkg-wrap" :class="tabName">
+  <div v-loading.nomask="isLoading" class="pkg-wrap" :class="tabName">
     <div class="filter-sidebar">
       <FilterRadio v-if="filterOsList.length" v-model="searchOs" :options="filterOsList">
         <template #header>
@@ -298,7 +301,7 @@ watch(
       </div>
       <ResultNotApp v-if="pkgData.length === 0 && isSearchError" />
       <template v-else>
-        <div v-loading.nomask="isLoading" class="pkg-panel">
+        <div class="pkg-panel">
           <ORow gap="32px" flex-wrap="wrap">
             <OCol v-for="(subItem, index) in pkgData" :key="index" flex="0 1 33.33%" :laptop="{ flex: '0 1 33.33%' }">
               <OCardItem :data="subItem" />
