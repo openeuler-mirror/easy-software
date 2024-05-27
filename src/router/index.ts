@@ -42,12 +42,6 @@ const routes = [
     component: () => import('@/views/search/TheSearch.vue'),
   },
   {
-    path: '/zh/upstream/detail',
-    name: 'upstream-detail',
-    alias: '/en/upstream/detail',
-    component: () => import('@/views/upstream/TheDetail.vue'),
-  },
-  {
     path: '/zh/image',
     name: 'image',
     alias: '/en/image',

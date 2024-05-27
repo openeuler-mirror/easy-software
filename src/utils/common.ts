@@ -49,16 +49,6 @@ export const scrollToTop = (top: number = 0, smooth: boolean = true) => {
   }
 };
 
-export const sureTag = (tag: string) => {
-  switch (tag) {
-    case 'rpmpkg':
-      return 'RPM';
-    case 'epkgpkg':
-      return 'EPKG';
-    default:
-      return '';
-  }
-};
 
 import EpkgIcon from '~icons/pkg/epkg.svg';
 import ImageIcon from '~icons/pkg/image.svg';
@@ -91,28 +81,6 @@ export const checkDomainLink = (path: string) => {
   return path.includes('openeuler.org')
 }
 
-
-
-
-/**
- * URL参数转对象
- * @param {string} url 地址
- * @returns {(string|undefined)} 转换成功返回参数对象，失败返回 undefined
- */
-export function getUrlParams(url: string) {
-  const arrObj = url.split('?');
-  if (arrObj.length > 1) {
-    const arrPara = arrObj[1].split('&');
-    const list = {} as any;
-    for (let i = 0; i < arrPara.length; i++) {
-      const item = arrPara[i].split('=');
-      const key = item[0];
-      const value = item[1];
-      list[key] = value;
-    }
-    return list;
-  }
-}
 
 
 /**
