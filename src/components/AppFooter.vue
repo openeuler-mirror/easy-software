@@ -193,7 +193,7 @@ const footBg = {
             <img class="show-pc" :src="LogoFooter" alt="" />
             <img class="show-mo" :src="LogoFooter1" alt="" />
             <p>
-              <a class="email" :href="`mailto:${OPENEULER_CONTACT}`" target="_blank"> {{ OPENEULER_CONTACT }} </a>
+              <a class="email" :href="`mailto:${OPENEULER_CONTACT}`" target="_blank" rel="noopener noreferrer"> {{ OPENEULER_CONTACT }} </a>
             </p>
           </div>
           <div class="footer-option">
@@ -217,7 +217,7 @@ const footBg = {
               </a>
             </div>
             <div class="footer-links" :class="isZh ? 'zh' : ''">
-              <a v-for="item in linkList" :key="item.id" :href="item.href" class="links-logo" target="_blank">
+              <a v-for="item in linkList" :key="item.id" :href="item.href" class="links-logo" target="_blank" rel="noopener noreferrer">
                 <img :src="item.logo" alt="" />
               </a>
             </div>

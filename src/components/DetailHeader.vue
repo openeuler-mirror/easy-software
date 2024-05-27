@@ -1,10 +1,11 @@
 <script lang="ts" setup>
 import { ref } from 'vue';
+import { OLink, OIcon } from '@opensig/opendesign';
 import { checkDomainLink, windowOpen } from '@/utils/common';
 
 import Email from '@/assets/email.svg';
 import Gitee from '@/assets/gitee.svg';
-import Home from '@/assets/icon/icon-home.svg';
+import IconOutlink from '~icons/pkg/icon-outlink.svg';
 import { GITEE } from '@/data/config';
 
 import ExternalLink from '@/components/ExternalLink.vue';
@@ -50,9 +51,19 @@ const onExternalDialog = (href: string) => {
           <div class="box">
             <p class="title">
               {{ data.name }}
-              <a @click="onExternalDialog(data.repository)" v-if="data.repository" target="_blank" rel="noopener noreferrer">
-                <img :src="Home" class="icon-img" alt="" />主页</a
-              >
+              <OLink
+                v-if="data.repository"
+                class="home-page"
+                color="primary"
+                hover-underline
+                @click="onExternalDialog(data.repository)"
+                target="_blank"
+                rel="noopener noreferrer"
+                >主页
+                <template #suffix>
+                  <OIcon><IconOutlink /></OIcon>
+                </template>
+              </OLink>
             </p>
             <p v-if="basicInfo" class="detail">{{ basicInfo }}</p>
           </div>
@@ -102,9 +113,14 @@ const onExternalDialog = (href: string) => {
         color: var(--o-color-info1);
         display: flex;
         justify-content: space-between;
-        a {
-          display: flex;
-          font-size: 14px;
+      }
+      .home-page {
+        --link-icon-size: 16px;
+        @include tip1;
+        svg {
+          width: 16px;
+          color: currentColor;
+          margin-left: 4px;
         }
       }
     }
@@ -122,6 +138,7 @@ const onExternalDialog = (href: string) => {
           gap: 8px;
         }
       }
+
       .title {
         font-size: 16px;
         color: rgba(0, 0, 0, 0.8);
