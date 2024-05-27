@@ -23,11 +23,6 @@ export function getDetail(params: DetailT) {
   return request.get(url, { params }).then((res: AxiosResponse) => res?.data);
 }
 
-export function queryDownload(params: { app: string }) {
-  const url = '/dsapi/query/software/app/download?community=software';
-  return request.get(url, { params }).then((res: AxiosResponse) => res?.data);
-}
-
 // 领域应用
 export function getSearchAllColumn(params: ColumnT) {
   const url = `/api-query/field/column`;
