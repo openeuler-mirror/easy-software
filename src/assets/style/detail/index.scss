@@ -17,7 +17,7 @@
   :deep(li) {
     margin: 12px 0;
     color: var(--o-color-info1);
-    @include tip1;
+
     > code {
       display: block;
     }
@@ -49,11 +49,7 @@
     word-break: break-word;
     --table-edge-padding: 24px;
   }
-  &.apppkg {
-    .o-tab-navs-wrap {
-      display: none;
-    }
-  }
+
   // 容器镜像样式
   &.tabs-switch {
     .o-tab-nav-list {
@@ -98,8 +94,8 @@
   margin-top: 26px;
 
   p {
-    @include tip1;
-    color: var(--o-color-info2);
+    @include text1;
+    color: var(--o-color-info1);
     display: flex;
     align-items: top;
     border-bottom: 1px solid rgba(0, 0, 0, 0.1);
@@ -111,12 +107,13 @@
     .label {
       background: rgba(0, 47, 167, 0.05);
       padding: 12px 24px;
+      color: var(--o-color-info2);
       min-width: 150px;
       border-right: 1px solid rgba(0, 0, 0, 0.1);
     }
   }
   .mymarkdown-body {
-    max-width: 600px;
+    flex: 1;
     padding: 12px 24px;
   }
 }

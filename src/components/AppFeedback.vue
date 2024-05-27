@@ -5,6 +5,7 @@ import { useRoute } from 'vue-router';
 import { postFeedback } from '@/api/api-feedback';
 import { GITEE } from '@/data/config';
 import { useI18n } from 'vue-i18n';
+import { OPENEULER_FORUM } from '@/data/config';
 import xss from 'xss';
 import ExternalLink from '@/components/ExternalLink.vue';
 import AppSection from '@/components/AppSection.vue';
@@ -130,7 +131,7 @@ const onExternalDialog = () => {
           <a @click="onExternalDialog()">
             <OIcon><IconIssue /></OIcon>提交issue
           </a>
-          <a>
+          <a :href="OPENEULER_FORUM" target="_blank" rel="noopener noreferrer">
             <OIcon><IconHelp /></OIcon>发帖求助
           </a>
         </div>

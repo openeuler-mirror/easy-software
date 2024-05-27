@@ -221,6 +221,8 @@ const jumpTo = (id: string) => {
 
     .o-icon {
       font-size: 24px;
+      width: 24px;
+      height: 24px;
       &:hover {
         color: var(--o-color-primary1);
       }
