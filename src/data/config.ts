@@ -14,3 +14,5 @@ export const OPENEULER_CONTACT = 'contact@openeuler.io';
 export const GITEE = 'https://gitee.com';
 export const HIASCEND = 'https://www.hiascend.com';
 export const OPENEULER_STATUS = 'https://status.openeuler.org';
+export const OPENEULER_FORUM = 'https://forum.openeuler.org';
+

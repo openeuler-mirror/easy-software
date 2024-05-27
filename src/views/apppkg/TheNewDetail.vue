@@ -172,8 +172,9 @@ const getDetailValue = (data: any) => {
       { name: '软件包分类', value: data.category || '' },
       { name: '版本支持情况', value: data.osSupport || '' },
     ];
+
     appData.value.size = data.appSize || 0;
-    latestOsSupport.value = data.latestOsSupport;
+    latestOsSupport.value = data.latestOsSupport === 'true';
     summary.value = data.description;
     version.value = data?.appVer;
   }
@@ -260,7 +261,7 @@ const repeatTags = (v: string) => {
 
     <DetailHead :data="appData" :basicInfo="summary" :maintainer="maintainer" />
 
-    <OTab variant="text" @change="onChange" :line="false" class="domain-tabs" :class="tabList.length === 1 ? 'apppkg' : ''" v-model="activeName" size="large">
+    <OTab variant="text" @change="onChange" :line="false" class="domain-tabs" v-model="activeName" size="large">
       <OTabPane class="tab-pane" v-for="item in tabList" :key="item" :label="item">
         <template #nav><OIcon :icon="getTabIcon(item)" class="tabs-icon" /> {{ repeatTags(item) }}</template>
         <div class="detail-row">
