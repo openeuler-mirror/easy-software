@@ -82,7 +82,7 @@ const getDetailValue = (data: ImageDetailT) => {
   tagVer.value = [data.osSupport, data.arch];
   license.value = data.license;
   version.value = data?.appVer;
-  latestOsSupport.value = data.latestOsSupport;
+  latestOsSupport.value = data.latestOsSupport === 'true';
   upStream.value = data?.upStream;
   security.value = data?.securityLevel;
   description.value = data?.description;
