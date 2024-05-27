@@ -69,7 +69,7 @@ export interface ImageDetailT extends PackageDetailT {
   imageTags: string;
   imageUsage: string;
   securityLevel: string | null;
-  latestOsSupport: boolean;
+  latestOsSupport: string;
 }
 
 export interface ParamsKeyT {
