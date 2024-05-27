@@ -172,8 +172,9 @@ const getDetailValue = (data: any) => {
       { name: '软件包分类', value: data.category || '' },
       { name: '版本支持情况', value: data.osSupport || '' },
     ];
+
     appData.value.size = data.appSize || 0;
-    latestOsSupport.value = data.latestOsSupport;
+    latestOsSupport.value = data.latestOsSupport === 'true';
     summary.value = data.description;
     version.value = data?.appVer;
   }
