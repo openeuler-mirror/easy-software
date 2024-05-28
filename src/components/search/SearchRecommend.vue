@@ -156,7 +156,7 @@ watch(
         </p>
         <p class="info">
           <OLink @click="jumpPages(item.key)">
-            {{ t('software.searchview[0]') }}{{ item.docCount }} {{ t('software.searchview[1]') }}{{ t(`software.${item.key}`) }}
+            {{ t('software.searchview[0]') }} {{ item.docCount }} {{ t('software.searchview[1]') }}{{ t(`software.${item.key}`) }}
             <template #suffix><IconChevronRight /></template>
           </OLink>
         </p>
@@ -184,7 +184,7 @@ watch(
     </ul>
   </div>
   <div v-else-if="options.length === 0 && isShow" class="recommend">
-    <span class="history">{{ t('software.nofound') }}</span>
+    <span class="text">{{ t('software.nofound') }}</span>
     <p>
       {{ t('software.nofoundApp') }} <OLink color="primary" @click="clickFeedback"> {{ t('software.feedback') }}</OLink>
     </p>
@@ -200,7 +200,7 @@ watch(
   background-color: var(--o-color-fill2);
   box-shadow: var(--o-shadow-1);
   height: auto;
-  padding: 16px;
+  padding: 16px 16px 12px;
   .search-all {
     display: flex;
     align-items: center;
@@ -246,10 +246,15 @@ watch(
       }
     }
   }
+  .text {
+    padding: 0 0 8px;
+    display: block;
+    color: var(--o-color-info1);
+  }
   .history {
     @include tip2;
     color: var(--o-color-info3);
-    padding: 8px 0;
+    padding: 0 0 8px;
     display: block;
   }
   li {

@@ -45,7 +45,7 @@
   pre {
     position: relative;
     border-radius: var(--layout-pkg-radius);
-    background-color: var(--o-color-fill3);
+    background-color: var(--pkg-bg);
     padding: 0;
     overflow: hidden;
 
@@ -83,11 +83,13 @@
     th,
     td {
       box-sizing: border-box;
-      border-color: var(--o-color-control4);
       padding: var(--table-padding);
       height: 40px;
       @include tip1;
       color: var(--o-color-info2);
+    }
+    tr {
+      background: #fff !important;
     }
 
     td {
@@ -108,7 +110,7 @@
     position: absolute;
     top: 0;
     right: 0;
-    background-color: var(--o-color-fill3);
+    background-color: var(--o-color-fill1);
     opacity: 0;
     transition: all var(--o-duration-m1) var(--o-easing-standard-in);
     padding: 12px 12px 0 0;
@@ -119,13 +121,9 @@
       -webkit-mask-image: url(@/assets/icon-copy.svg);
       mask-image: url(@/assets/icon-copy.svg);
       -webkit-mask-size: cover;
-      background-color: var(--o-color-info2);
+      background-color: var(--o-color-primary1);
     }
-    &:hover {
-      .icon-copy {
-        background-color: var(--o-color-primary1);
-      }
-    }
+
     @include respond-to('phone') {
       top: 4px;
     }

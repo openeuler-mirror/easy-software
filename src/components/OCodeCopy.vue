@@ -39,13 +39,13 @@ const copyText = (e: MouseEvent) => {
 
 <style lang="scss" scoped>
 .download-code {
-  background: var(--o-color-fill3);
+  background: var(--pkg-bg);
   border-radius: var(--layout-pkg-radius);
   height: auto;
   width: 100%;
   padding: 12px;
   @include tip1;
-  color: var(--o-color-info1);
+  color: var(--o-color-primary1);
   position: relative;
 
   &:hover {
@@ -58,7 +58,7 @@ const copyText = (e: MouseEvent) => {
   }
   .copy-icon {
     width: 24px;
-    color: var(--o-color-info2);
+    color: var(--o-color-primary1);
     cursor: pointer;
     position: absolute;
     top: 0;

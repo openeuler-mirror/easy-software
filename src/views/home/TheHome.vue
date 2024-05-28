@@ -106,7 +106,7 @@ onMounted(() => {
           <div id="resource" class="domain-resource">
             <h2>获取资源</h2>
             <div class="resource-content">
-              <ORow flex-wrap="wrap">
+              <ORow flex-wrap="wrap" gap="40px">
                 <OCol
                   v-for="item in homeData"
                   :key="item.name"
@@ -162,7 +162,7 @@ onMounted(() => {
 <style lang="scss" scoped>
 .resource-content {
   background: var(--o-color-fill2);
-  padding: 48px 60px;
+  padding: 48px;
   .resource-item {
     display: flex;
     flex-direction: column;
@@ -181,6 +181,7 @@ onMounted(() => {
       @include h2;
       color: var(--o-color-info1);
       margin: 16px 0 12px;
+      font-weight: 500;
     }
     .desc {
       @include text1;

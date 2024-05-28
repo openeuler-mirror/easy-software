@@ -56,7 +56,7 @@ const { isZh } = useLocale();
 
   --layout-footer-height: 300px;
 
-  --layout-content-min-height: calc(100vh - var(--layout-header-height) - var(--layout-footer-height));
+  --layout-content-min-height: calc(100vh - var(--layout-header-height));
 
   @include respond-to('<=laptop') {
     --layout-header-max-width: 100%;

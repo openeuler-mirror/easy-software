@@ -163,7 +163,7 @@ const queryVer = () => {
             </OTabPane>
           </OTab>
         </AppSection>
-        <AppFeedback v-if="!isTags" :email="maintainer.maintainerEmail" />
+        <AppFeedback v-if="!isTags" :name="appData.name" :version="version" type="容器镜像" />
       </div>
       <div v-if="!isTags" class="detail-row-side">
         <DetailAside

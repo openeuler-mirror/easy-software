@@ -6,6 +6,8 @@ html {
   --o-radius_control-s: 4px;
   --o-radius_control-m: 4px;
   --o-radius_control-l: 4px;
+
+  --pkg-bg: rgba(var(--o-kleinblue-6), 0.05);
 }
 
 .o-btn {
@@ -13,6 +15,9 @@ html {
 }
 .o-tag {
   border-radius: var(--layout-pkg-radius);
+  &.o-tag-small {
+    --tag-padding: 0 4px;
+  }
 }
 .o-icon {
   svg {
@@ -22,6 +27,8 @@ html {
 .o-card {
   --card-cover-radius: 0;
   --card-radius: 0;
+  --card-shadow-hover: 0 2px 24px rgba(var(--o-kleinblue-10), 0.15);
+  --card-shadow-active: 0 2px 24px rgba(var(--o-kleinblue-10), 0.15);
 }
 
 .o-dialog {
@@ -73,8 +80,4 @@ html {
       color: currentColor;
     }
   }
-}
-
-.o-layer {
-  --layer-mask: none;
 }

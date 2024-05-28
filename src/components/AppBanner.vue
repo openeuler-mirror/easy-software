@@ -126,7 +126,7 @@ defineExpose({
     .banner-subtitle {
       position: relative;
       z-index: 1;
-      color: #fff;
+      color: rgba($color: #fff, $alpha: 0.8);
       @include text1;
       margin-top: 8px;
       --d: 60px;

@@ -73,6 +73,7 @@ const repeatTags = (v: string) => {
   .pkg-info {
     display: flex;
     align-items: center;
+    flex: 1;
   }
   .pkg-icon {
     height: 32px;
@@ -91,12 +92,13 @@ const repeatTags = (v: string) => {
     color: var(--o-color-info1);
     flex: 1;
     word-break: break-word;
+    font-weight: 500;
     span {
       color: var(--o-color-primary1);
     }
   }
   .pkg-box {
-    flex: 1;
+    height: 102px;
     .desc {
       @include text1;
       margin-top: 16px;
