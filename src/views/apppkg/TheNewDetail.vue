@@ -86,6 +86,8 @@ const queryEntity = () => {
 //tab切换
 const tabValue = ref();
 const onChange = (tab: string) => {
+  isTags.value = false;
+  imgName.value = tagList[0].lable;
   if (tab === 'RPM') {
     tabValue.value = 'rpmpkg';
     typePkg.value = 'RPM';
@@ -324,7 +326,7 @@ const repeatTags = (v: string) => {
               </OTab>
             </AppSection>
             <ExternalLink v-if="showExternalDlg" :href="externalLink" @change="showExternalDlg = false" />
-            <AppFeedback v-if="!isTags" :email="maintainer.maintainerEmail" />
+            <AppFeedback v-if="!isTags" :name="appData.name" :version="version" :type="typePkg" />
           </div>
           <div v-if="!isTags" class="detail-row-side">
             <DetailAside

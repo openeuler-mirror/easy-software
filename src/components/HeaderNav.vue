@@ -123,7 +123,7 @@ const jumpTo = (href: string) => {
 
   &.is-active,
   &.is-selected {
-    a {
+    span {
       color: var(--o-color-primary1);
     }
   }

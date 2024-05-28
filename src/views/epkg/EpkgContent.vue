@@ -26,14 +26,14 @@ const { isZh } = useLocale();
 
 // EPKG-表头
 const columns = [
-  { label: t('software.columns.name'), key: 'name', style: 'width:15%' },
+  { label: t('software.columns.name'), key: 'name' },
   { label: t('software.columns.version'), key: 'version' },
   { label: t('software.columns.os'), key: 'os' },
   { label: t('software.columns.arch'), key: 'arch' },
-  { label: t('software.columns.category'), key: 'category', style: 'width:8%' },
+  { label: t('software.columns.category'), key: 'category' },
   { label: t('software.columns.timeorder'), key: 'epkgUpdateAt' },
-  { label: t('software.columns.size'), key: 'epkgSize', style: 'width:11%' },
-  { label: t('software.columns.operation'), key: 'operation', style: 'width:15%' },
+  { label: t('software.columns.size'), key: 'epkgSize' },
+  { label: t('software.columns.operation'), key: 'operation' },
 ];
 
 //  ------------  main ------------
@@ -304,8 +304,14 @@ watch(
       <FilterHeader title="EPKG" @sort="changeTimeOrder" :total="total" />
       <div v-if="isSearchDocs || searchArch.length > 0 || searchOs.length > 0 || searchCategory.length > 0" class="search-result">
         <p v-if="!isPageSearch" class="text">
-          为您找到符合条件的筛选<span class="total">{{ total }}</span
-          >个
+          <template v-if="isSearchDocs">
+            为您找到<span class="total">{{ total }}</span
+            >个与{{ searchKey }} 匹配的搜索结果</template
+          >
+          <template v-else>
+            为您找到符合条件的筛选<span class="total">{{ total }}</span
+            >个</template
+          >
         </p>
         <div class="search-filter-tags">
           <OTag v-for="(item, index) in searchOs" :key="item" closable @Close="closeTag(index, 'os')">{{ item }}</OTag>

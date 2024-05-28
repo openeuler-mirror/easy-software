@@ -7,13 +7,17 @@ import handleResponse from './handleResponse';
 import handleError from './handleError';
 import setConfig from './setConfig';
 
-import { isBoolean, useLoading, useMessage } from '@opensig/opendesign';
+import { isBoolean, useLoading, useMessage, isNull, isUndefined } from '@opensig/opendesign';
 import type { LoadingPropsT } from '@opensig/opendesign/lib/loading/types';
+
+
 
 interface RequestConfig<D = any> extends AxiosRequestConfig {
   data?: D;
   showLoading?: boolean | { opt?: Partial<LoadingPropsT>; wrap: Ref<HTMLElement> | HTMLElement | string }; // 加载时是否出现Loading框，默认为false
   showError?: boolean; // 请求报错是否出现错误提示，默认为true
+  ignoreError?: number; // 忽略某个状态码错误提示
+  ignoreDuplicates?: boolean; // false: 取消重复请求； true: 允许重复请求
   global?: boolean; // 是否为全局请求，全局请求在清除请求池时，不清除
 }
 
@@ -44,12 +48,11 @@ let loadingCount = 0;
  * 也就是没有**取消请求**和**批量请求**的方法。
  * 所以如果需要在实例中调用取消某个请求的方法（例如取消上传），请用intactRequest。
  */
-
 const intactRequest: AxiosStatic = setConfig(axios);
 const request: RequestInstance = intactRequest.create() as RequestInstance;
 
 // 请求中的api
-const pendingPool: Map<string, { cancelFn: Canceler; global?: boolean }> = new Map();
+const pendingPool: Map<string, { method?: string; cancelFn: Canceler; global?: boolean }> = new Map();
 
 const getLoadingInstance = (showLoading: boolean | { opt?: Partial<LoadingPropsT>; wrap: Ref<HTMLElement> | HTMLElement | string }) => {
   if (isBoolean(showLoading)) {
@@ -70,6 +73,7 @@ const getLoadingInstance = (showLoading: boolean | { opt?: Partial<LoadingPropsT
 const requestInterceptorId = request.interceptors.request.use(
   (config: InternalRequestConfig) => {
     const { showLoading } = config;
+
     if (loadingCount === 0 && config.showLoading) {
       if (showLoading) {
         loadingInstance = getLoadingInstance(showLoading);
@@ -80,24 +84,32 @@ const requestInterceptorId = request.interceptors.request.use(
     }
     // 存储请求信息
     // 定义取消请求
-    config.cancelToken = new axios.CancelToken((cancelFn) => {
-      if (!config?.url) {
-        return;
-      }
+    if (!config.ignoreDuplicates) {
+      config.cancelToken = new axios.CancelToken((cancelFn) => {
+        if (!config?.url) {
+          return;
+        }
 
-      // 如果已请求，则取消重复请求
-      if (pendingPool.has(config.url)) {
-        cancelFn(`${config.url}请求重复`);
-      } else {
-        // 存储到请求池
-        pendingPool.set(config.url, {
-          cancelFn,
-          global: config.global,
-        });
-      }
-    });
-
-
+        // 如果已请求，则取消重复请求
+        if (pendingPool.has(config.url)) {
+          cancelFn(`${config.url}请求重复`);
+        } else {
+          // 存储到请求池
+          pendingPool.set(config.url, {
+            method: config.method,
+            cancelFn,
+            global: config.global,
+          });
+        }
+      });
+    }
+    if (config.params) {
+      Object.keys(config?.params).forEach((key) => {
+        if (config.params[key] === '' || isNull(config.params[key]) || isUndefined(config.params[key])) {
+          delete config.params[key];
+        }
+      });
+    }
     return config;
   },
   (err: AxiosError) => {
@@ -131,6 +143,7 @@ const responseInterceptorId = request.interceptors.response.use(
       loadingInstance.toggle(false);
       loadingCount = 0;
     }
+
     const config = err.config as InternalRequestConfig;
 
     // 非取消请求发生异常，同样将请求移除请求池
@@ -152,7 +165,7 @@ const responseInterceptorId = request.interceptors.response.use(
       }
     }
 
-    if (config && config.showError !== false) {
+    if (config && config.showError !== false && config.ignoreError !== err.response?.status) {
       const msg = useMessage();
       msg.show({
         content: err.message,

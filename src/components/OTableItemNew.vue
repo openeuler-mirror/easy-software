@@ -198,5 +198,32 @@ const onExternalDialog = (href: string) => {
       }
     }
   }
+  .name {
+    width: 165px;
+  }
+  .appVer{
+    width: 230px;
+  }
+  .version {
+    width: 130px;
+  }
+  .os {
+    width: 230px;
+  }
+  .arch {
+    width: 90px;
+  }
+  .category {
+    width: 90px;
+  }
+  .rpmUpdateAt,
+  .rpmSize,
+  .epkgUpdateAt,
+  .epkgSize {
+    width: 120px;
+  }
+  .operation {
+    width: 155px;
+  }
 }
 </style>

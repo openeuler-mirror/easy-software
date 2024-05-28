@@ -295,8 +295,14 @@ watch(
       <FilterHeader title="容器镜像" :isSort="false" @sort="changeTimeOrder" :total="total" />
       <div v-if="isSearchDocs || filterList.length > 0" class="search-result">
         <p v-if="!isPageSearch" class="text">
-          为您找到符合条件的筛选<span class="total">{{ total }}</span
-          >个
+          <template v-if="isSearchDocs">
+            为您找到<span class="total">{{ total }}</span
+            >个与{{ searchKey }} 匹配的搜索结果</template
+          >
+          <template v-else>
+            为您找到符合条件的筛选<span class="total">{{ total }}</span
+            >个</template
+          >
         </p>
         <div v-if="filterList.length > 0" class="search-filter-tags">
           <OTag v-for="(item, index) in searchOs" :key="item" closable @Close="closeTag(index, 'os')">{{ item }}</OTag>

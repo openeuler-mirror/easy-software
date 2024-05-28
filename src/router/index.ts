@@ -7,10 +7,10 @@ import { useLangStore, useViewStore } from '@/stores/common';
 const routes = [
   {
     path: '/',
-    component: () => import('@/views/home/TheHome.vue'),
+    redirect: '/zh/',
   },
   { path: '/zh/', component: () => import('@/views/home/TheHome.vue'), },
-  { path: '/en/', component: () => import('@/views/home/TheHome.vue'), },
+  { path: '/en/', redirect: '/zh/', },
   {
     path: '/zh/apppkg',
     name: 'apppkg',

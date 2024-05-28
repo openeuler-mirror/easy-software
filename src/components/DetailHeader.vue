@@ -59,10 +59,9 @@ const onExternalDialog = (href: string) => {
                 @click="onExternalDialog(data.repository)"
                 target="_blank"
                 rel="noopener noreferrer"
-                >主页
-                <template #suffix>
-                  <OIcon><IconOutlink /></OIcon>
-                </template>
+              >
+                <OIcon><IconOutlink /></OIcon>
+                主页
               </OLink>
             </p>
             <p v-if="basicInfo" class="detail">{{ basicInfo }}</p>
@@ -117,10 +116,13 @@ const onExternalDialog = (href: string) => {
       .home-page {
         --link-icon-size: 16px;
         @include tip1;
-        svg {
-          width: 16px;
-          color: currentColor;
-          margin-left: 4px;
+        :deep(.o-link-label) {
+          display: flex;
+          align-items: center;
+          svg {
+            width: 16px;
+            margin-right: 4px;
+          }
         }
       }
     }

@@ -173,7 +173,7 @@ const queryVer = () => {
           </OTab>
         </AppSection>
         <ExternalLink v-if="showExternalDlg" :href="externalLink" @change="showExternalDlg = false" />
-        <AppFeedback :email="maintainer.maintainerEmail" />
+        <AppFeedback :name="appData.name" :version="version" type="EPKG" />
       </div>
       <div class="detail-row-side">
         <DetailAside :data="appData" :basicInfo="basicInfo" :maintainer="maintainer" :ver-data="verData" :license="license" :tagVer="tagVer" :type="'EPKG'" />

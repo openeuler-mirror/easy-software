@@ -1,7 +1,6 @@
 <script lang="ts" setup>
 import { ref } from 'vue';
 import { ORate, OTextarea, OButton, useMessage, OIcon } from '@opensig/opendesign';
-import { useRoute } from 'vue-router';
 import { postFeedback } from '@/api/api-feedback';
 import { GITEE } from '@/data/config';
 import { useI18n } from 'vue-i18n';
@@ -13,14 +12,21 @@ import AppSection from '@/components/AppSection.vue';
 import IconHelp from '~icons/pkg/icon-help.svg';
 import IconIssue from '~icons/pkg/icon-issue.svg';
 
-defineProps({
-  email: {
+const props = defineProps({
+  name: {
+    type: String,
+    default: '',
+  },
+  type: {
+    type: String,
+    default: '',
+  },
+  version: {
     type: String,
     default: '',
   },
 });
 
-const route = useRoute();
 const { t } = useI18n();
 
 // -------------------- 快速反馈 --------------------
@@ -72,18 +78,21 @@ const clearData = () => {
 
 // -------------------- 提交issue --------------------
 const getIssueTemplate = () => {
-  return `1. 【网站链接】
+  return `1. 【网站链接】%0A
 > ${window.location.href}
-2. 【反馈评分】
+%0A
+2. 【反馈评分】%0A
 > ${rateVal.value}
-3. 【反馈意见】
+%0A
+3. 【反馈意见】%0A
 > ${feekbackTxa.value}
 `;
 };
 const issueUrl = ref();
+
 const getIssueUrl = () => {
   const desc = encodeURIComponent(getIssueTemplate());
-  issueUrl.value = `${GITEE}/openeuler/easy-software/issues/new?issue%5Bassignee_id%5D=0&issue%5Bmilestone_id%5D=0&title=${route.params?.name}-${route.query?.type}&description=${desc}`;
+  issueUrl.value = `${GITEE}/openeuler/easy-software/issues/new?issue%5Bassignee_id%5D=0&issue%5Bmilestone_id%5D=0&title=【${props.type}】-${props.name}-${props.version}&description=${desc}`;
 };
 
 const showExternalDlg = ref(false);
@@ -114,7 +123,7 @@ const onExternalDialog = () => {
       <div class="feekback-from">
         <OTextarea
           v-model="feekbackTxa"
-          round="0"
+          round="4px"
           :placeholder="t('software.feedbackPlaceholder')"
           :max-length="200"
           :input-on-outlimit="false"

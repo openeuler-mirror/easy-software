@@ -146,7 +146,7 @@ const trottleSearch = () => {
 };
 
 onMounted(() => {
-  defaultValue.value = route.query.key as string;
+  defaultValue.value = (route.query.key as string) || 'all';
   isLoading.value = false;
 
   if (route.query.name) {
@@ -209,7 +209,6 @@ onMounted(() => {
   background-color: var(--o-color-fill2);
   box-shadow: var(--o-shadow-1);
   height: auto;
-  padding: 24px;
   p {
     text-align: center;
     @include tip1;

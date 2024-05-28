@@ -51,6 +51,11 @@ import { homeNewsData } from '@/data/home/index';
   .o-card-cover {
     --card-cover-padding: 0;
   }
+  &:hover {
+    .o-card-title {
+      color: var(--o-color-primary1);
+    }
+  }
   .o-figure {
     img {
       height: 255px;
@@ -62,6 +67,17 @@ import { homeNewsData } from '@/data/home/index';
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 2;
     overflow: hidden;
+    position: relative;
+    &::after {
+      background-image: linear-gradient(90deg, hsla(0, 0%, 93%, 0), hsla(0, 0%, 100%, 0.8) 59%, var(--o-color-control-light) 100%);
+      bottom: 0;
+      content: '';
+      height: 24px;
+      pointer-events: none;
+      position: absolute;
+      right: 0;
+      width: 4em;
+    }
   }
 }
 

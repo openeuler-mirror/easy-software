@@ -14,8 +14,8 @@ export default {
   viewAll: '显示全部',
   upList: '收起',
   sortTitle: '综合排序',
-  timeOrder: '按更新时间',
-  nameOrder: '按软件包名称',
+  timeOrder: '最新',
+  nameOrder: '按首字母',
   filterPleaseEnter: ['请输入', '相关信息'],
 
   nofound: '无结果',

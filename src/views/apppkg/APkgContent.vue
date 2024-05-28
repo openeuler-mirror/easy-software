@@ -66,7 +66,7 @@ const queryAllpkg = () => {
   isLoading.value = true;
   // 过滤空参数
   const newData = getParamsRules(params);
-  
+
   getSearchAllFiled(newData)
     .then((res) => {
       pkgData.value = res.data.list;
@@ -289,8 +289,14 @@ watch(
 
       <div v-if="isSearchDocs || searchOs || searchArch || searchCategory.length > 0" class="search-result">
         <p v-if="!isPageSearch" class="text">
-          为您找到符合条件的筛选<span class="total">{{ total }}</span
-          >个
+          <template v-if="isSearchDocs">
+            为您找到<span class="total">{{ total }}</span
+            >个与{{ searchKey }} 匹配的搜索结果</template
+          >
+          <template v-else>
+            为您找到符合条件的筛选<span class="total">{{ total }}</span
+            >个</template
+          >
         </p>
         <div v-if="searchOs || searchArch || searchCategory.length > 0" class="search-filter-tags">
           <OTag v-if="searchOs" closable @Close="handleCloseTag('os')">{{ searchOs }}</OTag>

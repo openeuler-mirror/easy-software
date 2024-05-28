@@ -35,11 +35,11 @@ watch(
     <div class="header-content">
       <div class="header-left">
         <div class="logo">
-          <span @click="goHome" class="logo-text">{{ t('software.softwareHome') }}</span>
-          <ODivider direction="v" :darker="true" />
           <a target="_blank" :href="`${OPENEULER}/zh/`" class="community-logo" rel="noopener noreferrer">
             <img :src="openeulerLogo" />
           </a>
+          <ODivider direction="v" :darker="true" />
+          <span @click="goHome" class="logo-text">{{ t('software.softwareHome') }}</span>
         </div>
 
         <HeaderNav />
@@ -82,6 +82,10 @@ watch(
       align-items: center;
       animation: anim-header-trans-in var(--o-duration-xl);
     }
+  }
+  .logo {
+    display: flex;
+    align-items: center;
   }
   .community-logo {
     img {
