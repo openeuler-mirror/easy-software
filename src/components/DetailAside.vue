@@ -163,7 +163,7 @@ const jumpTo = (id: string) => {
 </script>
 
 <template>
-  <AppSection :title="type === 'IMAGE' ? '获取容器镜像' : '下载安装'" v-if="type === 'IMAGE' || data.size !== 0">
+  <AppSection :title="type === 'IMAGE' ? '获取容器镜像' : `${type}下载安装`" v-if="type === 'IMAGE' || data.size !== 0">
     <div class="detail">
       <p class="title" v-if="type !== 'IMAGE'">软件包大小：{{ data.size }}</p>
     </div>
@@ -223,9 +223,7 @@ const jumpTo = (id: string) => {
       font-size: 24px;
       width: 24px;
       height: 24px;
-      &:hover {
-        color: var(--o-color-primary1);
-      }
+      color: var(--o-color-primary1);
     }
   }
   p {

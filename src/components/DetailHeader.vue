@@ -7,7 +7,7 @@ import Email from '@/assets/email.svg';
 import Gitee from '@/assets/gitee.svg';
 import IconOutlink from '~icons/pkg/icon-outlink.svg';
 import { GITEE } from '@/data/config';
-
+import IconHelp from '~icons/pkg/icon-help.svg';
 import ExternalLink from '@/components/ExternalLink.vue';
 
 defineProps({
@@ -40,6 +40,13 @@ const onExternalDialog = (href: string) => {
     showExternalDlg.value = true;
   }
 };
+
+const scrollToAnchor = (id: any) => {
+  setTimeout(() => {
+    const doc = document.getElementById(id);
+    doc?.scrollIntoView();
+  }, 100);
+};
 </script>
 
 <template>
@@ -65,6 +72,9 @@ const onExternalDialog = (href: string) => {
               </OLink>
             </p>
             <p v-if="basicInfo" class="detail">{{ basicInfo }}</p>
+            <p class="scroll-box" @click="scrollToAnchor('feed')">
+              <OIcon><IconHelp /></OIcon>我要反馈
+            </p>
           </div>
         </div>
 
@@ -105,6 +115,7 @@ const onExternalDialog = (href: string) => {
       .box {
         margin-left: 32px;
         flex: 1;
+        position: relative;
       }
       .title {
         @include h2;
@@ -123,6 +134,19 @@ const onExternalDialog = (href: string) => {
             width: 16px;
             margin-right: 4px;
           }
+        }
+      }
+      .scroll-box {
+        cursor: pointer;
+        font-size: var(--o-font_size-tip1);
+        display: flex;
+        align-items: center;
+        position: absolute;
+        bottom: 0px;
+        svg {
+          width: 16px;
+          height: 16px;
+          margin-right: 5px;
         }
       }
     }
