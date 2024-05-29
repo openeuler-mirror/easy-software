@@ -48,6 +48,13 @@
   .o-table {
     word-break: break-word;
     --table-edge-padding: 24px;
+    .arch,
+    .appVer {
+      width: 250px;
+    }
+    tbody tr:hover {
+      background: none;
+    }
   }
 
   // 容器镜像样式
@@ -92,29 +99,31 @@
 
 .basic-info {
   margin-top: 26px;
-
-  p {
+  border-left: 4px solid var(--o-color-primary1);
+  p,
+  .basic-info-item {
     @include text1;
     color: var(--o-color-info1);
     display: flex;
     align-items: top;
     border-bottom: 1px solid rgba(0, 0, 0, 0.1);
     border-right: 1px solid rgba(0, 0, 0, 0.1);
-    border-left: 4px solid var(--o-color-primary1);
     &:first-child {
       border-top: 1px solid rgba(0, 0, 0, 0.1);
     }
     .label {
       background: rgba(0, 47, 167, 0.05);
-      padding: 12px 24px;
+      padding: 16px 24px;
       color: var(--o-color-info2);
       min-width: 150px;
-      border-right: 1px solid rgba(0, 0, 0, 0.1);
+    }
+    :deep(.o-link-primary) {
+      color: var(--o-color-link1);
     }
   }
   .mymarkdown-body {
     flex: 1;
-    padding: 12px 24px;
+    padding: 16px 24px;
   }
 }
 .icon-img {
@@ -166,8 +175,7 @@
   }
 }
 .sp {
-  margin-top: 40px;
-  margin-bottom: 24px;
+  margin: 32px 0 16px;
   @include h3;
 }
 .title {
@@ -175,6 +183,7 @@
   justify-content: space-between;
   align-items: center;
   @include h3;
+  font-weight: 500;
 }
 
 .ver {
@@ -184,4 +193,5 @@
   border-radius: var(--layout-pkg-radius);
   color: var(--o-color-primary1);
   padding: 6px 24px;
+  font-weight: 500;
 }

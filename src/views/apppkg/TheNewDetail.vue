@@ -274,19 +274,13 @@ const repeatTags = (v: string) => {
                 <p v-if="item === 'RPM' || version" class="ver">版本号：{{ version }}</p>
               </div>
               <div class="basic-info">
-                <p v-for="item in basicInfo" :key="item.name">
+                <div v-for="item in basicInfo" :key="item.name" class="basic-info-item">
                   <span class="label markdown download">{{ item.name }}</span>
-                  <OLink
-                    @click="onExternalDialog(item.value)"
-                    color="primary"
-                    v-if="item.name === t('detail.warehouse') || item.name === t('detail.source')"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    class="mymarkdown-body"
-                    >{{ item.type }}</OLink
-                  >
-                  <span class="markdown-body installation mymarkdown-body" v-dompurify-html="item.value" v-copy-code="true" v-else></span>
-                </p>
+                  <div v-if="item.name === t('detail.warehouse') || item.name === t('detail.source')" class="markdown-body installation mymarkdown-body">
+                    <OLink @click="onExternalDialog(item.value)" color="primary" class="" target="_blank" rel="noopener noreferrer">{{ item.type }}</OLink>
+                  </div>
+                  <div v-dompurify-html="item.value" v-copy-code="true" class="markdown-body installation mymarkdown-body" v-else></div>
+                </div>
               </div>
               <p class="sp">> 安装指引</p>
               <div v-if="installation" v-dompurify-html="installation" v-copy-code="true" class="markdown-body installation"></div>

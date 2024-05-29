@@ -48,11 +48,6 @@ const copyText = (e: MouseEvent) => {
   color: var(--o-color-primary1);
   position: relative;
 
-  &:hover {
-    .copy-icon {
-      opacity: 1;
-    }
-  }
   .code {
     color: var(--o-color-info2);
   }
@@ -66,7 +61,6 @@ const copyText = (e: MouseEvent) => {
     font-size: 24px;
     padding: 8px 8px 0 0;
     background-color: var(--o-color-fill1);
-    opacity: 0;
     transition: all var(--o-duration-m1) var(--o-easing-standard-in);
     height: 24px;
     box-sizing: content-box;

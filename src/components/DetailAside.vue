@@ -249,5 +249,8 @@ const jumpTo = (id: string) => {
   tbody tr:hover {
     background: none;
   }
+  th {
+    font-weight: 500;
+  }
 }
 </style>
