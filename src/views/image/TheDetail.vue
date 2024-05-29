@@ -145,14 +145,14 @@ const queryVer = () => {
                   <p v-if="version" class="ver">版本号：{{ version }}</p>
                 </div>
                 <div class="basic-info">
-                  <p v-for="item in basicInfo" :key="item.name">
+                  <div v-for="item in basicInfo" :key="item.name" class="basic-info-item">
                     <span class="label markdown download">{{ item.name }}</span>
 
-                    <span class="markdown-body mymarkdown-body">
+                    <div class="markdown-body mymarkdown-body">
                       {{ item.value }}
                       <OTag v-if="item.name === t('detail.support') && latestOsSupport" color="primary" size="small"> 最新版本</OTag>
-                    </span>
-                  </p>
+                    </div>
+                  </div>
                 </div>
                 <p class="sp">> 安装指引</p>
                 <div v-if="imageUsage" v-dompurify-html="imageUsage" v-copy-code="true" class="markdown-body download"></div>

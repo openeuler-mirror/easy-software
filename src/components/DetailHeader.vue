@@ -72,9 +72,9 @@ const scrollToAnchor = (id: any) => {
               </OLink>
             </p>
             <p v-if="basicInfo" class="detail">{{ basicInfo }}</p>
-            <p class="scroll-box" @click="scrollToAnchor('feed')">
+            <OLink color="primary" size="small" class="scroll-box" @click="scrollToAnchor('feed')">
               <OIcon><IconHelp /></OIcon>我要反馈
-            </p>
+            </OLink>
           </div>
         </div>
 
@@ -137,16 +137,16 @@ const scrollToAnchor = (id: any) => {
         }
       }
       .scroll-box {
-        cursor: pointer;
-        font-size: var(--o-font_size-tip1);
-        display: flex;
-        align-items: center;
         position: absolute;
         bottom: 0px;
+        :deep(.o-link-label) {
+          display: flex;
+          align-items: center;
+        }
         svg {
           width: 16px;
           height: 16px;
-          margin-right: 5px;
+          margin-right: 4px;
         }
       }
     }
@@ -195,7 +195,14 @@ const scrollToAnchor = (id: any) => {
     .detail {
       @include text1;
       color: var(--o-color-info2);
-      margin-top: 24px;
+      margin-top: 16px;
+
+      overflow: hidden;
+      display: -webkit-box;
+      -webkit-line-clamp: 4;
+      -webkit-box-orient: vertical;
+      position: relative;
+      word-break: break-all;
     }
   }
 }

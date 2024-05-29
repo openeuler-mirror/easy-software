@@ -97,21 +97,13 @@
     }
   }
 
-  pre {
-    &:hover {
-      .pre-copy {
-        opacity: 1;
-      }
-    }
-  }
-
   .pre-copy {
     cursor: pointer;
     position: absolute;
     top: 0;
     right: 0;
     background-color: var(--o-color-fill1);
-    opacity: 0;
+    opacity: 1;
     transition: all var(--o-duration-m1) var(--o-easing-standard-in);
     padding: 12px 12px 0 0;
     .icon-copy {
