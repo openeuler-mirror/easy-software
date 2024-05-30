@@ -12,6 +12,11 @@
   ul {
     list-style-type: disc;
   }
+  li > p {
+    &:first-child {
+      margin-top: 0;
+    }
+  }
 
   h1,
   h2,
@@ -52,7 +57,7 @@
     code {
       display: block;
       overflow-x: auto;
-      padding: 16px;
+      padding: 16px 36px 16px 16px;
       @include scrollbar;
     }
   }

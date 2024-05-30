@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { ref, onMounted, type PropType } from 'vue';
-import { OTab, OTabPane, OTable, OLink, OIcon, OTag } from '@opensig/opendesign';
+import { OTab, OTabPane, OLink, OIcon, OTag } from '@opensig/opendesign';
 import { useRoute } from 'vue-router';
 import { getDetail, getTags, getVer } from '@/api/api-domain';
 import { useMarkdown } from '@/composables/useMarkdown';
@@ -204,11 +204,11 @@ const getDetailValue = (data: any) => {
 
 // 更多信息表头
 const moreColumns = [
-  { label: 'Name', key: 'name' },
-  { label: 'Flags', key: 'flags' },
-  { label: 'Rel', key: 'rel' },
-  { label: 'Ver', key: 'ver' },
-  { label: 'Epoch', key: 'epoch' },
+  { label: 'Name', key: 'name', style: 'width:50%' },
+  { label: 'Flags', key: 'flags', style: 'width:12.5%' },
+  { label: 'Rel', key: 'rel', style: 'width:12.5%' },
+  { label: 'Ver', key: 'ver', style: 'width:12.5%' },
+  { label: 'Epoch', key: 'epoch', style: 'width:12.5%' },
 ];
 // 获取img分类
 const imgName = ref(tagList[0].lable);
@@ -263,7 +263,7 @@ const repeatTags = (v: string) => {
 
     <DetailHead :data="appData" :basicInfo="summary" :maintainer="maintainer" />
 
-    <OTab variant="text" @change="onChange" :line="false" class="domain-tabs" v-model="activeName" size="large">
+    <OTab variant="text" @change="onChange" :line="false" class="domain-tabs" :class="tabList.length > 1 ? 'max' : 'min'" v-model="activeName" size="large">
       <OTabPane class="tab-pane" v-for="item in tabList" :key="item" :label="item">
         <template #nav><OIcon :icon="getTabIcon(item)" class="tabs-icon" /> {{ repeatTags(item) }}</template>
         <div class="detail-row">
@@ -277,7 +277,9 @@ const repeatTags = (v: string) => {
                 <div v-for="item in basicInfo" :key="item.name" class="basic-info-item">
                   <span class="label markdown download">{{ item.name }}</span>
                   <div v-if="item.name === t('detail.warehouse') || item.name === t('detail.source')" class="markdown-body installation mymarkdown-body">
-                    <OLink @click="onExternalDialog(item.value)" color="primary" class="" target="_blank" rel="noopener noreferrer">{{ item.type }}</OLink>
+                    <OLink @click="onExternalDialog(item.value)" color="primary" class="tag-new" target="_blank" rel="noopener noreferrer">{{
+                      item.type
+                    }}</OLink>
                   </div>
                   <div v-dompurify-html="item.value" v-copy-code="true" class="markdown-body installation mymarkdown-body" v-else></div>
                 </div>
@@ -288,7 +290,7 @@ const repeatTags = (v: string) => {
               <OTab variant="text" :line="false" class="domain-tabs" v-if="item !== 'IMAGE'" :class="moreMessge.length > 1 ? 'tabs-switch' : 'tabs-one'">
                 <template v-for="it in moreMessge" :key="it">
                   <OTabPane class="tab-pane" v-if="it.value.length > 0" :label="it.name">
-                    <OTable :columns="moreColumns" :data="it.value" :small="true" border="all"> </OTable>
+                    <AppTableToggle :columns="moreColumns" :data="it.value" />
                   </OTabPane>
                 </template>
               </OTab>

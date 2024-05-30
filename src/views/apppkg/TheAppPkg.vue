@@ -4,7 +4,7 @@ import ContentWrapper from '@/components/ContentWrapper.vue';
 import AppPkgContent from './APkgContent.vue';
 import { homeData } from '@/data/home/index';
 
-import bannerImg from '@/assets/banner/banner.jpg';
+import bannerImg from '@/assets/banner/banner1.jpg';
 
 const bannerInfo = homeData[0];
 </script>

@@ -12,10 +12,14 @@
     flex: 1;
   }
 }
-
+.tag-new {
+  margin-left: 8px;
+}
 .installation {
   :deep(li) {
-    margin: 12px 0;
+    &:not(:first-child) {
+      margin: 12px 0;
+    }
     color: var(--o-color-info1);
 
     > code {
@@ -40,6 +44,17 @@
 }
 
 :deep(.domain-tabs) {
+  &.min {
+    > .o-tab-head {
+      .o-tab-nav-anchor {
+        display: none;
+      }
+      .o-tab-nav-active {
+        color: var(--o-color-info1);
+        cursor: default;
+      }
+    }
+  }
   .o-tab-navs {
     --tab-nav-justify: left;
     margin-bottom: 20px;
@@ -177,6 +192,7 @@
 .sp {
   margin: 32px 0 16px;
   @include h3;
+  font-weight: 500;
 }
 .title {
   display: flex;

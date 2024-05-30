@@ -71,7 +71,13 @@ const onExternalDialog = (href: string) => {
         <th v-for="item in columns" :key="item.key" :class="item.key">{{ item.label }}</th>
       </template>
       <template #td_name="{ row }">
-        <a :href="jumpTo(row.pkgId)" color="primary" target="_blank" rel="noopener noreferrer"><span v-dompurify-html="row.name"></span></a>
+        <a :href="jumpTo(row.pkgId)" color="primary" target="_blank" rel="noopener noreferrer"><span v-dompurify-html="row.name" class="td-break"></span></a>
+      </template>
+      <template #td_version="{ row }">
+        <div class="td-break">{{ row.version }}</div>
+      </template>
+      <template #td_appVer="{ row }">
+        <div class="td-break">{{ row.appVer }}</div>
       </template>
       <template #td_epkgUpdateAt="{ row }">
         {{ formatDateTime(row.epkgUpdateAt) }}
@@ -121,7 +127,7 @@ const onExternalDialog = (href: string) => {
       </template>
     </OTable>
     <!-- 安装下载容器镜像 -->
-    <ODialog v-model:visible="showDlg" :unmount-on-hide="true" size="medium" :hide-close="true" class="nss-dialog">
+    <ODialog v-model:visible="showDlg" :unmount-on-hide="true" size="small" :hide-close="true" class="nss-dialog">
       <template #header>
         <p class="feedback-title">{{ t('software.installImage.title') }}</p>
       </template>
@@ -201,14 +207,17 @@ const onExternalDialog = (href: string) => {
   .name {
     width: 165px;
   }
-  .appVer{
+  .appVer {
     width: 230px;
   }
   .version {
     width: 130px;
   }
+  .td-break {
+    word-break: break-all;
+  }
   .os {
-    width: 230px;
+    width: 215px;
   }
   .arch {
     width: 90px;

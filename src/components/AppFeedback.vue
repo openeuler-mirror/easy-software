@@ -194,4 +194,7 @@ const onExternalDialog = () => {
     }
   }
 }
+:deep(.o-rate) {
+  --rate-size: 24px;
+}
 </style>

@@ -43,13 +43,15 @@ const copyText = (e: MouseEvent) => {
   border-radius: var(--layout-pkg-radius);
   height: auto;
   width: 100%;
-  padding: 12px;
-  @include tip1;
+  padding: 16px 36px 16px 16px;
+  @include text1;
   color: var(--o-color-primary1);
   position: relative;
 
   .code {
     color: var(--o-color-info2);
+    font-size: 85%;
+    line-height: 1.45;
   }
   .copy-icon {
     width: 24px;
@@ -59,7 +61,7 @@ const copyText = (e: MouseEvent) => {
     top: 0;
     right: 0;
     font-size: 24px;
-    padding: 8px 8px 0 0;
+    padding: 12px 12px 0 0;
     background-color: var(--o-color-fill1);
     transition: all var(--o-duration-m1) var(--o-easing-standard-in);
     height: 24px;

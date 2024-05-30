@@ -150,7 +150,7 @@ const queryVer = () => {
 
                     <div class="markdown-body mymarkdown-body">
                       {{ item.value }}
-                      <OTag v-if="item.name === t('detail.support') && latestOsSupport" color="primary" size="small"> 最新版本</OTag>
+                      <OTag v-if="item.name === t('detail.support') && latestOsSupport" color="primary" size="small" class="tag-new">最新版本</OTag>
                     </div>
                   </div>
                 </div>

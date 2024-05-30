@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { OTable, useMessage, OButton, OTag, OIcon } from '@opensig/opendesign';
+import { OTable, useMessage, OButton, OTag, OIcon, OLink } from '@opensig/opendesign';
 import OCodeCopy from '@/components/OCodeCopy.vue';
 import { ref, computed, watch, type PropType } from 'vue';
 import ExternalLink from '@/components/ExternalLink.vue';
@@ -9,6 +9,10 @@ import { verColumns } from '@/data/detail/index';
 import IconCopy from '~icons/app/icon-copy.svg';
 import { useLocale } from '@/composables/useLocale';
 import type { PkgTypeT } from '@/@types/app';
+import { useI18n } from 'vue-i18n';
+
+import IconChevronDown from '~icons/app/icon-chevron-down.svg';
+
 const props = defineProps({
   data: {
     type: Object,
@@ -60,6 +64,7 @@ const props = defineProps({
     },
   },
 });
+const { t } = useI18n();
 
 const tableData = ref([
   {
@@ -160,6 +165,21 @@ const jumpTo = (id: string) => {
     return newHref;
   }
 };
+
+const isToggle = ref(false);
+const tableLen = ref(10);
+const tableAllData = computed(() => {
+  let tableVerData = [];
+  if (isToggle.value && props.verData.length > tableLen.value) {
+    tableVerData = props.verData;
+  } else {
+    tableVerData = props.verData.slice(0, tableLen.value);
+  }
+  return tableVerData;
+});
+const showMore = () => {
+  isToggle.value = !isToggle.value;
+};
 </script>
 
 <template>
@@ -184,13 +204,21 @@ const jumpTo = (id: string) => {
     </div>
   </AppSection>
   <AppSection :title="`${data.name}版本支持情况`">
-    <OTable :columns="verColumns" :data="verData" border="all" :cell-span="arraySpanMethod" :small="true">
+    <OTable :columns="verColumns" :data="tableAllData" border="all" :cell-span="arraySpanMethod" :small="true">
       <template #td_flags="{ row }">
         <a :href="jumpTo(row.pkgId)" color="primary" rel="noopener noreferrer">
           <OTag v-if="row.os === tagVer[0] && row.arch === tagVer[1]" color="primary" :size="'small'">当前版本</OTag> <span v-else>查看</span></a
         >
       </template>
     </OTable>
+    <p v-if="tableAllData.length >= tableLen" @click="showMore" class="view-all">
+      <OLink color="primary" :class="isToggle ? 'up' : 'down'" size="small">
+        {{ isToggle ? t('software.upList') : t('software.viewAll') }}
+        <template #suffix>
+          <OIcon><IconChevronDown /></OIcon>
+        </template>
+      </OLink>
+    </p>
   </AppSection>
 
   <ExternalLink v-if="showExternalDlg" :href="externalLink" @change="showExternalDlg = false" />
@@ -200,6 +228,21 @@ const jumpTo = (id: string) => {
 .app-section {
   padding: 32px 40px;
 }
+.view-all {
+  text-align: center;
+  margin-top: 12px;
+  .o-link-small {
+    @include tip2;
+  }
+  svg {
+    color: var(--o-color-primary1);
+    transition: 0.3s ease-in-out;
+  }
+  .up svg {
+    transform: rotate(180deg);
+  }
+}
+
 .detail {
   margin: 0 0 24px;
 }
