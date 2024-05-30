@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useLocale } from '@/composables/useLocale';
-import { windowOpen } from '@/utils/common';
+import { checkDomainLink, windowOpen } from '@/utils/common';
 import {
   OSCHINA,
   CSDN_BLOG,
@@ -20,6 +20,7 @@ import {
 } from '@/data/config';
 
 import ContentWrapper from '@/components/ContentWrapper.vue';
+import ExternalLink from '@/components/ExternalLink.vue';
 
 import LogoFooter from '@/assets/footer/footer-logo2.png';
 import LogoFooter1 from '@/assets/footer-logo1.png';
@@ -176,6 +177,17 @@ const footBg = {
   pc: `url(${FooterBg})`,
   mo: `url(${FooterBgMo})`,
 };
+
+const showExternalDlg = ref(false);
+const externalLink = ref('');
+const onExternalDialog = (href: string) => {
+  externalLink.value = href;
+  if (checkDomainLink(href)) {
+    windowOpen(href, '_blank');
+  } else {
+    showExternalDlg.value = true;
+  }
+};
 </script>
 
 <template>
@@ -217,7 +229,7 @@ const footBg = {
               </a>
             </div>
             <div class="footer-links" :class="isZh ? 'zh' : ''">
-              <a v-for="item in linkList" :key="item.id" :href="item.href" class="links-logo" target="_blank" rel="noopener noreferrer">
+              <a v-for="item in linkList" :key="item.id" @click="onExternalDialog(item.href)" href="javascript:;" class="links-logo">
                 <img :src="item.logo" alt="" />
               </a>
             </div>
@@ -225,6 +237,8 @@ const footBg = {
         </div>
       </ContentWrapper>
     </div>
+    <!-- 跳转外部链接提示 -->
+    <ExternalLink v-if="showExternalDlg" :href="externalLink" @change="showExternalDlg = false" />
   </div>
 </template>
 
