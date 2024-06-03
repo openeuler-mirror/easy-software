@@ -4,6 +4,7 @@ import { OBreadcrumb, OBreadcrumbItem } from '@opensig/opendesign';
 import { useLocale } from '@/composables/useLocale';
 import { homeData } from '@/data/home/index';
 import { HomeInfoT } from '@/@types/app';
+import { useI18n } from 'vue-i18n';
 
 const props = defineProps({
   id: {
@@ -17,6 +18,7 @@ const props = defineProps({
 });
 
 const { locale } = useLocale();
+const { t } = useI18n();
 const breadcrumbInfo = ref({} as HomeInfoT);
 
 homeData.forEach((item) => {
@@ -28,7 +30,7 @@ homeData.forEach((item) => {
 
 <template>
   <OBreadcrumb class="app-breadcrumb">
-    <OBreadcrumbItem :to="`/${locale}/`">软件市场</OBreadcrumbItem>
+    <OBreadcrumbItem :to="`/${locale}/`">{{ t('software.softwareHome') }}</OBreadcrumbItem>
     <OBreadcrumbItem :to="`/${locale}${breadcrumbInfo.href}`">{{ breadcrumbInfo.name }}</OBreadcrumbItem>
     <OBreadcrumbItem>{{ name }} </OBreadcrumbItem>
   </OBreadcrumb>

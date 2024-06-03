@@ -6,14 +6,14 @@ export const columnTags = [
 ];
 
 // 容器镜像tab分类
-export const tagList = [{lable:'概览'},{lable:'Tags'}]
+export const tagList = [{ lable: '概览' }, { lable: 'Tags' }]
 
 // RPM更多信息表头
 export const moreColumns = [
-  { label: 'Name', key: 'name', style: 'width:35%' },
-  { label: 'Flags', key: 'flags', style: 'width:15%' },
-  { label: 'Rel', key: 'rel', style: 'width:22%' },
-  { label: 'Ver', key: 'ver' },
+  { label: 'Name', key: 'name', style: 'width:46%' },
+  { label: 'Flags', key: 'flags', style: 'width:12%' },
+  { label: 'Rel', key: 'rel', style: 'width:15%' },
+  { label: 'Ver', key: 'ver', style: 'width:15%' },
   { label: 'Epoch', key: 'epoch', style: 'width:12%' },
 ];
 // 版本支持

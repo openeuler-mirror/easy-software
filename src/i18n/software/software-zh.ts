@@ -1,5 +1,5 @@
 export default {
-  softwareHome: '软件市场',
+  softwareHome: '软件中心',
   all: '领域应用',
   rpmpkg: 'RPM',
   apppkg: '容器镜像',
@@ -64,7 +64,7 @@ export default {
   // 外部链接提示
   external: {
     title: '即将跳转到外部网站',
-    text: '您将要访问的链接不属于软件市场 ，请关注您的账号安全。',
+    text: '您将要访问的链接不属于软件中心 ，请关注您的账号安全。',
     btn: ['继续前往', '取消']
   },
 

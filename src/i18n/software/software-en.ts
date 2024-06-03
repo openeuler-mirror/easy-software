@@ -1,5 +1,5 @@
 export default {
-  softwareHome: '软件市场',
+  softwareHome: '软件中心',
   all: '领域应用',
   rpmpkg: 'Package',
   apppkg: 'Image',

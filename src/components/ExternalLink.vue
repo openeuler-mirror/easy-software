@@ -34,7 +34,7 @@ const onChange = () => {
     <div class="external-content">
       <p class="text">{{ t('software.external.text') }}</p>
       <div class="content-link">
-        <div class="external-link-href">{{ href }}</div>
+        <div class="external-link-href" :title="href">{{ href }}</div>
       </div>
     </div>
     <template #footer>
@@ -64,6 +64,14 @@ const onChange = () => {
     color: var(--o-color-info2);
     margin-top: 24px;
     word-break: break-all;
+    .external-link-href {
+      overflow: hidden;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      position: relative;
+      word-break: break-all;
+    }
   }
 }
 </style>

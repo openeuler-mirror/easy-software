@@ -20,7 +20,7 @@ const message = useMessage();
 const state = ref(props.type);
 
 const feedbackRef = ref(null);
-const searchVal = ref(decodeURIComponent(route.params.id as string));
+const searchVal = ref(decodeURIComponent(route.query.name as string));
 const isLoading = ref(false);
 
 // 一键反馈
@@ -69,7 +69,9 @@ onMounted(() => {
 
         <OPopover position="right" :target="feedbackRef" trigger="click" :unmount-on-hide="false">
           <p class="text">{{ t('software.feedbackPkg.name') }}：{{ searchVal }}</p>
-          <p class="text">{{ t('software.feedbackPkg.state') }}：<OTag color="success">{{ t('software.feedbackPkg.online') }}</OTag></p>
+          <p class="text">
+            {{ t('software.feedbackPkg.state') }}：<OTag color="primary">{{ t('software.feedbackPkg.online') }}</OTag>
+          </p>
         </OPopover>
       </div>
     </template>
