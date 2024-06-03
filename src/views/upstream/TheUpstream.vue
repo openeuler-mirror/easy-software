@@ -2,7 +2,7 @@
 import ContentWrapper from '@/components/ContentWrapper.vue';
 
 import UpstreamContent from './UpstreamContent.vue';
-import bannerImg from '@/assets/banner/banner.jpg';
+import bannerImg from '@/assets/banner/banner1.jpg';
 </script>
 
 <template>

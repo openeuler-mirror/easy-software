@@ -2,7 +2,7 @@
 import type { PropType } from 'vue';
 import { OCard, OTag, OIcon } from '@opensig/opendesign';
 import type { AppItemT, PkgIdsT, PkgTypeT } from '@/@types/app';
-import { getTagsIcon, xssAllTag } from '@/utils/common';
+import { getTagsIcon } from '@/utils/common';
 import { useLocale } from '@/composables/useLocale';
 import { useI18n } from 'vue-i18n';
 

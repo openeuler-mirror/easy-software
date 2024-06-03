@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { ref, onMounted } from 'vue';
-import { OTab, OTabPane, OTable, OLink, isString } from '@opensig/opendesign';
+import { OTab, OTabPane, OLink, isString } from '@opensig/opendesign';
 import { OPENEULER_CONTACT } from '@/data/config';
 import { useRoute } from 'vue-router';
 import { useMarkdown } from '@/composables/useMarkdown';
@@ -155,7 +155,7 @@ const queryVer = () => {
           <OTab variant="text" :line="false" class="domain-tabs" :class="moreMessge.length > 1 ? 'tabs-switch' : 'tabs-one'">
             <template v-for="item in moreMessge" :key="item">
               <OTabPane class="tab-pane" v-if="item.value.length > 0" :label="item.name">
-                <OTable :columns="moreColumns" :data="item.value" :small="true" border="all"> </OTable>
+                <AppTableToggle :columns="moreColumns" :data="item.value" />
               </OTabPane>
             </template>
           </OTab>

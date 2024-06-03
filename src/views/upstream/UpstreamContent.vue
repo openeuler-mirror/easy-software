@@ -21,10 +21,10 @@ const { isZh } = useLocale();
 
 // 软件包-表头
 const columns = [
-  { label: '应用名称', key: 'name' },
-  { label: '上游最新版本', key: 'upstreamVersion' },
-  { label: '兼容版本', key: 'openeulerVersion' },
-  { label: '状态', key: 'status' },
+  { label: '应用名称', key: 'name', style: 'width:27%' },
+  { label: '上游最新版本', key: 'upstreamVersion', style: 'width:27%' },
+  { label: '兼容版本', key: 'openeulerVersion', style: 'width:27%' },
+  { label: '状态', key: 'status', style: 'width:19%' },
 ];
 
 //  ------------  main ------------

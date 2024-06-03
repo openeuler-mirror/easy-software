@@ -1,7 +1,6 @@
 <script lang="ts" setup>
 import { OCard, OTag, ORow, OCol } from '@opensig/opendesign';
 
-import { OPENEULER } from '@/data/config';
 import { homeNewsData } from '@/data/home/index';
 </script>
 
@@ -16,15 +15,7 @@ import { homeNewsData } from '@/data/home/index';
       :pad-v="{ flex: '0 1 100%' }"
       :phone="{ flex: '0 1 100%' }"
     >
-      <OCard
-        :href="subItem.url"
-        target="_blank"
-        rel="noopener noreferrer"
-        :title="subItem.title"
-        :title-row="2"
-        :cover="OPENEULER + '/' + subItem.banner"
-        hoverable
-      >
+      <OCard :href="subItem.url" target="_blank" rel="noopener noreferrer" :title="subItem.title" :title-row="2" :cover="subItem.banner" hoverable>
         <template #default>
           <div class="tag-box">
             <OTag v-for="tag in subItem.tags" :key="tag">{{ tag }}</OTag>

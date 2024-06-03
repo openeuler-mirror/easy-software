@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref, watch, onMounted } from 'vue';
+import { ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import { getSearchCount } from '@/api/api-search';
 import { isUndefined } from '@opensig/opendesign';

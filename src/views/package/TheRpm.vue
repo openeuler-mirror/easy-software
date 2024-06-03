@@ -3,7 +3,7 @@ import AppBanner from '@/components/AppBanner.vue';
 import RpmContent from './RpmContent.vue';
 import { homeData } from '@/data/home/index';
 
-import bannerImg from '@/assets/banner/banner.jpg';
+import bannerImg from '@/assets/banner/banner1.jpg';
 
 const bannerInfo = homeData[1];
 </script>

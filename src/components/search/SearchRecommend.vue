@@ -57,7 +57,7 @@ const jumpPages = (type: string) => {
   });
 };
 
-const goDetail = (key: string, id: string, name: string) => {
+const goDetail = (key: string, id: string) => {
   let type = '',
     pathName = '';
   if (key === 'apppkg') {

@@ -60,7 +60,7 @@ onMounted(() => {
   transform: translateY(100px);
   opacity: 0;
   &.action {
-    transition: all 1500ms 0.5s var(--o-easing-standard-in);
+    transition: all 1500ms 0.25s var(--o-easing-standard-in);
     transform: translateY(0);
     opacity: 1;
   }
@@ -77,7 +77,7 @@ onMounted(() => {
     transform: translateY(100px);
     opacity: 0;
     &.action {
-      transition: all 1500ms 0.35s var(--o-easing-standard-in);
+      transition: all 1500ms 0.25s var(--o-easing-standard-in);
       transform: translateY(0);
       opacity: 1;
     }
@@ -95,7 +95,7 @@ onMounted(() => {
     opacity: 0;
 
     &.action {
-      transition: all 1500ms 0.2s var(--o-easing-standard-in);
+      transition: all 1500ms 0.1s var(--o-easing-standard-in);
       transform: translateY(0);
       opacity: 1;
     }
@@ -108,7 +108,7 @@ onMounted(() => {
     transform: translateY(100px);
     opacity: 0;
     &.action {
-      transition: all 1500ms 0.35s var(--o-easing-standard-in);
+      transition: all 1500ms 0.15s var(--o-easing-standard-in);
       transform: translateY(0);
       opacity: 1;
     }

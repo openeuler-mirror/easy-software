@@ -285,7 +285,7 @@ watch(
       </FilterCheckbox>
     </div>
     <div class="pkg-content">
-      <FilterHeader :title="t('software.all')" @sort="changeTimeOrder" :isSort="false" :total="total" />
+      <FilterHeader v-if="pkgData.length > 0 || isSearchError" :title="t('software.all')" @sort="changeTimeOrder" :isSort="false" :total="total" />
 
       <div v-if="isSearchDocs || searchOs || searchArch || searchCategory.length > 0" class="search-result">
         <p v-if="!isPageSearch" class="text">
@@ -314,7 +314,7 @@ watch(
             </OCol>
           </ORow>
         </div>
-        <div class="pagination-box">
+        <div v-if="pkgData.length > 0" class="pagination-box">
           <el-config-provider :locale="isZh ? zhCn : English">
             <el-pagination
               v-model:current-page="currentPage"

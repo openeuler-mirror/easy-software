@@ -2,7 +2,7 @@
 import AppBanner from '@/components/AppBanner.vue';
 import EpkgContent from './EpkgContent.vue';
 import { homeData } from '@/data/home/index';
-import bannerImg from '@/assets/banner/banner.jpg';
+import bannerImg from '@/assets/banner/banner1.jpg';
 
 const bannerInfo = homeData[3];
 </script>

@@ -104,7 +104,7 @@ const scrollToAnchor = (id: any) => {
 <style lang="scss" scoped>
 .domain-head-box {
   margin-top: 24px;
-  margin-bottom: 24px;
+  margin-bottom: 40px;
   .domain-info {
     display: flex;
     .left {

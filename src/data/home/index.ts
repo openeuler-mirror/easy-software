@@ -1,11 +1,16 @@
 
-import { HIASCEND, OPENEULER } from '@/data/config';
+import { OPENEULER } from '@/data/config';
 
 import ApppkgIcon from '~icons/pkg/apppkg.svg';
 import EpkgIcon from '~icons/pkg/epkg.svg';
 import ImageIcon from '~icons/pkg/image.svg';
 import RpmIcon from '~icons/pkg/rpm.svg';
 
+import openHPC from '@/assets/home/openHPC.png';
+import openStack from '@/assets/home/openstack.png';
+import newsImg1 from '@/assets/home/news1.png';
+import newsImg2 from '@/assets/home/news2.png';
+import newsImg3 from '@/assets/home/1120-cv.jpg';
 
 export const homeData = [
   {
@@ -44,14 +49,14 @@ export const solutionData = [
     title: 'OpenStack',
     desc: '以人工智能计算机集群为基础，涵盖基建、硬件和软件基础设施的完整系统，提供从底层芯片算力释放到顶层应用使能的人工智能全栈能力',
     tags: ['RPM', 'EPKG'],
-    img: HIASCEND + '/_static3/img_fangan_1.DQt7q5qZ.jpg',
+    img: openStack,
     href: ''
   },
   {
     title: 'OpenHPC',
     desc: 'OpenHPC是Linux基金会开源的超算项目，致力于为高性能计算（HPC）构建一个开源框架，以适应现在工业和学术研究的需求',
     tags: ['RPM', 'EPKG'],
-    img: HIASCEND + '/_static3/img_fangan_1.DQt7q5qZ.jpg',
+    img: openHPC,
     href: ''
   }
 ]
@@ -66,7 +71,7 @@ export const homeNewsData = [
     archives: '2024-02',
     articleName: '20240306-riscv.md',
     author: ['openEuler'],
-    banner: 'img/banners/20240306-risc.png',
+    banner: newsImg1,
     type: 'news',
     title: '新突破！openEuler UniProton 实时操作系统成功适配 RISC-V 架构',
     tags: ['兼容性更新'],
@@ -81,7 +86,7 @@ export const homeNewsData = [
     archives: '2023-11',
     articleName: '20231120-cv.md',
     author: ['openEuler'],
-    banner: 'img/banners/1120-cv.jpg',
+    banner: newsImg3,
     type: 'news',
     title: 'OpenCV原生支持openEuler',
     tags: ['软件拓展'],
@@ -97,7 +102,7 @@ export const homeNewsData = [
     archives: '2023-07',
     articleName: '20230713-Eulaceura.md',
     author: ['openEuler'],
-    banner: 'img/banners/20230714-riscv.jpeg',
+    banner: newsImg2,
     type: 'news',
     title: 'Eulaceura 版本 23H1：RISC-V 架构新的里程碑',
     tags: ['版本升级'],
