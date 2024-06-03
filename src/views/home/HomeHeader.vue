@@ -31,7 +31,7 @@ onMounted(() => {
 <template>
   <div class="head-wrap">
     <div class="community-content">
-      <h1 :class="{ action: actionVisible }">openEuler软件市场</h1>
+      <h1 :class="{ action: actionVisible }">openEuler软件中心</h1>
       <p class="slog" :class="{ action: actionVisible }">用最easy的方式帮助每个开发者找到自己想要的</p>
 
       <div :class="{ action: actionVisible }" class="community-pkg">

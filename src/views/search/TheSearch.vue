@@ -40,11 +40,11 @@ const handleQueryData = () => {
   const { name, tab, key } = query;
 
   if (!isUndefined(name) && name) {
-    searchKey.value = encodeURIComponent(name as string);
+    searchKey.value = name as string;
   }
   // 判断key参数
   if (isValidSearchKey(key)) {
-    keywordType.value = encodeURIComponent(key as string);
+    keywordType.value = key as string;
   } else {
     keywordType.value = FLITERMENUOPTIONS[0].id;
   }

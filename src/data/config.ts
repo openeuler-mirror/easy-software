@@ -12,6 +12,7 @@ export const OPENEULER = 'https://www.openeuler.org';
 export const OPENATOM = 'https://openatom.cn';
 export const OPENEULER_CONTACT = 'contact@openeuler.io';
 export const GITEE = 'https://gitee.com';
+export const GITHUB = 'https://github.com';
 export const HIASCEND = 'https://www.hiascend.com';
 export const OPENEULER_STATUS = 'https://status.openeuler.org';
 export const OPENEULER_FORUM = 'https://forum.openeuler.org';

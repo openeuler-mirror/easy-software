@@ -52,6 +52,9 @@ html {
 .o-table {
   --table-head-bg: var(--o-color-control3-light);
 }
+.o-tab-nav-active {
+  font-weight: 500;
+}
 
 // tag
 .tags-box {
@@ -87,4 +90,23 @@ html {
 }
 .o-select-medium {
   --select-icon-size: 20px;
+}
+
+// 屏蔽loading 遮罩
+.o-layer {
+  &.o-loading {
+    --layer-mask: transparent;
+  }
+}
+
+.o-anchor {
+  --anchor-indicator-height: 100%;
+  .o-anchor-item-link {
+    &:hover {
+      --anchor-item-link-bg-color-hover: none;
+    }
+    &.is-active {
+      --anchor-item-link-bg-color-active: none;
+    }
+  }
 }

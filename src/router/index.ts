@@ -71,6 +71,18 @@ const routes = [
     alias: '/en/image/detail',
     component: () => import('@/views/image/TheDetail.vue'),
   },
+  {
+    path: '/zh/solution/openhpc',
+    name: 'openhpc',
+    alias: '/en/solution/openhpc',
+    component: () => import('@/views/solution/TheOpenHPC.vue'),
+  },
+  {
+    path: '/zh/solution/openstack',
+    name: 'openstack',
+    alias: '/en/solution/openstack',
+    component: () => import('@/views/solution/TheOpenStack.vue'),
+  },
   // 默认路由
   {
     path: '/:path(.*)*',

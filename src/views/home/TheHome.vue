@@ -2,6 +2,7 @@
 import { vLoading, OLink, OTag, ORow, OCol, OIcon, OAnchor, OAnchorItem } from '@opensig/opendesign';
 import { ref, onMounted } from 'vue';
 import { getSearchAllFiled } from '@/api/api-domain';
+import { useI18n } from 'vue-i18n';
 import type { AppT } from '@/@types/app';
 import HomeHeader from './HomeHeader.vue';
 import HomeNews from './HomeNews.vue';
@@ -11,6 +12,8 @@ import { useLocale } from '@/composables/useLocale';
 import { getTagsIcon } from '@/utils/common';
 import { useScreen } from '@/composables/useScreen';
 import IconChevronDown from '~icons/app/icon-chevron-right.svg';
+
+const { t } = useI18n();
 const { size } = useScreen();
 const { locale } = useLocale();
 const pkgData = ref<AppT[]>([]);
@@ -47,6 +50,10 @@ const resourceLeave = (id: string) => {
   }
 };
 
+const repeatImageTags = (v: string) => {
+  return v.toLocaleLowerCase() === 'image' ? t('software.apppkg') : v;
+};
+
 onMounted(() => {
   queryAllpkg();
 });
@@ -58,20 +65,18 @@ onMounted(() => {
     <ContentWrapper vertical-padding="72px">
       <div ref="pkgRef" v-loading.nomask="isLoading" class="pkg-wrap">
         <div v-if="size.width > 1900" class="anchor">
-          <OAnchor :target-offset="100">
+          <OAnchor>
             <OAnchorItem href="#all" title="领域应用">
-              <template v-for="item in pkgData">
-                <OAnchorItem v-if="item.children?.length > 0" :key="item.name" :href="'#' + item.name" :title="item.name" />
-              </template>
+              <OAnchorItem v-for="item in pkgData" :key="item.name" :href="'#' + item.name" :title="item.name" />
             </OAnchorItem>
             <OAnchorItem href="#resource" title="获取资源" />
             <OAnchorItem href="#solution" title="解决方案" />
             <OAnchorItem href="#news" title="最新资讯" />
           </OAnchor>
         </div>
-        <div id="all" class="pkg-main">
+        <div class="pkg-main">
           <h2>领域应用</h2>
-          <div v-if="pkgData.length > 0" class="pkg-content">
+          <div v-if="pkgData.length > 0" id="all" class="pkg-content">
             <div v-for="item in pkgData" :key="item.name" class="domain-item">
               <template v-if="item.children?.length > 0">
                 <div class="domain-item-title">
@@ -129,7 +134,7 @@ onMounted(() => {
           <div id="solution" class="domain-solution">
             <h2>解决方案</h2>
             <div class="solution-content">
-              <div v-for="item in solutionData" :key="item.title" class="solution-item">
+              <a v-for="item in solutionData" :key="item.title" class="solution-item" :href="`/${locale}` + item.href">
                 <div class="cover">
                   <img :src="item.img" alt="" />
                 </div>
@@ -140,12 +145,12 @@ onMounted(() => {
                       <template #icon
                         ><OIcon><component :is="getTagsIcon(tag)" /></OIcon
                       ></template>
-                      {{ tag }}
+                      {{ repeatImageTags(tag) }}
                     </OTag>
                   </div>
                   <p class="desc">{{ item.desc }}</p>
                 </div>
-              </div>
+              </a>
             </div>
           </div>
 
@@ -271,6 +276,13 @@ onMounted(() => {
     height: 260px;
     display: flex;
     justify-content: space-between;
+    transition: box-shadow var(--o-easing-standard) var(--o-duration-m2);
+    &:hover {
+      box-shadow: 0 2px 24px rgba(var(--o-kleinblue-10), 0.15);
+      h3 {
+        color: var(--o-color-primary1);
+      }
+    }
   }
   .cover {
     width: 260px;

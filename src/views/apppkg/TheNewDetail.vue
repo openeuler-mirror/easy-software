@@ -7,7 +7,7 @@ import { useMarkdown } from '@/composables/useMarkdown';
 import type { AppInfoT, MaintainerT, DetailItemT, MoreMessgeT, PkgTypeT } from '@/@types/app';
 import { OPENEULER_CONTACT } from '@/data/config';
 import { isValidTags } from '@/utils/query';
-import { columnTags, tagList } from '@/data/detail/index';
+import { columnTags, tagList, moreColumns } from '@/data/detail/index';
 import { useI18n } from 'vue-i18n';
 import { useViewStore } from '@/stores/common';
 import { getDetailRules } from '@/utils/common';
@@ -203,13 +203,7 @@ const getDetailValue = (data: any) => {
 };
 
 // 更多信息表头
-const moreColumns = [
-  { label: 'Name', key: 'name', style: 'width:50%' },
-  { label: 'Flags', key: 'flags', style: 'width:12.5%' },
-  { label: 'Rel', key: 'rel', style: 'width:12.5%' },
-  { label: 'Ver', key: 'ver', style: 'width:12.5%' },
-  { label: 'Epoch', key: 'epoch', style: 'width:12.5%' },
-];
+
 // 获取img分类
 const imgName = ref(tagList[0].lable);
 const tagsValue = ref([]);
