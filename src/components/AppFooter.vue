@@ -210,7 +210,7 @@ const onExternalDialog = (href: string) => {
           </div>
           <div class="footer-option">
             <div class="footer-option-item">
-              <a v-for="link in footLink" :key="link.URL" href="javascript:;" class="link" @click="handleNavClick(link.URL)">{{ link.NAME }}</a>
+              <span v-for="link in footLink" :key="link.URL" class="link" @click="handleNavClick(link.URL)">{{ link.NAME }}</span>
             </div>
             <p class="copyright">{{ t('common.FOOTER.COPY_RIGHT') }}</p>
             <p class="license">
@@ -220,18 +220,18 @@ const onExternalDialog = (href: string) => {
           </div>
           <div class="footer-right">
             <div v-if="isZh" class="code-box">
-              <a v-for="(item, index) in footerCodeList" :key="index" class="code-pop" href="javascript:;">
+              <span v-for="(item, index) in footerCodeList" :key="index" class="code-pop">
                 <img :src="item.img" class="code-img" alt="" />
                 <div class="code-layer">
                   <img :src="item.code" alt="" />
                   <p class="txt">{{ item.label }}</p>
                 </div>
-              </a>
+              </span>
             </div>
             <div class="footer-links" :class="isZh ? 'zh' : ''">
-              <a v-for="item in linkList" :key="item.id" @click="onExternalDialog(item.href)" href="javascript:;" class="links-logo">
+              <span v-for="item in linkList" :key="item.id" @click="onExternalDialog(item.href)" class="links-logo">
                 <img :src="item.logo" alt="" />
-              </a>
+              </span>
             </div>
           </div>
         </div>
@@ -397,6 +397,7 @@ $color: #fff;
       display: inline-block;
       padding: 0 12px;
       border-right: 1px solid $color;
+      cursor: pointer;
       &:last-child {
         border-right: 0;
       }
@@ -492,6 +493,7 @@ $color: #fff;
       gap: 16px;
       .links-logo {
         height: 16px;
+        cursor: pointer;
         img {
           height: 100%;
           object-fit: cover;

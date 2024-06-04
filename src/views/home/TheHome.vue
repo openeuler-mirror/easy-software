@@ -1,19 +1,16 @@
 <script lang="ts" setup>
-import { vLoading, OLink, OTag, ORow, OCol, OIcon, OAnchor, OAnchorItem } from '@opensig/opendesign';
+import { vLoading, OLink, ORow, OCol, OIcon, OAnchor, OAnchorItem } from '@opensig/opendesign';
 import { ref, onMounted } from 'vue';
 import { getSearchAllFiled } from '@/api/api-domain';
-import { useI18n } from 'vue-i18n';
 import type { AppT } from '@/@types/app';
 import HomeHeader from './HomeHeader.vue';
 import HomeNews from './HomeNews.vue';
 import HomeSkeleton from './HomeSkeleton.vue';
 import { solutionData, homeData } from '@/data/home/index';
 import { useLocale } from '@/composables/useLocale';
-import { getTagsIcon } from '@/utils/common';
 import { useScreen } from '@/composables/useScreen';
 import IconChevronDown from '~icons/app/icon-chevron-right.svg';
 
-const { t } = useI18n();
 const { size } = useScreen();
 const { locale } = useLocale();
 const pkgData = ref<AppT[]>([]);
@@ -48,10 +45,6 @@ const resourceLeave = (id: string) => {
   if (path) {
     path.setAttribute('fill', '');
   }
-};
-
-const repeatImageTags = (v: string) => {
-  return v.toLocaleLowerCase() === 'image' ? t('software.apppkg') : v;
 };
 
 onMounted(() => {
@@ -140,14 +133,6 @@ onMounted(() => {
                 </div>
                 <div class="solution-content-box">
                   <h3>{{ item.title }}</h3>
-                  <div v-if="item.tags && item.tags.length > 0" class="tags-box">
-                    <OTag v-for="tag in item.tags" variant="outline" :key="tag" style="--o-icon_size_control-xs: 0" :class="`${tag.toLocaleLowerCase()}-icon`">
-                      <template #icon
-                        ><OIcon><component :is="getTagsIcon(tag)" /></OIcon
-                      ></template>
-                      {{ repeatImageTags(tag) }}
-                    </OTag>
-                  </div>
                   <p class="desc">{{ item.desc }}</p>
                 </div>
               </a>
@@ -296,13 +281,13 @@ onMounted(() => {
   }
   .solution-content-box {
     flex: 1;
-    padding: 32px;
+    padding: 48px 32px;
     position: relative;
     h3 {
       @include h2;
       font-weight: 500;
       color: var(--o-color-info1);
-      margin-bottom: 24px;
+      margin-bottom: 32px;
     }
     .desc {
       @include text1;

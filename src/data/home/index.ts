@@ -47,15 +47,15 @@ export const homeData = [
 export const solutionData = [
   {
     title: 'OpenStack',
-    desc: '以人工智能计算机集群为基础，涵盖基建、硬件和软件基础设施的完整系统，提供从底层芯片算力释放到顶层应用使能的人工智能全栈能力',
-    tags: ['RPM', 'IMAGE', 'EPKG'],
+    desc: '作为一个开源的云计算管理平台，OpenStack 由nova、cinder、neutron、glance、keystone、horizon等几个主要的组件组合起来完成具体工作',
+
     img: openStack,
     href: '/solution/openStack'
   },
   {
     title: 'OpenHPC',
     desc: 'OpenHPC是Linux基金会开源的超算项目，致力于为高性能计算（HPC）构建一个开源框架，以适应现在工业和学术研究的需求',
-    tags: ['RPM', 'IMAGE', 'EPKG'],
+
     img: openHPC,
     href: '/solution/openhpc'
   }
