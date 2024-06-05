@@ -192,6 +192,7 @@ const showMore = () => {
   isToggle.value = !isToggle.value;
 };
 
+// 数据倒序、preview字段放最后
 const newVerData = () => {
   let newData = [...props.verData].reverse();
   let preview: EulerverT[] = [];
@@ -326,12 +327,6 @@ watch(
   }
   th {
     font-weight: 500;
-  }
-  td[rowspan] {
-    &:first-child {
-      border-top: var(--table-border);
-    }
-    border-bottom: 0;
   }
 }
 </style>
