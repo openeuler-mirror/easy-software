@@ -33,8 +33,8 @@ const isLoading = ref(false);
 const searchKey = ref((route.query.name as string) || '');
 const nameOrder = ref('');
 
-const searchOs = ref('');
-const searchArch = ref('');
+const searchOs = ref('openEuler-22.03-LTS-SP3');
+const searchArch = ref('x86_64');
 const searchCategory = ref<string[]>([]);
 const searchParams = computed(() => {
   return {
@@ -76,8 +76,14 @@ const queryAllpkg = () => {
         isSearchError.value = true;
       }
     })
-    .catch(() => {
-      useViewStore().showNotFound();
+    .catch((err) => {
+      if (err.response.data.code === 404) {
+        isSearchError.value = true;
+      } else {
+        useViewStore().showNotFound();
+      }
+      pkgData.value = [];
+      isLoading.value = false;
     });
 };
 
@@ -316,7 +322,7 @@ watch(
             </OCol>
           </ORow>
         </div>
-        <div v-if="pkgData.length > 0" class="pagination-box">
+        <div v-if="pkgData.length < total" class="pagination-box">
           <el-config-provider :locale="isZh ? zhCn : English">
             <el-pagination
               v-model:current-page="currentPage"

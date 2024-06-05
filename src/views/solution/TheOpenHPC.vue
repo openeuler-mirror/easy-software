@@ -192,10 +192,19 @@ const solutionInfo = {
     :deep(.o-card) {
       --card-main-padding: 40px;
       flex: 1;
+      &:hover {
+        .o-card-title {
+          color: var(--o-color-primary1);
+        }
+        svg {
+          color: var(--o-color-primary1);
+        }
+      }
       .o-card-icon {
         svg {
           width: 48px;
           height: 48px;
+          fill: currentColor;
         }
       }
     }

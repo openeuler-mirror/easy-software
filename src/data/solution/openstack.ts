@@ -38,7 +38,7 @@ export default {
   advInfo: [
     {
       name: '快速部署',
-      desc: 'openEuler社区提供了opensd等快速部署OpenStack的开发工具，解决了OpenStack企业级部署复杂度高的问题，可以让交付人员使用管理文本的方式，实现主机配置管理、OpenStack及其依赖的基础组件的安装与配置管理，极大地简化了OpenStack服务的部署过程'
+      desc: 'openEuler社区提供了oos、opensd等快速部署OpenStack的开发工具，解决了OpenStack企业级部署复杂度高的问题，可以让交付人员使用管理文本的方式，实现主机配置管理、OpenStack及其依赖的基础组件的安装与配置管理，极大地简化了OpenStack服务的部署过程'
     },
     {
       name: '持续创新',

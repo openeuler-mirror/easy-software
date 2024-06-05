@@ -236,7 +236,7 @@ watch(
             <OTag v-if="row.status" class="app-tag" :class="row.status.toLocaleLowerCase()">{{ row.status }} </OTag>
           </template>
         </OTable>
-        <div class="pagination-box">
+        <div v-if="pkgData.length < total" class="pagination-box">
           <el-config-provider :locale="isZh ? zhCn : English">
             <el-pagination
               v-model:current-page="currentPage"

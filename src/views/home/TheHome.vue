@@ -58,7 +58,7 @@ onMounted(() => {
     <ContentWrapper vertical-padding="72px">
       <div ref="pkgRef" v-loading.nomask="isLoading" class="pkg-wrap">
         <div v-if="size.width > 1900 && pkgData && pkgData.length" class="anchor">
-          <OAnchor container="#app > .o-scroller > .o-scroller-container">
+          <OAnchor container="#app > .o-scroller > .o-scroller-container" :target-offset="104">
             <OAnchorItem href="#all" title="领域应用">
               <OAnchorItem v-for="item in pkgData" :key="item.name" :href="'#' + item.name" :title="item.name" />
             </OAnchorItem>
@@ -67,9 +67,9 @@ onMounted(() => {
             <OAnchorItem href="#news" title="最新资讯" />
           </OAnchor>
         </div>
-        <div class="pkg-main">
+        <div id="all" class="pkg-main">
           <h2>领域应用</h2>
-          <div v-if="pkgData.length > 0" id="all" class="pkg-content">
+          <div v-if="pkgData.length > 0" class="pkg-content">
             <div v-for="item in pkgData" :key="item.name" class="domain-item">
               <template v-if="item.children?.length > 0">
                 <div class="domain-item-title">
@@ -298,7 +298,7 @@ onMounted(() => {
   }
 }
 .domain-item {
-  margin: 0 0 32px;
+  margin: 0 0 40px;
   h3 {
     @include h2;
     text-align: center;

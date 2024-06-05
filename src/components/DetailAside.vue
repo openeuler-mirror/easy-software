@@ -194,16 +194,15 @@ const showMore = () => {
 
 const newVerData = () => {
   let newData = [...props.verData].reverse();
-  let preview = {} as EulerverT;
+  let preview: EulerverT[] = [];
   newData.forEach(function (item, index) {
     if (item.os === 'openEuler-preview') {
-      preview = newData.splice(index, 1)[0];
-
+      preview = newData.splice(index, 1);
       index--;
     }
   });
 
-  versionData.value = newData.concat(preview);
+  versionData.value = preview.length > 0 ? newData.concat(preview) : newData;
 };
 newVerData();
 watch(
@@ -327,6 +326,12 @@ watch(
   }
   th {
     font-weight: 500;
+  }
+  td[rowspan] {
+    &:first-child {
+      border-top: var(--table-border);
+    }
+    border-bottom: 0;
   }
 }
 </style>

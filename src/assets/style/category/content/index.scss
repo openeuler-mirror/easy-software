@@ -60,8 +60,8 @@
     align-items: center;
     justify-content: flex-end;
     margin: 40px 0;
-    :deep(.o-input-input) {
-      text-decoration: none;
+    :deep(.el-input) {
+      --el-input-text-color: var(--o-color-info1);
     }
   }
 }

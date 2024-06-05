@@ -13,10 +13,11 @@ import newsImg2 from '@/assets/home/news2.png';
 import newsImg3 from '@/assets/home/1120-cv.jpg';
 
 export const homeData = [
+  // desc: 'openEuler操作系统支持的软件包集合(包括RPM、容器镜像、EPKG软件包等）',
   {
     id: 'apppkg',
     name: '领域应用',
-    desc: 'openEuler操作系统支持的软件包集合(包括RPM、容器镜像、EPKG软件包等）',
+    desc: 'openEuler操作系统支持的软件集合(包括RPM、容器镜像等）',
     icon: ApppkgIcon,
     href: "/apppkg"
   },
