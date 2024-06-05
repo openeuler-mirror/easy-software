@@ -172,7 +172,8 @@ const scrollToAnchor = (id: any) => {
         margin: 24px 0px 16px 0px;
       }
       .sp {
-        @include h2;
+        font-size: 22px;
+        line-height: 30px;
         font-weight: 500;
         color: var(--o-color-info1);
       }

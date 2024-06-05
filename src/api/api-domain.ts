@@ -20,18 +20,18 @@ interface DetailT {
 }
 export function getDetail(params: DetailT) {
   const url = `/api-query/field/detail`;
-  return request.get(url, { params }).then((res: AxiosResponse) => res?.data);
+  return request.get(url, { showError: false, params }).then((res: AxiosResponse) => res?.data);
 }
 
 // 领域应用
 export function getSearchAllColumn(params: ColumnT) {
   const url = `/api-query/field/column`;
-  return request.get(url, { params }).then((res: AxiosResponse) => res?.data);
+  return request.get(url, { showError: false, params }).then((res: AxiosResponse) => res?.data);
 }
 
 export function getSearchAllFiled(params: SearchSQLT) {
   const url = `/api-query/field`;
-  return request.get(url, { params }).then((res: AxiosResponse) => res?.data);
+  return request.get(url, { showError: false, params }).then((res: AxiosResponse) => res?.data);
 }
 
 //Tags
@@ -45,7 +45,7 @@ export function getTags(id: string) {
 
 export function getDetails(tabValue: string, id: string) {
   const url = `/api-query/${tabValue}?pkgId=${id}`;
-  return request.get(url).then((res: AxiosResponse) => res?.data);
+  return request.get(url, { showError: false }).then((res: AxiosResponse) => res?.data);
 }
 
 //支持情况

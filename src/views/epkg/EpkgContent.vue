@@ -120,10 +120,14 @@ const queryAllpkg = () => {
         isSearchError.value = true;
       }
     })
-    .catch(() => {
+    .catch((err) => {
+      if (err.response.data.code === 404) {
+        isSearchError.value = true;
+      } else {
+        useViewStore().showNotFound();
+      }
       pkgData.value = [];
       isLoading.value = false;
-      useViewStore().showNotFound();
     });
 };
 
@@ -327,7 +331,7 @@ watch(
       <ResultNotApp v-if="pkgData.length === 0 && isSearchError" />
       <div class="pkg-panel" v-else>
         <OTableItemNew :data="pkgData" :columns="columns" :type="tabName" />
-        <div class="pagination-box">
+        <div v-if="pkgData.length < total" class="pagination-box">
           <el-config-provider :locale="isZh ? zhCn : English">
             <el-pagination
               v-model:current-page="currentPage"

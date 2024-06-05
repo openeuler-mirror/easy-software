@@ -113,3 +113,7 @@ html {
     }
   }
 }
+
+a.o-card:hover .o-card-title {
+  color: var(--o-color-primary1);
+}
