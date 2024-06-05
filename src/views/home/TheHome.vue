@@ -57,8 +57,8 @@ onMounted(() => {
     <HomeHeader />
     <ContentWrapper vertical-padding="72px">
       <div ref="pkgRef" v-loading.nomask="isLoading" class="pkg-wrap">
-        <div v-if="size.width > 1900" class="anchor">
-          <OAnchor>
+        <div v-if="size.width > 1900 && pkgData && pkgData.length" class="anchor">
+          <OAnchor container="#app > .o-scroller > .o-scroller-container">
             <OAnchorItem href="#all" title="领域应用">
               <OAnchorItem v-for="item in pkgData" :key="item.name" :href="'#' + item.name" :title="item.name" />
             </OAnchorItem>
