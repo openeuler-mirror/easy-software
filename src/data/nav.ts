@@ -31,21 +31,21 @@ export const navs = [
     },
     href: '/image',
   },
-  {
-    id: 'epkg',
-    label: {
-      zh: 'EPKG',
-      en: 'EPKG'
-    },
-    href: '/epkg',
-  },
+  // {
+  //   id: 'epkg',
+  //   label: {
+  //     zh: 'EPKG',
+  //     en: 'EPKG'
+  //   },
+  //   href: '/epkg',
+  // },
 
-  {
-    id: 'upstream',
-    label: {
-      zh: '上游兼容应用全景',
-      en: '上游兼容应用全景'
-    },
-    href: '/upstream',
-  },
+  // {
+  //   id: 'upstream',
+  //   label: {
+  //     zh: '上游兼容应用全景',
+  //     en: '上游兼容应用全景'
+  //   },
+  //   href: '/upstream',
+  // },
 ];

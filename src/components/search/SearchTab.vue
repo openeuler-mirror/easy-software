@@ -45,18 +45,32 @@ const onChangeTabs = (v: string) => {
   });
 };
 
+// 过滤EPKG、上层兼容
+const menuData = ref<MenuT[]>([]);
+const filter = ['appversion', 'epkgpkg'];
 onMounted(() => {
   searchKey.value = route.query.name as string;
   tabName.value = route.query?.tab as string;
   fliterSelected.value = route.query.key as string;
+  menuData.value = [];
+  props.menu.forEach((item) => {
+    if (!filter.includes(item.key)) {
+      menuData.value.push(item);
+    }
+  });
 });
 
 watch(
   () => props.menu,
   () => {
+    menuData.value = [];
     props.menu.forEach((item) => {
       if (item.key === tabName.value) {
         searchCategoryValue.value = item.key;
+      }
+      // 过滤EPKG
+      if (!filter.includes(item.key)) {
+        menuData.value.push(item);
       }
     });
   }
@@ -72,7 +86,7 @@ watch(
 
 <template>
   <OTab v-model="searchCategoryValue" :line="false" variant="text" :style="{ '--tab-nav-justify': 'left' }" @change="(v) => onChangeTabs(v)">
-    <OTabPane v-for="item in menu" :key="item.key" class="pane" :value="item.key" :label="t(`software.${item.key}`) + `（${item.docCount}）`"> </OTabPane>
+    <OTabPane v-for="item in menuData" :key="item.key" class="pane" :value="item.key" :label="t(`software.${item.key}`) + `（${item.docCount}）`"> </OTabPane>
   </OTab>
 </template>
 

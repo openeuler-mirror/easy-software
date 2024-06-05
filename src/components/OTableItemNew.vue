@@ -71,13 +71,18 @@ const onExternalDialog = (href: string) => {
         <th v-for="item in columns" :key="item.key" :class="item.key">{{ item.label }}</th>
       </template>
       <template #td_name="{ row }">
-        <a :href="jumpTo(row.pkgId)" color="primary" target="_blank" rel="noopener noreferrer"><span v-dompurify-html="row.name" class="td-break"></span></a>
+        <a :href="jumpTo(row.pkgId)" color="primary" target="_blank" rel="noopener noreferrer"
+          ><span v-dompurify-html="row.name" class="td-break max" :title="xssAllTag(row.name)"></span
+        ></a>
       </template>
       <template #td_version="{ row }">
-        <div class="td-break">{{ row.version }}</div>
+        <div class="td-break max" :title="row.version">{{ row.version }}</div>
       </template>
       <template #td_appVer="{ row }">
         <div class="td-break">{{ row.appVer }}</div>
+      </template>
+      <template #td_arch="{ row }">
+        <div class="td-break">{{ row.arch }}</div>
       </template>
       <template #td_epkgUpdateAt="{ row }">
         {{ formatDateTime(row.epkgUpdateAt) }}
@@ -176,9 +181,9 @@ const onExternalDialog = (href: string) => {
 
 :deep(.o-table) {
   --table-edge-padding: 16px;
-  --table-cell-padding: 12px 16px;
+  --table-cell-padding: 16px 12px;
   --table-head-cell-padding: 12px 16px;
-
+  --table-cell-height: 80px;
   .label {
     display: flex;
     align-items: center;
@@ -214,6 +219,14 @@ const onExternalDialog = (href: string) => {
     width: 130px;
   }
   .td-break {
+    word-break: break-all;
+  }
+  .max {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    position: relative;
     word-break: break-all;
   }
   .os {

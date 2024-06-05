@@ -104,23 +104,13 @@ onMounted(() => {
           <div id="resource" class="domain-resource">
             <h2>获取资源</h2>
             <div class="resource-content">
-              <ORow flex-wrap="wrap" gap="40px">
-                <OCol
-                  v-for="item in homeData"
-                  :key="item.name"
-                  flex="0 1 25%"
-                  :laptop="{ flex: '0 1 25%' }"
-                  :pad="{ flex: '0 1 50%' }"
-                  :pad-v="{ flex: '0 1 100%' }"
-                  :phone="{ flex: '0 1 100%' }"
-                >
-                  <RouterLink :to="`/${locale}${item.href}`" class="resource-item" @mouseenter="resourceHover(item.id)" @mouseleave="resourceLeave(item.id)">
-                    <OIcon><component :is="item.icon" /></OIcon>
-                    <p class="title">{{ item.name }}</p>
-                    <p class="desc">{{ item.desc }}</p>
-                  </RouterLink>
-                </OCol>
-              </ORow>
+              <div v-for="item in homeData" :key="item.name" class="resource-panel">
+                <RouterLink :to="`/${locale}${item.href}`" class="resource-item" @mouseenter="resourceHover(item.id)" @mouseleave="resourceLeave(item.id)">
+                  <OIcon><component :is="item.icon" /></OIcon>
+                  <p class="title">{{ item.name }}</p>
+                  <p class="desc">{{ item.desc }}</p>
+                </RouterLink>
+              </div>
             </div>
           </div>
 
@@ -153,6 +143,12 @@ onMounted(() => {
 .resource-content {
   background: var(--o-color-fill2);
   padding: 48px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  .resource-panel {
+    flex: 1;
+  }
   .resource-item {
     display: flex;
     flex-direction: column;

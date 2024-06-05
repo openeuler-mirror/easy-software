@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import type { PropType } from 'vue';
+import { computed, type PropType } from 'vue';
 import { OCard, OTag, OIcon } from '@opensig/opendesign';
 import type { AppItemT, PkgIdsT, PkgTypeT } from '@/@types/app';
 import { getTagsIcon } from '@/utils/common';
@@ -8,7 +8,7 @@ import { useI18n } from 'vue-i18n';
 
 import defaultImg from '@/assets/default-logo.png';
 
-defineProps({
+const props = defineProps({
   data: {
     type: Object as PropType<AppItemT>,
     default: () => {},
@@ -17,15 +17,27 @@ defineProps({
 
 const { locale } = useLocale();
 const { t } = useI18n();
+
+// EPKG
 const jumpTo = (id: PkgIdsT, type?: PkgTypeT) => {
   return `/${locale.value}/apppkg/detail?${type ? `type=${type}` : ''}${id.IMAGE ? `&appPkgId=${encodeURIComponent(id.IMAGE)}` : ''}${
-    id.EPKG ? `&epkgPkgId=${encodeURIComponent(id.EPKG)}` : ''
-  }${id.RPM ? `&rpmPkgId=${encodeURIComponent(id.RPM)}` : ''}`;
+    id.RPM ? `&rpmPkgId=${encodeURIComponent(id.RPM)}` : ''
+  }`;
 };
 
 const repeatTags = (v: string) => {
   return v.toLocaleLowerCase() === 'image' ? t('software.apppkg') : v;
 };
+
+// 过滤EPKG
+const tagsData = computed(() => {
+  return (
+    props.data.tags.length > 0 &&
+    props.data.tags.filter((item) => {
+      return item.toLocaleLowerCase() !== 'epkg';
+    })
+  );
+});
 </script>
 
 <template>
@@ -42,8 +54,8 @@ const repeatTags = (v: string) => {
         <div class="pkg-icon"><img :src="data.iconUrl || defaultImg" class="icon" :class="{ 'default-img': !data.iconUrl }" /></div>
       </div>
       <div class="pkg-box">
-        <div v-if="data.tags && data.tags.length > 0" class="tags-box">
-          <a :href="jumpTo(data.pkgIds, tag)" v-for="tag in data.tags" :key="tag" target="_blank" rel="noopener noreferrer">
+        <div v-if="tagsData" class="tags-box">
+          <a :href="jumpTo(data.pkgIds, tag)" v-for="tag in tagsData" :key="tag" target="_blank" rel="noopener noreferrer">
             <OTag style="--o-icon_size_control-xs: 0" variant="outline" :class="`${tag.toLocaleLowerCase()}-icon`">
               <template #icon>
                 <OIcon><component :is="getTagsIcon(tag)" /></OIcon>
@@ -104,11 +116,11 @@ const repeatTags = (v: string) => {
       margin-top: 16px;
       color: var(--o-color-info2);
       overflow: hidden;
-      display: -webkit-box;
       -webkit-line-clamp: 2;
       -webkit-box-orient: vertical;
       position: relative;
       word-break: break-all;
+      height: 48px;
       span {
         color: var(--o-color-primary1);
       }

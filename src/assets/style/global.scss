@@ -51,6 +51,9 @@ html {
 
 .o-table {
   --table-head-bg: var(--o-color-control3-light);
+  th {
+    font-weight: 500;
+  }
 }
 .o-tab-nav-active {
   font-weight: 500;

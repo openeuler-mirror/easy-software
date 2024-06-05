@@ -142,6 +142,7 @@ const isFilterLoading = ref(false);
 
 const rpmColumn = {
   os: [
+    'openEuler-24.03-LTS',
     'openEuler-23.09',
     'openEuler-23.03',
     'openEuler-22.09',
@@ -193,6 +194,7 @@ const handleResettingTag = () => {
   timeOrder.value = '';
   nameOrder.value = '';
   isSearchDocs.value = false;
+  currentPage.value = 1;
 };
 
 // 更新时间、字母排序

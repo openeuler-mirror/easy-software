@@ -10,8 +10,15 @@ import IconCopy from '~icons/app/icon-copy.svg';
 import { useLocale } from '@/composables/useLocale';
 import type { PkgTypeT } from '@/@types/app';
 import { useI18n } from 'vue-i18n';
+import { ElTable } from 'element-plus';
 
 import IconChevronDown from '~icons/app/icon-chevron-down.svg';
+
+interface EulerverT {
+  pkgId: string;
+  os: string;
+  arch: string;
+}
 
 const props = defineProps({
   data: {
@@ -49,6 +56,7 @@ const props = defineProps({
     },
   },
   verData: {
+    type: Array as PropType<EulerverT[]>,
     default: () => {
       return [];
     },
@@ -135,20 +143,23 @@ const copyText = (e: MouseEvent, val: any) => {
     },
   });
 };
+
+const versionData = ref<EulerverT[]>([]);
+
 //合并单元格
 const arraySpanMethod = (rowIndex: number, colIdx: number, row: any, column: any) => {
   const fields = ['os'];
   const cellValue = row[column.key];
   if (cellValue && fields.includes(column.key)) {
-    const prevRow = props.verData[rowIndex - 1];
-    let nextRow = props.verData[rowIndex + 1];
+    const prevRow = versionData.value[rowIndex - 1];
+    let nextRow = versionData.value[rowIndex + 1];
 
     if (prevRow && prevRow[column.key] === cellValue) {
       return { rowspan: 0, colspan: 0 };
     } else {
       let countRowspan = 1;
       while (nextRow && nextRow[column.key] === cellValue) {
-        nextRow = props.verData[++countRowspan + rowIndex];
+        nextRow = versionData.value[++countRowspan + rowIndex];
       }
       if (countRowspan > 1) {
         return { rowspan: countRowspan, colspan: 1 };
@@ -170,16 +181,37 @@ const isToggle = ref(false);
 const tableLen = ref(10);
 const tableAllData = computed(() => {
   let tableVerData = [];
-  if (isToggle.value && props.verData.length > tableLen.value) {
-    tableVerData = props.verData;
+  if (isToggle.value && versionData.value.length > tableLen.value) {
+    tableVerData = versionData.value;
   } else {
-    tableVerData = props.verData.slice(0, tableLen.value);
+    tableVerData = versionData.value.slice(0, tableLen.value);
   }
   return tableVerData;
 });
 const showMore = () => {
   isToggle.value = !isToggle.value;
 };
+
+const newVerData = () => {
+  let newData = [...props.verData].reverse();
+  let preview = {} as EulerverT;
+  newData.forEach(function (item, index) {
+    if (item.os === 'openEuler-preview') {
+      preview = newData.splice(index, 1)[0];
+
+      index--;
+    }
+  });
+
+  versionData.value = newData.concat(preview);
+};
+newVerData();
+watch(
+  () => props.verData,
+  () => {
+    newVerData();
+  }
+);
 </script>
 
 <template>
@@ -289,6 +321,7 @@ const showMore = () => {
     padding: 2px 12px;
     font-size: 14px !important;
   }
+
   tbody tr:hover {
     background: none;
   }
