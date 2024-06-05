@@ -170,6 +170,7 @@ const onExternalDialog = () => {
     justify-content: center;
     background: rgba(0, 47, 167, 0.05);
     border-radius: 4px;
+    transition: all var(--o-duration-s) var(--o-easing-standard);
     .o-icon {
       font-size: 32px;
       margin-right: 12px;
@@ -178,6 +179,9 @@ const onExternalDialog = () => {
         width: 32px;
         height: 32px;
       }
+    }
+    &:hover {
+      background: #e3eaf6;
     }
   }
 }

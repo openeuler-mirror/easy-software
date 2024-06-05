@@ -24,7 +24,15 @@ const queryAllpkg = () => {
   isLoading.value = true;
   getSearchAllFiled(params)
     .then((res) => {
-      pkgData.value = res.data;
+      const { data } = res;
+      let preview: AppT[] = [];
+      data.forEach(function (item, index) {
+        if (item.name === '其他') {
+          preview = data.splice(index, 1);
+          index--;
+        }
+      });
+      pkgData.value = preview.length > 0 ? data.concat(preview) : data;
       isLoading.value = false;
     })
     .catch(() => {
@@ -74,7 +82,7 @@ onMounted(() => {
               <template v-if="item.children?.length > 0">
                 <div class="domain-item-title">
                   <h3 :id="item.name">{{ item.name }}</h3>
-                  <OLink :href="`/${locale}/apppkg?type=${item.name}`">
+                  <OLink v-if="item.children?.length > 4" :href="`/${locale}/apppkg?type=${item.name}`">
                     了解更多
                     <template #suffix
                       ><OIcon><IconChevronDown /></OIcon
@@ -194,7 +202,7 @@ onMounted(() => {
   height: 0;
   overflow: visible;
   position: sticky;
-  top: 0;
+  top: 40px;
   transform: translate(-180px, 70px);
   width: -moz-max-content;
   width: max-content;

@@ -49,9 +49,11 @@
       .o-tab-nav-anchor {
         display: none;
       }
+
       .o-tab-nav-active {
         color: var(--o-color-info1);
         cursor: default;
+        padding: 0;
       }
     }
   }

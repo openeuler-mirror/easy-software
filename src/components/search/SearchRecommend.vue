@@ -157,7 +157,7 @@ const searchOptions = computed(() => {
 </script>
 
 <template>
-  <div v-if="searchOptions" class="recommend">
+  <div v-if="searchOptions.length > 0" class="recommend">
     <div v-for="(item, index) in searchOptions" :key="index" class="recommend-item">
       <div class="recommend-header">
         <p class="title">
