@@ -176,6 +176,7 @@ const resetTag = () => {
   searchCategory.value = [];
   isSearchDocs.value = false;
   nameOrder.value = '';
+  currentPage.value = 1;
 };
 
 const filterList = computed(() => {

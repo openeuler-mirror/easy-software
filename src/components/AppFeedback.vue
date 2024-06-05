@@ -171,9 +171,13 @@ const onExternalDialog = () => {
     background: rgba(0, 47, 167, 0.05);
     border-radius: 4px;
     .o-icon {
-      font-size: 24px;
+      font-size: 32px;
       margin-right: 12px;
       color: var(--o-color-info2);
+      svg {
+        width: 32px;
+        height: 32px;
+      }
     }
   }
 }
@@ -189,9 +193,6 @@ const onExternalDialog = () => {
     display: flex;
     align-items: center;
     margin-top: 24px;
-    .o-btn {
-      margin: 0 8px;
-    }
   }
 }
 :deep(.o-rate) {

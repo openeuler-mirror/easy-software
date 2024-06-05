@@ -83,9 +83,9 @@ watch(
       <!-- 容器镜像  -->
       <ImageContent v-if="tabName === DATATYPE[2]" />
       <!-- EPKG -->
-      <EpkgContent v-if="tabName === DATATYPE[3]" />
+      <!-- <EpkgContent v-if="tabName === DATATYPE[3]" /> -->
       <!-- 上游兼容应用全景 -->
-      <UpstreamContent v-if="tabName === DATATYPE[4]" />
+      <!-- <UpstreamContent v-if="tabName === DATATYPE[4]" /> -->
     </div>
   </ContentWrapper>
 </template>

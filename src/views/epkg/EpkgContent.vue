@@ -184,6 +184,7 @@ const resetTag = () => {
   isSearchDocs.value = false;
   nameOrder.value = '';
   timeOrder.value = '';
+  currentPage.value = 1;
 };
 
 // 更新时间排序

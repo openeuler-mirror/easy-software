@@ -149,6 +149,8 @@ const onResetTag = () => {
   searchCategory.value = [];
   isSearchDocs.value = false;
   nameOrder.value = '';
+  currentPage.value = 1;
+
   if (route.query.type) {
     router.push({
       path: `/${locale.value}/apppkg`,

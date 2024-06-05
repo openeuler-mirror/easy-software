@@ -1,6 +1,5 @@
 <script lang="ts" setup>
-import type { PropType } from 'vue';
-import { ref, defineExpose, watch } from 'vue';
+import { ref, defineExpose, watch, computed, type PropType } from 'vue';
 import { OLink, useMessage, OIcon } from '@opensig/opendesign';
 import type { RecommendItemT } from '@/@types/search';
 import { useI18n } from 'vue-i18n';
@@ -144,11 +143,22 @@ watch(
     isShow.value = v;
   }
 );
+
+// 过滤EPKG
+const searchOptions = computed(() => {
+  if (props.options.length > 0) {
+    return props.options.filter((item) => {
+      return item.key !== 'epkgpkg';
+    });
+  } else {
+    return [];
+  }
+});
 </script>
 
 <template>
-  <div v-if="options.length > 0" class="recommend">
-    <div v-for="(item, index) in options" :key="index" class="recommend-item">
+  <div v-if="searchOptions" class="recommend">
+    <div v-for="(item, index) in searchOptions" :key="index" class="recommend-item">
       <div class="recommend-header">
         <p class="title">
           <OIcon><component :is="getTagsIcon(item.key)" /></OIcon>
@@ -183,7 +193,7 @@ watch(
       <li v-for="(item, index) in searchHistory" :key="index" @click="goSearch(item)">{{ item }}</li>
     </ul>
   </div>
-  <div v-else-if="options.length === 0 && isShow" class="recommend">
+  <div v-else-if="searchOptions.length === 0 && isShow" class="recommend">
     <span class="text">{{ t('software.nofound') }}</span>
     <p>
       {{ t('software.nofoundApp') }} <OLink color="primary" @click="clickFeedback"> {{ t('software.feedback') }}</OLink>
