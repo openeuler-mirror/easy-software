@@ -1,10 +1,14 @@
 .detail-row {
   display: flex;
   justify-content: space-between;
+  margin-bottom: 40px;
   .detail-row-main {
     width: 936px;
     &.tags {
       width: 100%;
+      .app-section {
+        min-height: calc(100vh - var(--layout-footer-height));
+      }
     }
   }
   .detail-row-side {
@@ -33,14 +37,6 @@
       font-size: 85%;
     }
   }
-}
-
-.domain-head {
-  background: var(--o-color-fill2);
-  height: 170px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
 }
 
 :deep(.domain-tabs) {

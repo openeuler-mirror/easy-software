@@ -171,5 +171,5 @@ const queryVer = () => {
 </template>
 
 <style lang="scss" scoped>
-@import '@/assets/style/detail/index.scss';
+@import '@/assets/style/category/detail/index.scss';
 </style>

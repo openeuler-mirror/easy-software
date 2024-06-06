@@ -271,29 +271,32 @@ watch(
 <template>
   <div v-loading.nomask="isLoading" class="pkg-wrap" :class="tabName">
     <div class="filter-sidebar">
-      <FilterCheckbox v-if="filterOsList.length" v-model="searchOs" :options="filterOsList">
-        <template #header>
-          <div class="filter-title">
-            <OIcon><IconOs /></OIcon>{{ t('software.filterSider.os') }}
-          </div>
-        </template>
-      </FilterCheckbox>
+      <template v-if="isFilterLoading"><FilterItemSkeleton v-for="tag in 3" :key="tag" /></template>
+      <template v-else>
+        <FilterCheckbox v-if="filterOsList.length" v-model="searchOs" :options="filterOsList">
+          <template #header>
+            <div class="filter-title">
+              <OIcon><IconOs /></OIcon>{{ t('software.filterSider.os') }}
+            </div>
+          </template>
+        </FilterCheckbox>
 
-      <FilterCheckbox v-if="filterArchList.length" v-model="searchArch" :options="filterArchList">
-        <template #header>
-          <div class="filter-title">
-            <OIcon><IconArch /></OIcon>{{ t('software.filterSider.arch') }}
-          </div>
-        </template>
-      </FilterCheckbox>
+        <FilterCheckbox v-if="filterArchList.length" v-model="searchArch" :options="filterArchList">
+          <template #header>
+            <div class="filter-title">
+              <OIcon><IconArch /></OIcon>{{ t('software.filterSider.arch') }}
+            </div>
+          </template>
+        </FilterCheckbox>
 
-      <FilterCheckbox v-if="filterCategoryList.length" v-model="searchCategory" :options="filterCategoryList">
-        <template #header>
-          <div class="filter-title">
-            <OIcon><IconCategory /></OIcon>{{ t('software.filterSider.category') }}
-          </div>
-        </template>
-      </FilterCheckbox>
+        <FilterCheckbox v-if="filterCategoryList.length" v-model="searchCategory" :options="filterCategoryList">
+          <template #header>
+            <div class="filter-title">
+              <OIcon><IconCategory /></OIcon>{{ t('software.filterSider.category') }}
+            </div>
+          </template>
+        </FilterCheckbox>
+      </template>
     </div>
 
     <div class="pkg-content">

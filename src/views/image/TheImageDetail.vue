@@ -25,9 +25,7 @@ const version = ref();
 const installation = ref('');
 const downloadData = ref('');
 const maintainer = ref<MaintainerT>({ maintainerId: '', maintainerEmail: '', maintainerGiteeId: '' });
-const upStream = ref();
 const security = ref();
-const description = ref();
 const appData = ref<AppInfoT>({
   name: '',
   cover: '',
@@ -63,38 +61,62 @@ onMounted(() => {
 
 const imageUsage = ref();
 const summary = ref();
-const latestOsSupport = ref();
-const license = ref();
+const latestSupportOs = ref();
+const pkgLicense = ref();
 const tagVer = ref();
 const getDetailValue = (data: ImageDetailT) => {
+  const {
+    arch = '',
+    category = '',
+    osSupport = '',
+    description,
+    maintainerId = 'openEuler community',
+    maintainerEmail = OPENEULER_CONTACT,
+    maintainerGiteeId = 'openeuler-ci-bot',
+    license,
+    appVer,
+    latestOsSupport = false,
+    securityLevel,
+    name,
+    srcDownloadUrl,
+    binDownloadUrl,
+    iconUrl,
+    srcRepo,
+    appSize,
+  } = data;
+
   basicInfo.value = [
-    { name: '架构', value: data.arch || '' },
-    { name: '软件包分类', value: data.category || '' },
-    { name: '版本支持情况', value: data.osSupport || '' },
+    { name: '架构', value: arch },
+    { name: '软件包分类', value: category },
+    { name: '版本支持情况', value: osSupport },
   ];
-  summary.value = data.description;
-  appData.value.size = data.appSize || '';
+
   maintainer.value = {
-    maintainerId: data?.maintainerId || 'openEuler community',
-    maintainerEmail: data?.maintainerEmail || OPENEULER_CONTACT,
-    maintainerGiteeId: data?.maintainerGiteeId || 'openeuler-ci-bot',
+    maintainerId,
+    maintainerEmail,
+    maintainerGiteeId,
   };
-  tagVer.value = [data.osSupport, data.arch];
-  license.value = data.license;
-  version.value = data?.appVer;
-  latestOsSupport.value = data.latestOsSupport === 'true';
-  upStream.value = data?.upStream;
-  security.value = data?.securityLevel;
-  description.value = data?.description;
+
+  summary.value = description;
+  pkgLicense.value = license;
+  version.value = appVer;
+  latestSupportOs.value = latestOsSupport;
+  security.value = securityLevel;
+
   downloadData.value = mkit(data?.download || '', { isCopy: true, Tag: data.appVer });
   installation.value = mkit(data?.installation || '', { isCopy: true, Tag: data.appVer });
   imageUsage.value = mkit(data?.imageUsage || '', { isCopy: true, Tag: data.appVer });
-  appData.value.name = data.name;
-  appData.value.source_code = data.srcDownloadUrl;
-  appData.value.bin_code = data.binDownloadUrl;
-  appData.value.cover = data?.iconUrl || defaultImg;
-  appData.value.repository = data.srcRepo;
-  if (data.name) {
+
+  appData.value = {
+    name: name,
+    source_code: srcDownloadUrl,
+    bin_code: binDownloadUrl,
+    cover: iconUrl || defaultImg,
+    repository: srcRepo,
+    size: appSize,
+  };
+
+  if (name) {
     queryVer();
   }
 };
@@ -150,11 +172,11 @@ const queryVer = () => {
 
                     <div class="markdown-body mymarkdown-body">
                       {{ item.value }}
-                      <OTag v-if="item.name === t('detail.support') && latestOsSupport" color="primary" size="small" class="tag-new">最新版本</OTag>
+                      <OTag v-if="item.name === t('detail.support') && latestSupportOs" color="primary" size="small" class="tag-new">最新版本</OTag>
                     </div>
                   </div>
                 </div>
-                <p class="sp">> 安装指引</p>
+                <p class="sp">> 使用方式</p>
                 <div v-if="imageUsage" v-dompurify-html="imageUsage" v-copy-code="true" class="markdown-body download"></div>
               </div>
               <div v-else>
@@ -173,7 +195,7 @@ const queryVer = () => {
           :type="'IMAGE'"
           :downloadData="downloadData"
           :ver-data="verData"
-          :license="license"
+          :license="pkgLicense"
           :tagVer="tagVer"
         />
       </div>
@@ -182,5 +204,5 @@ const queryVer = () => {
 </template>
 
 <style lang="scss" scoped>
-@import '@/assets/style/detail/index.scss';
+@import '@/assets/style/category/detail/index.scss';
 </style>
