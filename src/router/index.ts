@@ -21,7 +21,7 @@ const routes = [
     path: '/zh/apppkg/detail',
     name: 'apppkg-detail',
     alias: '/en/apppkg/detail',
-    component: () => import('@/views/apppkg/TheNewDetail.vue'),
+    component: () => import('@/views/apppkg/TheAppPkgDetail.vue'),
   },
   {
     path: '/zh/package',
@@ -57,19 +57,19 @@ const routes = [
     path: '/zh/epkg/detail',
     name: 'epkg-detail',
     alias: '/en/epkg/detail',
-    component: () => import('@/views/epkg/TheDetail.vue'),
+    component: () => import('@/views/epkg/TheEpkgDetail.vue'),
   },
   {
     path: '/zh/package/detail',
     name: 'package-detail',
     alias: '/en/package/detail',
-    component: () => import('@/views/package/TheDetail.vue'),
+    component: () => import('@/views/package/TheRpmDetail.vue'),
   },
   {
     path: '/zh/image/detail',
     name: 'image-detail',
     alias: '/en/image/detail',
-    component: () => import('@/views/image/TheDetail.vue'),
+    component: () => import('@/views/image/TheImageDetail.vue'),
   },
   {
     path: '/zh/solution/openhpc',

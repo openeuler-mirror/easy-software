@@ -200,13 +200,16 @@ watch(
 <template>
   <div v-loading.nomask="isLoading" class="pkg-wrap" :class="tabName">
     <div class="filter-sidebar">
-      <FilterRadio v-if="filterOsList.length" v-model="searchOs" :options="filterOsList">
-        <template #header>
-          <div class="filter-title">
-            <OIcon><IconOs /></OIcon>{{ t('software.filterSider.os') }}
-          </div>
-        </template>
-      </FilterRadio>
+      <template v-if="isFilterLoading"><FilterItemSkeleton /></template>
+      <template v-else>
+        <FilterRadio v-if="filterOsList.length" v-model="searchOs" :options="filterOsList">
+          <template #header>
+            <div class="filter-title">
+              <OIcon><IconOs /></OIcon>{{ t('software.filterSider.os') }}
+            </div>
+          </template>
+        </FilterRadio>
+      </template>
     </div>
     <div class="pkg-content">
       <FilterHeader title="应用名称" :isSort="false" @sort="changeTimeOrder" :total="total" />

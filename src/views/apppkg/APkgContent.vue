@@ -268,30 +268,34 @@ watch(
 <template>
   <div v-loading.nomask="isLoading" class="pkg-wrap" :class="tabName">
     <div class="filter-sidebar">
-      <FilterRadio v-if="filterOsList.length" v-model="searchOs" :options="filterOsList">
-        <template #header>
-          <div class="filter-title">
-            <OIcon><IconOs /></OIcon>{{ t('software.filterSider.os') }}
-          </div>
-        </template>
-      </FilterRadio>
+      <template v-if="isFilterLoading"><FilterItemSkeleton v-for="tag in 3" :key="tag" /></template>
+      <template v-else>
+        <FilterRadio v-if="filterOsList.length" v-model="searchOs" :options="filterOsList">
+          <template #header>
+            <div class="filter-title">
+              <OIcon><IconOs /></OIcon>{{ t('software.filterSider.os') }}
+            </div>
+          </template>
+        </FilterRadio>
 
-      <FilterRadio v-if="filterArchList.length" v-model="searchArch" :options="filterArchList">
-        <template #header>
-          <div class="filter-title">
-            <OIcon><IconArch /></OIcon>{{ t('software.filterSider.arch') }}
-          </div>
-        </template>
-      </FilterRadio>
+        <FilterRadio v-if="filterArchList.length" v-model="searchArch" :options="filterArchList">
+          <template #header>
+            <div class="filter-title">
+              <OIcon><IconArch /></OIcon>{{ t('software.filterSider.arch') }}
+            </div>
+          </template>
+        </FilterRadio>
 
-      <FilterCheckbox v-if="filterCategoryList.length" v-model="searchCategory" :options="filterCategoryList">
-        <template #header>
-          <div class="filter-title">
-            <OIcon><IconCategory /></OIcon>{{ t('software.filterSider.category') }}
-          </div>
-        </template>
-      </FilterCheckbox>
+        <FilterCheckbox v-if="filterCategoryList.length" v-model="searchCategory" :options="filterCategoryList">
+          <template #header>
+            <div class="filter-title">
+              <OIcon><IconCategory /></OIcon>{{ t('software.filterSider.category') }}
+            </div>
+          </template>
+        </FilterCheckbox>
+      </template>
     </div>
+
     <div class="pkg-content">
       <FilterHeader v-if="pkgData.length > 0 || isSearchError" :title="t('software.all')" @sort="changeTimeOrder" :isSort="false" :total="total" />
 
@@ -313,13 +317,20 @@ watch(
           <OLink color="primary" class="resetting" @click="onResetTag">{{ t('software.filterSider.clear') }}</OLink>
         </div>
       </div>
-      <ResultNotApp v-if="pkgData.length === 0 && isSearchError" />
+      <ResultNotApp v-if="isSearchError" />
       <template v-else>
         <div class="pkg-panel">
           <ORow gap="32px" flex-wrap="wrap">
-            <OCol v-for="(subItem, index) in pkgData" :key="index" flex="0 1 33.33%" :laptop="{ flex: '0 1 33.33%' }">
-              <OCardItem :data="subItem" />
-            </OCol>
+            <template v-if="pkgData.length > 0">
+              <OCol v-for="(subItem, index) in pkgData" :key="index" flex="0 1 33.33%" :laptop="{ flex: '0 1 33.33%' }">
+                <OCardItem :data="subItem" />
+              </OCol>
+            </template>
+            <template v-else>
+              <OCol v-for="index in 12" :key="index" flex="0 1 33.33%" :laptop="{ flex: '0 1 33.33%' }">
+                <OCardItemSkeleton />
+              </OCol>
+            </template>
           </ORow>
         </div>
         <div v-if="pkgData.length < total" class="pagination-box">

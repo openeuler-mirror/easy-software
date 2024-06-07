@@ -7,13 +7,14 @@ import { useMarkdown } from '@/composables/useMarkdown';
 import type { AppInfoT, MaintainerT, DetailItemT, MoreMessgeT } from '@/@types/app';
 import { useI18n } from 'vue-i18n';
 import { getDetails, getVer } from '@/api/api-domain';
+import { moreColumns } from '@/data/detail/index';
+import { useViewStore } from '@/stores/common';
 import AppFeedback from '@/components/AppFeedback.vue';
 import DetailHead from '@/components/DetailHeader.vue';
 import ExternalLink from '@/components/ExternalLink.vue';
 import DetailAside from '@/components/DetailAside.vue';
-import { moreColumns } from '@/data/detail/index';
+
 import defaultImg from '@/assets/default-logo.png';
-import { useViewStore } from '@/stores/common';
 
 const route = useRoute();
 const { mkit } = useMarkdown();
@@ -179,5 +180,5 @@ const queryVer = () => {
 </template>
 
 <style lang="scss" scoped>
-@import '@/assets/style/detail/index.scss';
+@import '@/assets/style/category/detail/index.scss';
 </style>

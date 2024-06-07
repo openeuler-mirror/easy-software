@@ -115,7 +115,7 @@ const onExternalDialog = () => {
 </script>
 
 <template>
-  <AppSection :title="t('software.feedbackTitle')" style="margin-bottom: 40px" id="feed">
+  <AppSection :title="t('software.feedbackTitle')" id="feed">
     <div class="feekback-content">
       <div class="rate-box">
         <ORate v-model="rateVal" color="primary" size="large" />

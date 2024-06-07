@@ -21,16 +21,16 @@ export interface AppInfoT {
   name: string;
   cover: string;
   repository: string;
-  size: string;
+  size: string | null;
   source_code: string;
   bin_code: string;
 }
 
 
 export interface MaintainerT {
-  maintainerId: string;
-  maintainerEmail: string;
-  maintainerGiteeId: string;
+  maintainerId: string | null;
+  maintainerEmail: string | null;
+  maintainerGiteeId: string | null;
 };
 
 export interface DetailItemT {

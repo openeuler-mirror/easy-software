@@ -5,7 +5,7 @@ import { getSearchAllFiled } from '@/api/api-domain';
 import type { AppT } from '@/@types/app';
 import HomeHeader from './HomeHeader.vue';
 import HomeNews from './HomeNews.vue';
-import HomeSkeleton from './HomeSkeleton.vue';
+import HomeSkeleton from '@/components/skeleton/HomeSkeleton.vue';
 import { solutionData, homeData } from '@/data/home/index';
 import { useLocale } from '@/composables/useLocale';
 import { useScreen } from '@/composables/useScreen';
