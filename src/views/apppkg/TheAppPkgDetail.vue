@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { ref, onMounted, type PropType } from 'vue';
 import { OTab, OTabPane, OLink, OIcon, OTag } from '@opensig/opendesign';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { getDetail, getTags, getVer } from '@/api/api-domain';
 import { useMarkdown } from '@/composables/useMarkdown';
 import type { AppInfoT, MaintainerT, DetailItemT, MoreMessgeT, PkgTypeT } from '@/@types/app';
@@ -9,6 +9,7 @@ import { OPENEULER_CONTACT } from '@/data/config';
 import { isValidTags } from '@/utils/query';
 import { columnTags, tagList, moreColumns } from '@/data/detail/index';
 import { useI18n } from 'vue-i18n';
+import { useLocale } from '@/composables/useLocale';
 import { useViewStore } from '@/stores/common';
 import { getDetailRules } from '@/utils/common';
 
@@ -21,8 +22,10 @@ import IconEpkg from '~icons/pkg/epkg.svg';
 import IconImage from '~icons/pkg/image.svg';
 import IconRpm from '~icons/pkg/rpm.svg';
 
+const { locale } = useLocale();
 const { t } = useI18n();
 const route = useRoute();
+const router = useRouter();
 const { mkit } = useMarkdown();
 
 const activeName = ref();
@@ -109,6 +112,24 @@ const onChange = (tab: string) => {
   } else {
     useViewStore().showNotFound();
   }
+  // 切换url参数
+  if (route.query.type) {
+    handleQueryData(tab);
+  }
+};
+
+const handleQueryData = (tab: string) => {
+  const query = route.query;
+  const { appPkgId, rpmPkgId, epkgPkgId } = query;
+  router.push({
+    path: `/${locale.value}/apppkg/detail`,
+    query: {
+      type: tab,
+      appPkgId,
+      rpmPkgId,
+      epkgPkgId,
+    },
+  });
 };
 
 onMounted(() => {
