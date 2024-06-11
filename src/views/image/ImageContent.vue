@@ -83,7 +83,6 @@ const querySearch = () => {
       pkgData.value = [];
       isLoading.value = false;
       isSearchDocs.value = false;
-      useViewStore().showNotFound();
     });
 };
 

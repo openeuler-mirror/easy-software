@@ -6,15 +6,17 @@ import { getStat } from '@/api/api-domain';
 import SearchFilter from '@/components/search/SearchFilter.vue';
 
 // -------------------- 社区应用数据接口 --------------------
-const total = ref(38746);
+const total = ref(0);
 const apppkg = ref(0);
 const queryStat = () => {
   getStat()
     .then((res) => {
       apppkg.value = res.data.apppkg;
+      total.value = res.data.total;
     })
     .catch(() => {
       apppkg.value = 0;
+      total.value = 0;
     });
 };
 

@@ -107,7 +107,6 @@ const querySearch = () => {
       isLoading.value = false;
       isSearchDocs.value = false;
       isSearchError.value = true;
-      useViewStore().showNotFound();
     });
 };
 
@@ -262,6 +261,15 @@ watch(
     handleQueryData();
   },
   { deep: true }
+);
+
+watch(
+  () => pkgData.value,
+  () => {
+    if (pkgData.value.length > 0) {
+      isSearchError.value = false;
+    }
+  }
 );
 </script>
 
