@@ -13,11 +13,10 @@ import newsImg2 from '@/assets/home/news2.png';
 import newsImg3 from '@/assets/home/1120-cv.jpg';
 
 export const homeData = [
-  // desc: 'openEuler操作系统支持的软件包集合(包括RPM、容器镜像、EPKG软件包等）',
   {
     id: 'apppkg',
     name: '领域应用',
-    desc: 'openEuler操作系统支持的软件集合(包括RPM、容器镜像等）',
+    desc: 'openEuler操作系统支持的软件集合(包括RPM、容器镜像、EPKG软件包等）',
     icon: ApppkgIcon,
     href: "/apppkg"
   },
@@ -35,13 +34,13 @@ export const homeData = [
     icon: ImageIcon,
     href: "/image"
   },
-  // {
-  //   id: 'epkg',
-  //   name: 'EPKG',
-  //   desc: '一种支持多版本多环境，一次适配，处处运行的新型软件包',
-  //   icon: EpkgIcon,
-  //   href: "/epkg"
-  // },
+  {
+    id: 'epkg',
+    name: 'EPKG',
+    desc: '一种支持多版本多环境，一次适配，处处运行的新型软件包',
+    icon: EpkgIcon,
+    href: "/epkg"
+  },
 ]
 
 // 首页 解决方案

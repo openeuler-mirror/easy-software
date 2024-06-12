@@ -10,7 +10,6 @@ import IconCopy from '~icons/app/icon-copy.svg';
 import { useLocale } from '@/composables/useLocale';
 import type { PkgTypeT } from '@/@types/app';
 import { useI18n } from 'vue-i18n';
-import { ElTable } from 'element-plus';
 
 import IconChevronDown from '~icons/app/icon-chevron-down.svg';
 

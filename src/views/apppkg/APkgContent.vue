@@ -33,8 +33,8 @@ const isLoading = ref(false);
 const searchKey = ref((route.query.name as string) || '');
 const nameOrder = ref('');
 
-const searchOs = ref('openEuler-22.03-LTS-SP3');
-const searchArch = ref('x86_64');
+const searchOs = ref('');
+const searchArch = ref('');
 const searchCategory = ref<string[]>([]);
 const searchParams = computed(() => {
   return {
@@ -82,6 +82,7 @@ const queryAllpkg = () => {
       } else {
         useViewStore().showNotFound();
       }
+      total.value = 0;
       pkgData.value = [];
       isLoading.value = false;
     });
@@ -103,6 +104,7 @@ const querySearch = () => {
       isLoading.value = false;
     })
     .catch(() => {
+      total.value = 0;
       pkgData.value = [];
       isLoading.value = false;
       isSearchDocs.value = false;

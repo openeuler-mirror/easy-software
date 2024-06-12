@@ -144,15 +144,8 @@ watch(
   }
 );
 
-// 过滤EPKG
 const searchOptions = computed(() => {
-  if (props.options.length > 0) {
-    return props.options.filter((item) => {
-      return item.key !== 'epkgpkg';
-    });
-  } else {
-    return [];
-  }
+  return props.options;
 });
 </script>
 

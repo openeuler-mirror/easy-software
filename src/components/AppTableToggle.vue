@@ -40,6 +40,14 @@ const showMore = () => {
 
 <template>
   <OTable :columns="columns" :data="tableAllData" border="all" :small="true" :class="tableAllData.length > 10 ? 'max' : 'min'" />
+  <p v-if="tableAllData.length >= tableLen" @click="showMore" class="view-all">
+    <OLink color="primary" :class="isToggle ? 'up' : 'down'" size="small">
+      {{ isToggle ? t('software.upList') : t('software.viewAll') }}
+      <template #suffix>
+        <OIcon><IconChevronDown /></OIcon>
+      </template>
+    </OLink>
+  </p>
 </template>
 
 <style lang="scss" scoped>
