@@ -168,7 +168,7 @@ const searchOptions = computed(() => {
         <li
           v-for="(subitem, idx) in item.nameDocs"
           :key="idx"
-          @click="goDetail(item.key, subitem.pkgId, subitem.name)"
+          @click="goDetail(item.key, subitem.pkgId)"
           v-dompurify-html="`${subitem.name} ${subitem.version ? `:${subitem.version}` : ''}`"
         ></li>
       </ul>
