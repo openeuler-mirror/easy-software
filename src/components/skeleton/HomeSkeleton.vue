@@ -3,7 +3,7 @@ import { OSkeleton, OSkeletonText } from '@opensig/opendesign';
 </script>
 
 <template>
-  <OSkeleton v-for="idx in 3" :key="idx" :animation="true" loading style="margin-bottom: 40px">
+  <OSkeleton v-for="idx in 3" :key="idx" loading style="margin-bottom: 40px">
     <template #template>
       <div class="skeleton-flex">
         <OSkeletonText style="width: 120px" :rows="1" />

@@ -1,10 +1,13 @@
 <script setup lang="ts">
-import { OCard, ODivider } from '@opensig/opendesign';
+import { ref } from 'vue';
+import { OCard, ODivider, OLink } from '@opensig/opendesign';
 import AppBanner from '@/components/AppBanner.vue';
 import ContentWrapper from '@/components/ContentWrapper.vue';
+import ExternalLink from '@/components/ExternalLink.vue';
 import bannerImg from '@/assets/banner/banner1.jpg';
 import OpenStack from '@/data/solution/openstack';
 import { GITEE, OPENEULER } from '@/data/config';
+import { checkDomainLink, windowOpen } from '@/utils/common';
 
 const solutionInfo = {
   title: 'OpenStack',
@@ -25,6 +28,17 @@ const advTxt = [
     href: `${GITEE}/openeuler/gostone`,
   },
 ];
+
+const showExternalDlg = ref(false);
+const externalLink = ref('');
+const jumpTo = (href: string) => {
+  externalLink.value = href;
+  if (checkDomainLink(href)) {
+    windowOpen(href, '_blank');
+  } else {
+    showExternalDlg.value = true;
+  }
+};
 </script>
 <template>
   <AppBanner :title="solutionInfo.title" :background-image="bannerImg" :subtitle="solutionInfo.desc" />
@@ -87,7 +101,7 @@ const advTxt = [
               {{ item.desc }}
               <template v-if="index === 1">
                 ，<template v-for="item in advTxt" :key="item.name">
-                  <a :href="item.href" target="_blank" rel="noopener noreferrer">{{ item.name }}</a
+                  <OLink color="primary" @click="jumpTo(item.href)">{{ item.name }}</OLink
                   >，</template
                 >等
               </template>
@@ -114,6 +128,8 @@ const advTxt = [
         />
       </div>
     </div>
+    <!-- 跳转外部链接提示 -->
+    <ExternalLink v-if="showExternalDlg" :href="externalLink" @change="showExternalDlg = false" />
   </ContentWrapper>
 </template>
 

@@ -13,18 +13,14 @@ declare module 'vue' {
     AppFooter: typeof import('./src/components/AppFooter.vue')['default']
     AppHeader: typeof import('./src/components/AppHeader.vue')['default']
     AppSection: typeof import('./src/components/AppSection.vue')['default']
-    AppTable: typeof import('./src/components/AppTable.vue')['default']
     AppTableToggle: typeof import('./src/components/AppTableToggle.vue')['default']
     ContentWrapper: typeof import('./src/components/ContentWrapper.vue')['default']
-    copy: typeof import('./src/components/skeleton/OCardItemSkeleton copy.vue')['default']
     DetailAside: typeof import('./src/components/DetailAside.vue')['default']
     DetailHeader: typeof import('./src/components/DetailHeader.vue')['default']
-    DetailHeaderSkeleton: typeof import('./src/components/skeleton/DetailHeaderSkeleton.vue')['default']
     DetailSkeleton: typeof import('./src/components/skeleton/DetailSkeleton.vue')['default']
     ExternalLink: typeof import('./src/components/ExternalLink.vue')['default']
     FilterCheckbox: typeof import('./src/components/filter/FilterCheckbox.vue')['default']
     FilterHeader: typeof import('./src/components/filter/FilterHeader.vue')['default']
-    FilterItemSkeletion: typeof import('./src/components/skeleton/FilterItemSkeletion.vue')['default']
     FilterItemSkeleton: typeof import('./src/components/skeleton/FilterItemSkeleton.vue')['default']
     FilterRadio: typeof import('./src/components/filter/FilterRadio.vue')['default']
     HeaderNav: typeof import('./src/components/HeaderNav.vue')['default']
@@ -40,8 +36,5 @@ declare module 'vue' {
     SearchFilter: typeof import('./src/components/search/SearchFilter.vue')['default']
     SearchRecommend: typeof import('./src/components/search/SearchRecommend.vue')['default']
     SearchTab: typeof import('./src/components/search/SearchTab.vue')['default']
-  }
-  export interface ComponentCustomProperties {
-    vLoading: typeof import('element-plus/es')['ElLoadingDirective']
   }
 }

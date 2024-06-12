@@ -3,7 +3,7 @@ import { OSkeleton, OSkeletonText, OSkeletonFigure } from '@opensig/opendesign';
 </script>
 
 <template>
-  <OSkeleton animation class="skeleton-fullname">
+  <OSkeleton class="skeleton-fullname">
     <template #template>
       <div class="domain-head">
         <div class="left">

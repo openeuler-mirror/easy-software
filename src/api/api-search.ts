@@ -20,17 +20,6 @@ export function getSearchData(params: SearchESParamsT) {
 }
 
 
-export function getSearchRecommend(name: string, type?: string) {
-  const url = `/api-search/software/word?query=${name}&dataType=${type}`;
-  return request.post(url, {
-    headers: {
-      'Content-Type': 'application/json;charset=UTF-8',
-    },
-  }).then((res: AxiosResponse) => res?.data);
-}
-
-
-
 export function getSearchCount(params: {
   keyword: string
 }) {

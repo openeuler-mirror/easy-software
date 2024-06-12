@@ -1,14 +1,29 @@
 <script setup lang="ts">
+import { ref } from 'vue';
 import { OCard, ODivider } from '@opensig/opendesign';
 import AppBanner from '@/components/AppBanner.vue';
 import ContentWrapper from '@/components/ContentWrapper.vue';
+import ExternalLink from '@/components/ExternalLink.vue';
 import bannerImg from '@/assets/banner/banner1.jpg';
 import OpenHPC from '@/data/solution/openhpc';
 import { GITHUB } from '@/data/config';
 
+import { checkDomainLink, windowOpen } from '@/utils/common';
+
 const solutionInfo = {
   title: 'OpenHPC',
   desc: 'OpenHPC是一个开源的高性能计算解决方案，它提供了构建、部署和管理高性能计算(HPC)集群所需要的工具，包括系统工具、资源管理器、I/O客户端、开发工具和各种科学库',
+};
+
+const showExternalDlg = ref(false);
+const externalLink = ref('');
+const jumpTo = (href: string) => {
+  externalLink.value = href;
+  if (checkDomainLink(href)) {
+    windowOpen(href, '_blank');
+  } else {
+    showExternalDlg.value = true;
+  }
 };
 </script>
 <template>
@@ -87,7 +102,7 @@ const solutionInfo = {
           cursor="auto"
           :title="item.name"
           :detail="item.desc"
-          :href="GITHUB + item.href"
+          @click="jumpTo(GITHUB + item.href)"
           :icon="item.icon"
           target="_blank"
           rel="noopener noreferrer"
@@ -101,6 +116,8 @@ const solutionInfo = {
         />
       </div>
     </div>
+    <!-- 跳转外部链接提示 -->
+    <ExternalLink v-if="showExternalDlg" :href="externalLink" @change="showExternalDlg = false" />
   </ContentWrapper>
 </template>
 

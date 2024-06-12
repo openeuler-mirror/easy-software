@@ -3,7 +3,7 @@ import { OSkeleton, OSkeletonText } from '@opensig/opendesign';
 </script>
 
 <template>
-  <OSkeleton animation class="skeleton-fullname">
+  <OSkeleton class="skeleton-fullname">
     <template #template>
       <OSkeletonText class="title" :rows="1" />
       <OSkeletonText :style="{ width: '88%', margin: '16px 0 0 28px' }" :rows="5" />

@@ -57,14 +57,21 @@ const emits = defineEmits<{
 
 const isTimeOrder = ref(false);
 const isNameOrder = ref(false);
-const changeSortBy = (type: string) => {
+const changeSortBy = (type: string, name: string) => {
   let v: SorT = '';
+  const path = document.querySelector(`.filter-sort.${name} svg`);
+  // 重置svg颜色
+  path?.children[0].setAttribute('fill', '#bdbdbd');
+  path?.children[1].setAttribute('fill', '#bdbdbd');
+
   if (type === 'timeOrder') {
     isTimeOrder.value = !isTimeOrder.value;
     v = isTimeOrder.value ? 'asc' : 'desc';
+    path?.children[isTimeOrder.value ? 0 : 1].setAttribute('fill', '#000');
   } else if (type === 'nameOrder') {
     isNameOrder.value = !isNameOrder.value;
     v = isNameOrder.value ? 'asc' : 'desc';
+    path?.children[isNameOrder.value ? 0 : 1].setAttribute('fill', '#000');
   }
   emits('sort', [type, v]);
 };
@@ -109,12 +116,12 @@ watch(
     </div>
     <div class="search-left">
       <template v-if="isSort">
-        <OLink @click="changeSortBy('timeOrder')" class="filter-sort">
+        <OLink @click="changeSortBy('timeOrder', 'time')" class="filter-sort time">
           {{ t('software.timeOrder') }}
           <template #suffix><IconTimeOrder /></template>
         </OLink>
       </template>
-      <OLink @click="changeSortBy('nameOrder')" class="filter-sort">
+      <OLink @click="changeSortBy('nameOrder', 'name')" class="filter-sort name">
         {{ t('software.nameOrder') }}
         <template #suffix><IconTimeOrder /></template>
       </OLink>
@@ -123,6 +130,12 @@ watch(
 </template>
 
 <style lang="scss" scoped>
+svg.asc {
+  color: red;
+  path {
+    fill: blue;
+  }
+}
 .filter-header {
   height: 40px;
   display: flex;
@@ -160,11 +173,12 @@ watch(
   .filter-sort {
     display: flex;
     margin-left: 24px;
+    user-select: none;
     align-items: center;
-    &.new {
-      color: var(--o-color-primary1);
-      svg {
-        fill: currentColor;
+    &.asc {
+      color: var(--o-color-info3);
+      svg path:first-child {
+        color: var(--o-color-primary1);
       }
     }
   }

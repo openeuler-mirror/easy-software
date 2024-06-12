@@ -64,11 +64,15 @@ const clickSubmit = () => {
         clearData();
       } else {
         message.warning({
-          content: t('software.feedbackWarning'),
+          content: res.msg,
         });
       }
     })
-    .catch(() => {});
+    .catch(() => {
+      message.success({
+        content: t('software.feedbackWarning'),
+      });
+    });
 };
 
 const clearData = () => {

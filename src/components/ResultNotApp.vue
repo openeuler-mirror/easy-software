@@ -39,6 +39,10 @@ const clickFeedback = () => {
           content: t('software.feedbackSuccess'),
         });
         state.value = 'feedback';
+      } else {
+        message.warning({
+          content: res.msg,
+        });
       }
     })
     .catch(() => {

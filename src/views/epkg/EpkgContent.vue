@@ -86,6 +86,7 @@ const querySearch = () => {
       }
     })
     .catch(() => {
+      total.value = 0;
       pkgData.value = [];
       isLoading.value = false;
       isSearchDocs.value = false;
@@ -126,6 +127,7 @@ const queryAllpkg = () => {
       } else {
         useViewStore().showNotFound();
       }
+      total.value = 0;
       pkgData.value = [];
       isLoading.value = false;
     });
