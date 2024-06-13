@@ -88,7 +88,7 @@ const onExternalDialog = () => {
           :rows="4"
           style="width: 100%"
         />
-        <p class="other-text">其他反馈方式</p>
+        <p class="other-text">反馈方式</p>
         <div class="feedback-other">
           <a @click="onExternalDialog()">
             <OIcon><IconIssue /></OIcon>提交issue
