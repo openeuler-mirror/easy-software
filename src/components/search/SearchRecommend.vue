@@ -1,12 +1,12 @@
 <script lang="ts" setup>
 import { ref, defineExpose, watch, computed, type PropType } from 'vue';
-import { OLink, useMessage, OIcon } from '@opensig/opendesign';
+import { OLink, OIcon } from '@opensig/opendesign';
 import type { RecommendItemT } from '@/@types/search';
 import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 import { getTagsIcon, xssAllTag } from '@/utils/common';
-
-import { postFeedback } from '@/api/api-feedback';
+import { GITEE } from '@/data/config';
+import ExternalLink from '@/components/ExternalLink.vue';
 
 import { useLocale } from '@/composables/useLocale';
 import xss from 'xss';
@@ -33,7 +33,6 @@ const props = defineProps({
 });
 
 const { t } = useI18n();
-const message = useMessage();
 const router = useRouter();
 const { locale } = useLocale();
 const isShow = ref(props.isFeedback);
@@ -83,26 +82,27 @@ const goSearch = (name: string) => {
 };
 
 // 一键反馈
-const clickFeedback = () => {
-  const params = {
-    feedbackPageUrl: window.location.href,
-    feedbackText: props.searchValue,
-    feedbackValue: 0,
-  };
+const getIssueTemplate = () => {
+  return `1. 【网站链接】%0A
+> ${encodeURIComponent(window.location.href)}
+%0A
+2. 【反馈内容】%0A
+> ${props.searchValue}
+`;
+};
+const issueUrl = ref();
 
-  postFeedback(params)
-    .then((res) => {
-      if (res.code === 200) {
-        message.success({
-          content: t('software.feedbackSuccess'),
-        });
-      }
-    })
-    .catch(() => {
-      message.warning({
-        content: t('software.feedbackWarning'),
-      });
-    });
+const getIssueUrl = () => {
+  const desc = encodeURIComponent(getIssueTemplate());
+  issueUrl.value = `${GITEE}/openeuler/easy-software/issues/new?issue%5Bassignee_id%5D=0&issue%5Bmilestone_id%5D=0&title=【搜索】-${props.searchValue}&description=${desc}`;
+};
+
+const showExternalDlg = ref(false);
+const externalLink = ref('');
+const clickFeedback = () => {
+  getIssueUrl();
+  externalLink.value = decodeURIComponent(issueUrl.value);
+  showExternalDlg.value = true;
 };
 
 // -------------------- 历史搜索记录----------------------
@@ -191,6 +191,7 @@ const searchOptions = computed(() => {
     <p>
       {{ t('software.nofoundApp') }} <OLink color="primary" @click="clickFeedback"> {{ t('software.feedback') }}</OLink>
     </p>
+    <ExternalLink v-if="showExternalDlg" :href="externalLink" @change="showExternalDlg = false" />
   </div>
 </template>
 

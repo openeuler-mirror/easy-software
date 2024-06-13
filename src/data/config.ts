@@ -17,3 +17,5 @@ export const HIASCEND = 'https://www.hiascend.com';
 export const OPENEULER_STATUS = 'https://status.openeuler.org';
 export const OPENEULER_FORUM = 'https://forum.openeuler.org';
 
+// api接口
+export const DOCS_SEARCH_API = 'https://doc-search.test.osinfra.cn';

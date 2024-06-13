@@ -1,85 +1,61 @@
 <script lang="ts" setup>
-import { ref, onMounted } from 'vue';
-import { OLink, OTag, OPopover, OResult, OFigure, useMessage, vLoading } from '@opensig/opendesign';
+import { ref } from 'vue';
+import { OLink, OResult, OFigure } from '@opensig/opendesign';
 import { useRoute } from 'vue-router';
 import { useI18n } from 'vue-i18n';
-import { postFeedback } from '@/api/api-feedback';
+import { GITEE } from '@/data/config';
+import ExternalLink from '@/components/ExternalLink.vue';
 
 import result404 from '@/assets/404.png';
 
 const props = defineProps({
   type: {
     type: String,
-    default: 'nofound',
+    default: '',
   },
 });
 
 const route = useRoute();
 const { t } = useI18n();
-const message = useMessage();
-const state = ref(props.type);
 
-const feedbackRef = ref(null);
 const searchVal = ref(decodeURIComponent(route.query.name as string));
-const isLoading = ref(false);
 
 // 一键反馈
-const clickFeedback = () => {
-  const params = {
-    feedbackPageUrl: window.location.href,
-    feedbackText: searchVal.value,
-    feedbackValue: 0,
-  };
-  isLoading.value = true;
-  postFeedback(params)
-    .then((res) => {
-      if (res.code === 200) {
-        isLoading.value = false;
-        message.success({
-          content: t('software.feedbackSuccess'),
-        });
-        state.value = 'feedback';
-      } else {
-        message.warning({
-          content: res.msg,
-        });
-      }
-    })
-    .catch(() => {
-      isLoading.value = false;
-      message.success({
-        content: t('software.feedbackWarning'),
-      });
-    });
+const getIssueTemplate = () => {
+  return `1. 【网站链接】%0A
+> ${encodeURIComponent(window.location.href)}
+%0A
+2. 【反馈内容】%0A
+> ${searchVal.value}
+`;
 };
-const tabName = ref('');
-onMounted(() => {
-  tabName.value = route.query?.tab as string;
-});
+const issueUrl = ref();
+const getIssueUrl = () => {
+  const desc = encodeURIComponent(getIssueTemplate());
+  issueUrl.value = `${GITEE}/openeuler/easy-software/issues/new?issue%5Bassignee_id%5D=0&issue%5Bmilestone_id%5D=0&title=【搜索】-${props.type}-${searchVal.value}&description=${desc}`;
+};
+
+const showExternalDlg = ref(false);
+const externalLink = ref('');
+const clickFeedback = () => {
+  getIssueUrl();
+  externalLink.value = decodeURIComponent(issueUrl.value);
+  showExternalDlg.value = true;
+};
 </script>
 
 <template>
-  <OResult v-loading="isLoading" class="result-tips" :class="tabName">
+  <OResult class="result-tips">
     <template #image>
       <OFigure :src="result404" fit="contain" />
     </template>
     <template #description>
-      <div v-if="state === 'nofound'">
-        {{ t('software.nofoundApp') }}
-        <OLink hover-underline color="primary" @click="clickFeedback">{{ t('software.feedbackPkg.btn') }}</OLink>
-      </div>
-      <div v-else>
-        {{ t('software.feedbackPkg.text') }} <OLink ref="feedbackRef" hover-underline color="primary">{{ t('software.feedbackPkg.schedule') }}</OLink>
-
-        <OPopover position="right" :target="feedbackRef" trigger="click" :unmount-on-hide="false">
-          <p class="text">{{ t('software.feedbackPkg.name') }}：{{ searchVal }}</p>
-          <p class="text">
-            {{ t('software.feedbackPkg.state') }}：<OTag color="primary">{{ t('software.feedbackPkg.online') }}</OTag>
-          </p>
-        </OPopover>
-      </div>
+      {{ t('software.nofoundApp') }}
+      <OLink hover-underline color="primary" @click="clickFeedback">{{ t('software.feedbackPkg.btn') }}</OLink>
     </template>
   </OResult>
+
+  <ExternalLink v-if="showExternalDlg" :href="externalLink" @change="showExternalDlg = false" />
 </template>
 
 <style lang="scss" scoped>
@@ -90,6 +66,7 @@ onMounted(() => {
   padding: 40px;
   box-shadow: var(--o-shadow-1);
   flex: 1;
+  margin-top: 24px;
 }
 .text {
   @include text1;

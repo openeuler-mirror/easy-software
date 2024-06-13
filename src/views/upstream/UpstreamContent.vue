@@ -223,7 +223,7 @@ watch(
           <OLink v-if="searchOs" color="primary" class="resetting" @click="handleResettingTag">{{ t('software.filterSider.clear') }}</OLink>
         </div>
       </div>
-      <ResultNotApp v-if="appData.length === 0 && isSearchError" />
+      <ResultNotApp v-if="appData.length === 0 && isSearchError" type="上游兼容应用全景" />
       <div class="pkg-panel" v-else>
         <OTable :columns="columns" :data="appData" border="all">
           <template #td_name="{ row }">

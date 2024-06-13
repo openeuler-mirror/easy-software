@@ -327,7 +327,7 @@ watch(
           <OLink color="primary" class="resetting" @click="onResetTag">{{ t('software.filterSider.clear') }}</OLink>
         </div>
       </div>
-      <ResultNotApp v-if="isSearchError" />
+      <ResultNotApp v-if="isSearchError" type="领域应用" />
       <template v-else>
         <div class="pkg-panel">
           <ORow gap="32px" flex-wrap="wrap">

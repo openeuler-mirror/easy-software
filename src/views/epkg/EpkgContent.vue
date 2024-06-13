@@ -333,7 +333,7 @@ watch(
           }}</OLink>
         </div>
       </div>
-      <ResultNotApp v-if="pkgData.length === 0 && isSearchError" />
+      <ResultNotApp v-if="pkgData.length === 0 && isSearchError" type="EPKG" />
       <div class="pkg-panel" v-else>
         <OTableItemNew :data="pkgData" :columns="columns" :type="tabName" />
         <div v-if="pkgData.length < total" class="pagination-box">
