@@ -1,4 +1,4 @@
-FROM node:18.14.1 as Builder
+FROM node:18.20.1 as Builder
 
 RUN mkdir -p /home/easysoftware/web
 WORKDIR /home/easysoftware/web
@@ -29,6 +29,7 @@ COPY --from=NginxBuilder /etc/nginx/geoip  /etc/nginx/geoip
 COPY --from=NginxBuilder /etc/nginx/mime.types  /etc/nginx/mime.types
 
 COPY --from=Builder /home/easysoftware/web/dist /usr/share/nginx/www/
+
 RUN sed -i "s|repo.openeuler.org|mirrors.nju.edu.cn/openeuler|g" /etc/yum.repos.d/openEuler.repo \
     && sed -i '/metalink/d' /etc/yum.repos.d/openEuler.repo \
     && sed -i '/metadata_expire/d' /etc/yum.repos.d/openEuler.repo \
