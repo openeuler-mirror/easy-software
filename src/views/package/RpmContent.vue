@@ -354,7 +354,7 @@ watch(
           >
         </div>
       </div>
-      <ResultNotApp v-if="pkgData.length === 0 && isSearchError" />
+      <ResultNotApp v-if="pkgData.length === 0 && isSearchError" type="RPM" />
       <div class="pkg-panel" v-else>
         <OTableItemNew :data="pkgData" :columns="columns" :type="tabName" />
 

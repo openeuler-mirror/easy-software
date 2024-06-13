@@ -320,7 +320,7 @@ watch(
           <OLink color="primary" class="resetting" @click="resetTag">{{ t('software.filterSider.clear') }}</OLink>
         </div>
       </div>
-      <ResultNotApp v-if="pkgData.length === 0 && isSearchError" />
+      <ResultNotApp v-if="pkgData.length === 0 && isSearchError" type="容器镜像" />
       <div class="pkg-panel" v-else>
         <OTableItemNew :data="pkgData" :columns="columns" :type="tabName" />
         <div v-if="pkgData.length < total" class="pagination-box">
