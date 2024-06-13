@@ -10,7 +10,7 @@ RUN pnpm build-only
 
 FROM swr.cn-north-4.myhuaweicloud.com/opensourceway/openeuler/nginx:1.24.0-22.03-lts-sp1 as NginxBuilder
 
-FROM openeuler/openeuler:22.03
+FROM openeuler/openeuler:22.03-lts-sp1
 
 ENV NGINX_CONFIG_FILE /etc/nginx/nginx.conf
 ENV NGINX_CONFIG_PATH /etc/nginx/
