@@ -65,7 +65,7 @@ export default {
   external: {
     title: '即将跳转到外部网站',
     text: '您将要访问的链接不属于软件中心 ，请关注您的账号安全。',
-    btn: ['继续前往', '取消']
+    btn: ['继续前往', '取消'],
   },
 
   // detail
@@ -81,5 +81,4 @@ export default {
     category: '领域',
     clear: '清空',
   },
-
 };

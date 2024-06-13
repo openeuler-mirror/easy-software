@@ -3,7 +3,7 @@ export const navs = [
     id: 'home',
     label: {
       zh: '主页',
-      en: 'Home'
+      en: 'Home',
     },
     href: '/',
   },
@@ -11,7 +11,7 @@ export const navs = [
     id: 'apppkg',
     label: {
       zh: '领域应用',
-      en: 'applications Package'
+      en: 'applications Package',
     },
     href: '/apppkg',
   },
@@ -19,7 +19,7 @@ export const navs = [
     id: 'rpm',
     label: {
       zh: 'RPM',
-      en: 'RPM'
+      en: 'RPM',
     },
     href: '/package',
   },
@@ -27,7 +27,7 @@ export const navs = [
     id: 'apppkg',
     label: {
       zh: '容器镜像',
-      en: 'Image'
+      en: 'Image',
     },
     href: '/image',
   },
@@ -35,7 +35,7 @@ export const navs = [
     id: 'epkg',
     label: {
       zh: 'EPKG',
-      en: 'EPKG'
+      en: 'EPKG',
     },
     href: '/epkg',
   },
@@ -44,7 +44,7 @@ export const navs = [
     id: 'upstream',
     label: {
       zh: '上游兼容应用全景',
-      en: '上游兼容应用全景'
+      en: '上游兼容应用全景',
     },
     href: '/upstream',
   },

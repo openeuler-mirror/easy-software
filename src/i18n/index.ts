@@ -4,7 +4,6 @@ import common from './common';
 import software from './software';
 import upstream from './upstream';
 import detail from '@/i18n/detail';
-import { getCurrentLocale } from '@/utils/locale';
 
 const messages = {
   zh: {
@@ -21,7 +20,7 @@ const messages = {
   },
 };
 
-const locale = getCurrentLocale();
+const locale = 'zh';
 
 const i18n = createI18n({
   globalInjection: true,

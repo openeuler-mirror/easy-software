@@ -44,14 +44,18 @@ export default {
     imageName: 'Image Name',
   },
 
-
   //反馈
   feedbackTitle: 'Feedback',
   feedbackPlaceholder: 'Please enter your feedback',
   feedbackSuccess: 'Success, thank you for your feedback!',
   feedbackWarning: 'Feedback failed, please try again',
   feedbackMessage: ['Please enter your feedback ', ' Please select an asterisk rating ', ' Illegal characters, please re-enter '],
-  feedbackTxt: ['Thank you for your feedback, we will improve as soon as possible! You can also ', ' contact maintainer ', ' or ', ' contact openEuler assistant '],
+  feedbackTxt: [
+    'Thank you for your feedback, we will improve as soon as possible! You can also ',
+    ' contact maintainer ',
+    ' or ',
+    ' contact openEuler assistant ',
+  ],
   feedbackButton: ['Quick Feedback ', ' Submit Issue '],
   feedbackPkg: {
     btn: 'One click feedback',
@@ -66,7 +70,7 @@ export default {
   external: {
     title: 'Jumping to external website soon',
     text: 'The link you are about to access does not belong to the software market. Please pay attention to the security of your account.',
-    btn: ['Continue ', ' Cancel ']
+    btn: ['Continue ', ' Cancel '],
   },
 
   // detail
@@ -81,5 +85,4 @@ export default {
     category: 'Domain',
     clear: 'Clear',
   },
-
 };

@@ -10,7 +10,7 @@ export interface PkgIdsT {
   EPKG: string;
   IMAGE: string;
   RPM: string;
-};
+}
 
 export interface AppT {
   name: string;
@@ -26,19 +26,17 @@ export interface AppInfoT {
   bin_code: string;
 }
 
-
 export interface MaintainerT {
   maintainerId: string | null;
   maintainerEmail: string | null;
   maintainerGiteeId: string | null;
-};
+}
 
 export interface DetailItemT {
   name: string;
   value: string | any;
   type?: string;
 }
-
 
 export interface HomeInfoT {
   id: string;
@@ -59,7 +57,5 @@ export interface MoreMessgeItemT {
   ver: string;
   epoch: string;
 }
-
-
 
 export type PkgTypeT = 'RPM' | 'IMAGE' | 'EPKG';

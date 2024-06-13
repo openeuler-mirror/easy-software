@@ -1,9 +1,8 @@
 export interface RecommendSubItemT {
   name: string;
   pkgId: string;
-  version?: string
+  version?: string;
 }
-
 
 export interface RecommendItemT {
   docCount: number;
@@ -11,12 +10,10 @@ export interface RecommendItemT {
   nameDocs?: RecommendSubItemT[];
 }
 
-
 export interface SearchParamsT {
   value: string;
   filter: string;
 }
-
 
 export interface MenuCountT {
   key: string;

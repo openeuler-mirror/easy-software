@@ -46,5 +46,4 @@ export default {
   },
   PREV: 'pre',
   NEXT: 'next',
-
 };

@@ -14,7 +14,6 @@ export function isValidTags(val: unknown) {
   return TAGS_OPTIONS.find((option: string) => option === val);
 }
 
-
 /**
  * 判断搜索 tab 参数是否有效
  * @param {unknown} val 待判断 tab 参数
@@ -26,8 +25,6 @@ export function isValidSearchTabName(val: unknown) {
   }
   return TABNAME_OPTIONS.find((option: string) => option === val);
 }
-
-
 
 /**
  * 判断搜索 tab 参数是否有效

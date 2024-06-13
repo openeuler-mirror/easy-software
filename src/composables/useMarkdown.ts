@@ -20,12 +20,12 @@ export const useMarkdown = () => {
         if (options.isCopy) {
           let copyText = lines[0];
           for (let i = 1, len = lines.length; i < len; i++) {
-            copyText += `&#10;${lines[i]}`; 
+            copyText += `&#10;${lines[i]}`;
           }
           return (
             `<pre class="hljs">` +
-            `<code>${escapeHtmlStr.replace('{Tag}',options.Tag)}</code>` +
-            `<div class="pre-copy copy" data-clipboard-text="${copyText.replace('{Tag}',options.Tag)}">` +
+            `<code>${escapeHtmlStr.replace('{Tag}', options.Tag)}</code>` +
+            `<div class="pre-copy copy" data-clipboard-text="${copyText.replace('{Tag}', options.Tag)}">` +
             `<i class="icon-copy copy"></i>` +
             `</div>` +
             `</pre>`

@@ -2,7 +2,7 @@ export interface SearchAppT {
   pageNum: number;
   pageSize: number;
   os?: string | string[];
-  arch?: string | string[]
+  arch?: string | string[];
   category?: string | string[];
   timeOrder?: string;
   nameOrder?: string;

@@ -3,14 +3,13 @@ import { createRouter, createWebHistory } from 'vue-router';
 import { scrollToTop } from '@/utils/common';
 import { useLangStore, useViewStore } from '@/stores/common';
 
-
 const routes = [
   {
     path: '/',
     redirect: '/zh/',
   },
-  { path: '/zh/', component: () => import('@/views/home/TheHome.vue'), },
-  { path: '/en/', redirect: '/zh/', },
+  { path: '/zh/', component: () => import('@/views/home/TheHome.vue') },
+  { path: '/en/', redirect: '/zh/' },
   {
     path: '/zh/apppkg',
     name: 'apppkg',
@@ -111,7 +110,6 @@ router.beforeEach((to, from, next) => {
   const langStore = useLangStore();
   const lang = to.path.startsWith('/en') ? 'en' : 'zh';
   langStore.lang = lang;
-
 
   next();
 });

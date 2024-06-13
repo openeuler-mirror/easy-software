@@ -1,8 +1,5 @@
 import { computed, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { isClient, isUndefined } from '@opensig/opendesign';
-import { type LocaleT } from '@/@types/locale';
-
 
 export const useLocale = () => {
   const { t, locale } = useI18n();
@@ -24,25 +21,10 @@ export const useLocale = () => {
     }
   );
 
-  // 语言切换
-  const changeLocale = (lang?: LocaleT) => {
-    if (locale.value === lang) {
-      return;
-    }
-
-    const language = isUndefined(lang) ? (isZh.value ? 'en' : 'zh') : lang;
-
-    if (isClient) {
-      localStorage.setItem('locale', language);
-      location.reload();
-    }
-  };
-
   return {
     t,
     locale,
     isZh,
     isEn,
-    changeLocale,
   };
 };
