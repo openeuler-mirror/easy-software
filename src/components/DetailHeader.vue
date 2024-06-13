@@ -2,7 +2,7 @@
 import { ref } from 'vue';
 import { OLink, OIcon } from '@opensig/opendesign';
 import { checkDomainLink, windowOpen } from '@/utils/common';
-
+import { scrollToTop } from '@/utils/common';
 import Email from '@/assets/email.svg';
 import Gitee from '@/assets/gitee.svg';
 import IconOutlink from '~icons/pkg/icon-outlink.svg';
@@ -41,11 +41,9 @@ const onExternalDialog = (href: string) => {
   }
 };
 
-const scrollToAnchor = (id: any) => {
-  setTimeout(() => {
-    const doc = document.getElementById(id);
-    doc?.scrollIntoView();
-  }, 100);
+const scrollToAnchor = (id: string) => {
+  const top = document.getElementById(id)?.offsetTop;
+  scrollToTop(top, false);
 };
 </script>
 
