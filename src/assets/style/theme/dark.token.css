@@ -1,5 +1,5 @@
 /* theme: opendesign.dark */
-[data-o-theme="dark"] {
+[data-o-theme='dark'] {
   /**
    * @name 
    * @type palette
@@ -62,7 +62,7 @@
    * @group kleinblue
    * @description 
    */
-  --o-kleinblue-7: 105, 143, 227 ;
+  --o-kleinblue-7: 105, 143, 227;
   /**
    * @name 
    * @type palette
@@ -951,7 +951,7 @@
    * @group mixedgray
    * @description 
    */
-  --o-mixedgray-14: 255,255, 255;
+  --o-mixedgray-14: 255, 255, 255;
   /**
    * @name 
    * @type palette
@@ -1525,7 +1525,7 @@
    * @group control
    * @description 常规-浅，常用于背景
    */
-  --o-color-control1-light: rgb(var(--o-mixedgray-7), 1.0);
+  --o-color-control1-light: rgb(var(--o-mixedgray-7), 1);
   /**
    * @name 
    * @type color
@@ -1553,14 +1553,14 @@
    * @group control
    * @description 很浅，常用于表格背景色
    */
-  --o-color-control-light: rgb(var(--o-mixedgray-4), 1.0);
+  --o-color-control-light: rgb(var(--o-mixedgray-4), 1);
   /**
    * @name 
    * @type color
    * @group info
    * @description 一级/强调/标题
    */
-  --o-color-info1: rgba(var(--o-mixedgray-14), 1.0);
+  --o-color-info1: rgba(var(--o-mixedgray-14), 1);
   /**
    * @name 
    * @type color
@@ -1588,7 +1588,7 @@
    * @group info
    * @description 一级/次强调/正文反色
    */
-  --o-color-info1-inverse: rgba(var(--o-mixedgray-1), 1.0);
+  --o-color-info1-inverse: rgba(var(--o-mixedgray-1), 1);
   /**
    * @name 
    * @type color

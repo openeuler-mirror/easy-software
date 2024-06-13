@@ -3,7 +3,6 @@ import { useI18n } from 'vue-i18n';
 import { isClient, isUndefined } from '@opensig/opendesign';
 import { type LocaleT } from '@/@types/locale';
 
-
 export const useLocale = () => {
   const { t, locale } = useI18n();
 

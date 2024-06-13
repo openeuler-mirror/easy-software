@@ -10,8 +10,6 @@ import setConfig from './setConfig';
 import { isBoolean, useLoading, useMessage, isNull, isUndefined } from '@opensig/opendesign';
 import type { LoadingPropsT } from '@opensig/opendesign/lib/loading/types';
 
-
-
 interface RequestConfig<D = any> extends AxiosRequestConfig {
   data?: D;
   showLoading?: boolean | { opt?: Partial<LoadingPropsT>; wrap: Ref<HTMLElement> | HTMLElement | string }; // 加载时是否出现Loading框，默认为false
@@ -170,8 +168,6 @@ const responseInterceptorId = request.interceptors.response.use(
         status: 'danger',
       });
     }
-
-
 
     return Promise.reject(err);
   }

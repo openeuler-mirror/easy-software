@@ -57,23 +57,18 @@ export const useScreen = () => {
     return handler(w1, w2);
   };
 
-
   const isPhone = computed(() => compare('le', Size.Phone));
   const gtPhone = computed(() => compare('gt', Size.Phone));
-
 
   const isPad = computed(() => compare('gt', Size.Phone) && compare('le', Size.PadH));
   const lePad = computed(() => compare('le', Size.PadH));
   const gtPad = computed(() => compare('gt', Size.PadH));
 
-
   const isPadV = computed(() => compare('gt', Size.Phone) && compare('le', Size.PadV));
   const lePadV = computed(() => compare('le', Size.PadV));
   const gtPadV = computed(() => compare('gt', Size.PadV));
 
-
   const isPadH = computed(() => compare('gt', Size.PadV) && compare('le', Size.PadH));
-
 
   const isLaptop = computed(() => compare('gt', Size.PadH) && compare('le', Size.Laptop));
   const leLaptop = computed(() => compare('le', Size.Laptop));
@@ -103,7 +98,6 @@ export const useScreen = () => {
   });
 
   return {
-
     getSize,
     current,
 

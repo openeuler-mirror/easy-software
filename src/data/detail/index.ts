@@ -6,7 +6,7 @@ export const columnTags = [
 ];
 
 // 容器镜像tab分类
-export const tagList = [{ lable: '概览' }, { lable: 'Tags' }]
+export const tagList = [{ lable: '概览' }, { lable: 'Tags' }];
 
 // RPM更多信息表头
 export const moreColumns = [
@@ -21,4 +21,4 @@ export const verColumns = [
   { label: 'openEuler版本', key: 'os' },
   { label: '架构', key: 'arch', style: 'width:30%' },
   { label: '操作', key: 'flags', style: 'width:30%' },
-];;
+];

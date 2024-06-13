@@ -1,6 +1,5 @@
 import { defineStore } from 'pinia';
 
-
 // 语言
 export const useLangStore = defineStore('lang', {
   state: () => {
@@ -14,7 +13,6 @@ export const useLangStore = defineStore('lang', {
     },
   },
 });
-
 
 /**
  * 页面状态

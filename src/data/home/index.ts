@@ -1,4 +1,3 @@
-
 import { OPENEULER } from '@/data/config';
 
 import ApppkgIcon from '~icons/pkg/apppkg.svg';
@@ -18,30 +17,30 @@ export const homeData = [
     name: '领域应用',
     desc: 'openEuler操作系统支持的软件集合(包括RPM、容器镜像、EPKG软件包等）',
     icon: ApppkgIcon,
-    href: "/apppkg"
+    href: '/apppkg',
   },
   {
     id: 'rpm',
     name: 'RPM',
     desc: '一系列基于openEuler操作系统预编译的二进制软件包',
     icon: RpmIcon,
-    href: "/package"
+    href: '/package',
   },
   {
     id: 'image',
     name: '容器镜像',
     desc: '一系列基于openEuler操作系统安装特定应用的容器镜像，提供开箱即用的部署体验',
     icon: ImageIcon,
-    href: "/image"
+    href: '/image',
   },
   {
     id: 'epkg',
     name: 'EPKG',
     desc: '一种支持多版本多环境，一次适配，处处运行的新型软件包',
     icon: EpkgIcon,
-    href: "/epkg"
+    href: '/epkg',
   },
-]
+];
 
 // 首页 解决方案
 export const solutionData = [
@@ -50,18 +49,16 @@ export const solutionData = [
     desc: '作为一个开源的云计算管理平台，OpenStack 由nova、cinder、neutron、glance、keystone、horizon等几个主要的组件组合起来完成具体工作',
 
     img: openStack,
-    href: '/solution/openStack'
+    href: '/solution/openStack',
   },
   {
     title: 'OpenHPC',
     desc: 'OpenHPC是Linux基金会开源的超算项目，致力于为高性能计算（HPC）构建一个开源框架，以适应现在工业和学术研究的需求',
 
     img: openHPC,
-    href: '/solution/openhpc'
-  }
-]
-
-
+    href: '/solution/openhpc',
+  },
+];
 
 // 首页新闻
 export const homeNewsData = [

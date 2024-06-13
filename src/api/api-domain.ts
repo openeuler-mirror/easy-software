@@ -2,7 +2,6 @@ import { request } from '@/shared/axios';
 import type { AxiosResponse } from '@/shared/axios';
 import type { SearchSQLT } from '@/@types/domain';
 
-
 interface ColumnT {
   name: string;
   column: string;

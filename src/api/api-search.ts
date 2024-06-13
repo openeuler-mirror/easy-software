@@ -20,10 +20,7 @@ export function getSearchData(params: SearchESParamsT) {
   return request.post(url, params).then((res: AxiosResponse) => res?.data);
 }
 
-
-export function getSearchCount(params: {
-  keyword: string
-}) {
+export function getSearchCount(params: { keyword: string }) {
   const url = DOCS_SEARCH_API + '/software/count';
   return request.post(url, params).then((res: AxiosResponse) => res?.data);
 }

@@ -12,9 +12,7 @@ export function getUpstream(params: SearchUpstreamT) {
   return request.get(url, { params }).then((res: AxiosResponse) => res?.data);
 }
 
-
 export function getUpstreamColumn(name: string) {
   const url = `/api-query/appVersion/column?column=${name}`;
   return request.get(url).then((res: AxiosResponse) => res?.data);
 }
-
