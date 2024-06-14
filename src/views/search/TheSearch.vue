@@ -94,12 +94,16 @@ watch(
 .layout {
   background: var(--o-color-primary1) url(@/assets/banner/search-banner.jpg) no-repeat top center/cover;
   .home-header {
-    padding: 32px 0 0;
+    padding: 32px 0 0 308px;
     display: flex;
     flex-direction: column;
-    align-items: center;
     justify-content: space-between;
     height: 140px;
+    max-width: var(--layout-content-max-width);
+    margin: 0 auto;
+    .search {
+      width: 800px;
+    }
     :deep(.o-select) {
       height: 40px;
     }

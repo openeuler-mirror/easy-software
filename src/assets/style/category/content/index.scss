@@ -14,9 +14,9 @@
     margin-top: 24px;
   }
   .filter-sidebar {
-    padding-right: 32px;
+    padding-right: 8px;
     position: relative;
-    width: 310px;
+    width: 300px;
     .filter-text {
       @include text1;
       color: var(--o-color-info3);
