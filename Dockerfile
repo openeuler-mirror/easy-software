@@ -93,7 +93,9 @@ COPY ./deploy/monitor.sh ./deploy/entrypoint.sh /etc/nginx/
 RUN chmod 500 /etc/nginx/monitor.sh \
     && chmod 500 /etc/nginx/entrypoint.sh \
     && chown nginx:nginx /etc/nginx/monitor.sh \
-    && chown nginx:nginx /etc/nginx/entrypoint.sh
+    && chown nginx:nginx /etc/nginx/entrypoint.sh \
+    && sed -i "/PATH=/d" /home/nginx/.bashrc \
+    && source /home/nginx/.bashrc
 
 EXPOSE 8080
 
