@@ -14,8 +14,8 @@ export interface SearchSQLT extends SearchAppT {
 
 export interface SearchESParamsT extends SearchAppT {
   keyword: string;
-  keywordType: string;
-  dataType: string;
+  keywordType?: string;
+  dataType?: string;
 }
 
 export interface SearchUpstreamT extends SearchAppT {

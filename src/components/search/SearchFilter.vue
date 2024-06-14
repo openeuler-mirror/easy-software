@@ -119,7 +119,6 @@ const queryDocsAll = () => {
     keyword: searchInput.value,
     pageNum: 1,
     pageSize: 3,
-    dataType: '',
   };
   getSearchDataAll(params).then((res) => {
     try {
