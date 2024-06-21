@@ -5,6 +5,7 @@ import { getSearchAllFiled } from '@/api/api-domain';
 import type { AppT } from '@/@types/app';
 import HomeHeader from './HomeHeader.vue';
 import HomeNews from './HomeNews.vue';
+import HomeVersion from './HomeVersion.vue';
 import HomeSkeleton from '@/components/skeleton/HomeSkeleton.vue';
 import { solutionData, homeData } from '@/data/home/index';
 import { useLocale } from '@/composables/useLocale';
@@ -72,6 +73,7 @@ onMounted(() => {
             </OAnchorItem>
             <OAnchorItem href="#resource" title="获取资源" />
             <OAnchorItem href="#solution" title="解决方案" />
+            <OAnchorItem href="#version" title="openEuler社区版本" />
             <OAnchorItem href="#news" title="最新资讯" />
           </OAnchor>
         </div>
@@ -137,6 +139,10 @@ onMounted(() => {
             </div>
           </div>
 
+          <div id="version" class="domain-news">
+            <h2>openEuler社区版本</h2>
+            <HomeVersion />
+          </div>
           <div id="news" class="domain-news">
             <h2>最新资讯</h2>
             <HomeNews />

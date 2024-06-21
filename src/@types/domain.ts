@@ -1,6 +1,6 @@
 export interface SearchAppT {
-  pageNum: number;
-  pageSize: number;
+  pageNum?: number;
+  pageSize?: number;
   os?: string | string[];
   arch?: string | string[];
   category?: string | string[];

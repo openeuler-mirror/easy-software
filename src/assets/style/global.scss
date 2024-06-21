@@ -54,6 +54,12 @@ html {
   th {
     font-weight: 500;
   }
+  &.table-version {
+    --table-head-bg: var(--o-color-primary1);
+    th {
+      color: #fff;
+    }
+  }
 }
 .o-tab-nav-active {
   font-weight: 500;
