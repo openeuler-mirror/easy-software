@@ -6,7 +6,7 @@ export const columnTags = [
 ];
 
 // 容器镜像tab分类
-export const tagList = [{ lable: '概览' }, { lable: 'Tags' }];
+export const tagList = [{ lable: '概览', value: 'overview' }, { lable: 'Tags', value: 'tags' }];
 
 // RPM更多信息表头
 export const moreColumns = [

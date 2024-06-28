@@ -8,7 +8,7 @@ import bannerImg from '@/assets/banner/banner1.jpg';
 import OpenHPC from '@/data/solution/openhpc';
 import { GITHUB } from '@/data/config';
 
-import { checkDomainLink, windowOpen } from '@/utils/common';
+import { checkOriginLink, windowOpen } from '@/utils/common';
 
 const solutionInfo = {
   title: 'OpenHPC',
@@ -19,7 +19,7 @@ const showExternalDlg = ref(false);
 const externalLink = ref('');
 const jumpTo = (href: string) => {
   externalLink.value = href;
-  if (checkDomainLink(href)) {
+  if (checkOriginLink(href)) {
     windowOpen(href, '_blank');
   } else {
     showExternalDlg.value = true;

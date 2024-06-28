@@ -304,19 +304,21 @@ const repeatTags = (v: string) => {
                 </div>
                 <p class="sp">> 安装指引</p>
                 <div v-if="installation" v-dompurify-html="installation" v-copy-code="true" class="markdown-body installation"></div>
-                <p class="sp" v-if="item !== 'IMAGE'">> 更多信息</p>
-                <OTab variant="text" :line="false" class="domain-tabs" v-if="item !== 'IMAGE'" :class="moreMessge.length > 1 ? 'tabs-switch' : 'tabs-one'">
-                  <template v-for="it in moreMessge" :key="it">
-                    <OTabPane class="tab-pane" v-if="it.value.length > 0" :label="it.name">
-                      <AppTableToggle :columns="moreColumns" :data="it.value" />
-                    </OTabPane>
-                  </template>
-                </OTab>
+                <template v-if="item !== 'IMAGE'">
+                  <p class="sp">> 更多信息</p>
+                  <OTab variant="text" :line="false" class="domain-tabs" :class="moreMessge.length > 1 ? 'tabs-switch' : 'tabs-one'">
+                    <template v-for="it in moreMessge" :key="it">
+                      <OTabPane class="tab-pane" v-if="it.value.length > 0" :label="it.name">
+                        <AppTableToggle :columns="moreColumns" :data="it.value" />
+                      </OTabPane>
+                    </template>
+                  </OTab>
+                </template>
               </AppSection>
               <AppSection v-else>
                 <OTab variant="text" @change="onChangeImage" :line="false" class="domain-tabs tabs-switch" v-model="imgName">
-                  <OTabPane class="tab-pane" v-for="item in tagList" :key="item" :label="item.lable">
-                    <div v-if="item.lable === tagList[0].lable">
+                  <OTabPane class="tab-pane" v-for="item in tagList" :key="item.value" :label="item.lable">
+                    <div v-if="item.value === tagList[0].value">
                       <div class="title">
                         <p>> 基本信息</p>
                         <p v-if="version" class="ver">版本号：{{ version }}</p>

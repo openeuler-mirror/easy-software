@@ -7,7 +7,7 @@ import ExternalLink from '@/components/ExternalLink.vue';
 import bannerImg from '@/assets/banner/banner1.jpg';
 import OpenStack from '@/data/solution/openstack';
 import { GITEE, OPENEULER } from '@/data/config';
-import { checkDomainLink, windowOpen } from '@/utils/common';
+import { checkOriginLink, windowOpen } from '@/utils/common';
 
 const solutionInfo = {
   title: 'OpenStack',
@@ -33,7 +33,7 @@ const showExternalDlg = ref(false);
 const externalLink = ref('');
 const jumpTo = (href: string) => {
   externalLink.value = href;
-  if (checkDomainLink(href)) {
+  if (checkOriginLink(href)) {
     windowOpen(href, '_blank');
   } else {
     showExternalDlg.value = true;

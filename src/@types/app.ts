@@ -5,11 +5,14 @@ export interface AppItemT {
   name: string;
   tags: PkgTypeT[];
   pkgIds: PkgIdsT;
+  arch?: string;
+  os?: string;
 }
 export interface PkgIdsT {
-  EPKG: string;
-  IMAGE: string;
   RPM: string;
+  IMAGE: string;
+  EPKG: string;
+  OEPKG: string;
 }
 
 export interface AppT {
@@ -58,4 +61,4 @@ export interface MoreMessgeItemT {
   epoch: string;
 }
 
-export type PkgTypeT = 'RPM' | 'IMAGE' | 'EPKG';
+export type PkgTypeT = 'RPM' | 'IMAGE' | 'EPKG' | 'OEPKG';

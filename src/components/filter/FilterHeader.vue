@@ -92,10 +92,10 @@ watch(
 
 <template>
   <div class="filter-header">
-    <div class="search-right">
+    <div class="search-left">
       <template v-if="isPageSearch">
         <p class="text">
-          为您找到<span class="total">{{ total }}</span> 个与 <span>{{ searchValue }}</span> 匹配的搜索结果
+          为您找到<span class="total">{{ total }}</span> 个与 <span class="search-value">{{ searchValue }}</span> 匹配的搜索结果
         </p>
       </template>
       <OInput
@@ -114,7 +114,7 @@ watch(
         </template>
       </OInput>
     </div>
-    <div class="search-left">
+    <div class="search-right">
       <template v-if="isSort">
         <OLink @click="changeSortBy('timeOrder', 'time')" class="filter-sort time">
           {{ t('software.timeOrder') }}
@@ -146,16 +146,8 @@ svg.asc {
     color: var(--o-color-info1);
     font-weight: 600;
   }
-  .text {
-    @include tip1;
-    color: var(--o-color-info3);
-    .total {
-      color: var(--o-color-info1);
-      font-weight: 600;
-      margin: 0 4px;
-    }
-  }
-  .search-left {
+
+  .search-right {
     display: flex;
     align-items: center;
     :deep(.o-select) {
@@ -182,7 +174,26 @@ svg.asc {
       }
     }
   }
-  .search-right {
+  .search-left {
+    flex: 1;
+    .search-value {
+      max-width: 480px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: inline-block;
+    }
+    .text {
+      @include tip1;
+      color: var(--o-color-info3);
+      display: flex;
+      align-items: center;
+
+      .total {
+        color: var(--o-color-info1);
+        font-weight: 600;
+        margin: 0 4px;
+      }
+    }
     .o-input {
       --input-radius: 4px;
       transition: all 0.3s;

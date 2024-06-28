@@ -40,6 +40,13 @@ export const homeData = [
     icon: EpkgIcon,
     href: '/epkg',
   },
+  {
+    id: 'oepkg',
+    name: 'OEPKG',
+    desc: 'OEPKGS是openEUler第三方扩展软件包',
+    icon: EpkgIcon,
+    href: '/oepkg',
+  },
 ];
 
 // 首页 解决方案

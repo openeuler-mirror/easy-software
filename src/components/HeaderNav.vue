@@ -33,7 +33,7 @@ const selectedIndex = computed(() => {
     return idx;
   }
 
-  if (route.path.includes('/package')) {
+  if (route.path.includes('/rpm')) {
     idx = 2;
     return idx;
   }
@@ -47,8 +47,13 @@ const selectedIndex = computed(() => {
     idx = 4;
     return idx;
   }
-  if (route.path.includes('/upstream')) {
+  if (route.path.includes('/oepkg')) {
     idx = 5;
+    return idx;
+  }
+
+  if (route.path.includes('/upstream')) {
+    idx = 6;
     return idx;
   }
 

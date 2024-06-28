@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { ref, onMounted, watch } from 'vue';
-import { OSelect, OOption, OInput, OIcon, vLoading } from '@opensig/opendesign';
+import { OSelect, OOption, OInput, OIcon, vLoading, useMessage } from '@opensig/opendesign';
 import { useRouter, useRoute } from 'vue-router';
 import { getSearchDataAll } from '@/api/api-search';
 import type { RecommendItemT } from '@/@types/search';
@@ -23,7 +23,7 @@ defineProps({
     default: () => true,
   },
 });
-
+const msg = useMessage();
 const router = useRouter();
 const route = useRoute();
 const { locale } = useLocale();
@@ -44,6 +44,12 @@ const changeFilter = (v: string) => {
 const changeSearchInput = (v: string) => {
   if (v === '') {
     return;
+  }
+  if (v.length > 100) {
+    return msg.show({
+      content: '文字长度超过限制',
+      status: 'danger',
+    });
   }
   isLoading.value = true;
   isFocus.value = false;
@@ -137,8 +143,14 @@ const queryDocsAll = () => {
 };
 
 let timer: any;
-const trottleSearch = () => {
+const trottleSearch = (v: string) => {
   clearTimeout(timer);
+  if (v.length > 100) {
+    return msg.show({
+      content: '文字长度超过限制',
+      status: 'danger',
+    });
+  }
   timer = setTimeout(() => {
     queryDocsAll();
   }, 500);
@@ -175,6 +187,7 @@ onMounted(() => {
         round="0"
         clearable
         class="search-input"
+        :max-length="100"
         @press-enter="(v) => changeSearchInput(v)"
         @input="trottleSearch"
         @clear="clearInput"

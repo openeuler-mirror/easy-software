@@ -3,10 +3,10 @@ import i18n from '@/i18n';
 const { t } = i18n.global;
 
 // tags参数
-export const TAGS_OPTIONS = ['RPM', 'IMAGE', 'EPKG'];
+export const TAGS_OPTIONS = ['RPM', 'IMAGE', 'EPKG', 'OEPKG'];
 
 // 搜索tab参数
-export const TABNAME_OPTIONS = ['all', 'rpmpkg', 'apppkg', 'epkgpkg', 'appversion'];
+export const TABNAME_OPTIONS = ['all', 'rpmpkg', 'apppkg', 'epkgpkg', 'oepkg', 'appversion'];
 
 // 搜索筛选菜单
 export const FLITERMENUOPTIONS = [

@@ -5,25 +5,25 @@ import { OPENEULER_CONTACT } from '@/data/config';
 import { useRoute } from 'vue-router';
 import { useMarkdown } from '@/composables/useMarkdown';
 import type { AppInfoT, MaintainerT, DetailItemT, MoreMessgeT } from '@/@types/app';
+import { useI18n } from 'vue-i18n';
 import { getDetails, getVer } from '@/api/api-domain';
 import { moreColumns } from '@/data/detail/index';
 import { useViewStore } from '@/stores/common';
-import { useI18n } from 'vue-i18n';
-import { TABNAME_OPTIONS } from '@/data/query';
-
-import defaultImg from '@/assets/default-logo.png';
 import AppFeedback from '@/components/AppFeedback.vue';
 import DetailHead from '@/components/DetailHeader.vue';
-import DetailAside from '@/components/DetailAside.vue';
 import ExternalLink from '@/components/ExternalLink.vue';
+import DetailAside from '@/components/DetailAside.vue';
 
-const { t } = useI18n();
+import defaultImg from '@/assets/default-logo.png';
+
 const route = useRoute();
 const { mkit } = useMarkdown();
-const tabValue = ref(TABNAME_OPTIONS[1]);
+const { t } = useI18n();
+
 const basicInfo = ref<DetailItemT[]>([]);
 const version = ref();
 const installation = ref('');
+const tabValue = ref('oepkg');
 const downloadData = ref('');
 const maintainer = ref<MaintainerT>({ maintainerId: '', maintainerEmail: '', maintainerGiteeId: '' });
 const upStream = ref();
@@ -38,7 +38,6 @@ const appData = ref<AppInfoT>({
   source_code: '',
   bin_code: '',
 });
-
 //详情请求
 const queryPkg = () => {
   if (pkgId.value !== '') {
@@ -54,6 +53,7 @@ const queryPkg = () => {
     useViewStore().showNotFound();
   }
 };
+
 const pkgId = ref('');
 if (isString(route.query?.pkgId)) {
   pkgId.value = encodeURIComponent(route.query?.pkgId.toString());
@@ -62,20 +62,24 @@ if (isString(route.query?.pkgId)) {
 onMounted(() => {
   queryPkg();
 });
-
 const summary = ref();
 const license = ref();
 const tagVer = ref();
 const getDetailValue = (data: any) => {
-  basicInfo.value = [
-    { name: '详细描述', value: data?.description },
-    { name: '版本支持情况', value: data.osSupport },
-    { name: '架构', value: data.arch },
-    { name: '软件包分类', value: data.epkgCategory || '其他' },
-    { name: '所属仓库', value: JSON.parse(data?.repo).url, type: JSON.parse(data?.repo).type },
-    { name: 'Repo源', value: JSON.parse(data?.repoType).url, type: JSON.parse(data?.repoType).type },
-  ];
+  try {
+    basicInfo.value = [
+      { name: '详细描述', value: data?.description },
+      { name: '版本支持情况', value: data.osSupport },
+      { name: '架构', value: data.arch },
+      { name: '软件包分类', value: data.category || '其他' },
+      { name: '所属仓库', value: JSON.parse(data?.repo).url, type: JSON.parse(data?.repo).type },
+      { name: 'Repo源', value: JSON.parse(data?.repoType).url, type: JSON.parse(data?.repoType).type },
+    ];
+  } catch (res) {
+    basicInfo.value = [];
+  }
   summary.value = data.summary;
+
   const newData = [
     { name: 'Requires', value: JSON.parse(data?.requires || []) },
     { name: 'Provides', value: JSON.parse(data?.provides || []) },
@@ -107,9 +111,7 @@ const getDetailValue = (data: any) => {
   appData.value.bin_code = data.binDownloadUrl;
   appData.value.cover = data?.iconUrl || defaultImg;
   appData.value.repository = data.srcRepo;
-  if (data.name) {
-    queryVer();
-  }
+  queryVer();
 };
 
 const showExternalDlg = ref(false);
@@ -122,16 +124,19 @@ const onExternalDialog = (href: string) => {
 //获取支持
 const verData = ref();
 const queryVer = () => {
-  getVer(tabValue.value, encodeURIComponent(appData.value.name)).then((res) => {
-    verData.value = res.data.list;
-  });
+  if (appData.value.name) {
+    getVer(tabValue.value, encodeURIComponent(appData.value.name)).then((res) => {
+      verData.value = res.data.list;
+    });
+  }
 };
 </script>
 
 <template>
   <ContentWrapper vertical-padding="24px">
     <!-- 锚点 -->
-    <AppBreadcrumb id="rpm" :name="appData.name" />
+    <AppBreadcrumb id="oepkg" :name="appData.name" />
+
     <DetailHead :data="appData" :basicInfo="summary" :maintainer="maintainer" />
 
     <div class="detail-row">
@@ -151,6 +156,7 @@ const queryVer = () => {
             </div>
           </div>
           <p class="sp">> 安装指引</p>
+          <div v-if="downloadData" v-dompurify-html="downloadData" v-copy-code="true" class="markdown-body download"></div>
           <div v-if="installation" v-dompurify-html="installation" v-copy-code="true" class="markdown-body installation"></div>
           <p class="sp">> 更多信息</p>
           <OTab variant="text" :line="false" class="domain-tabs" :class="moreMessge.length > 1 ? 'tabs-switch' : 'tabs-one'">
@@ -162,10 +168,10 @@ const queryVer = () => {
           </OTab>
         </AppSection>
         <ExternalLink v-if="showExternalDlg" :href="externalLink" @change="showExternalDlg = false" />
-        <AppFeedback :name="appData.name" :version="version" type="RPM" />
+        <AppFeedback :name="appData.name" :version="version" type="OEPKG" />
       </div>
       <div class="detail-row-side">
-        <DetailAside :data="appData" :basicInfo="basicInfo" :maintainer="maintainer" :ver-data="verData" :license="license" :tagVer="tagVer" :type="'RPM'" />
+        <DetailAside :data="appData" :basicInfo="basicInfo" :maintainer="maintainer" :ver-data="verData" :license="license" :tagVer="tagVer" :type="'OEPKG'" />
       </div>
     </div>
   </ContentWrapper>
