@@ -1,0 +1,12 @@
+.o-table {
+  --table-head-bg: var(--o-color-control3-light);
+  th {
+    font-weight: 500;
+  }
+  &.table-version {
+    --table-head-bg: var(--o-color-primary1);
+    th {
+      color: #fff;
+    }
+  }
+}

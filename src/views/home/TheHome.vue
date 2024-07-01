@@ -156,10 +156,11 @@ onMounted(() => {
 <style lang="scss" scoped>
 .resource-content {
   background: var(--o-color-fill2);
-  padding: 48px;
+  padding: 42px;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 32px;
   .resource-panel {
     flex: 1;
   }

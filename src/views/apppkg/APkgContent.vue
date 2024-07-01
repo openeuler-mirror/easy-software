@@ -11,16 +11,12 @@ import { getParamsRules } from '@/utils/common';
 import { isValidSearchTabName, isValidSearchKey } from '@/utils/query';
 import { TABNAME_OPTIONS, FLITERMENUOPTIONS } from '@/data/query';
 
-import { ElPagination, ElConfigProvider } from 'element-plus';
-import zhCn from 'element-plus/es/locale/lang/zh-cn';
-import English from 'element-plus/es/locale/lang/en';
-
 import FilterCheckbox from '@/components/filter/FilterCheckbox.vue';
 import IconOs from '~icons/pkg/icon-os.svg';
 import IconArch from '~icons/pkg/icon-arch.svg';
 import IconCategory from '~icons/pkg/icon-category.svg';
 
-const { locale, isZh } = useLocale();
+const { locale } = useLocale();
 const route = useRoute();
 const router = useRouter();
 const { t } = useI18n();
@@ -113,22 +109,39 @@ const querySearch = () => {
 };
 
 // 获取筛选参数列表
-const filterOsList = ref('');
-const filterArchList = ref('');
+const filterOsList = ref<string[]>([]);
+const filterArchList = ref<string[]>([]);
 const filterCategoryList = ref<string[]>([]);
 const isFilterLoading = ref(false);
-
+const os = [
+  'openEuler-24.03-LTS',
+  'openEuler-23.09',
+  'openEuler-23.03',
+  'openEuler-22.09',
+  'openEuler-22.03-LTS-SP3',
+  'openEuler-22.03-LTS-SP2',
+  'openEuler-22.03-LTS-SP1',
+  'openEuler-22.03-LTS',
+  'openEuler-21.09',
+  'openEuler-21.03',
+  'openEuler-20.09',
+  'openEuler-20.03-LTS-SP4',
+  'openEuler-20.03-LTS-SP3',
+  'openEuler-20.03-LTS-SP2',
+  'openEuler-20.03-LTS-SP1',
+  'openEuler-20.03-LTS',
+];
+filterOsList.value = os;
 const queryFilter = () => {
-  filterOsList.value = '';
-  filterArchList.value = '';
+  filterArchList.value = [];
+  filterCategoryList.value = [];
   isFilterLoading.value = true;
   getSearchAllColumn({
     name: 'domain',
-    column: 'os,arch,category',
+    column: 'arch,category',
   })
     .then((res) => {
-      const { os, arch, category } = res.data;
-      filterOsList.value = os;
+      const { arch, category } = res.data;
       filterCategoryList.value = category;
       filterArchList.value = arch;
       isFilterLoading.value = false;
@@ -177,7 +190,6 @@ const changeTimeOrder = (v: string[]) => {
 const currentPage = ref(1);
 const pageSize = ref(12);
 const total = ref(0);
-const pageSizes = [12, 24, 48, 96];
 const handleSizeChange = (val: number) => {
   pageSize.value = val;
 };
@@ -344,18 +356,7 @@ watch(
           </ORow>
         </div>
         <div v-if="pkgData.length < total" class="pagination-box">
-          <el-config-provider :locale="isZh ? zhCn : English">
-            <el-pagination
-              v-model:current-page="currentPage"
-              v-model:page-size="pageSize"
-              background
-              layout="sizes, prev, pager, next, jumper"
-              :total="total"
-              :page-sizes="pageSizes"
-              @size-change="handleSizeChange"
-              @current-change="handleCurrentChange"
-            />
-          </el-config-provider>
+          <AppPagination :current="currentPage" :pagesize="pageSize" :total="total" @size-change="handleSizeChange" @current-change="handleCurrentChange" />
         </div>
       </template>
     </div>

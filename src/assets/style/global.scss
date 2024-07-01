@@ -12,61 +12,6 @@ html {
   --el-box-shadow-light: var(--o-shadow-2);
 }
 
-.o-btn {
-  --btn-radius: var(--btn-height);
-}
-.o-tag {
-  border-radius: var(--layout-pkg-radius);
-  &.o-tag-small {
-    --tag-padding: 0 4px;
-  }
-}
-.o-icon {
-  svg {
-    fill: currentColor;
-  }
-}
-.o-card {
-  --card-cover-radius: 0;
-  --card-radius: 0;
-  --card-shadow-hover: 0 2px 24px rgba(var(--o-kleinblue-10), 0.15);
-  --card-shadow-active: 0 2px 24px rgba(var(--o-kleinblue-10), 0.15);
-}
-
-.o-dialog {
-  --dlg-radius: var(--layout-pkg-radius);
-}
-
-// 分页器圆角重置
-.o-pagination-round-pill {
-  --pagination-radius: 4px;
-  .o-pagination-select {
-    --select-radius: 4px;
-  }
-  .o-pagination-input {
-    --input-radius: 4px;
-  }
-}
-.o-dropdown-list {
-  --dropdown-list-radius: 4px;
-}
-
-.o-table {
-  --table-head-bg: var(--o-color-control3-light);
-  th {
-    font-weight: 500;
-  }
-  &.table-version {
-    --table-head-bg: var(--o-color-primary1);
-    th {
-      color: #fff;
-    }
-  }
-}
-.o-tab-nav-active {
-  font-weight: 500;
-}
-
 // tag
 .tags-box {
   display: flex;
@@ -78,6 +23,7 @@ html {
   }
   .o-tag {
     cursor: pointer;
+    --tag-padding: 2px 4px;
     &.image-icon .o-icon {
       color: #007af0;
     }
@@ -96,41 +42,12 @@ html {
   }
 }
 
-.o-input-clear {
-  font-size: 20px;
-}
-.o-select-medium {
-  --select-icon-size: 20px;
-}
-
-// 屏蔽loading 遮罩
-.o-layer {
-  &.o-loading {
-    --layer-mask: transparent;
+.o-icon {
+  svg {
+    fill: currentColor;
   }
 }
 
-.o-anchor {
-  --anchor-indicator-height: 100%;
-  .o-anchor-item-link {
-    &:hover {
-      --anchor-item-link-bg-color-hover: none;
-    }
-    &.is-active {
-      --anchor-item-link-bg-color-active: none;
-    }
-  }
-}
-
-a.o-card:hover .o-card-title {
-  color: var(--o-color-primary1);
-}
-
-.o-message-list {
-  z-index: 1008;
-  --app-header-height: 64px;
-  --app-footer-height: 300px;
-
-  --message-list-top-offset: calc(var(--app-header-height) + 32px);
-  --message-list-bottom-offset: calc(var(--app-footer-height) + 32px);
+.o-tab-nav-active {
+  font-weight: 500;
 }

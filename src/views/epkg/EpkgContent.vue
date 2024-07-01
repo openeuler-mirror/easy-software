@@ -11,9 +11,6 @@ import { isValidSearchTabName, isValidSearchKey } from '@/utils/query';
 import { TABNAME_OPTIONS, FLITERMENUOPTIONS } from '@/data/query';
 import { useViewStore } from '@/stores/common';
 import { useLocale } from '@/composables/useLocale';
-import { ElPagination, ElConfigProvider } from 'element-plus';
-import zhCn from 'element-plus/es/locale/lang/zh-cn';
-import English from 'element-plus/es/locale/lang/en';
 
 import FilterCheckbox from '@/components/filter/FilterCheckbox.vue';
 import IconOs from '~icons/pkg/icon-os.svg';
@@ -209,7 +206,6 @@ const changeTimeOrder = (v: string[]) => {
 const currentPage = ref(1);
 const pageSize = ref(10);
 const total = ref(0);
-const pageSizes = [10, 24, 48, 96];
 const handleSizeChange = (val: number) => {
   pageSize.value = val;
 };
@@ -337,18 +333,7 @@ watch(
       <div class="pkg-panel" v-else>
         <OTableItemNew :data="pkgData" :columns="columns" :type="tabName" />
         <div v-if="pkgData.length < total" class="pagination-box">
-          <el-config-provider :locale="isZh ? zhCn : English">
-            <el-pagination
-              v-model:current-page="currentPage"
-              v-model:page-size="pageSize"
-              background
-              layout="sizes, prev, pager, next, jumper"
-              :total="total"
-              :page-sizes="pageSizes"
-              @size-change="handleSizeChange"
-              @current-change="handleCurrentChange"
-            />
-          </el-config-provider>
+          <AppPagination :current="currentPage" :pagesize="pageSize" :total="total" @size-change="handleSizeChange" @current-change="handleCurrentChange" />
         </div>
       </div>
     </div>

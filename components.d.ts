@@ -12,6 +12,7 @@ declare module 'vue' {
     AppFeedback: typeof import('./src/components/AppFeedback.vue')['default']
     AppFooter: typeof import('./src/components/AppFooter.vue')['default']
     AppHeader: typeof import('./src/components/AppHeader.vue')['default']
+    AppPagination: typeof import('./src/components/AppPagination.vue')['default']
     AppSection: typeof import('./src/components/AppSection.vue')['default']
     AppTableToggle: typeof import('./src/components/AppTableToggle.vue')['default']
     ContentWrapper: typeof import('./src/components/ContentWrapper.vue')['default']

@@ -19,3 +19,7 @@
 );
 
 @use 'element-plus/theme-chalk/src/index.scss' as *;
+@use './popper.scss' as *;
+@use './pagination.scss' as *;
+@use './input.scss' as *;
+@use './select.scss' as *;
