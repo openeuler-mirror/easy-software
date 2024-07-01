@@ -102,17 +102,6 @@ export const getParamsRules = (data: any) => {
   });
   return newData;
 };
-import type { ParamsKeyT } from '@/@types/detail';
-export const getDetailRules = (data: any) => {
-  const newData = {} as any;
-  Object.keys(data).forEach((key) => {
-    const value = data[key as keyof ParamsKeyT];
-    if (value) {
-      newData[key] = value;
-    }
-  });
-  return newData;
-};
 
 
 // 返回名称参数
@@ -121,12 +110,24 @@ export const getPkgName = (type: string) => {
   switch (type) {
     case 'apppkg':
       name = 'image';
+      break;
     case 'epkgpkg':
       name = 'epkg';
+      break;
     case 'rpmpkg':
       name = 'rpm';
+      break;
     case 'oepkg':
-      return 'oepkg';
+      name = 'oepkg';
+      break;
   }
   return name
 };
+
+
+// 是否是搜索页面
+import { useRoute } from 'vue-router';
+const route = useRoute();
+export const isSearchPage = () => {
+  return route.name === 'search'
+}

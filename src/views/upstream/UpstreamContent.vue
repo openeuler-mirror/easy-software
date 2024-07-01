@@ -8,9 +8,6 @@ import { getUpstreamColumn, getUpstream } from '@/api/api-upstream';
 import { getSearchData } from '@/api/api-search';
 import { useLocale } from '@/composables/useLocale';
 import { useViewStore } from '@/stores/common';
-import { ElPagination, ElConfigProvider } from 'element-plus';
-import zhCn from 'element-plus/es/locale/lang/zh-cn';
-import English from 'element-plus/es/locale/lang/en';
 
 import FilterRadio from '@/components/filter/FilterRadio.vue';
 import IconOs from '~icons/pkg/icon-os.svg';
@@ -141,7 +138,6 @@ const changeTimeOrder = (v: string[]) => {
 const currentPage = ref(1);
 const pageSize = ref(10);
 const total = ref(0);
-const pageSizes = [10, 24, 48, 96];
 const handleSizeChange = (val: number) => {
   pageSize.value = val;
   queryAppVersion();
@@ -240,18 +236,7 @@ watch(
           </template>
         </OTable>
         <div v-if="appData.length < total" class="pagination-box">
-          <el-config-provider :locale="isZh ? zhCn : English">
-            <el-pagination
-              v-model:current-page="currentPage"
-              v-model:page-size="pageSize"
-              background
-              layout="sizes, prev, pager, next, jumper"
-              :total="total"
-              :page-sizes="pageSizes"
-              @size-change="handleSizeChange"
-              @current-change="handleCurrentChange"
-            />
-          </el-config-provider>
+          <AppPagination :current="currentPage" :pagesize="pageSize" :total="total" @size-change="handleSizeChange" @current-change="handleCurrentChange" />
         </div>
       </div>
     </div>

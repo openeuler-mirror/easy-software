@@ -11,7 +11,7 @@ import { columnTags, tagList, moreColumns } from '@/data/detail/index';
 import { useI18n } from 'vue-i18n';
 import { useLocale } from '@/composables/useLocale';
 import { useViewStore } from '@/stores/common';
-import { getDetailRules } from '@/utils/common';
+import type { ParamsKeyT } from '@/@types/detail';
 
 import AppFeedback from '@/components/AppFeedback.vue';
 import DetailHead from '@/components/DetailHeader.vue';
@@ -49,6 +49,18 @@ const appData = ref<AppInfoT>({
   bin_code: '',
 });
 
+// 过滤空参数
+const filterEmptyParams = (data: any) => {
+  const newData = {} as any;
+  Object.keys(data).forEach((key) => {
+    const value = data[key as keyof ParamsKeyT];
+    if (value) {
+      newData[key] = value;
+    }
+  });
+  return newData;
+};
+
 // 获取tab分类
 const tabList = ref([] as PropType<PkgTypeT>);
 const pkgId = ref('');
@@ -61,7 +73,7 @@ const queryEntity = () => {
   const { type, appPkgId, epkgPkgId, rpmPkgId } = query;
 
   getDetail(
-    getDetailRules({
+    filterEmptyParams({
       appPkgId: (appPkgId as string) || '',
       epkgPkgId: (epkgPkgId as string) || '',
       rpmPkgId: (rpmPkgId as string) || '',

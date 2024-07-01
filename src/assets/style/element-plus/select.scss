@@ -1,0 +1,9 @@
+.el-select {
+  .el-input {
+    &.is-focus {
+      .el-input__wrapper {
+        box-shadow: none !important;
+      }
+    }
+  }
+}

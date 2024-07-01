@@ -1,0 +1,10 @@
+// 屏蔽loading 遮罩
+.o-layer {
+  &.o-loading {
+    --layer-mask: transparent;
+  }
+}
+
+.o-dialog {
+  --dlg-radius: var(--layout-pkg-radius);
+}

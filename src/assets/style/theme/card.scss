@@ -1,0 +1,10 @@
+.o-card {
+  --card-cover-radius: 0;
+  --card-radius: 0;
+  --card-shadow-hover: 0 2px 24px rgba(var(--o-kleinblue-10), 0.15);
+  --card-shadow-active: 0 2px 24px rgba(var(--o-kleinblue-10), 0.15);
+}
+
+a.o-card:hover .o-card-title {
+  color: var(--o-color-primary1);
+}
