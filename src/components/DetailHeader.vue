@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { ref } from 'vue';
 import { OLink, OIcon } from '@opensig/opendesign';
-import { checkDomainLink, windowOpen } from '@/utils/common';
+import { checkOriginLink, windowOpen } from '@/utils/common';
 import { scrollToTop } from '@/utils/common';
 import Email from '@/assets/email.svg';
 import Gitee from '@/assets/gitee.svg';
@@ -34,7 +34,7 @@ const showExternalDlg = ref(false);
 const externalLink = ref('');
 const onExternalDialog = (href: string) => {
   externalLink.value = href;
-  if (checkDomainLink(href)) {
+  if (checkOriginLink(href)) {
     windowOpen(href, '_blank');
   } else {
     showExternalDlg.value = true;

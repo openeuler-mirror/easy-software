@@ -21,7 +21,7 @@ export const navs = [
       zh: 'RPM',
       en: 'RPM',
     },
-    href: '/package',
+    href: '/rpm',
   },
   {
     id: 'apppkg',
@@ -39,7 +39,14 @@ export const navs = [
     },
     href: '/epkg',
   },
-
+  {
+    id: 'oepkg',
+    label: {
+      zh: 'OEPKG',
+      en: 'OEPKG',
+    },
+    href: '/oepkg',
+  },
   {
     id: 'upstream',
     label: {

@@ -160,8 +160,8 @@ const queryVer = () => {
       <div class="detail-row-main" :class="{ tags: isTags }">
         <AppSection>
           <OTab variant="text" @change="onChange" :line="false" class="domain-tabs tabs-switch" v-model="activeName">
-            <OTabPane class="tab-pane" v-for="item in tagList" :key="item" :label="item.lable">
-              <div v-if="item.lable === tagList[0].lable">
+            <OTabPane class="tab-pane" v-for="item in tagList" :key="item.value" :label="item.lable">
+              <div v-if="item.value === tagList[0].value">
                 <div class="title">
                   <p>> 基本信息</p>
                   <p v-if="version" class="ver">版本号：{{ version }}</p>

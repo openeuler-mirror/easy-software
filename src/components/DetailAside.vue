@@ -4,7 +4,7 @@ import OCodeCopy from '@/components/OCodeCopy.vue';
 import { ref, computed, watch, type PropType } from 'vue';
 import ExternalLink from '@/components/ExternalLink.vue';
 import { useClipboard } from '@/composables/useClipboard';
-import { getCode } from '@/utils/common';
+import { getCode, getPkgName } from '@/utils/common';
 import { verColumns } from '@/data/detail/index';
 import IconCopy from '~icons/app/icon-copy.svg';
 import { useLocale } from '@/composables/useLocale';
@@ -143,10 +143,14 @@ const copyText = (e: MouseEvent, val: any) => {
   });
 };
 
-const versionData = ref<EulerverT[]>([]);
+const versionData = ref<EulerverT[]>(props.verData || []);
 
+interface ColumnT {
+  key: string;
+  label: string;
+}
 //合并单元格
-const arraySpanMethod = (rowIndex: number, colIdx: number, row: any, column: any) => {
+const arraySpanMethod = (rowIndex: number, colIdx: number, row: EulerverT, column: ColumnT) => {
   const fields = ['os'];
   const cellValue = row[column.key];
   if (cellValue && fields.includes(column.key)) {
@@ -170,8 +174,7 @@ const arraySpanMethod = (rowIndex: number, colIdx: number, row: any, column: any
 const { locale } = useLocale();
 const jumpTo = (id: string) => {
   if (props.type) {
-    const detailType = props.type === 'IMAGE' ? 'image' : props.type === 'RPM' ? 'package' : 'epkg';
-    const newHref = `/${locale.value}/${detailType}/detail?pkgId=${encodeURIComponent(id)}`;
+    const newHref = `/${locale.value}/${getPkgName(props.type)}/detail?pkgId=${encodeURIComponent(id)}`;
     return newHref;
   }
 };
@@ -191,24 +194,10 @@ const showMore = () => {
   isToggle.value = !isToggle.value;
 };
 
-// 数据倒序、preview字段放最后
-const newVerData = () => {
-  let newData = [...props.verData].reverse();
-  let preview: EulerverT[] = [];
-  newData.forEach(function (item, index) {
-    if (item.os === 'openEuler-preview') {
-      preview = newData.splice(index, 1);
-      index--;
-    }
-  });
-
-  versionData.value = preview.length > 0 ? newData.concat(preview) : newData;
-};
-newVerData();
 watch(
   () => props.verData,
   () => {
-    newVerData();
+    versionData.value = props.verData;
   }
 );
 </script>
@@ -238,8 +227,8 @@ watch(
     <OTable :columns="verColumns" :data="tableAllData" border="all" :cell-span="arraySpanMethod" :small="true">
       <template #td_flags="{ row }">
         <a :href="jumpTo(row.pkgId)" color="primary" rel="noopener noreferrer">
-          <OTag v-if="row.os === tagVer[0] && row.arch === tagVer[1]" color="primary" :size="'small'">当前版本</OTag> <span v-else>查看</span></a
-        >
+          <OTag v-if="row.os === tagVer[0] && row.arch === tagVer[1]" color="primary" :size="'small'">当前版本</OTag> <span v-else>查看</span>
+        </a>
       </template>
     </OTable>
     <p v-if="tableAllData.length >= tableLen" @click="showMore" class="view-all">

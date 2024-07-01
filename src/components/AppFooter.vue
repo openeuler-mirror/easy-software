@@ -2,7 +2,7 @@
 import { computed, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useLocale } from '@/composables/useLocale';
-import { checkDomainLink, windowOpen } from '@/utils/common';
+import { checkOriginLink, windowOpen } from '@/utils/common';
 import {
   OSCHINA,
   CSDN_BLOG,
@@ -122,10 +122,6 @@ const linksData2 = {
       URL: OPENEULER + '/zh/other/brand/',
     },
     {
-      NAME: '隐私政策',
-      URL: OPENEULER + '/zh/other/privacy/',
-    },
-    {
       NAME: '法律声明',
       URL: OPENEULER + '/zh/other/legal/',
     },
@@ -134,10 +130,6 @@ const linksData2 = {
     {
       NAME: 'Trademark',
       URL: OPENEULER + '/en/other/brand/',
-    },
-    {
-      NAME: 'Privacy Policy',
-      URL: OPENEULER + '/en/other/privacy/',
     },
     {
       NAME: 'Legal Notice',
@@ -182,7 +174,7 @@ const showExternalDlg = ref(false);
 const externalLink = ref('');
 const onExternalDialog = (href: string) => {
   externalLink.value = href;
-  if (checkDomainLink(href)) {
+  if (checkOriginLink(href)) {
     windowOpen(href, '_blank');
   } else {
     showExternalDlg.value = true;

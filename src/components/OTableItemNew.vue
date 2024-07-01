@@ -3,7 +3,7 @@ import type { PropType } from 'vue';
 import { ref } from 'vue';
 import { OTable, OLink, ODialog, OIcon } from '@opensig/opendesign';
 import { useLocale } from '@/composables/useLocale';
-import { formatDateTime, checkDomainLink, windowOpen, xssAllTag } from '@/utils/common';
+import { formatDateTime, checkOriginLink, windowOpen, xssAllTag, getPkgName } from '@/utils/common';
 import { useI18n } from 'vue-i18n';
 
 import OCodeCopy from '@/components/OCodeCopy.vue';
@@ -39,7 +39,7 @@ const props = defineProps({
 const { t } = useI18n();
 const { locale } = useLocale();
 const jumpTo = (id: string) => {
-  const detailType = props.type === 'apppkg' ? 'image' : props.type === 'rpmpkg' ? 'package' : 'epkg';
+  const detailType = getPkgName(props.type);
   const newHref = `/${locale.value}/${detailType}/detail?pkgId=${encodeURIComponent(id)}`;
   return newHref;
 };
@@ -56,7 +56,7 @@ const showExternalDlg = ref(false);
 const externalLink = ref('');
 const onExternalDialog = (href: string) => {
   externalLink.value = href;
-  if (checkDomainLink(href)) {
+  if (checkOriginLink(href)) {
     windowOpen(href, '_blank');
   } else {
     showExternalDlg.value = true;

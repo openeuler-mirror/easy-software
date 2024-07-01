@@ -4,7 +4,7 @@ import { OLink, OIcon } from '@opensig/opendesign';
 import type { RecommendItemT } from '@/@types/search';
 import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
-import { getTagsIcon, xssAllTag } from '@/utils/common';
+import { getTagsIcon, xssAllTag, getPkgName } from '@/utils/common';
 import { GITEE } from '@/data/config';
 import ExternalLink from '@/components/ExternalLink.vue';
 
@@ -37,17 +37,6 @@ const router = useRouter();
 const { locale } = useLocale();
 const isShow = ref(props.isFeedback);
 
-const getPkgName = (type: string) => {
-  switch (type) {
-    case 'apppkg':
-      return 'image';
-    case 'epkgpkg':
-      return 'epkg';
-    case 'rpmpkg':
-      return 'package';
-  }
-};
-
 const jumpPages = (type: string) => {
   router.push({
     path: `/${locale.value}/${getPkgName(type)}`,
@@ -56,20 +45,9 @@ const jumpPages = (type: string) => {
 };
 
 const goDetail = (key: string, id: string) => {
-  let type = '',
-    pathName = '';
-  if (key === 'apppkg') {
-    type = 'IMAGE';
-    pathName = 'image';
-  } else if (key === 'epkgpkg') {
-    type = 'EPKG';
-    pathName = 'epkg';
-  } else if (key === 'rpmpkg') {
-    type = 'RPM';
-    pathName = 'package';
-  }
+  const type = getPkgName(key).toLocaleUpperCase();
   router.push({
-    path: `/${locale.value}/${pathName}/detail`,
+    path: `/${locale.value}/${getPkgName(key)}/detail`,
     query: { type: type, pkgId: id },
   });
 };
@@ -266,6 +244,8 @@ const searchOptions = computed(() => {
     color: var(--o-color-info1);
     padding: 3px 12px;
     cursor: pointer;
+    overflow: hidden;
+    text-overflow: ellipsis;
     &:hover {
       background: var(--o-color-control4-light);
     }

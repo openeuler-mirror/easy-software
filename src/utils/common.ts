@@ -58,6 +58,8 @@ export const getTagsIcon = (v: string) => {
     return EpkgIcon;
   } else if (v === 'IMAGE' || v === 'apppkg') {
     return ImageIcon;
+  } else if (v === 'OEPKG' || v === 'oepkg') {
+    return ImageIcon;
   }
 };
 
@@ -74,7 +76,7 @@ export const getCode = (code: string) => {
 };
 
 // 检查是否是同域名
-export const checkDomainLink = (path: string) => {
+export const checkOriginLink = (path: string) => {
   return path.includes('openeuler.org');
 };
 
@@ -110,4 +112,21 @@ export const getDetailRules = (data: any) => {
     }
   });
   return newData;
+};
+
+
+// 返回名称参数
+export const getPkgName = (type: string) => {
+  let name = '';
+  switch (type) {
+    case 'apppkg':
+      name = 'image';
+    case 'epkgpkg':
+      name = 'epkg';
+    case 'rpmpkg':
+      name = 'rpm';
+    case 'oepkg':
+      return 'oepkg';
+  }
+  return name
 };

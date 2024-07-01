@@ -8,7 +8,7 @@ const routes = [
     path: '/',
     redirect: '/zh/',
   },
-  { path: '/zh/', component: () => import('@/views/home/TheHome.vue') },
+  { path: '/zh/', name: 'home', component: () => import('@/views/home/TheHome.vue') },
   { path: '/en/', redirect: '/zh/' },
   {
     path: '/zh/apppkg',
@@ -23,9 +23,9 @@ const routes = [
     component: () => import('@/views/apppkg/TheAppPkgDetail.vue'),
   },
   {
-    path: '/zh/package',
-    name: 'package',
-    alias: '/en/package',
+    path: '/zh/rpm',
+    name: 'rpm',
+    alias: '/en/rpm',
     component: () => import('@/views/package/TheRpm.vue'),
   },
   {
@@ -59,9 +59,21 @@ const routes = [
     component: () => import('@/views/epkg/TheEpkgDetail.vue'),
   },
   {
-    path: '/zh/package/detail',
-    name: 'package-detail',
-    alias: '/en/package/detail',
+    path: '/zh/oepkg',
+    name: 'oepkg',
+    alias: '/en/oepkg',
+    component: () => import('@/views/oepkg/TheOEpkg.vue'),
+  },
+  {
+    path: '/zh/oepkg/detail',
+    name: 'oepkg-detail',
+    alias: '/en/oepkg/detail',
+    component: () => import('@/views/oepkg/TheOEpkgDetail.vue'),
+  },
+  {
+    path: '/zh/rpm/detail',
+    name: 'rpm-detail',
+    alias: '/en/rpm/detail',
     component: () => import('@/views/package/TheRpmDetail.vue'),
   },
   {
