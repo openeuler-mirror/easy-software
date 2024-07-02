@@ -19,6 +19,8 @@ declare module 'vue' {
     DetailAside: typeof import('./src/components/DetailAside.vue')['default']
     DetailHeader: typeof import('./src/components/DetailHeader.vue')['default']
     DetailSkeleton: typeof import('./src/components/skeleton/DetailSkeleton.vue')['default']
+    ElTable: typeof import('element-plus/es')['ElTable']
+    ElTableColumn: typeof import('element-plus/es')['ElTableColumn']
     ExternalLink: typeof import('./src/components/ExternalLink.vue')['default']
     FilterCheckbox: typeof import('./src/components/filter/FilterCheckbox.vue')['default']
     FilterHeader: typeof import('./src/components/filter/FilterHeader.vue')['default']

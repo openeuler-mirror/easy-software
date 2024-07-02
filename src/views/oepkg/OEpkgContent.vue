@@ -144,42 +144,47 @@ const pageSearch = () => {
 
 // ----------- 左侧菜单交互-------------
 // 获取筛选参数列表
+const oepkgColumn = {
+  os: [
+    'openEuler-24.03-LTS',
+    'openEuler-22.03-LTS-SP4',
+    'openEuler-22.03-LTS-SP3',
+    'openEuler-22.03-LTS-SP2',
+    'openEuler-22.03-LTS-SP1',
+    'openEuler-22.03-LTS',
+    'openEuler-20.03-LTS-SP4',
+    'openEuler-20.03-LTS-SP3',
+    'openEuler-20.03-LTS-SP2',
+    'openEuler-20.03-LTS-SP1',
+    'openEuler-20.03-LTS',
+  ],
+  arch: ['aarch64', 'noarch', 'x86_64', 's390x', 'i686'],
+  category: ['其他'],
+};
 
-const os = [
-  'openEuler-24.03-LTS',
-  'openEuler-22.03-LTS-SP4',
-  'openEuler-22.03-LTS-SP3',
-  'openEuler-22.03-LTS-SP2',
-  'openEuler-22.03-LTS-SP1',
-  'openEuler-22.03-LTS',
-  'openEuler-20.03-LTS-SP4',
-  'openEuler-20.03-LTS-SP3',
-  'openEuler-20.03-LTS-SP2',
-  'openEuler-20.03-LTS-SP1',
-  'openEuler-20.03-LTS',
-];
 const filterOsList = ref<string[]>([]);
 const filterArchList = ref<string[]>([]);
 const filterCategoryList = ref<string[]>([]);
 const isFilterLoading = ref(false);
-filterOsList.value = os;
+
 const queryFilter = () => {
-  filterCategoryList.value = [];
-  filterArchList.value = [];
-  isFilterLoading.value = true;
-  getSearchAllColumn({
-    name: tabName.value,
-    column: 'arch,category',
-  })
-    .then((res) => {
-      const { arch, category } = res.data;
-      filterCategoryList.value = category;
-      filterArchList.value = arch;
-      isFilterLoading.value = false;
-    })
-    .catch(() => {
-      isFilterLoading.value = false;
-    });
+  filterCategoryList.value = oepkgColumn.category;
+  filterArchList.value = oepkgColumn.arch;
+  filterOsList.value = oepkgColumn.os;
+  // isFilterLoading.value = true;
+  // getSearchAllColumn({
+  //   name: tabName.value,
+  //   column: 'arch,category',
+  // })
+  //   .then((res) => {
+  //     const { arch, category } = res.data;
+  //     filterCategoryList.value = category;
+  //     filterArchList.value = arch;
+  //     isFilterLoading.value = false;
+  //   })
+  //   .catch(() => {
+  //     isFilterLoading.value = false;
+  //   });
 };
 
 const closeTag = (idx: string | number, type: string) => {
