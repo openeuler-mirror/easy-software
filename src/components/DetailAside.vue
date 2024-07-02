@@ -174,7 +174,7 @@ const arraySpanMethod = (rowIndex: number, colIdx: number, row: EulerverT, colum
 const { locale } = useLocale();
 const jumpTo = (id: string) => {
   if (props.type) {
-    const newHref = `/${locale.value}/${getPkgName(props.type)}/detail?pkgId=${encodeURIComponent(id)}`;
+    const newHref = `/${locale.value}/${props.type.toLocaleLowerCase()}/detail?pkgId=${encodeURIComponent(id)}`;
     return newHref;
   }
 };
