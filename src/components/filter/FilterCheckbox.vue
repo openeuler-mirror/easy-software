@@ -52,7 +52,7 @@ const showMoreItem = () => {
         </OCheckbox>
       </template>
     </OCheckboxGroup>
-    <p v-if="options.length >= showLen" @click="showMoreItem" class="view-all">
+    <p v-if="options.length >= showLen && options.length !== DEFAULT_NUM" @click="showMoreItem" class="view-all">
       <OLink color="primary" :class="isAll ? 'up' : 'down'" size="small">
         {{ isAll ? t('software.upList') : t('software.viewAll') }}
         <template #suffix>

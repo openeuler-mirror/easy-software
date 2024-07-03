@@ -4,6 +4,7 @@ export default {
   rpmpkg: 'Package',
   apppkg: 'Image',
   epkgpkg: 'EPKG',
+  oepkg: 'OEPKG',
   appversion: 'Upstream',
   filterAll: 'All',
   filterName: 'name',

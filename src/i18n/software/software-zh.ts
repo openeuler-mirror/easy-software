@@ -4,6 +4,7 @@ export default {
   rpmpkg: 'RPM',
   apppkg: '容器镜像',
   epkgpkg: 'EPKG',
+  oepkg: 'OEPKG',
   appversion: '上游兼容应用全景',
   filterAll: '全部',
   filterName: '按名称',
@@ -29,7 +30,7 @@ export default {
   columns: {
     name: '软件包名称',
     version: '软件包版本号',
-    os: 'OpenEuler版本',
+    os: 'openEuler版本',
     arch: '架构',
     category: '领域',
     timeorder: '更新时间',
