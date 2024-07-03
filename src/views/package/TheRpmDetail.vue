@@ -10,7 +10,7 @@ import { moreColumns } from '@/data/detail/index';
 import { useViewStore } from '@/stores/common';
 import { useI18n } from 'vue-i18n';
 import { TABNAME_OPTIONS } from '@/data/query';
-
+import OCodeDown from '@/components/OCodeDown.vue';
 import defaultImg from '@/assets/default-logo.png';
 import AppFeedback from '@/components/AppFeedback.vue';
 import DetailHead from '@/components/DetailHeader.vue';
@@ -68,12 +68,13 @@ const license = ref();
 const tagVer = ref();
 const getDetailValue = (data: any) => {
   basicInfo.value = [
-    { name: '详细描述', value: data?.description },
-    { name: '版本支持情况', value: data.osSupport },
-    { name: '架构', value: data.arch },
-    { name: '软件包分类', value: data.epkgCategory || '其他' },
-    { name: '所属仓库', value: JSON.parse(data?.repo).url, type: JSON.parse(data?.repo).type },
-    { name: 'Repo源', value: JSON.parse(data?.repoType).url, type: JSON.parse(data?.repoType).type },
+    { name: t('detail.description'), value: data?.description },
+    // { name: t('detail.osSupport'), value: data.osSupport },
+    // { name: t('detail.arch'), value: data.arch },
+    { name: t('detail.number'), value: data?.version },
+    { name: t('detail.epkgCategory'), value: data.epkgCategory || '其他' },
+    { name: t('detail.repo'), value: JSON.parse(data?.repo).url, type: JSON.parse(data?.repo).type },
+    { name: t('detail.repoType'), value: JSON.parse(data?.repoType).url, type: JSON.parse(data?.repoType).type },
   ];
   summary.value = data.summary;
   const newData = [
@@ -138,21 +139,24 @@ const queryVer = () => {
       <div class="detail-row-main">
         <AppSection>
           <div class="title">
-            <p>> 基本信息</p>
-            <p v-if="version" class="ver">版本号：{{ version }}</p>
+            <p>> {{ t('detail.information') }}</p>
+            <!-- <p v-if="version" class="ver">{{ t('detail.number') }}：{{ version }}</p> -->
+            <!-- <OCodeDown :verData="verData" :tagVer="tagVer" :type="'RPM'"></OCodeDown> -->
           </div>
           <div class="basic-info">
             <div v-for="item in basicInfo" :key="item.name" class="basic-info-item">
               <span class="label markdown download">{{ item.name }}</span>
               <div v-if="item.name === t('detail.warehouse') || item.name === t('detail.source')" class="markdown-body installation mymarkdown-body">
                 <OLink @click="onExternalDialog(item.value)" color="primary" class="" target="_blank" rel="noopener noreferrer">{{ item.type }}</OLink>
+              </div> 
+              <div v-copy-code="true" class="markdown-body installation mymarkdown-body" v-else>
+                <span :class="item.name === t('detail.number') ? 'ver' : ''">{{ item.value }}</span>
               </div>
-              <div v-dompurify-html="item.value" v-copy-code="true" class="markdown-body installation mymarkdown-body" v-else></div>
             </div>
           </div>
-          <p class="sp">> 安装指引</p>
+          <p class="sp">> {{ t('detail.installation') }}</p>
           <div v-if="installation" v-dompurify-html="installation" v-copy-code="true" class="markdown-body installation"></div>
-          <p class="sp">> 更多信息</p>
+          <p class="sp">> {{ t('detail.more') }}</p>
           <OTab variant="text" :line="false" class="domain-tabs" :class="moreMessge.length > 1 ? 'tabs-switch' : 'tabs-one'">
             <template v-for="item in moreMessge" :key="item">
               <OTabPane class="tab-pane" v-if="item.value.length > 0" :label="item.name">

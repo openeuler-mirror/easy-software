@@ -86,9 +86,10 @@ const getDetailValue = (data: ImageDetailT) => {
   } = data;
 
   basicInfo.value = [
-    { name: '架构', value: arch },
-    { name: '软件包分类', value: category },
-    { name: '版本支持情况', value: osSupport },
+    // { name: '架构', value: arch },
+    { name: t('detail.number'), value: appVer },
+    { name: t('detail.epkgCategory'), value: category },
+    // { name: '版本支持情况', value: osSupport },
   ];
 
   maintainer.value = {
@@ -163,20 +164,20 @@ const queryVer = () => {
             <OTabPane class="tab-pane" v-for="item in tagList" :key="item.value" :label="item.lable">
               <div v-if="item.value === tagList[0].value">
                 <div class="title">
-                  <p>> 基本信息</p>
-                  <p v-if="version" class="ver">版本号：{{ version }}</p>
+                  <p>> {{ t('detail.information') }}</p>
+                  <!-- <p v-if="version" class="ver">版本号：{{ version }}</p> -->
                 </div>
                 <div class="basic-info">
                   <div v-for="item in basicInfo" :key="item.name" class="basic-info-item">
                     <span class="label markdown download">{{ item.name }}</span>
 
                     <div class="markdown-body mymarkdown-body">
-                      {{ item.value }}
-                      <OTag v-if="item.name === t('detail.support') && latestSupportOs" color="primary" size="small" class="tag-new">最新版本</OTag>
+                      <span :class="item.name === t('detail.number') ? 'ver' : ''">{{ item.value }}</span>
+                      <!-- <OTag v-if="item.name === t('detail.support') && latestSupportOs" color="primary" size="small" class="tag-new">最新版本</OTag> -->
                     </div>
                   </div>
                 </div>
-                <p class="sp">> 使用方式</p>
+                <p class="sp">> {{ t('detail.usage') }}</p>
                 <div v-if="imageUsage" v-dompurify-html="imageUsage" v-copy-code="true" class="markdown-body download"></div>
               </div>
               <div v-else>

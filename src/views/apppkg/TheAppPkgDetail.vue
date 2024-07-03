@@ -292,16 +292,17 @@ const repeatTags = (v: string) => {
     <DetailSkeleton v-if="isLoading" />
     <template v-else>
       <AppBreadcrumb id="apppkg" :name="appData.name" />
-      <DetailHead :data="appData" :basicInfo="summary" :maintainer="maintainer" />
+      <!-- <DetailHead :data="appData" :basicInfo="summary" :maintainer="maintainer" /> -->
       <OTab variant="text" @change="onChange" :line="false" class="domain-tabs" :class="tabList.length > 1 ? 'max' : 'min'" v-model="activeName" size="large">
+        <template #suffix><DetailHead :data="appData" :basicInfo="summary" :maintainer="maintainer" /></template>
         <OTabPane class="tab-pane" v-for="item in tabList" :key="item" :label="item">
           <template #nav><OIcon :icon="getTabIcon(item)" class="tabs-icon" /> {{ repeatTags(item) }}</template>
           <div class="detail-row">
             <div class="detail-row-main" :class="{ tags: isTags }">
               <AppSection v-if="item !== 'IMAGE'">
                 <div class="title">
-                  <p>> 基本信息</p>
-                  <p v-if="item === 'RPM' || version" class="ver">版本号：{{ version }}</p>
+                  <p>> {{ t('detail.information') }}</p>
+                  <p v-if="item === 'RPM' || version" class="ver">{{t('detail.number')}}：{{ version }}</p>
                 </div>
                 <div class="basic-info">
                   <div v-for="item in basicInfo" :key="item.name" class="basic-info-item">
@@ -314,10 +315,10 @@ const repeatTags = (v: string) => {
                     <div v-dompurify-html="item.value" v-copy-code="true" class="markdown-body installation mymarkdown-body" v-else></div>
                   </div>
                 </div>
-                <p class="sp">> 安装指引</p>
+                <p class="sp">> {{ t('detail.installation') }}</p>
                 <div v-if="installation" v-dompurify-html="installation" v-copy-code="true" class="markdown-body installation"></div>
                 <template v-if="item !== 'IMAGE'">
-                  <p class="sp">> 更多信息</p>
+                  <p class="sp">> {{ t('detail.more') }}</p>
                   <OTab variant="text" :line="false" class="domain-tabs" :class="moreMessge.length > 1 ? 'tabs-switch' : 'tabs-one'">
                     <template v-for="it in moreMessge" :key="it">
                       <OTabPane class="tab-pane" v-if="it.value.length > 0" :label="it.name">
@@ -332,19 +333,19 @@ const repeatTags = (v: string) => {
                   <OTabPane class="tab-pane" v-for="item in tagList" :key="item.value" :label="item.lable">
                     <div v-if="item.value === tagList[0].value">
                       <div class="title">
-                        <p>> 基本信息</p>
-                        <p v-if="version" class="ver">版本号：{{ version }}</p>
+                        <p>> {{ t('detail.information') }}</p>
+                        <p v-if="version" class="ver">{{t('detail.number')}}：{{ version }}</p>
                       </div>
                       <div class="basic-info">
                         <p v-for="item in basicInfo" :key="item.name">
                           <span class="label markdown download">{{ item.name }}</span>
                           <span class="markdown-body mymarkdown-body">
                             {{ item.value }}
-                            <OTag v-if="item.name === t('detail.support') && latestOsSupport" color="primary" size="small"> 最新版本</OTag>
+                            <OTag v-if="item.name === t('detail.support') && latestOsSupport" color="primary" size="small"> {{t('detail.latest')}}</OTag>
                           </span>
                         </p>
                       </div>
-                      <p class="sp">> 使用方式</p>
+                      <p class="sp">> {{ t('detail.usage') }}</p>
                       <div v-if="imageUsage" v-dompurify-html="imageUsage" v-copy-code="true" class="markdown-body download"></div>
                     </div>
                     <div v-else>

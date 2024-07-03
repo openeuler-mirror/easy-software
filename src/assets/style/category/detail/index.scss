@@ -40,6 +40,7 @@
 }
 
 :deep(.domain-tabs) {
+  padding-top: 26px;
   &.min {
     > .o-tab-head {
       .o-tab-nav-anchor {
@@ -52,6 +53,9 @@
         padding: 0;
       }
     }
+  }
+  .o-tab-head{
+    display: block !important;
   }
   .o-tab-navs {
     --tab-nav-justify: left;
@@ -202,9 +206,25 @@
 .ver {
   background: #f2f4fa;
   @include text2;
-  border: 1px solid rgba(0, 47, 167, 0.2);
+  border: none;
   border-radius: var(--layout-pkg-radius);
   color: var(--o-color-primary1);
   padding: 6px 24px;
   font-weight: 500;
 }
+
+.drop{
+  display: flex;
+  :deep(.o-select) {
+    width: 70%;
+    height: 100%;
+    border-radius: 8px;
+    padding: 9px 16px;
+    color: var(--o-color-info1);
+    &:nth-child(2){
+      margin-left: 20px;
+      width: 30%;
+    }   
+  }
+}
+
