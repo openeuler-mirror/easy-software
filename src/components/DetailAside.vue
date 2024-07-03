@@ -318,9 +318,13 @@ watch(
   }
 }
 
-.obtn{
+.obtn {
   border-radius: 4px;
-  background: rgba(0, 47, 167, 0.05);
-  border:none
+  background: rgba(var(--o-kleinblue-6), 0.05);
+  border: none;
+  --btn-color: var(--o-color-info1);
+  &:hover {
+    background: var(--o-color-primary4-light);
+  }
 }
 </style>

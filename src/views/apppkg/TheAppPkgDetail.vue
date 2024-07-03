@@ -156,6 +156,7 @@ const getDetailValue = (data: any) => {
   if (typePkg.value === 'RPM') {
     basicInfo.value = [
       { name: '详细描述', value: data?.description },
+      { name: '版本号', value: data.version },
       { name: '版本支持情况', value: data.osSupport },
       { name: '架构', value: data.arch },
       { name: '软件包分类', value: data.rpmCategory || '其他' },
@@ -181,6 +182,7 @@ const getDetailValue = (data: any) => {
   } else if (typePkg.value === 'EPKG') {
     basicInfo.value = [
       { name: '详细描述', value: data?.description },
+      { name: '版本号', value: data.version },
       { name: '版本支持情况', value: data.osSupport },
       { name: '架构', value: data.arch },
       { name: '软件包分类', value: data.epkgCategory || '其他' },
@@ -206,6 +208,7 @@ const getDetailValue = (data: any) => {
     version.value = data?.version;
   } else if (typePkg.value === 'IMAGE') {
     basicInfo.value = [
+      { name: '版本号', value: data.version },
       { name: '架构', value: data.arch || '' },
       { name: '软件包分类', value: data.category || '' },
       { name: '版本支持情况', value: data.osSupport || '' },
@@ -302,7 +305,6 @@ const repeatTags = (v: string) => {
               <AppSection v-if="item !== 'IMAGE'">
                 <div class="title">
                   <p>> {{ t('detail.information') }}</p>
-                  <p v-if="item === 'RPM' || version" class="ver">{{t('detail.number')}}：{{ version }}</p>
                 </div>
                 <div class="basic-info">
                   <div v-for="item in basicInfo" :key="item.name" class="basic-info-item">
@@ -311,6 +313,9 @@ const repeatTags = (v: string) => {
                       <OLink @click="onExternalDialog(item.value)" color="primary" class="tag-new" target="_blank" rel="noopener noreferrer">{{
                         item.type
                       }}</OLink>
+                    </div>
+                    <div v-else-if="item.name === t('detail.pkgVersion')" class="mymarkdown-body">
+                      <span v-if="typePkg === 'RPM' || version" class="ver">{{ version }}</span>
                     </div>
                     <div v-dompurify-html="item.value" v-copy-code="true" class="markdown-body installation mymarkdown-body" v-else></div>
                   </div>
@@ -334,16 +339,18 @@ const repeatTags = (v: string) => {
                     <div v-if="item.value === tagList[0].value">
                       <div class="title">
                         <p>> {{ t('detail.information') }}</p>
-                        <p v-if="version" class="ver">{{t('detail.number')}}：{{ version }}</p>
                       </div>
                       <div class="basic-info">
-                        <p v-for="item in basicInfo" :key="item.name">
+                        <div v-for="item in basicInfo" :key="item.name" class="basic-info-item">
                           <span class="label markdown download">{{ item.name }}</span>
-                          <span class="markdown-body mymarkdown-body">
+                          <div v-if="item.name === t('detail.pkgVersion')" class="mymarkdown-body">
+                            <span v-if="typePkg === 'RPM' || version" class="ver">{{ version }}</span>
+                          </div>
+                          <div class="markdown-body mymarkdown-body" v-else>
                             {{ item.value }}
-                            <OTag v-if="item.name === t('detail.support') && latestOsSupport" color="primary" size="small"> {{t('detail.latest')}}</OTag>
-                          </span>
-                        </p>
+                            <OTag v-if="item.name === t('detail.support') && latestOsSupport" color="primary" size="small"> {{ t('detail.latest') }}</OTag>
+                          </div>
+                        </div>
                       </div>
                       <p class="sp">> {{ t('detail.usage') }}</p>
                       <div v-if="imageUsage" v-dompurify-html="imageUsage" v-copy-code="true" class="markdown-body download"></div>

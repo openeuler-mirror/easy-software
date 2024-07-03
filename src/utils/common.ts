@@ -50,6 +50,7 @@ export const scrollToTop = (top: number = 0, smooth: boolean = true) => {
 import EpkgIcon from '~icons/pkg/epkg.svg';
 import ImageIcon from '~icons/pkg/image.svg';
 import RpmIcon from '~icons/pkg/rpm.svg';
+import OepkgIcon from '~icons/pkg/oepkg.svg';
 
 export const getTagsIcon = (v: string) => {
   if (v === 'RPM' || v === 'rpmpkg') {
@@ -59,7 +60,7 @@ export const getTagsIcon = (v: string) => {
   } else if (v === 'IMAGE' || v === 'apppkg') {
     return ImageIcon;
   } else if (v === 'OEPKG' || v === 'oepkg') {
-    return ImageIcon;
+    return OepkgIcon;
   }
 };
 

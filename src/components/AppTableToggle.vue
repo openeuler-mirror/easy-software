@@ -1,10 +1,10 @@
 <script lang="ts" setup>
 import { ref, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { OTable, OLink, OIcon } from '@opensig/opendesign';
+import { OTable, OLink, OIcon, OPopover } from '@opensig/opendesign';
 
 import IconChevronDown from '~icons/app/icon-chevron-down.svg';
-import IconHelp from '~icons/app/icon-help1.svg';
+import IconHelp from '~icons/app/icon-help.svg';
 const props = defineProps({
   data: {
     type: Object,
@@ -43,11 +43,16 @@ const showMore = () => {
     <template #th_flags>
       <span class="flags">
         Flags
-        <a title="aaa"
-          ><OIcon style="margin-left: 8px"><IconHelp /></OIcon
-        ></a>
-      </span> </template
-  ></OTable>
+
+        <OPopover position="top" trigger="hover" style="width: 168px">
+          <template #target>
+            <OIcon ref="flagsRef" class="flags-icon"><IconHelp /></OIcon>
+          </template>
+          <div class="box">EQ表示相等，表示两个版本或者状态是相同的</div>
+        </OPopover>
+      </span>
+    </template>
+  </OTable>
   <p v-if="tableAllData.length >= tableLen" @click="showMore" class="view-all">
     <OLink color="primary" :class="isToggle ? 'up' : 'down'" size="small">
       {{ isToggle ? t('software.upList') : t('software.viewAll') }}
@@ -76,5 +81,15 @@ const showMore = () => {
 .flags {
   display: flex;
   align-items: center;
+  gap: 8px;
+  .flags-icon {
+    font-size: 16px;
+    cursor: pointer;
+    color: var(--o-color-info1);
+    svg {
+      width: 16px;
+      height: 16px;
+    }
+  }
 }
 </style>

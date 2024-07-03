@@ -121,7 +121,7 @@ const onExternalDialog = () => {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: rgba(0, 47, 167, 0.05);
+    background: rgba(var(--o-kleinblue-6), 0.05);
     border-radius: 4px;
     transition: all var(--o-duration-s) var(--o-easing-standard);
     .o-icon {
@@ -134,7 +134,7 @@ const onExternalDialog = () => {
       }
     }
     &:hover {
-      background: #e3eaf6;
+      background: var(--o-color-primary4-light);
     }
   }
 }

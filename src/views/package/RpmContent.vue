@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { ref, watch, computed, onMounted } from 'vue';
-import { OTag, vLoading, OLink, OIcon, isUndefined } from '@opensig/opendesign';
+import { OTag, OLink, OIcon, isUndefined } from '@opensig/opendesign';
 import { useI18n } from 'vue-i18n';
 import { getSearchData } from '@/api/api-search';
 import { useRoute } from 'vue-router';
@@ -11,6 +11,7 @@ import { getParamsRules } from '@/utils/common';
 import { useViewStore } from '@/stores/common';
 
 import FilterCheckbox from '@/components/filter/FilterCheckbox.vue';
+import AppLoading from '@/components/AppLoading.vue';
 import IconOs from '~icons/pkg/icon-os.svg';
 import IconArch from '~icons/pkg/icon-arch.svg';
 import IconCategory from '~icons/pkg/icon-category.svg';
@@ -61,8 +62,6 @@ const isSearchError = ref(false);
 const isSearchDocs = ref(false);
 // es搜索
 const querySearch = () => {
-  isLoading.value = true;
-
   // 过滤空参数
   const newData = getParamsRules(searchParams.value);
   getSearchData(newData)
@@ -95,7 +94,6 @@ const queryAllpkg = () => {
     nameOrder: nameOrder.value,
     category: searchCategory.value.join(),
   };
-  isLoading.value = true;
 
   // 过滤空参数
   const newData = getParamsRules(params);
@@ -125,6 +123,7 @@ const queryAllpkg = () => {
 const pageSearch = () => {
   isSearchError.value = false;
   if (tabName.value === TABNAME_OPTIONS[1]) {
+    isLoading.value = true;
     if (searchKey.value === '') {
       queryAllpkg();
     } else {
@@ -299,7 +298,7 @@ watch(
 </script>
 
 <template>
-  <div v-loading.nomask="isLoading" class="pkg-wrap" :class="tabName">
+  <div class="pkg-wrap" :class="tabName">
     <div class="filter-sidebar">
       <div v-loading.nomask="isFilterLoading">
         <FilterCheckbox v-if="filterOsList.length" v-model="searchOs" :options="filterOsList">
@@ -328,7 +327,7 @@ watch(
       </div>
     </div>
 
-    <div class="pkg-content">
+    <div class="pkg-main">
       <FilterHeader title="RPM" @sort="changeTimeOrder" :total="total" @clear="clearFilter" />
       <div v-if="isSearchDocs || searchArch.length > 0 || searchOs.length > 0 || searchCategory.length > 0" class="search-result">
         <p v-if="!isPageSearch" class="text">
@@ -354,12 +353,15 @@ watch(
           >
         </div>
       </div>
-      <ResultNotApp v-if="pkgData.length === 0 && isSearchError" type="RPM" />
-      <div class="pkg-panel" v-else>
-        <OTableItemNew :data="pkgData" :columns="columns" :type="tabName" />
+      <div class="pkg-content">
+        <AppLoading :loading="isLoading" />
+        <ResultNotApp v-if="isSearchError" type="RPM" />
+        <div v-if="pkgData.length !== 0 && !isSearchError" class="pkg-panel">
+          <OTableItemNew :data="pkgData" :columns="columns" :type="tabName" />
 
-        <div v-if="pkgData.length < total" class="pagination-box">
-          <AppPagination :current="currentPage" :pagesize="pageSize" :total="total" @size-change="handleSizeChange" @current-change="handleCurrentChange" />
+          <div v-if="pkgData.length < total" class="pagination-box">
+            <AppPagination :current="currentPage" :pagesize="pageSize" :total="total" @size-change="handleSizeChange" @current-change="handleCurrentChange" />
+          </div>
         </div>
       </div>
     </div>
