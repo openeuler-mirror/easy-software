@@ -186,6 +186,11 @@ const changeTimeOrder = (v: string[]) => {
   currentPage.value = 1;
 };
 
+// 清除排序
+const clearFilter = () => {
+  nameOrder.value = '';
+};
+
 // 分页
 const currentPage = ref(1);
 const pageSize = ref(12);
@@ -319,7 +324,14 @@ watch(
     </div>
 
     <div class="pkg-content">
-      <FilterHeader v-if="pkgData.length > 0 || isSearchError" :title="t('software.all')" @sort="changeTimeOrder" :isSort="false" :total="total" />
+      <FilterHeader
+        v-if="pkgData.length > 0 || isSearchError"
+        :title="t('software.all')"
+        @sort="changeTimeOrder"
+        :isSort="false"
+        :total="total"
+        @clear="clearFilter"
+      />
 
       <div v-if="isSearchDocs || searchOs || searchArch || searchCategory.length > 0" class="search-result">
         <p v-if="!isPageSearch" class="text">

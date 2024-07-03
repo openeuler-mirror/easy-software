@@ -28,8 +28,8 @@ export default {
   // 表格
   columns: {
     name: '软件包名称',
-    version: '版本号',
-    os: '系统版本',
+    version: '软件包版本号',
+    os: 'OpenEuler版本',
     arch: '架构',
     category: '领域',
     timeorder: '更新时间',

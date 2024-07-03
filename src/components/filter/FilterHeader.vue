@@ -53,31 +53,58 @@ const replaceWinUrl = () => {
 };
 const emits = defineEmits<{
   (e: 'sort', value: string[]): void;
+  (e: 'clear'): void;
 }>();
 
 const isTimeOrder = ref(false);
 const isNameOrder = ref(false);
+
 const changeSortBy = (type: string, name: string) => {
   let v: SorT = '';
+  clearSvgFill();
+
   const path = document.querySelector(`.filter-sort.${name} svg`);
   // 重置svg颜色
   path?.children[0].setAttribute('fill', '#bdbdbd');
   path?.children[1].setAttribute('fill', '#bdbdbd');
 
   if (type === 'timeOrder') {
+    isNameOrder.value = false;
+    activeIndex.value = 0;
     isTimeOrder.value = !isTimeOrder.value;
     v = isTimeOrder.value ? 'asc' : 'desc';
-    path?.children[isTimeOrder.value ? 0 : 1].setAttribute('fill', '#000');
+    path?.children[isTimeOrder.value ? 1 : 0].setAttribute('fill', '#000');
   } else if (type === 'nameOrder') {
+    isTimeOrder.value = false;
+    activeIndex.value = 1;
     isNameOrder.value = !isNameOrder.value;
     v = isNameOrder.value ? 'asc' : 'desc';
-    path?.children[isNameOrder.value ? 0 : 1].setAttribute('fill', '#000');
+    path?.children[isNameOrder.value ? 1 : 0].setAttribute('fill', '#000');
   }
   emits('sort', [type, v]);
 };
 
-const isPageSearch = ref(false);
+// 重置svg颜色
+const clearSvgFill = () => {
+  const path = document.querySelectorAll(`.filter-sort svg`);
+  path.forEach((item) => {
+    item?.children[0].setAttribute('fill', '#bdbdbd');
+    item?.children[1].setAttribute('fill', '#bdbdbd');
+  });
+};
 
+// 清除筛选数据
+// activeIndex -1清除全部 0最新排序、1首字母排序
+const activeIndex = ref(-1);
+const clearAll = () => {
+  isTimeOrder.value = false;
+  isNameOrder.value = false;
+  activeIndex.value = -1;
+  clearSvgFill();
+  emits('clear');
+};
+
+const isPageSearch = ref(false);
 onMounted(() => {
   isPageSearch.value = route.name === 'search';
 });
@@ -115,13 +142,16 @@ watch(
       </OInput>
     </div>
     <div class="search-right">
+      <OLink @click="clearAll()" class="filter-sort" :class="{ active: activeIndex === -1 }">
+        {{ t('software.sortTitle') }}
+      </OLink>
       <template v-if="isSort">
-        <OLink @click="changeSortBy('timeOrder', 'time')" class="filter-sort time">
+        <OLink @click="changeSortBy('timeOrder', 'time')" class="filter-sort time" :class="{ active: activeIndex === 0 }">
           {{ t('software.timeOrder') }}
           <template #suffix><IconTimeOrder /></template>
         </OLink>
       </template>
-      <OLink @click="changeSortBy('nameOrder', 'name')" class="filter-sort name">
+      <OLink @click="changeSortBy('nameOrder', 'name')" class="filter-sort name" :class="{ active: activeIndex === 1 }">
         {{ t('software.nameOrder') }}
         <template #suffix><IconTimeOrder /></template>
       </OLink>
@@ -172,6 +202,10 @@ svg.asc {
       svg path:first-child {
         color: var(--o-color-primary1);
       }
+    }
+    &.active {
+      color: var(--o-color-info1);
+      font-weight: 600;
     }
   }
   .search-left {

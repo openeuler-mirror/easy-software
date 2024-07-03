@@ -191,6 +191,10 @@ const changeTimeOrder = (v: string[]) => {
     nameOrder.value = v[1];
   }
 };
+// 清除排序
+const clearFilter = () => {
+  nameOrder.value = '';
+};
 
 // 分页
 const currentPage = ref(1);
@@ -297,7 +301,7 @@ watch(
     </div>
 
     <div class="pkg-content">
-      <FilterHeader title="容器镜像" :isSort="false" @sort="changeTimeOrder" :total="total" />
+      <FilterHeader title="容器镜像" :isSort="false" @sort="changeTimeOrder" :total="total" @clear="clearFilter" />
       <div v-if="isSearchDocs || filterList.length > 0" class="search-result">
         <p v-if="!isPageSearch" class="text">
           <template v-if="isSearchDocs">

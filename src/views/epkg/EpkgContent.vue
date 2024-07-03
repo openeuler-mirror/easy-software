@@ -192,14 +192,20 @@ const resetTag = () => {
 
 // 更新时间排序
 const changeTimeOrder = (v: string[]) => {
+  nameOrder.value = '';
+  timeOrder.value = '';
   if (v[0] === 'timeOrder') {
     timeOrder.value = v[1];
-    nameOrder.value = '';
   } else if (v[0] === 'nameOrder') {
     nameOrder.value = v[1];
-    timeOrder.value = '';
   }
   currentPage.value = 1;
+};
+
+// 清除排序
+const clearFilter = () => {
+  nameOrder.value = '';
+  timeOrder.value = '';
 };
 
 // 分页
@@ -307,7 +313,7 @@ watch(
     </div>
 
     <div class="pkg-content">
-      <FilterHeader title="EPKG" @sort="changeTimeOrder" :total="total" />
+      <FilterHeader title="EPKG" @sort="changeTimeOrder" :total="total" @clear="clearFilter" />
       <div v-if="isSearchDocs || searchArch.length > 0 || searchOs.length > 0 || searchCategory.length > 0" class="search-result">
         <p v-if="!isPageSearch" class="text">
           <template v-if="isSearchDocs">
