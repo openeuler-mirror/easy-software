@@ -1,0 +1,21 @@
+@use '../mixin/font.scss' as *;
+#app .el-table {
+  --el-table-header-bg-color: var(--o-color-control3-light);
+  border-radius: 4px;
+  @include text1;
+  .el-table__cell {
+    padding: 12px 0;
+    .cell {
+      padding: 0 16px;
+    }
+  }
+  thead {
+    color: var(--o-color-info2);
+    th {
+      font-weight: 500;
+    }
+  }
+  td {
+    color: var(--o-color-info2);
+  }
+}

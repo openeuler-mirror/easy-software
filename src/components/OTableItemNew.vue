@@ -244,6 +244,10 @@ const onExternalDialog = (href: string) => {
   .epkgSize {
     width: 120px;
   }
+  .rpmSize,
+  .epkgSize {
+    text-align: right;
+  }
   .operation {
     width: 155px;
   }

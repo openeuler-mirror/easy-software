@@ -2,7 +2,10 @@
   display: flex;
   justify-content: space-between;
   position: relative;
-
+  --pkg-side-width: 300px;
+  :deep(.o-loading-main) {
+    margin-left: var(--pkg-side-width);
+  }
   .pkg-content {
     flex: 1;
     min-height: 680px;
@@ -16,7 +19,7 @@
   .filter-sidebar {
     padding-right: 8px;
     position: relative;
-    width: 300px;
+    width: var(--pkg-side-width);
     .filter-text {
       @include text1;
       color: var(--o-color-info3);
@@ -97,6 +100,7 @@
         .arch,
         .category {
           width: 120px;
+          text-align: right;
         }
         .os {
           width: 230px;

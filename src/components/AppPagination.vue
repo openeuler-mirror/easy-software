@@ -1,5 +1,7 @@
 <script lang="ts" setup>
+import { ref, onMounted } from 'vue';
 import { useLocale } from '@/composables/useLocale';
+import { useRoute } from 'vue-router';
 import { ElPagination, ElConfigProvider } from 'element-plus';
 import zhCn from 'element-plus/es/locale/lang/zh-cn';
 import English from 'element-plus/es/locale/lang/en';
@@ -18,7 +20,10 @@ defineProps({
     default: 0,
   },
 });
-const pageSizes = [12, 24, 48, 96];
+const route = useRoute();
+
+const pageSizesField = [12, 24, 48, 96];
+const pageSizes = [10, 20, 40, 90];
 const emit = defineEmits(['size-change', 'current-change']);
 const { isZh } = useLocale();
 
@@ -28,6 +33,12 @@ const handleSizeChange = (val: number) => {
 const handleCurrentChange = (val: number) => {
   emit('current-change', val);
 };
+
+const isFieldPage = ref(false);
+
+onMounted(() => {
+  isFieldPage.value = route.name === 'apppkg';
+});
 </script>
 
 <template>
@@ -38,7 +49,7 @@ const handleCurrentChange = (val: number) => {
       background
       layout="sizes, prev, pager, next, jumper"
       :total="total"
-      :page-sizes="pageSizes"
+      :page-sizes="isFieldPage ? pageSizesField : pageSizes"
       @size-change="handleSizeChange"
       @current-change="handleCurrentChange"
     />

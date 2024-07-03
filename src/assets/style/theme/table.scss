@@ -2,6 +2,7 @@
   --table-head-bg: var(--o-color-control3-light);
   th {
     font-weight: 500;
+    border-right: 0;
   }
   &.table-version {
     --table-head-bg: var(--o-color-primary1);
