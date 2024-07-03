@@ -103,7 +103,6 @@ export const getParamsRules = (data: any) => {
   return newData;
 };
 
-
 // 返回名称参数
 export const getPkgName = (type: string) => {
   let name = '';
@@ -121,13 +120,24 @@ export const getPkgName = (type: string) => {
       name = 'oepkg';
       break;
   }
-  return name
+  return name;
 };
-
 
 // 是否是搜索页面
 import { useRoute } from 'vue-router';
 const route = useRoute();
 export const isSearchPage = () => {
-  return route.name === 'search'
-}
+  return route.name === 'search';
+};
+
+// 去重
+
+export const getTarget = (data: any, key: any) => {
+  const map = new Map();
+  for (const item of data) {
+    if (!map.has(item[key])) {
+      map.set(item[key], item);
+    }
+  }
+  return [...map.values()];
+};

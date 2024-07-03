@@ -210,7 +210,7 @@ watch(
     <OCodeCopy :code="getCode(downloadData)" v-if="type === 'IMAGE' && downloadData" />
     <div v-if="type !== 'IMAGE' && show">
       <div v-for="item in tableData" :key="item.name" class="bt">
-        <OButton variant="solid" color="primary" size="large" @click="onExternalDialog(item.download)">{{ item.name }}</OButton>
+        <OButton variant="solid" class="obtn" size="large" @click="onExternalDialog(item.download)">{{ item.name }}</OButton>
         <p @click="copyText($event, item.download)" class="copy-icon">
           <OIcon><IconCopy /></OIcon>
         </p>
@@ -316,5 +316,11 @@ watch(
   th {
     font-weight: 500;
   }
+}
+
+.obtn{
+  border-radius: 4px;
+  background: rgba(0, 47, 167, 0.05);
+  border:none
 }
 </style>

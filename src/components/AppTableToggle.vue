@@ -4,7 +4,7 @@ import { useI18n } from 'vue-i18n';
 import { OTable, OLink, OIcon } from '@opensig/opendesign';
 
 import IconChevronDown from '~icons/app/icon-chevron-down.svg';
-
+import IconHelp from '~icons/app/icon-help1.svg';
 const props = defineProps({
   data: {
     type: Object,
@@ -39,7 +39,15 @@ const showMore = () => {
 </script>
 
 <template>
-  <OTable :columns="columns" :data="tableAllData" border="all" :small="true" :class="tableAllData.length > 10 ? 'max' : 'min'" />
+  <OTable :columns="columns" :data="tableAllData" border="all" :small="true" :class="tableAllData.length > 10 ? 'max' : 'min'">
+    <template #th_flags>
+      <span class="flags">
+        Flags
+        <a title="aaa"
+          ><OIcon style="margin-left: 8px"><IconHelp /></OIcon
+        ></a>
+      </span> </template
+  ></OTable>
   <p v-if="tableAllData.length >= tableLen" @click="showMore" class="view-all">
     <OLink color="primary" :class="isToggle ? 'up' : 'down'" size="small">
       {{ isToggle ? t('software.upList') : t('software.viewAll') }}
@@ -64,5 +72,9 @@ const showMore = () => {
   .up svg {
     transform: rotate(180deg);
   }
+}
+.flags {
+  display: flex;
+  align-items: center;
 }
 </style>
