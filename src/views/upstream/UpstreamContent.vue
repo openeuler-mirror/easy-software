@@ -133,6 +133,10 @@ const changeTimeOrder = (v: string[]) => {
     nameOrder.value = v[1];
   }
 };
+// 清除排序
+const clearFilter = () => {
+  nameOrder.value = '';
+};
 
 // 分页
 const currentPage = ref(1);
@@ -208,7 +212,7 @@ watch(
       </template>
     </div>
     <div class="pkg-content">
-      <FilterHeader title="应用名称" :isSort="false" @sort="changeTimeOrder" :total="total" />
+      <FilterHeader title="应用名称" :isSort="false" @sort="changeTimeOrder" :total="total" @clear="clearFilter" />
       <div v-if="searchOs || isSearch" class="search-result">
         <p v-if="!isPageSearch" class="text">
           为您找到符合条件的筛选<span class="total">{{ total }}</span
