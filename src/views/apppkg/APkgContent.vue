@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, watch, computed, onMounted } from 'vue';
-import { ORow, OCol, OTag, vLoading, OLink, OIcon, isUndefined, isString } from '@opensig/opendesign';
+import { ORow, OCol, OTag, OLink, OIcon, isUndefined, isString } from '@opensig/opendesign';
 import { getSearchData } from '@/api/api-search';
 import { getSearchAllColumn, getSearchAllFiled } from '@/api/api-domain';
 import { useRoute, useRouter } from 'vue-router';
@@ -12,6 +12,7 @@ import { isValidSearchTabName, isValidSearchKey } from '@/utils/query';
 import { TABNAME_OPTIONS, FLITERMENUOPTIONS } from '@/data/query';
 
 import FilterCheckbox from '@/components/filter/FilterCheckbox.vue';
+import AppLoading from '@/components/AppLoading.vue';
 import IconOs from '~icons/pkg/icon-os.svg';
 import IconArch from '~icons/pkg/icon-arch.svg';
 import IconCategory from '~icons/pkg/icon-category.svg';
@@ -59,7 +60,6 @@ const queryAllpkg = () => {
     category: searchCategory.value.join(),
     nameOrder: nameOrder.value,
   };
-  isLoading.value = true;
   // 过滤空参数
   const newData = getParamsRules(params);
 
@@ -86,7 +86,6 @@ const queryAllpkg = () => {
 
 // es搜索
 const querySearch = () => {
-  isLoading.value = true;
   // 过滤空参数
   const newData = getParamsRules(searchParams.value);
   getSearchData(newData)
@@ -205,6 +204,7 @@ const handleCurrentChange = (val: number) => {
 const pageSearch = () => {
   isSearchError.value = false;
   if (tabName.value === 'all') {
+    isLoading.value = true;
     if (searchKey.value === '') {
       queryAllpkg();
     } else {
@@ -293,7 +293,7 @@ watch(
 </script>
 
 <template>
-  <div v-loading.nomask="isLoading" class="pkg-wrap" :class="tabName">
+  <div class="pkg-wrap" :class="tabName">
     <div class="filter-sidebar">
       <template v-if="isFilterLoading"><FilterItemSkeleton v-for="tag in 3" :key="tag" /></template>
       <template v-else>
@@ -323,7 +323,7 @@ watch(
       </template>
     </div>
 
-    <div class="pkg-content">
+    <div class="pkg-main">
       <FilterHeader
         v-if="pkgData.length > 0 || isSearchError"
         :title="t('software.all')"
@@ -351,9 +351,10 @@ watch(
           <OLink color="primary" class="resetting" @click="onResetTag">{{ t('software.filterSider.clear') }}</OLink>
         </div>
       </div>
-      <ResultNotApp v-if="isSearchError" type="领域应用" />
-      <template v-else>
-        <div class="pkg-panel">
+      <div class="pkg-content">
+        <AppLoading :loading="isLoading" />
+        <ResultNotApp v-if="isSearchError" type="领域应用" />
+        <div v-if="pkgData.length !== 0 && !isSearchError" class="pkg-panel">
           <ORow gap="32px" flex-wrap="wrap">
             <template v-if="pkgData.length > 0">
               <OCol v-for="(subItem, index) in pkgData" :key="index" flex="0 1 33.33%" :laptop="{ flex: '0 1 33.33%' }">
@@ -366,11 +367,12 @@ watch(
               </OCol>
             </template>
           </ORow>
+
+          <div v-if="pkgData.length < total" class="pagination-box">
+            <AppPagination :current="currentPage" :pagesize="pageSize" :total="total" @size-change="handleSizeChange" @current-change="handleCurrentChange" />
+          </div>
         </div>
-        <div v-if="pkgData.length < total" class="pagination-box">
-          <AppPagination :current="currentPage" :pagesize="pageSize" :total="total" @size-change="handleSizeChange" @current-change="handleCurrentChange" />
-        </div>
-      </template>
+      </div>
     </div>
   </div>
 </template>

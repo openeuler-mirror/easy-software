@@ -10,6 +10,7 @@ import { TABNAME_OPTIONS, FLITERMENUOPTIONS } from '@/data/query';
 import SearchTab from '@/components/search/SearchTab.vue';
 import AppPkgContent from '@/views/apppkg/APkgContent.vue';
 import EpkgContent from '@/views/epkg/EpkgContent.vue';
+import OepkgContent from '@/views/oepkg/OEpkgContent.vue';
 import ImageContent from '@/views/image/ImageContent.vue';
 import RpmContent from '@/views/package/RpmContent.vue';
 import UpstreamContent from '@/views/upstream/UpstreamContent.vue';
@@ -23,7 +24,7 @@ const menuData = ref<MenuCountT[]>([]);
 const searchKey = ref('');
 const keywordType = ref('');
 
-// 搜索类型结果数量
+// -------------------- 搜索类型结果数量 ---------------------
 const querySearchCount = () => {
   const searchParams = {
     keyword: searchKey.value,
@@ -35,6 +36,8 @@ const querySearchCount = () => {
     }
   });
 };
+
+// -------------------- 监听 url query 变化 触发搜索 ---------------------
 const handleQueryData = () => {
   const query = route.query;
   const { name, tab, key } = query;
@@ -84,8 +87,10 @@ watch(
       <ImageContent v-if="tabName === DATATYPE[2]" />
       <!-- EPKG -->
       <EpkgContent v-if="tabName === DATATYPE[3]" />
+      <!-- OEPKG -->
+      <OepkgContent v-if="tabName === DATATYPE[4]" />
       <!-- 上游兼容应用全景 -->
-      <UpstreamContent v-if="tabName === DATATYPE[4]" />
+      <UpstreamContent v-if="tabName === DATATYPE[5]" />
     </div>
   </ContentWrapper>
 </template>

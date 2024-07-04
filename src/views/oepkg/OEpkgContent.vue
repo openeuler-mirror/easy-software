@@ -1,25 +1,24 @@
 <script setup lang="ts">
 import { ref, watch, computed, onMounted } from 'vue';
-import { OTag, OLink, OIcon, isUndefined, vLoading } from '@opensig/opendesign';
+import { OTag, OLink, OIcon, isUndefined } from '@opensig/opendesign';
 
 import { getSearchData } from '@/api/api-search';
-import { getSearchAllColumn, getSearchAllFiled } from '@/api/api-domain';
+import { getSearchAllFiled } from '@/api/api-domain';
 import { useRoute } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { getParamsRules } from '@/utils/common';
 import { isValidSearchTabName, isValidSearchKey } from '@/utils/query';
 import { TABNAME_OPTIONS, FLITERMENUOPTIONS } from '@/data/query';
 import { useViewStore } from '@/stores/common';
-import { useLocale } from '@/composables/useLocale';
 
 import FilterCheckbox from '@/components/filter/FilterCheckbox.vue';
+import AppLoading from '@/components/AppLoading.vue';
 import IconOs from '~icons/pkg/icon-os.svg';
 import IconArch from '~icons/pkg/icon-arch.svg';
 import IconCategory from '~icons/pkg/icon-category.svg';
 
 const route = useRoute();
 const { t } = useI18n();
-const { isZh } = useLocale();
 
 // EPKG-表头
 const columns = [
@@ -39,7 +38,7 @@ const pkgData = ref([]);
 
 const tabName = ref(TABNAME_OPTIONS[4]);
 const keywordType = ref((route.query.key as string) || '');
-const isLoading = ref(false);
+const isLoading = ref(true);
 
 const searchKey = ref((route.query.name as string) || '');
 const timeOrder = ref('');
@@ -66,26 +65,23 @@ const searchParams = computed(() => {
 
 // es搜索
 const querySearch = () => {
-  isLoading.value = true;
   // 过滤空参数
   const newData = getParamsRules(searchParams.value);
-
   getSearchData(newData)
     .then((res) => {
       if (res.code === 200) {
         pkgData.value = res.data.oepkg;
         total.value = res.data.total;
       }
-      isLoading.value = false;
       isSearchDocs.value = true;
       if (pkgData.value.length === 0) {
         isSearchError.value = true;
       }
+      isLoading.value = false;
     })
     .catch(() => {
       total.value = 0;
       pkgData.value = [];
-      isLoading.value = false;
       isSearchDocs.value = false;
       useViewStore().showNotFound();
     });
@@ -93,6 +89,7 @@ const querySearch = () => {
 
 // sql搜索
 const isSearchError = ref(false);
+// 是否为搜索
 const isSearchDocs = ref(false);
 const queryAllpkg = () => {
   const params = {
@@ -105,18 +102,18 @@ const queryAllpkg = () => {
     arch: searchArch.value.join(),
     category: searchCategory.value.join(),
   };
-  isLoading.value = true;
   // 过滤空参数
   const newData = getParamsRules(params);
-  console.log(newData);
+
   getSearchAllFiled(newData)
     .then((res) => {
       pkgData.value = res.data.list;
       total.value = res.data.total;
-      isLoading.value = false;
+
       if (pkgData.value.length === 0) {
         isSearchError.value = true;
       }
+      isLoading.value = false;
     })
     .catch((err) => {
       if (err.response.data.code === 404) {
@@ -126,14 +123,15 @@ const queryAllpkg = () => {
       }
       total.value = 0;
       pkgData.value = [];
-      isLoading.value = false;
     });
 };
 
 // 判断是走es还是sql
 const pageSearch = () => {
   isSearchError.value = false;
+
   if (tabName.value === TABNAME_OPTIONS[4]) {
+    isLoading.value = true;
     if (searchKey.value === '') {
       queryAllpkg();
     } else {
@@ -197,14 +195,17 @@ const closeTag = (idx: string | number, type: string) => {
   }
 };
 
+const filterLength = computed(() => {
+  return [...searchOs.value, ...searchArch.value, ...searchCategory.value].length;
+});
+
 // 重置筛选结果
 const resetTag = () => {
   searchOs.value = [];
   searchArch.value = [];
   searchCategory.value = [];
   isSearchDocs.value = false;
-  nameOrder.value = '';
-  timeOrder.value = '';
+  clearFilter();
   currentPage.value = 1;
 };
 
@@ -300,7 +301,7 @@ watch(
 </script>
 
 <template>
-  <div v-loading.nomask="isLoading" class="pkg-wrap" :class="tabName">
+  <div class="pkg-wrap" :class="tabName">
     <div class="filter-sidebar" flex="0 0 25%">
       <template v-if="isFilterLoading"><FilterItemSkeleton v-for="tag in 3" :key="tag" /></template>
       <template v-else>
@@ -329,14 +330,14 @@ watch(
       </template>
     </div>
 
-    <div class="pkg-content">
+    <div class="pkg-main">
       <FilterHeader title="OEPKG" @sort="changeTimeOrder" :total="total" @clear="clearFilter" />
-      <div v-if="isSearchDocs || searchArch.length > 0 || searchOs.length > 0 || searchCategory.length > 0" class="search-result">
+      <div v-if="isSearchDocs || filterLength > 0" class="search-result">
         <p v-if="!isPageSearch" class="text">
           <template v-if="isSearchDocs">
             为您找到<span class="total">{{ total }}</span
-            >个与{{ searchKey }} 匹配的搜索结果</template
-          >
+            >个与{{ searchKey }} 匹配的搜索结果
+          </template>
           <template v-else>
             为您找到符合条件的筛选<span class="total">{{ total }}</span
             >个</template
@@ -346,17 +347,17 @@ watch(
           <OTag v-for="(item, index) in searchOs" :key="item" closable @Close="closeTag(index, 'os')">{{ item }}</OTag>
           <OTag v-for="(item, index) in searchArch" :key="item" closable @Close="closeTag(index, 'arch')">{{ item }}</OTag>
           <OTag v-for="(item, index) in searchCategory" :key="item" closable @Close="closeTag(index, 'category')">{{ item }}</OTag>
-
-          <OLink v-if="searchArch.length > 0 || searchOs.length > 0 || searchCategory.length > 0" color="primary" class="resetting" @click="resetTag">{{
-            t('software.filterSider.clear')
-          }}</OLink>
+          <OLink v-if="filterLength > 0" color="primary" class="resetting" @click="resetTag">{{ t('software.filterSider.clear') }}</OLink>
         </div>
       </div>
-      <ResultNotApp v-if="pkgData.length === 0 && isSearchError" type="OEPKG" />
-      <div class="pkg-panel" v-else>
-        <OTableItemNew :data="pkgData" :columns="columns" :type="tabName" />
-        <div v-if="pkgData.length < total" class="pagination-box">
-          <AppPagination :current="currentPage" :pagesize="pageSize" :total="total" @size-change="handleSizeChange" @current-change="handleCurrentChange" />
+      <div class="pkg-content">
+        <AppLoading :loading="isLoading" />
+        <ResultNotApp v-if="isSearchError" type="OEPKG" />
+        <div v-if="pkgData.length !== 0 && !isSearchError" class="pkg-panel">
+          <OTableItemNew :data="pkgData" :columns="columns" :type="tabName" />
+          <div v-if="pkgData.length < total" class="pagination-box">
+            <AppPagination :current="currentPage" :pagesize="pageSize" :total="total" @size-change="handleSizeChange" @current-change="handleCurrentChange" />
+          </div>
         </div>
       </div>
     </div>

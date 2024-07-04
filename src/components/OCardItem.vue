@@ -45,24 +45,6 @@ const repeatTags = (v: string) => {
   return v.toLocaleLowerCase() === 'image' ? t('software.apppkg') : v;
 };
 
-// 埋点
-const getSensorsData = (href: string) => {
-  const sensors = (window as any)['sensorsDataAnalytic201505'];
-  const downloadTime = new Date();
-  sensors?.setProfile({
-    ...(window as any)['sensorsCustomBuriedData'],
-    profileType: 'hot',
-    origin: href,
-    softwareName: props.data.name,
-    os: props.data.os,
-    arch: props.data.arch,
-    category: props.data.category,
-    version: props.data.version,
-    downloadTime,
-    language: 'zh',
-  });
-};
-
 // 判断是否是搜索页
 const isPageSearch = ref(false);
 const isPageHome = ref(false);

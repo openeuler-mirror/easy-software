@@ -3,14 +3,16 @@
   justify-content: space-between;
   position: relative;
   --pkg-side-width: 300px;
-  :deep(.o-loading-main) {
-    margin-left: var(--pkg-side-width);
-  }
-  .pkg-content {
+
+  .pkg-main {
     flex: 1;
     min-height: 680px;
     display: flex;
     flex-direction: column;
+  }
+  .pkg-content {
+    position: relative;
+    height: 100%;
   }
   .pkg-panel,
   .result-tips {

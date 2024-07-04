@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { ref, watch, computed, onMounted } from 'vue';
-import { OTag, OLink, OIcon, isUndefined, vLoading } from '@opensig/opendesign';
+import { OTag, OLink, OIcon, isUndefined } from '@opensig/opendesign';
 import { getSearchData } from '@/api/api-search';
 import { useRoute } from 'vue-router';
 import { getSearchAllFiled, getSearchAllColumn } from '@/api/api-domain';
@@ -8,17 +8,16 @@ import { useI18n } from 'vue-i18n';
 import { isValidSearchTabName, isValidSearchKey } from '@/utils/query';
 import { TABNAME_OPTIONS, FLITERMENUOPTIONS } from '@/data/query';
 import { getParamsRules } from '@/utils/common';
-import { useLocale } from '@/composables/useLocale';
 import { useViewStore } from '@/stores/common';
 
 import FilterCheckbox from '@/components/filter/FilterCheckbox.vue';
+import AppLoading from '@/components/AppLoading.vue';
 import IconOs from '~icons/pkg/icon-os.svg';
 import IconArch from '~icons/pkg/icon-arch.svg';
 import IconCategory from '~icons/pkg/icon-category.svg';
 
 const route = useRoute();
 const { t } = useI18n();
-const { isZh } = useLocale();
 
 // 软件包-表头
 const columns = [
@@ -60,10 +59,8 @@ const searchParams = computed(() => {
 
 // es搜索
 const querySearch = () => {
-  isLoading.value = true;
   // 过滤空参数
   const newData = getParamsRules(searchParams.value);
-
   getSearchData(newData)
     .then((res) => {
       if (res.code === 200) {
@@ -97,7 +94,6 @@ const queryAllpkg = () => {
     category: searchCategory.value.join(),
     nameOrder: nameOrder.value,
   };
-  isLoading.value = true;
   // 过滤空参数
   const newData = getParamsRules(params);
 
@@ -126,6 +122,7 @@ const queryAllpkg = () => {
 const pageSearch = () => {
   isSearchError.value = false;
   if (tabName.value === TABNAME_OPTIONS[2]) {
+    isLoading.value = true;
     if (searchKey.value === '') {
       queryAllpkg();
     } else {
@@ -270,7 +267,7 @@ watch(
 </script>
 
 <template>
-  <div v-loading.nomask="isLoading" class="pkg-wrap" :class="tabName">
+  <div class="pkg-wrap" :class="tabName">
     <div class="filter-sidebar">
       <template v-if="isFilterLoading"><FilterItemSkeleton v-for="tag in 3" :key="tag" /></template>
       <template v-else>
@@ -300,7 +297,7 @@ watch(
       </template>
     </div>
 
-    <div class="pkg-content">
+    <div class="pkg-main">
       <FilterHeader title="容器镜像" :isSort="false" @sort="changeTimeOrder" :total="total" @clear="clearFilter" />
       <div v-if="isSearchDocs || filterList.length > 0" class="search-result">
         <p v-if="!isPageSearch" class="text">
@@ -320,11 +317,14 @@ watch(
           <OLink color="primary" class="resetting" @click="resetTag">{{ t('software.filterSider.clear') }}</OLink>
         </div>
       </div>
-      <ResultNotApp v-if="pkgData.length === 0 && isSearchError" type="容器镜像" />
-      <div class="pkg-panel" v-else>
-        <OTableItemNew :data="pkgData" :columns="columns" :type="tabName" />
-        <div v-if="pkgData.length < total" class="pagination-box">
-          <AppPagination :current="currentPage" :pagesize="pageSize" :total="total" @size-change="handleSizeChange" @current-change="handleCurrentChange" />
+      <div class="pkg-content">
+        <AppLoading :loading="isLoading" />
+        <ResultNotApp v-if="isSearchError" type="容器镜像" />
+        <div v-if="pkgData.length !== 0 && !isSearchError" class="pkg-panel">
+          <OTableItemNew :data="pkgData" :columns="columns" :type="tabName" />
+          <div v-if="pkgData.length < total" class="pagination-box">
+            <AppPagination :current="currentPage" :pagesize="pageSize" :total="total" @size-change="handleSizeChange" @current-change="handleCurrentChange" />
+          </div>
         </div>
       </div>
     </div>

@@ -1,20 +1,19 @@
 <script lang="ts" setup>
 import { ref, watch, onMounted, computed } from 'vue';
-import { OTag, OLink, OIcon, OTable, vLoading } from '@opensig/opendesign';
+import { OTag, OLink, OIcon, OTable } from '@opensig/opendesign';
 import { useI18n } from 'vue-i18n';
 import { useRoute } from 'vue-router';
 import { getParamsRules } from '@/utils/common';
 import { getUpstreamColumn, getUpstream } from '@/api/api-upstream';
 import { getSearchData } from '@/api/api-search';
-import { useLocale } from '@/composables/useLocale';
 import { useViewStore } from '@/stores/common';
 
 import FilterRadio from '@/components/filter/FilterRadio.vue';
+import AppLoading from '@/components/AppLoading.vue';
 import IconOs from '~icons/pkg/icon-os.svg';
 
 const route = useRoute();
 const { t } = useI18n();
-const { isZh } = useLocale();
 
 // 软件包-表头
 const columns = [
@@ -36,7 +35,6 @@ const searchKey = ref((route.query.name as string) || '');
 const searchOs = ref('');
 
 const queryAppVersion = () => {
-  isLoading.value = true;
   const params = {
     eulerOsVersion: searchOs.value,
     pageNum: currentPage.value,
@@ -74,8 +72,6 @@ const searchParams = computed(() => {
 const isSearchError = ref(false);
 const isSearch = ref(false);
 const querySearch = () => {
-  isLoading.value = true;
-
   // 过滤空参数
   const newData = getParamsRules(searchParams.value);
   getSearchData(newData)
@@ -165,6 +161,7 @@ onMounted(() => {
 const pageSearch = () => {
   isSearchError.value = false;
   if (tabName.value === 'appversion') {
+    isLoading.value = true;
     if (searchKey.value === '') {
       queryAppVersion();
     } else {
@@ -198,7 +195,7 @@ watch(
 </script>
 
 <template>
-  <div v-loading.nomask="isLoading" class="pkg-wrap" :class="tabName">
+  <div class="pkg-wrap" :class="tabName">
     <div class="filter-sidebar">
       <template v-if="isFilterLoading"><FilterItemSkeleton /></template>
       <template v-else>
@@ -211,7 +208,7 @@ watch(
         </FilterRadio>
       </template>
     </div>
-    <div class="pkg-content">
+    <div class="pkg-main">
       <FilterHeader title="应用名称" :isSort="false" @sort="changeTimeOrder" :total="total" @clear="clearFilter" />
       <div v-if="searchOs || isSearch" class="search-result">
         <p v-if="!isPageSearch" class="text">
@@ -223,24 +220,27 @@ watch(
           <OLink v-if="searchOs" color="primary" class="resetting" @click="handleResettingTag">{{ t('software.filterSider.clear') }}</OLink>
         </div>
       </div>
-      <ResultNotApp v-if="appData.length === 0 && isSearchError" type="上游兼容应用全景" />
-      <div class="pkg-panel" v-else>
-        <OTable :columns="columns" :data="appData" border="all">
-          <template #td_name="{ row }">
-            <span v-dompurify-html="row.name"></span>
-          </template>
-          <template #td_upstreamVersion="{ row }">
-            {{ row.upstreamVersion }}
-          </template>
-          <template #td_compatibleVersion="{ row }">
-            {{ row.compatibleVersion }}
-          </template>
-          <template #td_status="{ row }">
-            <OTag v-if="row.status" class="app-tag" :class="row.status.toLocaleLowerCase()">{{ row.status }} </OTag>
-          </template>
-        </OTable>
-        <div v-if="appData.length < total" class="pagination-box">
-          <AppPagination :current="currentPage" :pagesize="pageSize" :total="total" @size-change="handleSizeChange" @current-change="handleCurrentChange" />
+      <div class="pkg-content">
+        <AppLoading :loading="isLoading" />
+        <ResultNotApp v-if="isSearchError" type="上游兼容应用全景" />
+        <div v-if="appData.length !== 0 && !isSearchError" class="pkg-panel">
+          <OTable :columns="columns" :data="appData" border="all">
+            <template #td_name="{ row }">
+              <span v-dompurify-html="row.name"></span>
+            </template>
+            <template #td_upstreamVersion="{ row }">
+              {{ row.upstreamVersion }}
+            </template>
+            <template #td_compatibleVersion="{ row }">
+              {{ row.compatibleVersion }}
+            </template>
+            <template #td_status="{ row }">
+              <OTag v-if="row.status" class="app-tag" :class="row.status.toLocaleLowerCase()">{{ row.status }} </OTag>
+            </template>
+          </OTable>
+          <div v-if="appData.length < total" class="pagination-box">
+            <AppPagination :current="currentPage" :pagesize="pageSize" :total="total" @size-change="handleSizeChange" @current-change="handleCurrentChange" />
+          </div>
         </div>
       </div>
     </div>

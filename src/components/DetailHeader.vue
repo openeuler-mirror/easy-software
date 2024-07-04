@@ -153,6 +153,8 @@ const scrollToAnchor = (id: string) => {
     }
     .text {
       margin-top: 8px;
+      @include text1;
+
       a {
         display: flex;
         align-items: center;

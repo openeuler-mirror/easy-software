@@ -1,16 +1,16 @@
 <script lang="ts" setup>
-import { vLoading, OLink, ORow, OCol, OIcon, OAnchor, OAnchorItem } from '@opensig/opendesign';
+import { OAnchor, OAnchorItem } from '@opensig/opendesign';
 import { ref, onMounted } from 'vue';
 import { getSearchAllFiled } from '@/api/api-domain';
 import type { AppT } from '@/@types/app';
 import HomeHeader from './HomeHeader.vue';
 import HomeNews from './HomeNews.vue';
 import HomeVersion from './HomeVersion.vue';
-import HomeSkeleton from '@/components/skeleton/HomeSkeleton.vue';
-import { solutionData, homeData } from '@/data/home/index';
+import HomeField from './HomeField.vue';
+import HomeResource from './HomeResource.vue';
+import { solutionData } from '@/data/home/index';
 import { useLocale } from '@/composables/useLocale';
 import { useScreen } from '@/composables/useScreen';
-import IconChevronDown from '~icons/app/icon-chevron-right.svg';
 
 const { size } = useScreen();
 const { locale } = useLocale();
@@ -42,20 +42,6 @@ const queryAllpkg = () => {
     });
 };
 
-// Hover 修改资源icon 颜色
-const resourceHover = (id: string) => {
-  const path = document.querySelector(`.resource-item #${id}-icon`);
-  if (path) {
-    path.setAttribute('fill', '#002fa7');
-  }
-};
-const resourceLeave = (id: string) => {
-  const path = document.querySelector(`.resource-item #${id}-icon`);
-  if (path) {
-    path.setAttribute('fill', '');
-  }
-};
-
 onMounted(() => {
   queryAllpkg();
 });
@@ -65,7 +51,7 @@ onMounted(() => {
   <div>
     <HomeHeader />
     <ContentWrapper vertical-padding="72px">
-      <div ref="pkgRef" v-loading.nomask="isLoading" class="pkg-wrap">
+      <div ref="pkgRef" class="pkg-wrap">
         <div v-if="size.width > 1900 && pkgData && pkgData.length" class="anchor">
           <OAnchor container="#app > .o-scroller > .o-scroller-container" :target-offset="104">
             <OAnchorItem href="#all" title="领域应用">
@@ -79,49 +65,10 @@ onMounted(() => {
         </div>
         <div id="all" class="pkg-main">
           <h2>领域应用</h2>
-          <div v-if="pkgData.length > 0" class="pkg-content">
-            <div v-for="item in pkgData" :key="item.name" class="domain-item">
-              <template v-if="item.children?.length > 0">
-                <div class="domain-item-title">
-                  <h3 :id="item.name">{{ item.name }}</h3>
-                  <OLink v-if="item.children?.length > 4" :href="`/${locale}/apppkg?type=${item.name}`">
-                    了解更多
-                    <template #suffix
-                      ><OIcon><IconChevronDown /></OIcon
-                    ></template>
-                  </OLink>
-                </div>
-                <ORow gap="32px" flex-wrap="wrap">
-                  <OCol
-                    v-for="subItem in item.children.slice(0, 4)"
-                    :key="subItem.name"
-                    flex="0 1 25%"
-                    :laptop="{ flex: '0 1 25%' }"
-                    :pad="{ flex: '0 1 50%' }"
-                    :pad-v="{ flex: '0 1 100%' }"
-                    :phone="{ flex: '0 1 100%' }"
-                  >
-                    <OCardItem :data="subItem" />
-                  </OCol>
-                </ORow>
-              </template>
-            </div>
-          </div>
-          <div v-else class="pkg-content">
-            <HomeSkeleton />
-          </div>
-
+          <HomeField :data="pkgData" />
           <div id="resource" class="domain-resource">
             <h2>获取资源</h2>
-            <div class="resource-content">
-              <div v-for="item in homeData" :key="item.name" class="resource-panel">
-                <RouterLink :to="`/${locale}${item.href}`" class="resource-item" @mouseenter="resourceHover(item.id)" @mouseleave="resourceLeave(item.id)">
-                  <OIcon><component :is="item.icon" /></OIcon>
-                  <p class="title">{{ item.name }}</p>
-                  <p class="desc">{{ item.desc }}</p>
-                </RouterLink>
-              </div>
-            </div>
+            <HomeResource />
           </div>
 
           <div id="solution" class="domain-solution">
@@ -154,45 +101,6 @@ onMounted(() => {
 </template>
 
 <style lang="scss" scoped>
-.resource-content {
-  background: var(--o-color-fill2);
-  padding: 42px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 32px;
-  .resource-panel {
-    flex: 1;
-  }
-  .resource-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    &:hover {
-      .title {
-        color: var(--o-color-primary1);
-      }
-    }
-    svg {
-      width: 56px;
-      height: 56px;
-      color: var(--o-color-info1);
-    }
-    .title {
-      @include h2;
-      color: var(--o-color-info1);
-      margin: 16px 0 12px;
-      font-weight: 500;
-    }
-    .desc {
-      @include text1;
-      color: var(--o-color-info2);
-      max-width: 306px;
-      text-align: center;
-    }
-  }
-}
-
 .pkg-main {
   h2 {
     @include display3;
@@ -217,47 +125,6 @@ onMounted(() => {
   z-index: 9;
 }
 
-.slides2 {
-  width: 100%;
-  margin: auto;
-  height: 400px;
-  overflow: hidden;
-
-  .img {
-    position: absolute;
-    z-index: -1;
-  }
-  .slide2-slide-content {
-    width: 100%;
-    height: 100%;
-    padding: 24px;
-    box-sizing: border-box;
-    text-align: center;
-    display: flex;
-    justify-content: center;
-    flex-direction: column;
-    align-items: center;
-    .title {
-      @include h2;
-      color: #fff;
-      margin-bottom: 16px;
-    }
-    .desc {
-      @include text2;
-      color: #fff;
-      max-width: 600px;
-    }
-  }
-}
-.domain-item-title {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 24px;
-  .o-link {
-    @include text1;
-  }
-}
 .domain-solution,
 .domain-resource,
 .domain-news {
@@ -310,31 +177,6 @@ onMounted(() => {
       bottom: 24px;
       left: 32px;
     }
-  }
-}
-.domain-item {
-  margin: 0 0 40px;
-  h3 {
-    @include h2;
-    text-align: center;
-    font-weight: 500;
-  }
-}
-.more {
-  margin-top: 24px;
-  text-align: center;
-  .more-box {
-    display: inline-block;
-    cursor: pointer;
-  }
-  .more-text {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    @include text1;
-  }
-  .o-icon {
-    color: var(--o-color-primary1);
   }
 }
 </style>

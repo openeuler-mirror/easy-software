@@ -12,6 +12,7 @@ declare module 'vue' {
     AppFeedback: typeof import('./src/components/AppFeedback.vue')['default']
     AppFooter: typeof import('./src/components/AppFooter.vue')['default']
     AppHeader: typeof import('./src/components/AppHeader.vue')['default']
+    AppLoading: typeof import('./src/components/AppLoading.vue')['default']
     AppPagination: typeof import('./src/components/AppPagination.vue')['default']
     AppSection: typeof import('./src/components/AppSection.vue')['default']
     AppTableToggle: typeof import('./src/components/AppTableToggle.vue')['default']
@@ -31,6 +32,7 @@ declare module 'vue' {
     OCardItem: typeof import('./src/components/OCardItem.vue')['default']
     OCardItemSkeleton: typeof import('./src/components/skeleton/OCardItemSkeleton.vue')['default']
     OCodeCopy: typeof import('./src/components/OCodeCopy.vue')['default']
+    OCodeDown: typeof import('./src/components/OCodeDown.vue')['default']
     OTableItemNew: typeof import('./src/components/OTableItemNew.vue')['default']
     ResultNotApp: typeof import('./src/components/ResultNotApp.vue')['default']
     ResultNotFound: typeof import('./src/components/ResultNotFound.vue')['default']
@@ -39,5 +41,8 @@ declare module 'vue' {
     SearchFilter: typeof import('./src/components/search/SearchFilter.vue')['default']
     SearchRecommend: typeof import('./src/components/search/SearchRecommend.vue')['default']
     SearchTab: typeof import('./src/components/search/SearchTab.vue')['default']
+  }
+  export interface ComponentCustomProperties {
+    vLoading: typeof import('element-plus/es')['ElLoadingDirective']
   }
 }

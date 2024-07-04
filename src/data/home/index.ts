@@ -4,6 +4,7 @@ import ApppkgIcon from '~icons/pkg/apppkg.svg';
 import EpkgIcon from '~icons/pkg/epkg.svg';
 import ImageIcon from '~icons/pkg/image.svg';
 import RpmIcon from '~icons/pkg/rpm.svg';
+import OepkgIcon from '~icons/pkg/oepkg.svg';
 
 import openHPC from '@/assets/home/openHPC.png';
 import openStack from '@/assets/home/openstack.png';
@@ -44,7 +45,7 @@ export const homeData = [
     id: 'oepkg',
     name: 'OEPKG',
     desc: 'OEPKGS是openEuler第三方扩展软件包',
-    icon: EpkgIcon,
+    icon: OepkgIcon,
     href: '/oepkg',
   },
 ];
