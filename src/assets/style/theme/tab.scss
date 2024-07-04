@@ -1,0 +1,8 @@
+.field-tabs {
+  > .o-tab-head > .o-tab-navs {
+    max-width: var(--layout-content-max-width);
+    padding-left: var(--layout-content-padding);
+    padding-right: var(--layout-content-padding);
+    margin: 0 auto;
+  }
+}

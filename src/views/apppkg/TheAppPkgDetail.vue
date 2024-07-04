@@ -1,22 +1,23 @@
 <script lang="ts" setup>
 import { ref, onMounted, type PropType } from 'vue';
-import { OTab, OTabPane, OLink, OIcon, OTag } from '@opensig/opendesign';
+import { OTab, OTabPane, OIcon } from '@opensig/opendesign';
 import { useRoute, useRouter } from 'vue-router';
 import { getDetail, getTags, getVer } from '@/api/api-domain';
 import { useMarkdown } from '@/composables/useMarkdown';
 import type { AppInfoT, MaintainerT, DetailItemT, MoreMessgeT, PkgTypeT } from '@/@types/app';
 import { OPENEULER_CONTACT } from '@/data/config';
 import { isValidTags } from '@/utils/query';
-import { columnTags, tagList, moreColumns } from '@/data/detail/index';
+import { columnTags, tagList } from '@/data/detail/index';
 import { useI18n } from 'vue-i18n';
 import { useLocale } from '@/composables/useLocale';
 import { useViewStore } from '@/stores/common';
 import type { ParamsKeyT } from '@/@types/detail';
 
 import AppFeedback from '@/components/AppFeedback.vue';
-import DetailHead from '@/components/DetailHeader.vue';
-import ExternalLink from '@/components/ExternalLink.vue';
-import DetailAside from '@/components/DetailAside.vue';
+import DetailHead from '@/components/detail/DetailHeader.vue';
+import DetailBasicInfo from '@/components/detail/DetailBasicInfo.vue';
+
+import DetailAside from '@/components/detail/DetailAside.vue';
 import defaultImg from '@/assets/default-logo.png';
 import IconEpkg from '~icons/pkg/epkg.svg';
 import IconImage from '~icons/pkg/image.svg';
@@ -156,7 +157,7 @@ const getDetailValue = (data: any) => {
   if (typePkg.value === 'RPM') {
     basicInfo.value = [
       { name: '详细描述', value: data?.description },
-      { name: '版本号', value: data.version },
+      { name: '版本号', value: data?.version },
       { name: '版本支持情况', value: data.osSupport },
       { name: '架构', value: data.arch },
       { name: '软件包分类', value: data.rpmCategory || '其他' },
@@ -208,10 +209,8 @@ const getDetailValue = (data: any) => {
     version.value = data?.version;
   } else if (typePkg.value === 'IMAGE') {
     basicInfo.value = [
-      { name: '版本号', value: data.version },
-      { name: '架构', value: data.arch || '' },
+      { name: '版本号', value: data.appVer },
       { name: '软件包分类', value: data.category || '' },
-      { name: '版本支持情况', value: data.osSupport || '' },
     ];
 
     appData.value.size = data.appSize || 0;
@@ -252,13 +251,6 @@ const queryTags = () => {
   });
 };
 
-const showExternalDlg = ref(false);
-const externalLink = ref('');
-const onExternalDialog = (href: string) => {
-  externalLink.value = href;
-  showExternalDlg.value = true;
-};
-
 const getTabIcon = (tab: string) => {
   if (tab === 'RPM') {
     return IconRpm;
@@ -295,93 +287,76 @@ const repeatTags = (v: string) => {
     <DetailSkeleton v-if="isLoading" />
     <template v-else>
       <AppBreadcrumb id="apppkg" :name="appData.name" />
-      <!-- <DetailHead :data="appData" :basicInfo="summary" :maintainer="maintainer" /> -->
-      <OTab variant="text" @change="onChange" :line="false" class="domain-tabs" :class="tabList.length > 1 ? 'max' : 'min'" v-model="activeName" size="large">
-        <template #suffix><DetailHead :data="appData" :basicInfo="summary" :maintainer="maintainer" /></template>
-        <OTabPane class="tab-pane" v-for="item in tabList" :key="item" :label="item">
-          <template #nav><OIcon :icon="getTabIcon(item)" class="tabs-icon" /> {{ repeatTags(item) }}</template>
-          <div class="detail-row">
-            <div class="detail-row-main" :class="{ tags: isTags }">
-              <AppSection v-if="item !== 'IMAGE'">
-                <div class="title">
-                  <p>> {{ t('detail.information') }}</p>
-                </div>
-                <div class="basic-info">
-                  <div v-for="item in basicInfo" :key="item.name" class="basic-info-item">
-                    <span class="label markdown download">{{ item.name }}</span>
-                    <div v-if="item.name === t('detail.warehouse') || item.name === t('detail.source')" class="markdown-body installation mymarkdown-body">
-                      <OLink @click="onExternalDialog(item.value)" color="primary" class="tag-new" target="_blank" rel="noopener noreferrer">{{
-                        item.type
-                      }}</OLink>
-                    </div>
-                    <div v-else-if="item.name === t('detail.pkgVersion')" class="mymarkdown-body">
-                      <span v-if="typePkg === 'RPM' || version" class="ver">{{ version }}</span>
-                    </div>
-                    <div v-dompurify-html="item.value" v-copy-code="true" class="markdown-body installation mymarkdown-body" v-else></div>
-                  </div>
-                </div>
-                <p class="sp">> {{ t('detail.installation') }}</p>
-                <div v-if="installation" v-dompurify-html="installation" v-copy-code="true" class="markdown-body installation"></div>
-                <template v-if="item !== 'IMAGE'">
-                  <p class="sp">> {{ t('detail.more') }}</p>
-                  <OTab variant="text" :line="false" class="domain-tabs" :class="moreMessge.length > 1 ? 'tabs-switch' : 'tabs-one'">
-                    <template v-for="it in moreMessge" :key="it">
-                      <OTabPane class="tab-pane" v-if="it.value.length > 0" :label="it.name">
-                        <AppTableToggle :columns="moreColumns" :data="it.value" />
-                      </OTabPane>
-                    </template>
-                  </OTab>
-                </template>
-              </AppSection>
-              <AppSection v-else>
-                <OTab variant="text" @change="onChangeImage" :line="false" class="domain-tabs tabs-switch" v-model="imgName">
-                  <OTabPane class="tab-pane" v-for="item in tagList" :key="item.value" :label="item.lable">
-                    <div v-if="item.value === tagList[0].value">
-                      <div class="title">
-                        <p>> {{ t('detail.information') }}</p>
-                      </div>
-                      <div class="basic-info">
-                        <div v-for="item in basicInfo" :key="item.name" class="basic-info-item">
-                          <span class="label markdown download">{{ item.name }}</span>
-                          <div v-if="item.name === t('detail.pkgVersion')" class="mymarkdown-body">
-                            <span v-if="typePkg === 'RPM' || version" class="ver">{{ version }}</span>
-                          </div>
-                          <div class="markdown-body mymarkdown-body" v-else>
-                            {{ item.value }}
-                            <OTag v-if="item.name === t('detail.support') && latestOsSupport" color="primary" size="small"> {{ t('detail.latest') }}</OTag>
-                          </div>
-                        </div>
-                      </div>
-                      <p class="sp">> {{ t('detail.usage') }}</p>
-                      <div v-if="imageUsage" v-dompurify-html="imageUsage" v-copy-code="true" class="markdown-body download"></div>
-                    </div>
-                    <div v-else>
-                      <OTableItemNew :data="tagsValue" :columns="columnTags" />
-                    </div>
-                  </OTabPane>
-                </OTab>
-              </AppSection>
-              <ExternalLink v-if="showExternalDlg" :href="externalLink" @change="showExternalDlg = false" />
-              <AppFeedback v-if="!isTags" :name="appData.name" :version="version" :type="typePkg" />
-            </div>
-            <div v-if="!isTags" class="detail-row-side">
-              <DetailAside
-                :data="appData"
-                :basicInfo="basicInfo"
-                :maintainer="maintainer"
-                :type="item"
-                :downloadData="downloadData"
-                :all-show="true"
-                :ver-data="verData"
-                :license="license"
-                :tagVer="tagVer"
-              />
-            </div>
-          </div>
-        </OTabPane>
-      </OTab>
     </template>
   </ContentWrapper>
+  <OTab
+    variant="text"
+    @change="onChange"
+    class="field-tabs domain-tabs"
+    :class="tabList.length > 1 ? 'max' : 'min'"
+    v-model="activeName"
+    size="large"
+    :style="{ '--tab-nav-justify': 'flex-start' }"
+  >
+    <OTabPane class="tab-pane" v-for="item in tabList" :key="item" :label="item">
+      <template #nav><OIcon :icon="getTabIcon(item)" class="tabs-icon" /> {{ repeatTags(item) }}</template>
+      <ContentWrapper>
+        <DetailHead :data="appData" :basicInfo="summary" :maintainer="maintainer" />
+        <div class="detail-row">
+          <div class="detail-row-main" :class="{ tags: isTags }">
+            <AppSection :title="t('detail.information')" v-if="item !== 'IMAGE'">
+              <!-- 基本信息 -->
+              <DetailBasicInfo :options="basicInfo" />
+
+              <!-- 安装指引 -->
+              <p class="sp">> {{ t('detail.installation') }}</p>
+              <div v-if="installation" v-dompurify-html="installation" v-copy-code="true" class="markdown-body installation"></div>
+
+              <!-- 更多信息 -->
+              <template v-if="item !== 'IMAGE'">
+                <p class="sp">> {{ t('detail.more') }}</p>
+                <DetailMoreInfo :options="moreMessge" />
+              </template>
+            </AppSection>
+            <AppSection v-else>
+              <!-- 容器镜像 -->
+              <OTab variant="text" @change="onChangeImage" :line="false" class="domain-tabs tabs-switch" v-model="imgName">
+                <OTabPane class="tab-pane" v-for="item in tagList" :key="item.value" :label="item.lable">
+                  <template v-if="item.value === tagList[0].value">
+                    <!-- 基本信息 -->
+                    <p class="sp">> {{ t('detail.information') }}</p>
+                    <DetailBasicInfo :options="basicInfo" />
+
+                    <!-- 使用方式 -->
+                    <p class="sp">> {{ t('detail.usage') }}</p>
+                    <div v-if="imageUsage" v-dompurify-html="imageUsage" v-copy-code="true" class="markdown-body download"></div>
+                  </template>
+
+                  <OTableItemNew v-else :data="tagsValue" :columns="columnTags" />
+                </OTabPane>
+              </OTab>
+            </AppSection>
+
+            <!-- 反馈 -->
+            <AppFeedback v-if="!isTags" :name="appData.name" :version="version" :type="typePkg" />
+          </div>
+          <div v-if="!isTags" class="detail-row-side">
+            <DetailAside
+              :data="appData"
+              :basicInfo="basicInfo"
+              :maintainer="maintainer"
+              :type="item"
+              :downloadData="downloadData"
+              :all-show="true"
+              :ver-data="verData"
+              :license="license"
+              :tagVer="tagVer"
+            />
+          </div>
+        </div>
+      </ContentWrapper>
+    </OTabPane>
+  </OTab>
 </template>
 
 <style lang="scss" scoped>

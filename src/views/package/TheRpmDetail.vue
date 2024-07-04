@@ -1,21 +1,22 @@
 <script lang="ts" setup>
 import { ref, onMounted } from 'vue';
-import { OTab, OTabPane, OLink, isString } from '@opensig/opendesign';
+import { isString } from '@opensig/opendesign';
 import { OPENEULER_CONTACT } from '@/data/config';
 import { useRoute } from 'vue-router';
 import { useMarkdown } from '@/composables/useMarkdown';
 import type { AppInfoT, MaintainerT, DetailItemT, MoreMessgeT } from '@/@types/app';
 import { getDetails, getVer } from '@/api/api-domain';
-import { moreColumns } from '@/data/detail/index';
 import { useViewStore } from '@/stores/common';
 import { useI18n } from 'vue-i18n';
 import { TABNAME_OPTIONS } from '@/data/query';
 import OCodeDown from '@/components/OCodeDown.vue';
-import defaultImg from '@/assets/default-logo.png';
+
+import DetailBasicInfo from '@/components/detail/DetailBasicInfo.vue';
 import AppFeedback from '@/components/AppFeedback.vue';
-import DetailHead from '@/components/DetailHeader.vue';
-import DetailAside from '@/components/DetailAside.vue';
-import ExternalLink from '@/components/ExternalLink.vue';
+import DetailHead from '@/components/detail/DetailHeader.vue';
+import DetailAside from '@/components/detail/DetailAside.vue';
+
+import defaultImg from '@/assets/default-logo.png';
 
 const { t } = useI18n();
 const route = useRoute();
@@ -39,6 +40,7 @@ const appData = ref<AppInfoT>({
   bin_code: '',
 });
 
+const isLoading = ref(true);
 //详情请求
 const queryPkg = () => {
   if (pkgId.value !== '') {
@@ -46,12 +48,15 @@ const queryPkg = () => {
       .then((res) => {
         const data = res.data.list[0];
         getDetailValue(data);
+        isLoading.value = false;
       })
       .catch(() => {
         useViewStore().showNotFound();
+        isLoading.value = false;
       });
   } else {
     useViewStore().showNotFound();
+    isLoading.value = false;
   }
 };
 const pkgId = ref('');
@@ -113,13 +118,6 @@ const getDetailValue = (data: any) => {
   }
 };
 
-const showExternalDlg = ref(false);
-const externalLink = ref('');
-const onExternalDialog = (href: string) => {
-  externalLink.value = href;
-  showExternalDlg.value = true;
-};
-
 //获取支持
 const verData = ref();
 const queryVer = () => {
@@ -131,47 +129,36 @@ const queryVer = () => {
 
 <template>
   <ContentWrapper vertical-padding="24px">
-    <!-- 锚点 -->
-    <AppBreadcrumb id="rpm" :name="appData.name" />
-    <DetailHead :data="appData" :basicInfo="summary" :maintainer="maintainer" />
+    <DetailSkeleton v-if="isLoading" />
+    <template v-else>
+      <!-- 锚点 -->
+      <AppBreadcrumb id="rpm" :name="appData.name" />
+      <!-- 头部信息 -->
+      <DetailHead :data="appData" :basicInfo="summary" :maintainer="maintainer" />
 
-    <div class="detail-row">
-      <div class="detail-row-main">
-        <AppSection>
-          <div class="title">
-            <p>> {{ t('detail.information') }}</p>
-            <!-- <p v-if="version" class="ver">{{ t('detail.number') }}：{{ version }}</p> -->
-            <!-- <OCodeDown :verData="verData" :tagVer="tagVer" :type="'RPM'"></OCodeDown> -->
-          </div>
-          <div class="basic-info">
-            <div v-for="item in basicInfo" :key="item.name" class="basic-info-item">
-              <span class="label markdown download">{{ item.name }}</span>
-              <div v-if="item.name === t('detail.warehouse') || item.name === t('detail.source')" class="markdown-body installation mymarkdown-body">
-                <OLink @click="onExternalDialog(item.value)" color="primary" class="" target="_blank" rel="noopener noreferrer">{{ item.type }}</OLink>
-              </div> 
-              <div v-copy-code="true" class="markdown-body installation mymarkdown-body" v-else>
-                <span :class="item.name === t('detail.number') ? 'ver' : ''">{{ item.value }}</span>
-              </div>
-            </div>
-          </div>
-          <p class="sp">> {{ t('detail.installation') }}</p>
-          <div v-if="installation" v-dompurify-html="installation" v-copy-code="true" class="markdown-body installation"></div>
-          <p class="sp">> {{ t('detail.more') }}</p>
-          <OTab variant="text" :line="false" class="domain-tabs" :class="moreMessge.length > 1 ? 'tabs-switch' : 'tabs-one'">
-            <template v-for="item in moreMessge" :key="item">
-              <OTabPane class="tab-pane" v-if="item.value.length > 0" :label="item.name">
-                <AppTableToggle :columns="moreColumns" :data="item.value" />
-              </OTabPane>
-            </template>
-          </OTab>
-        </AppSection>
-        <ExternalLink v-if="showExternalDlg" :href="externalLink" @change="showExternalDlg = false" />
-        <AppFeedback :name="appData.name" :version="version" type="RPM" />
+      <div class="detail-row">
+        <div class="detail-row-main">
+          <AppSection :title="`> ${t('detail.information')}`">
+            <!-- 基本信息 -->
+            <DetailBasicInfo :options="basicInfo" />
+
+            <!-- 安装指引 -->
+            <p class="sp">> {{ t('detail.installation') }}</p>
+            <div v-if="installation" v-dompurify-html="installation" v-copy-code="true" class="markdown-body installation"></div>
+
+            <!-- 更多信息 -->
+            <p class="sp">> {{ t('detail.more') }}</p>
+            <DetailMoreInfo :options="moreMessge" />
+          </AppSection>
+
+          <!-- 反馈 -->
+          <AppFeedback :name="appData.name" :version="version" type="RPM" />
+        </div>
+        <div class="detail-row-side">
+          <DetailAside :data="appData" :basicInfo="basicInfo" :maintainer="maintainer" :ver-data="verData" :license="license" :tagVer="tagVer" :type="'RPM'" />
+        </div>
       </div>
-      <div class="detail-row-side">
-        <DetailAside :data="appData" :basicInfo="basicInfo" :maintainer="maintainer" :ver-data="verData" :license="license" :tagVer="tagVer" :type="'RPM'" />
-      </div>
-    </div>
+    </template>
   </ContentWrapper>
 </template>
 
