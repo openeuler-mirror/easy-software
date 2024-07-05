@@ -112,7 +112,6 @@
 }
 
 .basic-info {
-  margin-top: 26px;
   border-left: 4px solid var(--o-color-primary1);
   p,
   .basic-info-item {
@@ -135,7 +134,7 @@
       color: var(--o-color-link1);
     }
   }
-  .mymarkdown-body {
+  .basic-item-box {
     flex: 1;
     padding: 16px 24px;
   }
@@ -208,6 +207,11 @@
     padding: 10px 0px;
   }
 }
+.tab-pane {
+  .sp:first-child {
+    margin-top: 0;
+  }
+}
 
 .detail {
   display: flex;
@@ -227,7 +231,7 @@
   }
 }
 .sp {
-  margin: 32px 0 16px;
+  margin: 32px 0 24px;
   @include h3;
   font-weight: 500;
 }

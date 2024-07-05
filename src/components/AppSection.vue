@@ -31,13 +31,16 @@ defineProps({
     display: flex;
     justify-content: space-between;
     align-items: center;
+    margin-bottom: 24px;
     h3 {
       font-size: 22px;
       line-height: 30px;
       font-weight: 500;
       color: var(--o-color-info1);
-      margin-bottom: 16px;
     }
+  }
+  :deep(.domain-tabs) {
+    padding-top: 0;
   }
 }
 </style>

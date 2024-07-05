@@ -4,7 +4,7 @@ import OCodeCopy from '@/components/OCodeCopy.vue';
 import { ref, computed, watch, type PropType } from 'vue';
 import ExternalLink from '@/components/ExternalLink.vue';
 import { useClipboard } from '@/composables/useClipboard';
-import { getCode, getPkgName } from '@/utils/common';
+import { getCode } from '@/utils/common';
 import { verColumns } from '@/data/detail/index';
 import IconCopy from '~icons/app/icon-copy.svg';
 import { useLocale } from '@/composables/useLocale';

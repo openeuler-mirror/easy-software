@@ -9,7 +9,7 @@ import { useRoute } from 'vue-router';
 
 import defaultImg from '@/assets/default-logo.png';
 
-const props = defineProps({
+defineProps({
   data: {
     type: Object as PropType<AppItemT>,
     default: () => {},
