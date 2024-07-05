@@ -53,3 +53,10 @@ export function getVer(tabValue: string, id: string) {
   const url = `/api-query/${tabValue}/eulerver?name=${id}`;
   return request.get(url).then((res: AxiosResponse) => res?.data);
 }
+
+
+
+export function getVersionInfo() {
+  const url = `/api-query/field/archnum`;
+  return request.get(url, { showError: false }).then((res: AxiosResponse) => res?.data);
+}

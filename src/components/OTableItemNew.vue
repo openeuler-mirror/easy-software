@@ -181,8 +181,8 @@ const onExternalDialog = (href: string) => {
 
 :deep(.o-table) {
   --table-edge-padding: 16px;
-  --table-cell-padding: 16px 12px;
-  --table-head-cell-padding: 12px 16px;
+  --table-cell-padding: 12px;
+  --table-head-cell-padding: 12px;
   --table-cell-height: 80px;
   .label {
     display: flex;

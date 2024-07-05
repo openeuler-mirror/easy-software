@@ -1,20 +1,41 @@
 <script lang="ts" setup>
-import { OTag, OLink, OTable } from '@opensig/opendesign';
-import { ref, onMounted } from 'vue';
-import { getSearchAllFiled } from '@/api/api-domain';
+import { OTag, OLink } from '@opensig/opendesign';
+import { ref, onMounted, watch } from 'vue';
+import { getSearchAllFiled, getVersionInfo } from '@/api/api-domain';
 import { formatDateTime } from '@/utils/common';
+import { useRouter } from 'vue-router';
+import { useLocale } from '@/composables/useLocale';
 
-const columns = [
-  { label: 'openEuler社区版本', key: 'os', style: 'width:20%' },
-  { label: '发布时间', key: 'releaseTime', style: 'width:15%' },
-  { label: '计划维护时长', key: 'maintenanceDuration', style: 'width:15%' },
-  { label: '计划维护停止时间', key: 'plannedMaintenanceEndtime', style: 'width:15%' },
-  { label: '实际维护停止时间', key: 'actualMaintenanceEndtime', style: 'width:15%' },
-  { label: '状态', key: 'status', style: 'width:10%' },
-];
+interface DataT {
+  type: string;
+  id: string;
+  children: {
+    name: string;
+    value: number;
+  }[];
+}
 
+interface DataItem {
+  [key: string]: number;
+}
+
+interface CommunityColumnsT {
+  actualMaintenanceEndtime: string;
+  maintenanceDuration: string;
+  os: string;
+  plannedMaintenanceEndtime: string;
+  releaseTime: string;
+  remarks: string;
+  status: string;
+  osAlias: string;
+  children?: DataT[];
+}
+
+const router = useRouter();
+const { locale } = useLocale();
 const loading = ref(false);
-const versionData = ref([]);
+const versionData = ref<CommunityColumnsT[]>([]);
+const pkgInfo = ref({});
 const queryEulerVersion = () => {
   const params = {
     name: 'eulerLifecycle',
@@ -23,9 +44,95 @@ const queryEulerVersion = () => {
   getSearchAllFiled(params)
     .then((res) => {
       versionData.value = res.data.list.reverse();
+      queryVersionInfo();
       loading.value = false;
     })
+    .catch(() => {
+      versionData.value = [];
+      loading.value = false;
+    });
+};
+
+// 合并版本架构数据到版本列表
+const mergeData = () => {
+  versionData.value.forEach((item) => {
+    item.children = [];
+    Object.entries(pkgInfo.value).forEach(([key, value]) => {
+      if (item.osAlias === key) {
+        item?.children && item?.children.push(...formatArchData(value));
+      }
+    });
+  });
+};
+
+// 设置默认架构参数
+const arch: string[] = ['aarch64', 'noarch', 'riscv64', 'loongarch64', 'x86_64', 'sw_64'];
+
+// 创建一个映射，以 arch 数组中的架构作为键
+const archMap = new Map(arch.map((item) => [item, 0]));
+
+const formatArchItem = (items: DataItem) => {
+  // 更新archMap值
+  Object.keys(items).forEach((key) => {
+    archMap.set(key, items[key]);
+  });
+  return Array.from(archMap).map(([arch, value]) => ({
+    name: arch,
+    value: value,
+  }));
+};
+
+const formatArchData = (data: { [key: string]: DataItem }) => {
+  const newChildren: DataT[] = Object.entries(data).reduce((acc, [type, items]) => {
+    acc.push({
+      type: getPkgName(type),
+      id: type,
+      children: formatArchItem(items),
+    });
+    return acc;
+  }, []);
+  return newChildren;
+};
+
+const getPkgName = (type: string) => {
+  let name = '';
+  switch (type.toLocaleLowerCase()) {
+    case 'field':
+      name = '领域应用';
+      break;
+    case 'rpm':
+      name = 'RPM';
+      break;
+    case 'epkg':
+      name = 'EPKG';
+      break;
+    case 'oepkg':
+      name = 'OEPKG';
+      break;
+    case 'image':
+      name = 'IMAGE';
+      break;
+  }
+  return name;
+};
+
+const queryVersionInfo = () => {
+  getVersionInfo()
+    .then((res) => {
+      pkgInfo.value = res.data;
+      mergeData();
+    })
     .catch((err) => {});
+};
+
+const currentVersion = ref('');
+const expandChangeData = (row: CommunityColumnsT) => {
+  currentVersion.value = row.osAlias;
+};
+
+const expands = ref([]);
+const getRowKeys = (row: CommunityColumnsT) => {
+  return row.os;
 };
 
 const statusType = (v: string) => {
@@ -38,6 +145,7 @@ const statusType = (v: string) => {
   }
 };
 
+// 格式化时间
 const timeFormat = (t: string) => {
   if (t.startsWith('0000-00-00')) {
     return '-';
@@ -46,32 +154,107 @@ const timeFormat = (t: string) => {
   }
 };
 
+const goJump = (id: string, v: string) => {
+  // router.push({
+  //   path: `/${locale.value}/apppkg`,
+  //   query: {
+  //     os: currentVersion.value,
+  //     arch: v,
+  //   },
+  // });
+};
+
 onMounted(() => {
   queryEulerVersion();
 });
+
+watch(
+  () => versionData.value,
+  () => {
+    expands.value.push(versionData.value[0].os);
+    currentVersion.value = versionData.value[0].osAlias;
+  }
+);
 </script>
 
 <template>
-  <OTable :columns="columns" class="table-version" :data="versionData" :loading="loading" border="all">
-    <template #td_os="{ row }">
-      <OLink color="primary">{{ row.os }}</OLink>
-    </template>
-    <template #td_releaseTime="{ row }">
-      {{ timeFormat(row.releaseTime) }}
-    </template>
-    <template #td_plannedMaintenanceEndtime="{ row }">
-      {{ timeFormat(row.plannedMaintenanceEndtime) }}
-    </template>
-    <template #td_actualMaintenanceEndtime="{ row }">
-      {{ timeFormat(row.actualMaintenanceEndtime) }}
-    </template>
-    <template #td_status="{ row }">
-      <OTag v-if="row.status" class="app-tag" :color="statusType(row.status)">{{ row.status }} </OTag>
-    </template>
-  </OTable>
+  <el-table
+    :data="versionData"
+    :row-key="getRowKeys"
+    :tree-props="{ children: 'children', hasChildren: 'hasChildren' }"
+    :expand-row-keys="expands"
+    @expand-change="expandChangeData"
+    style="width: 100%"
+    class="community-table"
+  >
+    <el-table-column type="expand">
+      <template #default="props">
+        <div class="expand-data">
+          <el-table :data="props.row.children">
+            <el-table-column label="软件包分类" width="220px">
+              <template #default="scope">
+                <div class="name">{{ scope.row.type }}</div>
+              </template>
+            </el-table-column>
+            <el-table-column label="架构 (软件包个数)">
+              <template #default="scope">
+                <div class="arch-box">
+                  <OLink v-for="item in scope.row.children" @click="goJump(scope.row.id, item.name)" :key="item.name" color="primary"
+                    >{{ item.name }}({{ item.value }})</OLink
+                  >
+                </div>
+              </template>
+            </el-table-column>
+          </el-table>
+        </div>
+      </template>
+    </el-table-column>
+    <el-table-column label="openEuler社区版本">
+      <template #default="scope">
+        <OLink color="primary">{{ scope.row.os }}</OLink>
+      </template>
+    </el-table-column>
+    <el-table-column label="发布时间" width="200">
+      <template #default="scope">
+        {{ timeFormat(scope.row.releaseTime) }}
+      </template>
+    </el-table-column>
+    <el-table-column label="计划维护时长" prop="maintenanceDuration" width="200" />
+    <el-table-column label="计划维护停止时间" width="220">
+      <template #default="scope">
+        {{ timeFormat(scope.row.plannedMaintenanceEndtime) }}
+      </template>
+    </el-table-column>
+    <el-table-column label="实际维护停止时间" width="220">
+      <template #default="scope">
+        {{ timeFormat(scope.row.actualMaintenanceEndtime) }}
+      </template>
+    </el-table-column>
+    <el-table-column label="状态" width="150">
+      <template #default="scope">
+        <OTag v-if="scope.row.status" class="app-tag" :color="statusType(scope.row.status)">{{ scope.row.status }} </OTag>
+      </template>
+    </el-table-column>
+  </el-table>
 </template>
 
 <style lang="scss" scoped>
+.expand-data {
+  margin: 12px 40px;
+  border: 1px solid var(--el-table-border-color);
+  border-radius: 4px;
+  .arch-box {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    justify-content: space-between;
+    gap: 8px;
+  }
+  .name {
+    @include text1;
+    color: var(--o-colorinfo1);
+    font-weight: 500;
+  }
+}
 :deep(.o-tag) {
   min-width: 72px;
   &.o-tag-primary {

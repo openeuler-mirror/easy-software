@@ -19,6 +19,7 @@ declare module 'vue' {
     ContentWrapper: typeof import('./src/components/ContentWrapper.vue')['default']
     DetailAside: typeof import('./src/components/detail/DetailAside.vue')['default']
     DetailBasicInfo: typeof import('./src/components/detail/DetailBasicInfo.vue')['default']
+    DetailContent: typeof import('./src/components/detail/DetailContent.vue')['default']
     DetailHeader: typeof import('./src/components/detail/DetailHeader.vue')['default']
     DetailInstallInfo: typeof import('./src/components/detail/DetailInstallInfo.vue')['default']
     DetailMoreInfo: typeof import('./src/components/detail/DetailMoreInfo.vue')['default']

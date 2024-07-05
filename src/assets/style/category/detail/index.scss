@@ -139,44 +139,7 @@
     padding: 16px 24px;
   }
 }
-:deep(.download.markdown-body, .installation.markdown-body) {
-  ul {
-    list-style: none;
-    padding-left: 0;
-    counter-reset: num;
-    li {
-      position: relative;
-      counter-increment: num 1;
-      padding-left: 32px;
-      overflow: hidden;
-      margin: 0;
-      &::after {
-        height: 24px;
-        width: 24px;
-        background: var(--o-color-primary1);
-        content: counter(num);
-        position: absolute;
-        border-radius: 50%;
-        color: var(--o-color-info1-inverse);
-        @include text1;
-        text-align: center;
-        top: 0;
-        left: 0;
-        display: block;
-      }
-      &:not(:last-child):before {
-        width: 1px;
-        background: var(--o-color-primary1);
-        content: '';
-        position: absolute;
-        top: 32px;
-        left: 11px;
-        bottom: 8px;
-        display: block;
-      }
-    }
-  }
-}
+
 .icon-img {
   width: 24px;
   cursor: pointer;
