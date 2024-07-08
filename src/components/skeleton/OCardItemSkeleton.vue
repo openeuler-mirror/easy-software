@@ -32,6 +32,7 @@ import { OSkeleton, OSkeletonText, OSkeletonFigure } from '@opensig/opendesign';
     display: flex;
     align-items: center;
     gap: 24px;
+    height: 60px;
   }
   .pkg-icon {
     height: 32px;

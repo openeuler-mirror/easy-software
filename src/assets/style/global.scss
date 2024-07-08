@@ -33,6 +33,9 @@ html {
     &.rpm-icon .o-icon {
       color: #00a7b3;
     }
+    &:hover {
+      --tag-bg-color: var(--o-color-primary4-light);
+    }
 
     svg {
       width: 16px;
