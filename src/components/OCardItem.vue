@@ -89,17 +89,25 @@ onMounted(() => {
 </template>
 
 <style lang="scss" scoped>
-.search .name-info {
-  .name span {
-    color: var(--o-color-primary1);
-  }
-}
 .home {
-  .arch,
-  .pkg-os {
-    display: none;
+  .o-card-main {
+    .arch,
+    .pkg-os {
+      display: none;
+    }
+    .pkg-icon {
+      align-items: center;
+    }
+    .pkg-info {
+      height: auto;
+      align-items: center;
+    }
+    .name-info {
+      height: inherit;
+    }
   }
 }
+
 .o-card-main {
   width: 100%;
   position: relative;
@@ -118,14 +126,15 @@ onMounted(() => {
   }
   .pkg-info {
     display: flex;
-    align-items: center;
     flex: 1;
+    height: 60px;
+    align-items: flex-start;
   }
   .pkg-icon {
     height: 32px;
     width: 64px;
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: center;
     img {
       max-width: 100%;
@@ -138,6 +147,17 @@ onMounted(() => {
     flex: 1;
     word-break: break-word;
     font-weight: 500;
+
+    display: -webkit-box;
+    height: 60px;
+    overflow: hidden;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    position: relative;
+    word-break: break-all;
+    .name span {
+      color: var(--o-color-primary1);
+    }
   }
   .pkg-box {
     .tags-box {
