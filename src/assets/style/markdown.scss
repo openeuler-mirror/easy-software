@@ -138,6 +138,9 @@
         padding-left: 32px;
         overflow: hidden;
         margin: 0;
+        > p:first-child {
+          font-weight: 500;
+        }
         &::after {
           height: 24px;
           width: 24px;

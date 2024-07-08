@@ -1,9 +1,13 @@
 export default {
   softwareHome: '软件中心',
   all: '领域应用',
+  field: '领域应用',
   rpmpkg: 'RPM',
+  rpm: 'RPM',
   apppkg: '容器镜像',
+  image: '容器镜像',
   epkgpkg: 'EPKG',
+  epkg: 'EPKG',
   oepkg: 'OEPKG',
   appversion: '上游兼容应用全景',
   filterAll: '全部',

@@ -14,6 +14,7 @@ import defaultImg from '@/assets/default-logo.png';
 import { columnTags, tagList } from '@/data/detail/index';
 import { useViewStore } from '@/stores/common';
 import { useI18n } from 'vue-i18n';
+import { getCode } from '@/utils/common';
 
 const tabValue = ref('apppkg');
 const { t } = useI18n();
@@ -174,6 +175,10 @@ const queryVer = () => {
 
                   <!-- 使用方式 -->
                   <p class="sp">> {{ t('detail.usage') }}</p>
+                  <div v-if="downloadData" class="image-code">
+                    <p class="text">获取容器镜像</p>
+                    <OCodeCopy :code="getCode(downloadData)" />
+                  </div>
                   <div v-if="imageUsage" v-dompurify-html="imageUsage" v-copy-code="true" class="markdown-body download"></div>
                 </template>
 

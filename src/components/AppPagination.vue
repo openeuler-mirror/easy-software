@@ -37,7 +37,7 @@ const handleCurrentChange = (val: number) => {
 const isFieldPage = ref(false);
 
 onMounted(() => {
-  isFieldPage.value = route.name === 'apppkg' || route.query?.tab === 'all';
+  isFieldPage.value = route.name === 'field' || route.query?.tab === 'all';
 });
 </script>
 

@@ -12,6 +12,7 @@ import { useI18n } from 'vue-i18n';
 import { useLocale } from '@/composables/useLocale';
 import { useViewStore } from '@/stores/common';
 import type { ParamsKeyT } from '@/@types/detail';
+import { getCode } from '@/utils/common';
 
 import AppFeedback from '@/components/AppFeedback.vue';
 import DetailHead from '@/components/detail/DetailHeader.vue';
@@ -135,7 +136,7 @@ const handleQueryData = (tab: string) => {
   const query = route.query;
   const { appPkgId, rpmPkgId, epkgPkgId } = query;
   router.push({
-    path: `/${locale.value}/apppkg/detail`,
+    path: `/${locale.value}/field/detail`,
     query: {
       type: tab,
       appPkgId,
@@ -286,7 +287,7 @@ const repeatTags = (v: string) => {
   <ContentWrapper vertical-padding="24px">
     <DetailSkeleton v-if="isLoading" />
     <template v-else>
-      <AppBreadcrumb id="apppkg" :name="appData.name" />
+      <AppBreadcrumb id="field" :name="appData.name" />
     </template>
   </ContentWrapper>
   <OTab
@@ -329,6 +330,10 @@ const repeatTags = (v: string) => {
 
                     <!-- 使用方式 -->
                     <p class="sp">> {{ t('detail.usage') }}</p>
+                    <div v-if="downloadData" class="image-code">
+                      <p class="text">获取容器镜像</p>
+                      <OCodeCopy :code="getCode(downloadData)" />
+                    </div>
                     <div v-if="imageUsage" v-dompurify-html="imageUsage" v-copy-code="true" class="markdown-body download"></div>
                   </template>
 

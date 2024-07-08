@@ -19,7 +19,7 @@ const router = useRouter();
 const { locale } = useLocale();
 const jumpTo = (name: string) => {
   router.push({
-    path: `/${locale.value}/apppkg`,
+    path: `/${locale.value}/field`,
     query: {
       type: name,
     },

@@ -5,14 +5,17 @@ import { getSearchAllFiled, getVersionInfo } from '@/api/api-domain';
 import { formatDateTime } from '@/utils/common';
 import { useRouter } from 'vue-router';
 import { useLocale } from '@/composables/useLocale';
+import { useI18n } from 'vue-i18n';
+
+interface DataSubT {
+  name: string;
+  value: number;
+}
 
 interface DataT {
   type: string;
   id: string;
-  children: {
-    name: string;
-    value: number;
-  }[];
+  children: DataSubT[];
 }
 
 interface DataItem {
@@ -31,6 +34,7 @@ interface CommunityColumnsT {
   children?: DataT[];
 }
 
+const { t } = useI18n();
 const router = useRouter();
 const { locale } = useLocale();
 const loading = ref(false);
@@ -43,7 +47,7 @@ const queryEulerVersion = () => {
   loading.value = true;
   getSearchAllFiled(params)
     .then((res) => {
-      versionData.value = res.data.list.reverse();
+      versionData.value = res.data.list;
       queryVersionInfo();
       loading.value = false;
     })
@@ -85,7 +89,6 @@ const formatArchItem = (items: DataItem) => {
 const formatArchData = (data: { [key: string]: DataItem }) => {
   const newChildren: DataT[] = Object.entries(data).reduce((acc, [type, items]) => {
     acc.push({
-      type: getPkgName(type),
       id: type,
       children: formatArchItem(items),
     });
@@ -94,35 +97,13 @@ const formatArchData = (data: { [key: string]: DataItem }) => {
   return newChildren;
 };
 
-const getPkgName = (type: string) => {
-  let name = '';
-  switch (type.toLocaleLowerCase()) {
-    case 'field':
-      name = '领域应用';
-      break;
-    case 'rpm':
-      name = 'RPM';
-      break;
-    case 'epkg':
-      name = 'EPKG';
-      break;
-    case 'oepkg':
-      name = 'OEPKG';
-      break;
-    case 'image':
-      name = 'IMAGE';
-      break;
-  }
-  return name;
-};
-
 const queryVersionInfo = () => {
   getVersionInfo()
     .then((res) => {
       pkgInfo.value = res.data;
       mergeData();
     })
-    .catch((err) => {});
+    .catch(() => {});
 };
 
 const currentVersion = ref('');
@@ -154,14 +135,18 @@ const timeFormat = (t: string) => {
   }
 };
 
-const goJump = (id: string, v: string) => {
-  // router.push({
-  //   path: `/${locale.value}/apppkg`,
-  //   query: {
-  //     os: currentVersion.value,
-  //     arch: v,
-  //   },
-  // });
+const goJump = (id: string, item: DataSubT) => {
+  if (item.value === 0) {
+    return;
+  }
+
+  router.push({
+    path: `/${locale.value}/${id.toLocaleLowerCase()}`,
+    query: {
+      os: currentVersion.value,
+      arch: item.name,
+    },
+  });
 };
 
 onMounted(() => {
@@ -193,13 +178,17 @@ watch(
           <el-table :data="props.row.children">
             <el-table-column label="软件包分类" width="220px">
               <template #default="scope">
-                <div class="name">{{ scope.row.type }}</div>
+                <div class="name">{{ t(`software.${scope.row.id.toLocaleLowerCase()}`) }}</div>
               </template>
             </el-table-column>
             <el-table-column label="架构 (软件包个数)">
               <template #default="scope">
                 <div class="arch-box">
-                  <OLink v-for="item in scope.row.children" @click="goJump(scope.row.id, item.name)" :key="item.name" color="primary"
+                  <OLink
+                    v-for="item in scope.row.children"
+                    @click="goJump(scope.row.id, item)"
+                    :key="item.name"
+                    :color="item.value !== 0 ? 'primary' : 'normal'"
                     >{{ item.name }}({{ item.value }})</OLink
                   >
                 </div>
@@ -211,7 +200,7 @@ watch(
     </el-table-column>
     <el-table-column label="openEuler社区版本">
       <template #default="scope">
-        <OLink color="primary">{{ scope.row.os }}</OLink>
+        <OLink color="primary">{{ scope.row.osAlias }}</OLink>
       </template>
     </el-table-column>
     <el-table-column label="发布时间" width="200">
@@ -260,6 +249,14 @@ watch(
   &.o-tag-primary {
     --tag-bg-color: #058ef0;
     --tag-bd-color: #058ef0;
+  }
+}
+
+:deep(.o-link) {
+  &.o-link-normal {
+    --link-color: var(--o-color-info1);
+    --link-color-hover: var(--o-color-info1);
+    cursor: default;
   }
 }
 </style>

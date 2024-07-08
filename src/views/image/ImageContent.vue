@@ -2,13 +2,14 @@
 import { ref, watch, computed, onMounted } from 'vue';
 import { OTag, OLink, OIcon, isUndefined } from '@opensig/opendesign';
 import { getSearchData } from '@/api/api-search';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { getSearchAllFiled, getSearchAllColumn } from '@/api/api-domain';
 import { useI18n } from 'vue-i18n';
 import { isValidSearchTabName, isValidSearchKey } from '@/utils/query';
 import { TABNAME_OPTIONS, FLITERMENUOPTIONS } from '@/data/query';
 import { getParamsRules } from '@/utils/common';
 import { useViewStore } from '@/stores/common';
+import { useLocale } from '@/composables/useLocale';
 
 import FilterCheckbox from '@/components/filter/FilterCheckbox.vue';
 import AppLoading from '@/components/AppLoading.vue';
@@ -16,8 +17,10 @@ import IconOs from '~icons/pkg/icon-os.svg';
 import IconArch from '~icons/pkg/icon-arch.svg';
 import IconCategory from '~icons/pkg/icon-category.svg';
 
+const { locale } = useLocale();
 const route = useRoute();
 const { t } = useI18n();
+const router = useRouter();
 
 // 软件包-表头
 const columns = [
@@ -176,6 +179,12 @@ const resetTag = () => {
   isSearchDocs.value = false;
   nameOrder.value = '';
   currentPage.value = 1;
+
+  if (route.query.os || route.query.arch) {
+    router.push({
+      path: `/${locale.value}/image`,
+    });
+  }
 };
 
 const filterList = computed(() => {
@@ -236,7 +245,7 @@ watch(
 // -------------------- 监听 url query 变化 触发搜索 ---------------------
 const handleQueryData = () => {
   const query = route.query;
-  const { name, tab, key } = query;
+  const { name, tab, key, os, arch } = query;
   if (!isUndefined(name) && name) {
     searchKey.value = name?.toString();
     currentPage.value = 1;
@@ -254,6 +263,14 @@ const handleQueryData = () => {
     keywordType.value = encodeURIComponent(key as string);
   } else {
     keywordType.value = FLITERMENUOPTIONS[0].id;
+  }
+
+  // 首页社区版本跳转
+  if (!isUndefined(os) && os) {
+    searchOs.value.push(os?.toString());
+  }
+  if (!isUndefined(arch) && arch) {
+    searchArch.value.push(arch?.toString());
   }
 };
 

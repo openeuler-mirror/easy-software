@@ -8,7 +8,7 @@ import { isValidSearchTabName, isValidSearchKey } from '@/utils/query';
 import { TABNAME_OPTIONS, FLITERMENUOPTIONS } from '@/data/query';
 
 import SearchTab from '@/components/search/SearchTab.vue';
-import AppPkgContent from '@/views/apppkg/APkgContent.vue';
+import AppPkgContent from '@/views/field/FieldContent.vue';
 import EpkgContent from '@/views/epkg/EpkgContent.vue';
 import OepkgContent from '@/views/oepkg/OEpkgContent.vue';
 import ImageContent from '@/views/image/ImageContent.vue';

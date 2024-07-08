@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, watch, computed, onMounted } from 'vue';
-import { ORow, OCol, OTag, OLink, OIcon, isUndefined, isString } from '@opensig/opendesign';
+import { ORow, OCol, OTag, OLink, OIcon, isUndefined } from '@opensig/opendesign';
 import { getSearchData } from '@/api/api-search';
 import { getSearchAllColumn, getSearchAllFiled } from '@/api/api-domain';
 import { useRoute, useRouter } from 'vue-router';
@@ -170,9 +170,9 @@ const onResetTag = () => {
   nameOrder.value = '';
   currentPage.value = 1;
 
-  if (route.query.type) {
+  if (route.query.type || route.query.os || route.query.arch) {
     router.push({
-      path: `/${locale.value}/apppkg`,
+      path: `/${locale.value}/field`,
     });
   }
 };
@@ -222,11 +222,6 @@ onMounted(() => {
     pageSearch();
   }
 
-  //判断主页领域应用跳转
-  const homeType = route.query.type as string;
-  if (isString(homeType) && homeType) {
-    searchCategory.value.push(homeType);
-  }
   queryFilter();
   handleQueryData();
 });
@@ -251,7 +246,7 @@ watch(
 // -------------------- 监听 url query 变化 触发搜索 ---------------------
 const handleQueryData = () => {
   const query = route.query;
-  const { name, tab, key } = query;
+  const { name, tab, key, os, arch, type } = query;
 
   if (!isUndefined(name) && name) {
     searchKey.value = name?.toString();
@@ -271,6 +266,27 @@ const handleQueryData = () => {
     keywordType.value = encodeURIComponent(key as string);
   } else {
     keywordType.value = FLITERMENUOPTIONS[0].id;
+  }
+
+  if (!isUndefined(name) && name) {
+    searchKey.value = name?.toString();
+    currentPage.value = 1;
+  } else if (name === '') {
+    searchKey.value = '';
+    isSearchDocs.value = false;
+  }
+
+  //判断主页领域应用更多跳转
+  if (isUndefined(type) && type) {
+    searchCategory.value.push(type as string);
+  }
+
+  // 首页社区版本跳转
+  if (!isUndefined(os) && os) {
+    searchOs.value = os?.toString();
+  }
+  if (!isUndefined(arch) && arch) {
+    searchArch.value = arch?.toString();
   }
 };
 

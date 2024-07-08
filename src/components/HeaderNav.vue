@@ -28,7 +28,7 @@ const selectedIndex = computed(() => {
     return idx;
   }
 
-  if (route.path.includes('/apppkg')) {
+  if (route.path.includes('/field')) {
     idx = 1;
     return idx;
   }

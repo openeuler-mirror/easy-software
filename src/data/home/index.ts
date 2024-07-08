@@ -1,6 +1,6 @@
 import { OPENEULER } from '@/data/config';
 
-import ApppkgIcon from '~icons/pkg/apppkg.svg';
+import FieldIcon from '~icons/pkg/apppkg.svg';
 import EpkgIcon from '~icons/pkg/epkg.svg';
 import ImageIcon from '~icons/pkg/image.svg';
 import RpmIcon from '~icons/pkg/rpm.svg';
@@ -14,11 +14,11 @@ import newsImg3 from '@/assets/home/1120-cv.jpg';
 
 export const homeData = [
   {
-    id: 'apppkg',
+    id: 'field',
     name: '领域应用',
     desc: 'openEuler操作系统支持的软件集合(包括RPM、容器镜像、EPKG软件包等）',
-    icon: ApppkgIcon,
-    href: '/apppkg',
+    icon: FieldIcon,
+    href: '/field',
   },
   {
     id: 'rpm',
