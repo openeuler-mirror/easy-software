@@ -54,9 +54,17 @@
 
     .search-filter-tags {
       display: flex;
-      gap: 8px;
       flex-wrap: wrap;
-      margin-top: 8px;
+      .o-tag {
+        margin-top: 8px;
+      }
+      .o-tag + .o-tag {
+        margin-left: 8px;
+      }
+      .o-link {
+        margin-left: 8px;
+        margin-top: 8px;
+      }
     }
   }
 

@@ -11,7 +11,7 @@ import { OSkeleton, OSkeletonText, OSkeletonFigure } from '@opensig/opendesign';
       </div>
       <div class="pkg-box">
         <div class="tags-box">
-          <OSkeletonText v-for="tag in 3" :key="tag" :rows="1" />
+          <OSkeletonText v-for="tag in 4" :key="tag" :rows="1" />
         </div>
         <OSkeletonText class="desc" :rows="2" />
       </div>
@@ -23,34 +23,39 @@ import { OSkeleton, OSkeletonText, OSkeletonFigure } from '@opensig/opendesign';
 .o-skeleton-item + .o-skeleton-item {
   margin: 0;
 }
+.skeleton-fullname + .skeleton-fullname {
+  margin-left: 32px;
+}
 .skeleton-fullname {
-  height: 182px;
   flex: 1;
   padding: 24px;
   background: var(--o-color-fill2);
+
   .pkg-info {
     display: flex;
     align-items: center;
-    gap: 24px;
     height: 60px;
+    .pkg-icon {
+      margin-left: 24px;
+    }
   }
   .pkg-icon {
     height: 32px;
     width: 64px;
-    margin: 0 !important;
   }
   .name {
     @include h3;
     flex: 1;
   }
   .pkg-box {
-    height: 102px;
     .tags-box {
       display: flex;
       justify-content: space-between;
-      gap: 8px;
       .o-skeleton-text {
         --skeleton-height: 24px;
+      }
+      .o-skeleton-text + .o-skeleton-text {
+        margin-left: 8px;
       }
     }
     .desc {

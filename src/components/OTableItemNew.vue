@@ -150,8 +150,9 @@ const onExternalDialog = (href: string) => {
 .operation-box {
   display: flex;
   align-items: center;
-  gap: 12px;
-
+  .o-link + .o-link {
+    margin-left: 12px;
+  }
   .code-repo {
     svg {
       width: 16px;

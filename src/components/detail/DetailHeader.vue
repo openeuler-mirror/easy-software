@@ -158,7 +158,9 @@ const scrollToAnchor = (id: string) => {
       a {
         display: flex;
         align-items: center;
-        gap: 8px;
+        .icon-img {
+          margin-right: 8px;
+        }
       }
     }
 

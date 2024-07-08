@@ -113,7 +113,9 @@ const onExternalDialog = () => {
 .feedback-other {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 24px;
+  a + a {
+    margin-left: 24px;
+  }
   a {
     @include text1;
     color: var(--o-color-info1);

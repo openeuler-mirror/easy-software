@@ -133,19 +133,22 @@ onMounted(() => {
 .solution-content {
   display: flex;
   justify-content: space-between;
-  gap: 32px;
   .solution-item {
     background: var(--o-color-fill2);
     height: 260px;
     display: flex;
     justify-content: space-between;
     transition: box-shadow var(--o-easing-standard) var(--o-duration-m2);
+    flex: 1;
     &:hover {
       box-shadow: 0 2px 24px rgba(var(--o-kleinblue-10), 0.15);
       h3 {
         color: var(--o-color-primary1);
       }
     }
+  }
+  .solution-item + .solution-item {
+    margin-left: 32px;
   }
   .cover {
     width: 260px;
