@@ -408,8 +408,10 @@ $color: #fff;
     .code-box {
       display: flex;
       justify-content: right;
-      gap: 16px;
       margin-bottom: 16px;
+      .code-pop + .code-pop {
+        margin-left: 16px;
+      }
       .code-pop {
         position: relative;
         height: 20px;
@@ -482,7 +484,10 @@ $color: #fff;
       display: flex;
       justify-content: right;
       align-items: center;
-      gap: 16px;
+
+      .links-logo + .links-logo {
+        margin-left: 16px;
+      }
       .links-logo {
         height: 16px;
         cursor: pointer;
@@ -505,7 +510,9 @@ $color: #fff;
         }
       }
       &.iszh {
-        gap: 10px;
+        .links-logo + .links-logo {
+          margin-left: 10px;
+        }
         .links-logo {
           height: 14px;
 

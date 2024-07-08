@@ -132,7 +132,7 @@ const searchOptions = computed(() => {
     <div v-for="(item, index) in searchOptions" :key="index" class="recommend-item">
       <div class="recommend-header">
         <p class="title">
-          <OIcon><component :is="getTagsIcon(item.key)" /></OIcon>
+          <OIcon class="icon"><component :is="getTagsIcon(item.key)" /></OIcon>
           {{ t(`software.${item.key}`) }}
         </p>
         <p class="info">
@@ -212,7 +212,9 @@ const searchOptions = computed(() => {
       display: flex;
       align-items: center;
       color: var(--o-color-info3);
-      gap: 4px;
+      .icon {
+        margin-right: 4px;
+      }
       svg {
         width: 16px;
         height: 16px;

@@ -301,7 +301,9 @@ watch(
   width: 100%;
   display: flex;
   justify-content: space-between;
-  gap: 24px;
+  p + p {
+    margin-left: 24px;
+  }
 }
 :deep(.o-table) {
   th,

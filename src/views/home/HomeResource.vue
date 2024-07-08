@@ -39,9 +39,12 @@ const resourceLeave = (id: string) => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 32px;
+
   .resource-panel {
     flex: 1;
+  }
+  .resource-panel + .resource-panel {
+    margin-left: 32px;
   }
   .resource-item {
     display: flex;

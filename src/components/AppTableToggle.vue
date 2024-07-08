@@ -43,7 +43,6 @@ const showMore = () => {
     <template #th_flags>
       <span class="flags">
         Flags
-
         <OPopover position="top" trigger="hover" style="width: 168px">
           <template #target>
             <OIcon ref="flagsRef" class="flags-icon"><IconHelp /></OIcon>
@@ -81,10 +80,10 @@ const showMore = () => {
 .flags {
   display: flex;
   align-items: center;
-  gap: 8px;
   .flags-icon {
     font-size: 16px;
     cursor: pointer;
+    margin-left: 8px;
     color: var(--o-color-info1);
     svg {
       width: 16px;

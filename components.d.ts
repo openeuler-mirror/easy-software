@@ -22,6 +22,8 @@ declare module 'vue' {
     DetailHeader: typeof import('./src/components/detail/DetailHeader.vue')['default']
     DetailMoreInfo: typeof import('./src/components/detail/DetailMoreInfo.vue')['default']
     DetailSkeleton: typeof import('./src/components/skeleton/DetailSkeleton.vue')['default']
+    ElTable: typeof import('element-plus/es')['ElTable']
+    ElTableColumn: typeof import('element-plus/es')['ElTableColumn']
     ExternalLink: typeof import('./src/components/ExternalLink.vue')['default']
     FilterCheckbox: typeof import('./src/components/filter/FilterCheckbox.vue')['default']
     FilterHeader: typeof import('./src/components/filter/FilterHeader.vue')['default']
@@ -41,5 +43,8 @@ declare module 'vue' {
     SearchFilter: typeof import('./src/components/search/SearchFilter.vue')['default']
     SearchRecommend: typeof import('./src/components/search/SearchRecommend.vue')['default']
     SearchTab: typeof import('./src/components/search/SearchTab.vue')['default']
+  }
+  export interface ComponentCustomProperties {
+    vLoading: typeof import('element-plus/es')['ElLoadingDirective']
   }
 }

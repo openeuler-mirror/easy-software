@@ -50,7 +50,9 @@ const onChange = () => {
 .dlg-action {
   display: flex;
   justify-content: center;
-  gap: 16px;
+  .o-btn + .o-btn {
+    margin-left: 16px;
+  }
 }
 .external-content {
   margin: 0 0 24px;

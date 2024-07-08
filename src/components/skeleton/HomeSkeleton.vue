@@ -23,7 +23,6 @@ import { OSkeleton, OSkeletonText } from '@opensig/opendesign';
 }
 .skeleton-figure {
   display: flex;
-  gap: 32px;
   margin-top: 24px;
 }
 .o-skeleton-item + .o-skeleton-item {

@@ -184,7 +184,9 @@ const jumpTo = (href: string) => {
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 48px;
+      img + img {
+        margin-left: 48px;
+      }
       .img0,
       .img2 {
         height: 40px;
@@ -195,7 +197,9 @@ const jumpTo = (href: string) => {
     }
     .solution-adv-box {
       display: flex;
-      gap: 80px;
+      .o-card + .o-card {
+        margin-left: 80px;
+      }
       :deep(.o-card) {
         --card-main-padding: 0;
         flex: 1;
@@ -205,7 +209,10 @@ const jumpTo = (href: string) => {
   .solution-info {
     display: flex;
     justify-content: space-between;
-    gap: 32px;
+
+    .o-card + .o-card {
+      margin-left: 32px;
+    }
     :deep(.o-card) {
       --card-main-padding: 40px;
       flex: 1;
