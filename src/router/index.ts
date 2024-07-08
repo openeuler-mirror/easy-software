@@ -14,13 +14,13 @@ const routes = [
     path: '/zh/field',
     name: 'field',
     alias: '/en/field',
-    component: () => import('@/views/field/Thefield.vue'),
+    component: () => import('@/views/field/TheField.vue'),
   },
   {
     path: '/zh/field/detail',
     name: 'field-detail',
     alias: '/en/field/detail',
-    component: () => import('@/views/field/ThefieldDetail.vue'),
+    component: () => import('@/views/field/TheFieldDetail.vue'),
   },
   {
     path: '/zh/rpm',
