@@ -35,7 +35,15 @@
     }
   }
 }
-
+.image-code {
+  margin-bottom: 16px;
+  .text {
+    @include text1;
+    font-weight: 500;
+    color: var(--o-color-info1);
+    margin-bottom: 16px;
+  }
+}
 :deep(.domain-tabs) {
   padding-top: 26px;
   &.min {

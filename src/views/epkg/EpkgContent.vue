@@ -4,8 +4,9 @@ import { OTag, OLink, OIcon, isUndefined } from '@opensig/opendesign';
 
 import { getSearchData } from '@/api/api-search';
 import { getSearchAllColumn, getSearchAllFiled } from '@/api/api-domain';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
+import { useLocale } from '@/composables/useLocale';
 import { getParamsRules } from '@/utils/common';
 import { isValidSearchTabName, isValidSearchKey } from '@/utils/query';
 import { TABNAME_OPTIONS, FLITERMENUOPTIONS } from '@/data/query';
@@ -18,7 +19,9 @@ import IconArch from '~icons/pkg/icon-arch.svg';
 import IconCategory from '~icons/pkg/icon-category.svg';
 
 const route = useRoute();
+const router = useRouter();
 const { t } = useI18n();
+const { locale } = useLocale();
 
 // EPKG-表头
 const columns = [
@@ -186,6 +189,12 @@ const resetTag = () => {
   nameOrder.value = '';
   timeOrder.value = '';
   currentPage.value = 1;
+
+  if (route.query.os || route.query.arch) {
+    router.push({
+      path: `/${locale.value}/epkg`,
+    });
+  }
 };
 
 // 更新时间排序
@@ -250,7 +259,7 @@ watch(
 // -------------------- 监听 url query 变化 触发搜索 ---------------------
 const handleQueryData = () => {
   const query = route.query;
-  const { name, tab, key } = query;
+  const { name, tab, key, os, arch } = query;
   if (!isUndefined(name) && name) {
     searchKey.value = name?.toString();
     currentPage.value = 1;
@@ -268,6 +277,14 @@ const handleQueryData = () => {
     keywordType.value = encodeURIComponent(key as string);
   } else {
     keywordType.value = FLITERMENUOPTIONS[0].id;
+  }
+
+  // 首页社区版本跳转
+  if (!isUndefined(os) && os) {
+    searchOs.value.push(os?.toString());
+  }
+  if (!isUndefined(arch) && arch) {
+    searchArch.value.push(arch?.toString());
   }
 };
 

@@ -38,7 +38,7 @@ function getQueryString(params: PkgIdsT) {
 }
 
 const jumpTo = (id: PkgIdsT, type?: PkgTypeT) => {
-  return `/${locale.value}/apppkg/detail?${type ? `type=${type}` : ''}${getQueryString(id)}`;
+  return `/${locale.value}/field/detail?${type ? `type=${type}` : ''}${getQueryString(id)}`;
 };
 
 const repeatTags = (v: string) => {

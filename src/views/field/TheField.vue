@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import AppBanner from '@/components/AppBanner.vue';
 import ContentWrapper from '@/components/ContentWrapper.vue';
-import AppPkgContent from './APkgContent.vue';
+import AppPkgContent from './FieldContent.vue';
 import { homeData } from '@/data/home/index';
 
 import bannerImg from '@/assets/banner/banner1.jpg';

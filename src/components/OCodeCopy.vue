@@ -66,6 +66,7 @@ const copyText = (e: MouseEvent) => {
     transition: all var(--o-duration-m1) var(--o-easing-standard-in);
     height: 24px;
     box-sizing: content-box;
+    border-radius: 0 4px 0 0;
     svg {
       width: 24px;
     }
