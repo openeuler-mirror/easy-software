@@ -1,8 +1,13 @@
 @use '../mixin/font.scss' as *;
 #app .el-table {
   --el-table-header-bg-color: var(--o-color-control3-light);
+  --el-table-border-color: var(--o-color-control4);
   border-radius: 4px;
   @include text1;
+  color: var(--o-color-info1);
+  .el-table__inner-wrapper::before {
+    background-color: transparent;
+  }
   .el-table__cell {
     padding: 12px 0;
     .cell {
@@ -10,12 +15,26 @@
     }
   }
   thead {
-    color: var(--o-color-info2);
     th {
+      @include text1;
       font-weight: 500;
+      color: var(--o-color-info1);
     }
   }
-  td {
-    color: var(--o-color-info2);
+  tr:last-child {
+    td {
+      border-bottom: 0;
+    }
+  }
+  .el-table__expand-icon {
+    display: flex;
+    align-items: center;
+    > .el-icon {
+      font-size: 16px;
+      color: var(--o-color-info1);
+    }
+  }
+  .el-table__placeholder {
+    display: none;
   }
 }
