@@ -73,7 +73,6 @@ const isLoading = ref(true);
 const queryEntity = () => {
   const query = route.query;
   const { type, appPkgId, epkgPkgId, rpmPkgId } = query;
-
   getDetail(
     filterEmptyParams({
       appPkgId: (appPkgId as string) || '',
@@ -241,8 +240,6 @@ const getDetailValue = (data: any) => {
   appData.value.repository = data.srcRepo;
 };
 
-// 更多信息表头
-
 // 获取img分类
 const imgName = ref(tagList[0].lable);
 const tagsValue = ref([]);
@@ -305,7 +302,7 @@ const repeatTags = (v: string) => {
         <DetailHead :data="appData" :basicInfo="summary" :maintainer="maintainer" />
         <div class="detail-row">
           <div class="detail-row-main" :class="{ tags: isTags }">
-            <AppSection :title="t('detail.information')" v-if="item !== 'IMAGE'">
+            <AppSection :title="`> ${t('detail.information')}`" v-if="item !== 'IMAGE'">
               <!-- 基本信息 -->
               <DetailBasicInfo :options="basicInfo" />
 

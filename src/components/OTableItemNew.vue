@@ -181,9 +181,9 @@ const onExternalDialog = (href: string) => {
 }
 
 :deep(.o-table) {
-  --table-edge-padding: 16px;
-  --table-cell-padding: 12px;
-  --table-head-cell-padding: 12px;
+  --table-edge-padding: 32px;
+  --table-cell-padding: 16px 20px;
+  --table-head-cell-padding: 12px 20px;
   --table-cell-height: 80px;
   .label {
     display: flex;
@@ -214,10 +214,10 @@ const onExternalDialog = (href: string) => {
     width: 165px;
   }
   .appVer {
-    width: 230px;
+    width: 200px;
   }
   .version {
-    width: 130px;
+    width: 135px;
   }
   .td-break {
     word-break: break-all;
@@ -231,7 +231,7 @@ const onExternalDialog = (href: string) => {
     word-break: break-all;
   }
   .os {
-    width: 215px;
+    width: 200px;
   }
   .arch {
     width: 90px;
@@ -250,7 +250,7 @@ const onExternalDialog = (href: string) => {
     text-align: right;
   }
   .operation {
-    width: 155px;
+    width: 175px;
   }
 }
 </style>

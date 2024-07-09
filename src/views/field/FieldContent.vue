@@ -277,7 +277,7 @@ const handleQueryData = () => {
   }
 
   //判断主页领域应用更多跳转
-  if (isUndefined(type) && type) {
+  if (!isUndefined(type) && type) {
     searchCategory.value.push(type as string);
   }
 

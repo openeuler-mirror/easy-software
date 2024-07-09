@@ -42,7 +42,7 @@ const onExternalDialog = (href: string) => {
 };
 
 const scrollToAnchor = (id: string) => {
-  const top = document.getElementById(id)?.offsetTop;
+  const top = document.querySelector('.o-tab-pane-active .feedback')?.offsetTop;
   scrollToTop(top, false);
 };
 </script>

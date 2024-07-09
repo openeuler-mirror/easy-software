@@ -25,7 +25,7 @@ export const homeData = [
     name: 'RPM',
     desc: '一系列基于openEuler操作系统预编译的二进制软件包',
     icon: RpmIcon,
-    href: '/package',
+    href: '/rpm',
   },
   {
     id: 'image',

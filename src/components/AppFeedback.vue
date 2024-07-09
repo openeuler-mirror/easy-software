@@ -30,7 +30,7 @@ const { t } = useI18n();
 
 // -------------------- 快速反馈 --------------------
 const rateVal = ref(0);
-const feekbackTxa = ref('');
+const feedbackTxa = ref('');
 const message = useMessage();
 
 // -------------------- 提交issue --------------------
@@ -42,7 +42,7 @@ const getIssueTemplate = () => {
 > ${rateVal.value}
 %0A
 3. 【反馈意见】%0A
-> ${xss(feekbackTxa.value)}
+> ${xss(feedbackTxa.value)}
 `;
 };
 const issueUrl = ref();
@@ -59,7 +59,7 @@ const onExternalDialog = () => {
     return message.warning({
       content: t('software.feedbackMessage[1]'),
     });
-  } else if (feekbackTxa.value === '') {
+  } else if (feedbackTxa.value === '') {
     return message.warning({
       content: t('software.feedbackMessage[0]'),
     });
@@ -72,14 +72,14 @@ const onExternalDialog = () => {
 </script>
 
 <template>
-  <AppSection :title="t('software.feedbackTitle')" id="feed">
-    <div class="feekback-content">
+  <AppSection :title="t('software.feedbackTitle')" class="feedback">
+    <div class="feedback-content">
       <div class="rate-box">
         <ORate v-model="rateVal" color="primary" size="large" />
       </div>
-      <div class="feekback-from">
+      <div class="feedback-from">
         <OTextarea
-          v-model="feekbackTxa"
+          v-model="feedbackTxa"
           round="4px"
           :placeholder="t('software.feedbackPlaceholder')"
           :max-length="200"
@@ -140,7 +140,7 @@ const onExternalDialog = () => {
     }
   }
 }
-.feekback-from {
+.feedback-from {
   .o-textarea {
     margin: 16px 0 0;
   }

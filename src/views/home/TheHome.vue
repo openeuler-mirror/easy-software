@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { OAnchor, OAnchorItem } from '@opensig/opendesign';
+import { OAnchor, OAnchorItem, OCard } from '@opensig/opendesign';
 import { ref, onMounted } from 'vue';
 import { getSearchAllFiled } from '@/api/api-domain';
 import type { AppT } from '@/@types/app';
@@ -74,15 +74,17 @@ onMounted(() => {
           <div id="solution" class="domain-solution">
             <h2>解决方案</h2>
             <div class="solution-content">
-              <a v-for="item in solutionData" :key="item.title" class="solution-item" :href="`/${locale}` + item.href">
-                <div class="cover">
-                  <img :src="item.img" alt="" />
-                </div>
-                <div class="solution-content-box">
-                  <h3>{{ item.title }}</h3>
-                  <p class="desc">{{ item.desc }}</p>
-                </div>
-              </a>
+              <OCard
+                v-for="item in solutionData"
+                :key="item.title"
+                class="solution-item"
+                :href="`/${locale}` + item.href"
+                :cover="item.img"
+                :cover-ratio="1 / 1"
+                :title="item.title"
+                :detail="item.desc"
+                layout="h"
+              />
             </div>
           </div>
 
@@ -134,52 +136,18 @@ onMounted(() => {
   display: flex;
   justify-content: space-between;
   .solution-item {
-    background: var(--o-color-fill2);
     height: 260px;
-    display: flex;
-    justify-content: space-between;
-    transition: box-shadow var(--o-easing-standard) var(--o-duration-m2);
-    flex: 1;
+
     &:hover {
-      box-shadow: 0 2px 24px rgba(var(--o-kleinblue-10), 0.15);
       h3 {
         color: var(--o-color-primary1);
       }
     }
+    --card-h-cover-width: 260px;
+    --card-main-padding: 40px 32px;
   }
   .solution-item + .solution-item {
     margin-left: 32px;
-  }
-  .cover {
-    width: 260px;
-    height: 100%;
-    overflow: hidden;
-    img {
-      max-width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-  }
-  .solution-content-box {
-    flex: 1;
-    padding: 48px 32px;
-    position: relative;
-    h3 {
-      @include h2;
-      font-weight: 500;
-      color: var(--o-color-info1);
-      margin-bottom: 32px;
-    }
-    .desc {
-      @include text1;
-      margin-top: 16px;
-      color: var(--o-color-info2);
-    }
-    .o-btn {
-      position: absolute;
-      bottom: 24px;
-      left: 32px;
-    }
   }
 }
 </style>

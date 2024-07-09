@@ -1,11 +1,13 @@
 <script lang="ts" setup>
-import { OTag, OLink } from '@opensig/opendesign';
-import { ref, onMounted, watch } from 'vue';
+import { OTag, OLink, OIcon } from '@opensig/opendesign';
+import { ref, onMounted, watch, computed } from 'vue';
 import { getSearchAllFiled, getVersionInfo } from '@/api/api-domain';
 import { formatDateTime } from '@/utils/common';
 import { useRouter } from 'vue-router';
 import { useLocale } from '@/composables/useLocale';
 import { useI18n } from 'vue-i18n';
+
+import IconChevronDown from '~icons/app/icon-chevron-down.svg';
 
 interface DataSubT {
   name: string;
@@ -39,6 +41,7 @@ const router = useRouter();
 const { locale } = useLocale();
 const loading = ref(false);
 const versionData = ref<CommunityColumnsT[]>([]);
+const renderData = ref<CommunityColumnsT[]>([]);
 const pkgInfo = ref({});
 const queryEulerVersion = () => {
   const params = {
@@ -48,6 +51,7 @@ const queryEulerVersion = () => {
   getSearchAllFiled(params)
     .then((res) => {
       versionData.value = res.data.list;
+      renderData.value = res.data.list;
       queryVersionInfo();
       loading.value = false;
     })
@@ -72,10 +76,10 @@ const mergeData = () => {
 // 设置默认架构参数
 const arch: string[] = ['aarch64', 'noarch', 'riscv64', 'loongarch64', 'x86_64', 'sw_64'];
 
-// 创建一个映射，以 arch 数组中的架构作为键
-const archMap = new Map(arch.map((item) => [item, 0]));
-
 const formatArchItem = (items: DataItem) => {
+  // 创建一个映射，以 arch 数组中的架构作为键
+  const archMap = new Map(arch.map((item) => [item, 0]));
+
   // 更新archMap值
   Object.keys(items).forEach((key) => {
     archMap.set(key, items[key]);
@@ -156,15 +160,34 @@ onMounted(() => {
 watch(
   () => versionData.value,
   () => {
-    expands.value.push(versionData.value[0].os);
-    currentVersion.value = versionData.value[0].osAlias;
+    if (versionData.value && versionData.value[0]?.length > 0) {
+      expands.value.push(versionData.value[0]?.os);
+      currentVersion.value = versionData.value[0].osAlias;
+    }
+    renderData.value = versionData.value;
   }
 );
+
+// ------------------------默认展示10条数据 展开收起-----------------------------
+const isToggle = ref(false);
+const tableLen = ref(10);
+const tableAllData = computed(() => {
+  let tableVerData = [];
+  if (isToggle.value && versionData.value.length > tableLen.value) {
+    tableVerData = versionData.value;
+  } else {
+    tableVerData = versionData.value.slice(0, tableLen.value);
+  }
+  return tableVerData;
+});
+const showMore = () => {
+  isToggle.value = !isToggle.value;
+};
 </script>
 
 <template>
   <el-table
-    :data="versionData"
+    :data="tableAllData"
     :row-key="getRowKeys"
     :tree-props="{ children: 'children', hasChildren: 'hasChildren' }"
     :expand-row-keys="expands"
@@ -225,11 +248,34 @@ watch(
       </template>
     </el-table-column>
   </el-table>
+  <p v-if="tableAllData.length >= tableLen" @click="showMore" class="view-all">
+    <OLink :class="isToggle ? 'up' : 'down'">
+      {{ isToggle ? t('software.upList') : t('software.viewAll') }}
+      <template #suffix>
+        <OIcon><IconChevronDown /></OIcon>
+      </template>
+    </OLink>
+  </p>
 </template>
 
 <style lang="scss" scoped>
+.view-all {
+  text-align: center;
+  margin-top: 20px;
+  .o-link:hover {
+    color: var(--o-color-primary1);
+    cursor: pointer;
+  }
+  svg {
+    transition: 0.3s ease-in-out;
+  }
+  .up svg {
+    transform: rotate(180deg);
+  }
+}
+
 .expand-data {
-  margin: 12px 40px;
+  margin: 12px 64px;
   border: 1px solid var(--el-table-border-color);
   border-radius: 4px;
   .arch-box {
@@ -240,7 +286,7 @@ watch(
   }
   .name {
     @include text1;
-    color: var(--o-colorinfo1);
+    color: var(--o-color-info1);
     font-weight: 500;
   }
 }
