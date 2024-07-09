@@ -183,6 +183,7 @@ const searchOptions = computed(() => {
   box-shadow: var(--o-shadow-1);
   height: auto;
   padding: 16px 16px 12px;
+  border-radius: 4px;
   .search-all {
     display: flex;
     align-items: center;
@@ -226,7 +227,7 @@ const searchOptions = computed(() => {
       color: var(--o-color-info2);
       svg {
         width: 16px;
-        color: currentColor;
+        fill: currentColor;
       }
     }
   }

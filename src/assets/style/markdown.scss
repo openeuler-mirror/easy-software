@@ -84,21 +84,25 @@
     th {
       background-color: var(--o-color-control3-light);
       text-align: left;
+      border: 0 none !important;
+      height: 40px;
     }
     th,
     td {
       box-sizing: border-box;
       padding: var(--table-padding);
-      height: 40px;
       @include tip1;
       color: var(--o-color-info2);
+      border-color: var(--o-color-control4);
     }
     tr {
-      background: #fff !important;
+      background: var(--o-color-fill2) !important;
+      border: 0 !important;
     }
 
     td {
       box-sizing: border-box;
+      height: 48px;
     }
   }
 

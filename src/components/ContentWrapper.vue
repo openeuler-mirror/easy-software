@@ -56,9 +56,14 @@ const paddingBottom = computed(() => {
 <style lang="scss" scoped>
 .content-wrapper {
   max-width: var(--layout-content-max-width);
+  margin: 0 auto;
+
   padding-left: var(--layout-content-padding);
   padding-right: var(--layout-content-padding);
-  margin: 0 auto;
+  @include respond-to('<=laptop') {
+    padding-left: 0;
+    padding-right: 0;
+  }
 
   --content-wrapper-vertical-paddingTop: 32px;
   --content-wrapper-vertical-paddingBottom: 48px;

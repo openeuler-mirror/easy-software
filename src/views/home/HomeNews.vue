@@ -39,6 +39,7 @@ import { homeNewsData } from '@/data/home/index';
 }
 
 :deep(.o-card) {
+  --card-footer-gap: 16px;
   .o-card-cover {
     --card-cover-padding: 0;
   }
@@ -59,6 +60,7 @@ import { homeNewsData } from '@/data/home/index';
     -webkit-line-clamp: 2;
     overflow: hidden;
     position: relative;
+    @include text1;
     &::after {
       background-image: linear-gradient(90deg, hsla(0, 0%, 93%, 0), hsla(0, 0%, 100%, 0.8) 59%, var(--o-color-control-light) 100%);
       bottom: 0;

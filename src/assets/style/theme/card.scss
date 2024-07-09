@@ -4,7 +4,9 @@
   --card-shadow-hover: 0 2px 24px rgba(var(--o-kleinblue-10), 0.15);
   --card-shadow-active: 0 2px 24px rgba(var(--o-kleinblue-10), 0.15);
 }
-
+.o-card-cover-h {
+  --card-cover-padding: 0;
+}
 a.o-card:hover .o-card-title {
   color: var(--o-color-primary1);
 }

@@ -46,6 +46,7 @@ const { isZh } = useLocale();
   -moz-osx-font-smoothing: grayscale;
   background-color: var(--o-color-fill1);
   min-width: 1440px;
+
   --layout-header-height: 64px;
   --layout-header-zIndex: 20;
   --layout-header-max-width: 1440px;
@@ -83,4 +84,3 @@ const { isZh } = useLocale();
   padding-top: var(--layout-header-height);
 }
 </style>
-@/stores/common
