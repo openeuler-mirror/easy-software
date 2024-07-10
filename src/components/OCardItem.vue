@@ -119,8 +119,7 @@ onMounted(() => {
     }
   }
   .pkg-os {
-    font-size: 12px;
-    line-height: 18px;
+    @include tip1;
     color: var(--o-color-info2);
     margin-top: 6px;
   }

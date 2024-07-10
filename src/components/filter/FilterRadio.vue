@@ -51,8 +51,8 @@ const showMoreItem = () => {
         </ORadio>
       </template>
     </ORadioGroup>
-    <p v-if="options.length >= showLen && options.length !== DEFAULT_NUM" @click="showMoreItem" class="view-all">
-      <OLink color="primary" :class="isAll ? 'up' : 'down'" size="small">
+    <p v-if="options.length >= showLen && options.length !== DEFAULT_NUM" class="view-all">
+      <OLink color="primary" @click="showMoreItem" :class="isAll ? 'up' : 'down'" size="small">
         {{ isAll ? t('software.upList') : t('software.viewAll') }}
         <template #suffix>
           <OIcon><IconChevronDown /></OIcon>
@@ -69,6 +69,10 @@ const showMoreItem = () => {
   margin-left: 28px;
   .o-radio {
     margin: 8px 0;
+  }
+  .o-radio-checked .o-radio-label {
+    color: var(--o-color-info1);
+    font-weight: 500;
   }
 }
 .filter-box {
@@ -103,6 +107,7 @@ const showMoreItem = () => {
   svg {
     color: var(--o-color-primary1);
     transition: 0.3s ease-in-out;
+    width: 20px;
   }
   .up svg {
     transform: rotate(180deg);

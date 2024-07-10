@@ -192,7 +192,7 @@ const searchOptions = computed(() => {
     color: var(--o-color-info1);
     svg {
       width: 16px;
-      color: currentColor;
+      fill: currentColor;
     }
   }
   .recommend-item {

@@ -132,7 +132,7 @@ const onExternalDialog = (href: string) => {
       </template>
     </OTable>
     <!-- 安装下载容器镜像 -->
-    <ODialog v-model:visible="showDlg" :unmount-on-hide="true" size="small" :hide-close="true" class="nss-dialog">
+    <ODialog v-model:visible="showDlg" :unmount-on-hide="true" size="small" class="nss-dialog">
       <template #header>
         <p class="feedback-title">{{ t('software.installImage.title') }}</p>
       </template>

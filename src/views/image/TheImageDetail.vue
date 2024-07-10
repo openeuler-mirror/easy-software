@@ -86,14 +86,16 @@ const getDetailValue = (data: ImageDetailT) => {
     binDownloadUrl,
     iconUrl,
     srcRepo,
+    osSupport,
+    arch,
     appSize,
   } = data;
 
   basicInfo.value = [
-    // { name: '架构', value: arch },
+    { name: '架构', value: arch },
     { name: t('detail.number'), value: appVer },
     { name: t('detail.epkgCategory'), value: category },
-    // { name: '版本支持情况', value: osSupport },
+    { name: '版本支持情况', value: osSupport },
   ];
 
   maintainer.value = {
