@@ -30,11 +30,15 @@ const querySearchCount = () => {
     keyword: searchKey.value,
     keywordType: keywordType.value,
   };
-  getSearchCount(searchParams).then((res) => {
-    if (res.code === 200) {
-      menuData.value = res.data;
-    }
-  });
+  getSearchCount(searchParams)
+    .then((res) => {
+      if (res.code === 200) {
+        menuData.value = res.data;
+      }
+    })
+    .catch(() => {
+      menuData.value = [];
+    });
 };
 
 // -------------------- 监听 url query 变化 触发搜索 ---------------------

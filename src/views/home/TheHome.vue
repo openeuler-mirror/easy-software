@@ -137,7 +137,7 @@ onMounted(() => {
   justify-content: space-between;
   .solution-item {
     height: 260px;
-
+    flex: 1;
     &:hover {
       h3 {
         color: var(--o-color-primary1);

@@ -41,7 +41,6 @@ const router = useRouter();
 const { locale } = useLocale();
 const loading = ref(false);
 const versionData = ref<CommunityColumnsT[]>([]);
-const renderData = ref<CommunityColumnsT[]>([]);
 const pkgInfo = ref({});
 const queryEulerVersion = () => {
   const params = {
@@ -51,7 +50,6 @@ const queryEulerVersion = () => {
   getSearchAllFiled(params)
     .then((res) => {
       versionData.value = res.data.list;
-      renderData.value = res.data.list;
       queryVersionInfo();
       loading.value = false;
     })
@@ -115,9 +113,9 @@ const expandChangeData = (row: CommunityColumnsT) => {
   currentVersion.value = row.osAlias;
 };
 
-const expands = ref([]);
+const expands = ref<string[]>([]);
 const getRowKeys = (row: CommunityColumnsT) => {
-  return row.os;
+  return row.osAlias;
 };
 
 const statusType = (v: string) => {
@@ -153,6 +151,15 @@ const goJump = (id: string, item: DataSubT) => {
   });
 };
 
+const goFieldJump = (v: string) => {
+  router.push({
+    path: `/${locale.value}/field`,
+    query: {
+      os: v,
+    },
+  });
+};
+
 onMounted(() => {
   queryEulerVersion();
 });
@@ -160,11 +167,10 @@ onMounted(() => {
 watch(
   () => versionData.value,
   () => {
-    if (versionData.value && versionData.value[0]?.length > 0) {
-      expands.value.push(versionData.value[0]?.os);
+    if (versionData.value && versionData.value.length > 0) {
+      expands.value.push(versionData.value[0]?.osAlias);
       currentVersion.value = versionData.value[0].osAlias;
     }
-    renderData.value = versionData.value;
   }
 );
 
@@ -223,7 +229,7 @@ const showMore = () => {
     </el-table-column>
     <el-table-column label="openEuler社区版本">
       <template #default="scope">
-        <OLink color="primary">{{ scope.row.osAlias }}</OLink>
+        <OLink color="primary" @click="goFieldJump(scope.row.osAlias)">{{ scope.row.osAlias }}</OLink>
       </template>
     </el-table-column>
     <el-table-column label="发布时间" width="200">
@@ -248,8 +254,8 @@ const showMore = () => {
       </template>
     </el-table-column>
   </el-table>
-  <p v-if="tableAllData.length >= tableLen" @click="showMore" class="view-all">
-    <OLink :class="isToggle ? 'up' : 'down'">
+  <p v-if="tableAllData.length >= tableLen" class="view-all">
+    <OLink :class="isToggle ? 'up' : 'down'" @click="showMore">
       {{ isToggle ? t('software.upList') : t('software.viewAll') }}
       <template #suffix>
         <OIcon><IconChevronDown /></OIcon>

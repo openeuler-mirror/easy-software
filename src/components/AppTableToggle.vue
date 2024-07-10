@@ -52,8 +52,8 @@ const showMore = () => {
       </span>
     </template>
   </OTable>
-  <p v-if="tableAllData.length >= tableLen" @click="showMore" class="view-all">
-    <OLink color="primary" :class="isToggle ? 'up' : 'down'" size="small">
+  <p v-if="tableAllData.length >= tableLen" class="view-all">
+    <OLink color="primary" :class="isToggle ? 'up' : 'down'" @click="showMore" size="small">
       {{ isToggle ? t('software.upList') : t('software.viewAll') }}
       <template #suffix>
         <OIcon><IconChevronDown /></OIcon>
