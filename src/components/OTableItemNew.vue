@@ -217,7 +217,7 @@ const onExternalDialog = (href: string) => {
     width: 200px;
   }
   .version {
-    width: 135px;
+    width: 138px;
   }
   .td-break {
     word-break: break-all;

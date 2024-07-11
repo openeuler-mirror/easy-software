@@ -209,8 +209,10 @@ const getDetailValue = (data: any) => {
     version.value = data?.version;
   } else if (typePkg.value === 'IMAGE') {
     basicInfo.value = [
+      { name: '架构', value: data.arch },
       { name: '版本号', value: data.appVer },
       { name: '软件包分类', value: data.category || '' },
+      { name: '版本支持情况', value: data.osSupport },
     ];
 
     appData.value.size = data.appSize || 0;
@@ -229,6 +231,7 @@ const getDetailValue = (data: any) => {
   security.value = data?.securityLevel;
   description.value = data?.description;
   license.value = data.license;
+
   downloadData.value = mkit(data?.download || '', { isCopy: true, Tag: data.appVer });
   installation.value = mkit(data?.installation || '', { isCopy: true, Tag: data.appVer });
 
