@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { onMounted, ref, watch } from 'vue';
-import { OLink, OInput } from '@opensig/opendesign';
+import { OLink, OInput, useMessage } from '@opensig/opendesign';
 import { useLocale } from '@/composables/useLocale';
 import { useI18n } from 'vue-i18n';
 import { useRouter, useRoute } from 'vue-router';
@@ -25,6 +25,7 @@ defineProps({
   },
 });
 
+const msg = useMessage();
 const router = useRouter();
 const route = useRoute();
 const { t } = useI18n();
@@ -35,6 +36,15 @@ const showPanel = ref(false);
 
 // 搜索
 const changeSearchInput = (v: string) => {
+  if (v === '') {
+    return;
+  }
+  if (v.length > 100) {
+    return msg.show({
+      content: '文字长度不能超过100字符',
+      status: 'danger',
+    });
+  }
   searchValue.value = v;
   replaceWinUrl();
 };
@@ -130,6 +140,7 @@ watch(
         :placeholder="`${t('software.filterPleaseEnter[0]')}${title}${t('software.filterPleaseEnter[1]')}`"
         :style="{ width: '348px' }"
         size="large"
+        :max-length="100"
         clearable
         @focus="showPanel = true"
         v-model="searchValue"

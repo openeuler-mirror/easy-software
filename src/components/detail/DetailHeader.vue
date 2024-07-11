@@ -3,12 +3,14 @@ import { ref } from 'vue';
 import { OLink, OIcon } from '@opensig/opendesign';
 import { checkOriginLink, windowOpen } from '@/utils/common';
 import { scrollToTop } from '@/utils/common';
+import { useRoute } from 'vue-router';
+import ExternalLink from '@/components/ExternalLink.vue';
+
 import Email from '@/assets/email.svg';
 import Gitee from '@/assets/gitee.svg';
 import IconOutlink from '~icons/pkg/icon-outlink.svg';
 import { GITEE } from '@/data/config';
 import IconHelp from '~icons/pkg/icon-help.svg';
-import ExternalLink from '@/components/ExternalLink.vue';
 
 defineProps({
   data: {
@@ -30,6 +32,7 @@ defineProps({
   },
 });
 
+const route = useRoute();
 const showExternalDlg = ref(false);
 const externalLink = ref('');
 const onExternalDialog = (href: string) => {
@@ -42,7 +45,12 @@ const onExternalDialog = (href: string) => {
 };
 
 const scrollToAnchor = (id: string) => {
-  const top = document.querySelector('.o-tab-pane-active .feedback')?.offsetTop;
+  let top = 0;
+  if (route.name === 'field-detail') {
+    top = document.querySelector('.o-tab-pane-active .feedback')?.offsetTop;
+  } else {
+    top = document.querySelector('.feedback')?.offsetTop;
+  }
   scrollToTop(top, false);
 };
 </script>

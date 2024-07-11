@@ -47,7 +47,7 @@ const changeSearchInput = (v: string) => {
   }
   if (v.length > 100) {
     return msg.show({
-      content: '文字长度超过限制',
+      content: '文字长度不能超过100字符',
       status: 'danger',
     });
   }
@@ -126,20 +126,27 @@ const queryDocsAll = () => {
     pageNum: 1,
     pageSize: 3,
   };
-  getSearchDataAll(params).then((res) => {
-    try {
-      if (res.data.length) {
-        recommendList.value = res.data;
-      } else {
+  getSearchDataAll(params)
+    .then((res) => {
+      try {
+        if (res.data.length) {
+          recommendList.value = res.data;
+        } else {
+          isNoFound.value = true;
+          recommendList.value = [];
+        }
+        isLoading.value = false;
+      } catch {
         isNoFound.value = true;
+        isLoading.value = false;
         recommendList.value = [];
       }
-      isLoading.value = false;
-    } catch {
+    })
+    .catch(() => {
+      recommendList.value = [];
       isNoFound.value = true;
       isLoading.value = false;
-    }
-  });
+    });
 };
 
 let timer: any;
@@ -147,7 +154,7 @@ const trottleSearch = (v: string) => {
   clearTimeout(timer);
   if (v.length > 100) {
     return msg.show({
-      content: '文字长度超过限制',
+      content: '文字长度不能超过100字符',
       status: 'danger',
     });
   }

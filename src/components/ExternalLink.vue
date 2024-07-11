@@ -13,13 +13,15 @@ const props = defineProps({
 });
 const showDlg = ref(true);
 const { t } = useI18n();
-const jumpOut = () => {
-  windowOpen(props.href, '_blank');
-};
 
 const emits = defineEmits<{
   (e: 'change'): void;
 }>();
+
+const jumpOut = () => {
+  emits('change');
+  windowOpen(props.href, '_blank');
+};
 
 const onChange = () => {
   emits('change');
