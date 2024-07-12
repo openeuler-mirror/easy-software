@@ -1,9 +1,11 @@
 <script lang="ts" setup>
 import { ref } from 'vue';
-import { ORate, OTextarea, useMessage, OIcon } from '@opensig/opendesign';
+import { ORate, OTextarea, useMessage, OIcon, OButton } from '@opensig/opendesign';
 import { GITEE } from '@/data/config';
 import { useI18n } from 'vue-i18n';
 import { OPENEULER_FORUM } from '@/data/config';
+import { postFeedback } from '@/api/api-feedback';
+import { inputValidator } from '@/utils/common';
 import xss from 'xss';
 import ExternalLink from '@/components/ExternalLink.vue';
 import AppSection from '@/components/AppSection.vue';
@@ -32,6 +34,49 @@ const { t } = useI18n();
 const rateVal = ref(0);
 const feedbackTxa = ref('');
 const message = useMessage();
+
+const clickSubmit = () => {
+  if (rateVal.value === 0) {
+    return message.warning({
+      content: t('software.feedbackMessage[1]'),
+    });
+  } else if (feedbackTxa.value === '') {
+    return message.warning({
+      content: t('software.feedbackMessage[0]'),
+    });
+  }
+
+  const params = {
+    feedbackPageUrl: window.location.href,
+    feedbackText: xss(feedbackTxa.value),
+    feedbackValue: rateVal.value,
+  };
+
+  if (feedbackTxa.value.includes('$') || !new RegExp(inputValidator).test(feedbackTxa.value)) {
+    return message.warning({
+      content: `非法字符，请重新输入`,
+    });
+  }
+  postFeedback(params)
+    .then((res) => {
+      if (res.code === 200) {
+        message.success({
+          content: t('software.feedbackSuccess'),
+        });
+        clearData();
+      } else {
+        message.warning({
+          content: t('software.feedbackWarning'),
+        });
+      }
+    })
+    .catch(() => {});
+};
+
+const clearData = () => {
+  feedbackTxa.value = '';
+  rateVal.value = 0;
+};
 
 // -------------------- 提交issue --------------------
 const getIssueTemplate = () => {
@@ -88,6 +133,9 @@ const onExternalDialog = () => {
           :rows="4"
           style="width: 100%"
         />
+        <div class="action">
+          <OButton color="primary" variant="solid" size="large" @click="clickSubmit">{{ t('software.feedbackButton[0]') }}</OButton>
+        </div>
         <p class="other-text">反馈方式</p>
         <div class="feedback-other">
           <a @click="onExternalDialog()">

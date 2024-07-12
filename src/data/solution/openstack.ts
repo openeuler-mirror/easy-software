@@ -27,7 +27,7 @@ export default {
     {
       icon: openstack2,
       name: '存储资源管理',
-      desc: 'OpenStack可以可以根据用户需求为云服务或云应用提供所需的对象及块存储资源',
+      desc: 'OpenStack可以根据用户需求为云服务或云应用提供所需的对象及块存储资源',
     },
     {
       icon: openstack3,

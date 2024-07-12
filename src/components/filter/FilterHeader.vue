@@ -4,6 +4,7 @@ import { OLink, OInput, useMessage } from '@opensig/opendesign';
 import { useLocale } from '@/composables/useLocale';
 import { useI18n } from 'vue-i18n';
 import { useRouter, useRoute } from 'vue-router';
+import { inputValidator } from '@/utils/common';
 import type { SorT } from '@/@types/type-sort';
 import IconTimeOrder from '~icons/app/icon-time-order.svg';
 import IconSearch from '~icons/app/icon-search.svg';
@@ -36,17 +37,25 @@ const showPanel = ref(false);
 
 // 搜索
 const changeSearchInput = (v: string) => {
+  changePkgInput(v);
+  searchValue.value = v;
+  replaceWinUrl();
+};
+
+const changePkgInput = (v: string) => {
   if (v === '') {
     return;
   }
   if (v.length > 100) {
-    return msg.show({
+    return msg.warning({
       content: '文字长度不能超过100字符',
-      status: 'danger',
     });
   }
-  searchValue.value = v;
-  replaceWinUrl();
+  if (!new RegExp(inputValidator).test(v)) {
+    return msg.warning({
+      content: '非法字符，请重新输入',
+    });
+  }
 };
 
 const clearSearchData = () => {
@@ -145,6 +154,7 @@ watch(
         @focus="showPanel = true"
         v-model="searchValue"
         @press-enter="(v) => changeSearchInput(v)"
+        @input="(v) => changePkgInput(v)"
         @clear="clearSearchData"
       >
         <template #prefix>
