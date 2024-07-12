@@ -91,6 +91,8 @@ const getDetailValue = (data: ImageDetailT) => {
     appSize,
   } = data;
 
+  tagVer.value = [osSupport, arch];
+
   basicInfo.value = [
     { name: '架构', value: arch },
     { name: t('detail.number'), value: appVer },

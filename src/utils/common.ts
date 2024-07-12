@@ -142,3 +142,8 @@ export const getTarget = (data: any, key: any) => {
   }
   return [...map.values()];
 };
+
+
+
+// 输入框文字校验
+export const inputValidator = new RegExp("^[\u4E00-\u9FA5A-Za-z0-9.()$\\-]+$");
