@@ -8,6 +8,7 @@ import { useI18n } from 'vue-i18n';
 import { useRoute } from 'vue-router';
 
 import defaultImg from '@/assets/default-logo.png';
+import IconUser from '~icons/app/icon-user.svg';
 
 defineProps({
   data: {
@@ -19,7 +20,7 @@ const route = useRoute();
 const { locale } = useLocale();
 const { t } = useI18n();
 
-function getQueryString(params: PkgIdsT) {
+function getQueryStr(params: PkgIdsT) {
   let queryStr = '';
 
   if (params.RPM) {
@@ -37,8 +38,25 @@ function getQueryString(params: PkgIdsT) {
   return queryStr.replace(/^&/, '');
 }
 
+function getMaintainersStr(params: PkgIdsT) {
+  let maintainers = '';
+  if (params.RPM) {
+    maintainers += `${params.RPM}、`;
+  }
+  if (params.IMAGE) {
+    maintainers += `${params.IMAGE}、`;
+  }
+  if (params.EPKG) {
+    maintainers += `${params.EPKG}、`;
+  }
+  if (params.OEPKG) {
+    maintainers += `${params.OEPKG}、`;
+  }
+  return maintainers.replace(/、+$/, '');
+}
+
 const jumpTo = (id: PkgIdsT, type?: PkgTypeT) => {
-  return `/${locale.value}/field/detail?${type ? `type=${type}&` : ''}${getQueryString(id)}`;
+  return `/${locale.value}/field/detail?${type ? `type=${type}&` : ''}${getQueryStr(id)}`;
 };
 
 const repeatTags = (v: string) => {
@@ -83,6 +101,9 @@ onMounted(() => {
           </a>
         </div>
         <p v-if="data.description" v-dompurify-html="data.description" class="desc"></p>
+        <p v-if="data.maintainers" class="maintainers">
+          <OIcon><IconUser /></OIcon>{{ getMaintainersStr(data.maintainers) }}
+        </p>
       </div>
     </template>
   </OCard>
@@ -161,6 +182,23 @@ onMounted(() => {
   .pkg-box {
     .tags-box {
       margin-top: 24px;
+    }
+    .maintainers {
+      @include tip1;
+      color: var(--o-color-info3);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: flex;
+      align-items: center;
+      margin-top: 16px;
+      .o-icon {
+        margin-right: 8px;
+        svg{
+          width: 16px;
+          height: 16px;
+        }
+      }
     }
     .desc {
       @include text1;

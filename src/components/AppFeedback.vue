@@ -5,7 +5,7 @@ import { GITEE } from '@/data/config';
 import { useI18n } from 'vue-i18n';
 import { OPENEULER_FORUM } from '@/data/config';
 import { postFeedback } from '@/api/api-feedback';
-import { inputValidator } from '@/utils/common';
+
 import xss from 'xss';
 import ExternalLink from '@/components/ExternalLink.vue';
 import AppSection from '@/components/AppSection.vue';
@@ -52,7 +52,7 @@ const clickSubmit = () => {
     feedbackValue: rateVal.value,
   };
 
-  if (feedbackTxa.value.includes('$') || !new RegExp(inputValidator).test(feedbackTxa.value)) {
+  if (feedbackTxa.value.includes('$')) {
     return message.warning({
       content: `非法字符，请重新输入`,
     });
@@ -136,7 +136,7 @@ const onExternalDialog = () => {
         <div class="action">
           <OButton color="primary" variant="solid" size="large" @click="clickSubmit">{{ t('software.feedbackButton[0]') }}</OButton>
         </div>
-        <p class="other-text">反馈方式</p>
+        <p class="other-text">其他反馈方式</p>
         <div class="feedback-other">
           <a @click="onExternalDialog()">
             <OIcon><IconIssue /></OIcon>提交issue

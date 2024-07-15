@@ -112,21 +112,25 @@ const onExternalDialog = (href: string) => {
         <div class="docker"><OCodeCopy :code="row.dockerStr" /></div>
       </template>
       <template #td_operation="{ row }">
-        <div class="operation-box">
+        <div class="operation-box" :class="type">
           <!-- 容器镜像 -->
-          <template v-if="props.type === 'apppkg'">
+          <template v-if="type === 'apppkg'">
             <OLink color="primary" hover-underline @click="openDownloadDialog(row.name, row.appVer)">{{ t('software.columns.download') }}</OLink>
           </template>
           <template v-else>
-            <OLink v-if="row.srcRepo" @click="onExternalDialog(row.srcRepo)" class="code-repo" color="primary" hover-underline>
-              {{ t('software.columns.repository') }}
-              <template #suffix
-                ><OIcon><IconOutlink /></OIcon
-              ></template>
-            </OLink>
-            <OLink v-if="row.binDownloadUrl" @click="onExternalDialog(row.binDownloadUrl)" color="primary" hover-underline>{{
-              t('software.columns.download')
-            }}</OLink>
+            <span class="code-repo">
+              <OLink v-if="row.srcRepo" @click="onExternalDialog(row.srcRepo)" color="primary" hover-underline>
+                {{ t('software.columns.repository') }}
+                <template #suffix
+                  ><OIcon><IconOutlink /></OIcon
+                ></template>
+              </OLink>
+            </span>
+            <span>
+              <OLink v-if="row.binDownloadUrl" @click="onExternalDialog(row.binDownloadUrl)" color="primary" hover-underline>{{
+                t('software.columns.download')
+              }}</OLink>
+            </span>
           </template>
         </div>
       </template>
@@ -148,10 +152,12 @@ const onExternalDialog = (href: string) => {
 
 <style lang="scss" scoped>
 .operation-box {
-  display: flex;
+  display: grid;
   align-items: center;
-  .o-link + .o-link {
-    margin-left: 12px;
+  grid-template-columns: 74px auto;
+  gap: 12px;
+  &.apppkg {
+    display: flex;
   }
   .code-repo {
     svg {

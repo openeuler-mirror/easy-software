@@ -8,7 +8,6 @@ import { onClickOutside } from '@vueuse/core';
 import { useLocale } from '@/composables/useLocale';
 import { useI18n } from 'vue-i18n';
 import { FLITERMENUOPTIONS } from '@/data/query';
-import { inputValidator } from '@/utils/common';
 
 import SearchRecommend from '@/components/search/SearchRecommend.vue';
 
@@ -159,12 +158,7 @@ const trottleSearch = (v: string) => {
       status: 'danger',
     });
   }
-  if (!new RegExp(inputValidator).test(v)) {
-    return msg.show({
-      content: '输入的内容不合法',
-      status: 'danger',
-    });
-  }
+
   timer = setTimeout(() => {
     queryDocsAll();
   }, 500);

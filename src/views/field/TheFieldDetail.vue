@@ -157,7 +157,7 @@ const getDetailValue = (data: any) => {
   if (typePkg.value === 'RPM') {
     basicInfo.value = [
       { name: '详细描述', value: data?.description },
-      { name: '版本号', value: data?.version },
+      // { name: '版本号', value: data?.version },
       { name: '版本支持情况', value: data.osSupport },
       { name: '架构', value: data.arch },
       { name: '软件包分类', value: data.rpmCategory || '其他' },
@@ -183,7 +183,7 @@ const getDetailValue = (data: any) => {
   } else if (typePkg.value === 'EPKG') {
     basicInfo.value = [
       { name: '详细描述', value: data?.description },
-      { name: '版本号', value: data.version },
+      // { name: '版本号', value: data.version },
       { name: '版本支持情况', value: data.osSupport },
       { name: '架构', value: data.arch },
       { name: '软件包分类', value: data.epkgCategory || '其他' },
@@ -209,10 +209,9 @@ const getDetailValue = (data: any) => {
     version.value = data?.version;
   } else if (typePkg.value === 'IMAGE') {
     basicInfo.value = [
-      { name: '架构', value: data.arch },
-      { name: '版本号', value: data.appVer },
-      { name: '软件包分类', value: data.category || '' },
       { name: '版本支持情况', value: data.osSupport },
+      { name: '架构', value: data.arch },
+      { name: '软件包分类', value: data.category || '' },
     ];
 
     appData.value.size = data.appSize || 0;
@@ -306,6 +305,9 @@ const repeatTags = (v: string) => {
         <div class="detail-row">
           <div class="detail-row-main" :class="{ tags: isTags }">
             <AppSection :title="`> ${t('detail.information')}`" v-if="item !== 'IMAGE'">
+              <template #append>
+                <span v-if="version" class="ver"> {{ t('detail.number') }}: {{ version }}</span>
+              </template>
               <!-- 基本信息 -->
               <DetailBasicInfo :options="basicInfo" />
 
@@ -325,8 +327,13 @@ const repeatTags = (v: string) => {
                 <OTabPane class="tab-pane" v-for="item in tagList" :key="item.value" :label="item.lable">
                   <template v-if="item.value === tagList[0].value">
                     <!-- 基本信息 -->
-                    <p class="sp">> {{ t('detail.information') }}</p>
-                    <DetailBasicInfo :options="basicInfo" />
+                    <AppSection :title="`> ${t('detail.information')}`">
+                      <template #append>
+                        <span v-if="version" class="ver">{{ t('detail.number') }}: {{ version }}</span>
+                      </template>
+
+                      <DetailBasicInfo :options="basicInfo" />
+                    </AppSection>
 
                     <!-- 使用方式 -->
                     <p class="sp">> {{ t('detail.usage') }}</p>

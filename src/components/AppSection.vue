@@ -24,6 +24,10 @@ defineProps({
   + .app-section {
     margin-top: 24px;
   }
+  .app-section {
+    padding: 0;
+    background: transparent;
+  }
   @include respond-to('<=laptop') {
     padding: 24px;
   }

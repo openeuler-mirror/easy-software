@@ -78,6 +78,7 @@ const querySearch = () => {
       }
     })
     .catch(() => {
+      isSearchError.value = true;
       total.value = 0;
       pkgData.value = [];
       isLoading.value = false;

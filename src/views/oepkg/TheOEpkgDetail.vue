@@ -73,7 +73,6 @@ const getDetailValue = (data: any) => {
   try {
     const basic = [
       { name: '详细描述', value: data?.description },
-      { name: '版本号', value: data?.version },
       { name: '版本支持情况', value: data.osSupport },
       { name: '架构', value: data.arch },
       { name: '软件包分类', value: data.category || '其他' },
@@ -148,6 +147,9 @@ const queryVer = () => {
       <div class="detail-row">
         <div class="detail-row-main">
           <AppSection :title="`> ${t('detail.information')}`">
+            <template #append>
+              <span v-if="version" class="ver">{{ t('detail.number') }}: {{ version }}</span>
+            </template>
             <!-- 基本信息 -->
             <DetailBasicInfo :options="basicInfo" />
 
