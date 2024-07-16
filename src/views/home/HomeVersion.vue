@@ -289,6 +289,12 @@ const showMore = () => {
     grid-template-columns: repeat(6, 1fr);
     justify-content: space-between;
     gap: 8px;
+    :deep(.o-link) {
+      &.o-link-normal {
+        color: var(--o-color-info4) !important;
+        cursor: default;
+      }
+    }
   }
   .name {
     @include text1;
@@ -303,12 +309,12 @@ const showMore = () => {
     --tag-bd-color: #058ef0;
   }
 }
-
-:deep(.o-link) {
-  &.o-link-normal {
-    --link-color: var(--o-color-info1);
-    --link-color-hover: var(--o-color-info1);
-    cursor: default;
+.view-all {
+  :deep(.o-link) {
+    &.o-link-normal {
+      --link-color: var(--o-color-info1);
+      --link-color-hover: var(--o-color-info1);
+    }
   }
 }
 </style>

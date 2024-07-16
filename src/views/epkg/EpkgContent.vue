@@ -73,10 +73,8 @@ const querySearch = () => {
 
   getSearchData(newData)
     .then((res) => {
-      if (res.code === 200) {
-        pkgData.value = res.data.epkgpkg;
-        total.value = res.data.total;
-      }
+      pkgData.value = res.data.epkgpkg;
+      total.value = res.data.total;
       isLoading.value = false;
       isSearchDocs.value = true;
       if (pkgData.value.length === 0) {
@@ -84,11 +82,11 @@ const querySearch = () => {
       }
     })
     .catch(() => {
+      isSearchError.value = true;
       total.value = 0;
       pkgData.value = [];
       isLoading.value = false;
       isSearchDocs.value = false;
-      useViewStore().showNotFound();
     });
 };
 

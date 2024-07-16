@@ -99,6 +99,7 @@ const querySearch = () => {
       isLoading.value = false;
     })
     .catch(() => {
+      isSearchError.value = true;
       total.value = 0;
       pkgData.value = [];
       isLoading.value = false;

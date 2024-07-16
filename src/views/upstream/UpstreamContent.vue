@@ -87,9 +87,9 @@ const querySearch = () => {
       }
     })
     .catch(() => {
+      isSearchError.value = true;
       appData.value = [];
       isLoading.value = false;
-      useViewStore().showNotFound();
     });
 };
 

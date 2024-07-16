@@ -216,12 +216,13 @@
 
 .ver {
   background: rgba(var(--o-kleinblue-6), 0.05);
-  @include text1;
+  @include text2;
   border: none;
   border-radius: var(--layout-pkg-radius);
   color: var(--o-color-primary1);
-  padding: 6px 16px;
+  padding: 6px 24px;
   font-weight: 500;
+  border: 1px solid var(--o-color-control3-light);
 }
 
 .drop {

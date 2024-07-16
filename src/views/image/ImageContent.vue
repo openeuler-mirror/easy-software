@@ -66,17 +66,16 @@ const querySearch = () => {
   const newData = getParamsRules(searchParams.value);
   getSearchData(newData)
     .then((res) => {
-      if (res.code === 200) {
-        pkgData.value = res.data.apppkg;
-        total.value = res.data.total;
-        isSearchDocs.value = true;
-      }
+      pkgData.value = res.data.apppkg;
+      total.value = res.data.total;
+      isSearchDocs.value = true;
       isLoading.value = false;
       if (pkgData.value.length === 0) {
         isSearchError.value = true;
       }
     })
     .catch(() => {
+      isSearchError.value = true;
       total.value = 0;
       pkgData.value = [];
       isLoading.value = false;

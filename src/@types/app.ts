@@ -5,9 +5,11 @@ export interface AppItemT {
   name: string;
   tags: PkgTypeT[];
   pkgIds: PkgIdsT;
+  maintainers?: PkgIdsT;
   arch?: string;
   os?: string;
 }
+
 export interface PkgIdsT {
   RPM: string;
   IMAGE: string;

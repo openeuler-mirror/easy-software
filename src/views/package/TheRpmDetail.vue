@@ -74,9 +74,8 @@ const tagVer = ref();
 const getDetailValue = (data: any) => {
   basicInfo.value = [
     { name: t('detail.description'), value: data?.description },
-    // { name: t('detail.osSupport'), value: data.osSupport },
-    // { name: t('detail.arch'), value: data.arch },
-    { name: t('detail.number'), value: data?.version },
+    { name: t('detail.osSupport'), value: data.osSupport },
+    { name: t('detail.arch'), value: data.arch },
     { name: t('detail.epkgCategory'), value: data.epkgCategory || '其他' },
     { name: t('detail.repo'), value: JSON.parse(data?.repo).url, type: JSON.parse(data?.repo).type },
     { name: t('detail.repoType'), value: JSON.parse(data?.repoType).url, type: JSON.parse(data?.repoType).type },
@@ -139,6 +138,9 @@ const queryVer = () => {
       <div class="detail-row">
         <div class="detail-row-main">
           <AppSection :title="`> ${t('detail.information')}`">
+            <template #append>
+              <span v-if="version" class="ver">{{ t('detail.number') }}: {{ version }}</span>
+            </template>
             <!-- 基本信息 -->
             <DetailBasicInfo :options="basicInfo" />
 

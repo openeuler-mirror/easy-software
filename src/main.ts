@@ -6,12 +6,13 @@ import ElementPlus from 'element-plus'
 
 
 import '@/assets/style/base.scss';
-import '@/assets/style/element-plus/index.scss';
+import 'element-plus/theme-chalk/src/index.scss';
 import '@opensig/opendesign/es/index.scss';
 import '@/assets/style/theme/default-light.token.css';
 import '@/assets/style/theme/dark.token.css';
 import '@/assets/style/markdown.scss';
 import '@/assets/style/theme/index.scss';
+import '@/assets/style/global.scss';
 
 import { initRound } from '@opensig/opendesign';
 

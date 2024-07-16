@@ -94,10 +94,9 @@ const getDetailValue = (data: ImageDetailT) => {
   tagVer.value = [osSupport, arch];
 
   basicInfo.value = [
-    { name: '架构', value: arch },
-    { name: t('detail.number'), value: appVer },
-    { name: t('detail.epkgCategory'), value: category },
     { name: '版本支持情况', value: osSupport },
+    { name: '架构', value: arch },
+    { name: t('detail.epkgCategory'), value: category },
   ];
 
   maintainer.value = {
@@ -174,8 +173,13 @@ const queryVer = () => {
               <OTabPane class="tab-pane" v-for="item in tagList" :key="item.value" :label="item.lable">
                 <template v-if="item.value === tagList[0].value">
                   <!-- 基本信息 -->
-                  <p class="sp">> {{ t('detail.information') }}</p>
-                  <DetailBasicInfo :options="basicInfo" />
+                  <AppSection :title="`> ${t('detail.information')}`">
+                    <template #append>
+                      <span v-if="version" class="ver">{{ t('detail.number') }}:{{ version }}</span>
+                    </template>
+
+                    <DetailBasicInfo :options="basicInfo" />
+                  </AppSection>
 
                   <!-- 使用方式 -->
                   <p class="sp">> {{ t('detail.usage') }}</p>

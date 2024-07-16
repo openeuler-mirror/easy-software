@@ -79,7 +79,7 @@ const { isZh } = useLocale();
 }
 .ly-main {
   position: relative;
-  min-height: calc(var(--layout-content-min-height) + var(--layout-header-height));
+  min-height: calc(var(--layout-content-min-height) - var(--layout-footer-height));
   background-color: var(--o-color-fill1);
   padding-top: var(--layout-header-height);
 }

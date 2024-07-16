@@ -76,7 +76,7 @@ const scrollToAnchor = (id: string) => {
           </OLink>
         </p>
         <p v-if="basicInfo" class="detail">{{ basicInfo }}</p>
-        <OLink color="primary" size="small" class="scroll-box" @click="scrollToAnchor('feed')">
+        <OLink size="small" class="scroll-box" @click="scrollToAnchor('feed')">
           <OIcon><IconHelp /></OIcon>我要反馈
         </OLink>
       </div>
