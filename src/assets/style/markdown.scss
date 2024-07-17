@@ -6,7 +6,7 @@
   }
 
   ol {
-    list-style-type: decimal;
+    list-style-type: decimal !important;
   }
 
   ul {
@@ -136,7 +136,7 @@
       list-style: none;
       padding-left: 0;
       counter-reset: num;
-      li {
+      > li {
         position: relative;
         counter-increment: num 1;
         padding-left: 32px;

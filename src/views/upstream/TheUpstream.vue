@@ -7,12 +7,13 @@ import bannerImg from '@/assets/banner/banner1.jpg';
 
 <template>
   <AppBanner title="上游兼容应用全景" :background-image="bannerImg" subtitle="上游兼容应用全景简介" />
-  <ContentWrapper vertical-padding="40px">
+  <ContentWrapper vertical-padding="40px" class="pkg-content-wrap">
     <UpstreamContent />
   </ContentWrapper>
 </template>
 
 <style lang="scss" scoped>
+@import '@/assets/style/category/content/index.scss';
 :deep(.o-table) {
   .label {
     display: flex;

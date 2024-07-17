@@ -20,6 +20,7 @@ const route = useRoute();
 const { locale } = useLocale();
 const { t } = useI18n();
 
+// 跳转id
 function getQueryStr(params: PkgIdsT) {
   let queryStr = '';
 
@@ -38,6 +39,7 @@ function getQueryStr(params: PkgIdsT) {
   return queryStr.replace(/^&/, '');
 }
 
+// Maintainer数据
 function getMaintainersStr(params: PkgIdsT) {
   let maintainers = '';
   if (params.RPM) {
@@ -101,7 +103,7 @@ onMounted(() => {
           </a>
         </div>
         <p v-if="data.description" v-dompurify-html="data.description" class="desc"></p>
-        <p v-if="data.maintainers" class="maintainers">
+        <p v-if="data.maintainers && Object.keys(data.maintainers).length > 0" class="maintainers">
           <OIcon><IconUser /></OIcon>{{ getMaintainersStr(data.maintainers) }}
         </p>
       </div>
@@ -194,7 +196,7 @@ onMounted(() => {
       margin-top: 16px;
       .o-icon {
         margin-right: 8px;
-        svg{
+        svg {
           width: 16px;
           height: 16px;
         }

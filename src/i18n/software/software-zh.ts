@@ -15,6 +15,7 @@ export default {
   filterSummary: '按概要',
   filterFile: '按文件',
   searchPlaceholder: '输入内容进行搜索，多个关键字请用逗号隔开',
+  searchFilterTips: '为您找到符合条件的筛选{0}个',
 
   viewAll: '显示全部',
   upList: '收起',

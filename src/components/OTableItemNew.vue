@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import type { PropType } from 'vue';
 import { ref } from 'vue';
-import { OTable, OLink, ODialog, OIcon } from '@opensig/opendesign';
+import { OTable, OLink, ODialog, OIcon, OPopover } from '@opensig/opendesign';
 import { useLocale } from '@/composables/useLocale';
 import { formatDateTime, checkOriginLink, windowOpen, xssAllTag, getPkgName } from '@/utils/common';
 import { useI18n } from 'vue-i18n';
@@ -10,11 +10,13 @@ import OCodeCopy from '@/components/OCodeCopy.vue';
 import ExternalLink from '@/components/ExternalLink.vue';
 
 import IconOutlink from '~icons/pkg/icon-outlink.svg';
+import IconUbuntu from '@/assets/ubuntu.png';
 
 interface ColumnsT {
   key: string;
   label: string;
   width?: string;
+  type?: string;
 }
 
 const props = defineProps({
@@ -68,12 +70,20 @@ const onExternalDialog = (href: string) => {
   <div class="table-main">
     <OTable :columns="columns" :data="data" :loading="loading" border="all">
       <template #head="{ columns }">
-        <th v-for="item in columns" :key="item.key" :class="item.key">{{ item.label }}</th>
+        <th v-for="item in columns" :key="item.type" :class="item.type">{{ item.label }}</th>
       </template>
       <template #td_name="{ row }">
-        <a :href="jumpTo(row.pkgId)" color="primary" target="_blank" rel="noopener noreferrer"
-          ><span v-dompurify-html="row.name" class="td-break max" :title="xssAllTag(row.name)"></span
-        ></a>
+        <a :href="jumpTo(row.pkgId)" class="row-name max" target="_blank" rel="noopener noreferrer">
+          <span v-dompurify-html="row.name" class="td-break" :title="xssAllTag(row.name)"></span>
+          <template v-if="row.originPkg">
+            <OPopover position="top" trigger="hover">
+              <template #target>
+                <img :src="IconUbuntu" ref="ubuntuRef" class="ubuntu-icon" />
+              </template>
+              <div class="box">ubuntu软件包名称为：{{ row.originPkg }}</div>
+            </OPopover>
+          </template>
+        </a>
       </template>
       <template #td_version="{ row }">
         <div class="td-break max" :title="row.version">{{ row.version }}</div>
@@ -151,6 +161,11 @@ const onExternalDialog = (href: string) => {
 </template>
 
 <style lang="scss" scoped>
+.ubuntu-icon {
+  width: 16px;
+  height: 16px;
+  margin-left: 8px;
+}
 .operation-box {
   display: grid;
   align-items: center;
@@ -216,15 +231,7 @@ const onExternalDialog = (href: string) => {
       }
     }
   }
-  .name {
-    width: 165px;
-  }
-  .appVer {
-    width: 200px;
-  }
-  .version {
-    width: 138px;
-  }
+
   .td-break {
     word-break: break-all;
   }
@@ -236,27 +243,39 @@ const onExternalDialog = (href: string) => {
     position: relative;
     word-break: break-all;
   }
-  .os {
-    width: 200px;
+  .row-name {
+    display: flex;
+    align-items: center;
   }
-  .arch {
-    width: 90px;
-  }
-  .category {
-    width: 90px;
-  }
-  .rpmUpdateAt,
-  .rpmSize,
-  .epkgUpdateAt,
-  .epkgSize {
-    width: 120px;
-  }
-  .rpmSize,
-  .epkgSize {
-    text-align: right;
-  }
-  .operation {
-    width: 175px;
+  thead {
+    .name {
+      width: 165px;
+    }
+    .tag {
+      width: 200px;
+    }
+    .version {
+      width: 138px;
+    }
+    .os {
+      width: 180px;
+    }
+    .arch {
+      width: 100px;
+    }
+    .category {
+      width: 90px;
+    }
+    .time {
+      width: 130px;
+    }
+    .size {
+      width: 120px;
+      text-align: right;
+    }
+    .operation {
+      width: 175px;
+    }
   }
 }
 </style>

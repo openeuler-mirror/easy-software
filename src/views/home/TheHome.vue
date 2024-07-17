@@ -25,15 +25,7 @@ const queryAllpkg = () => {
   isLoading.value = true;
   getSearchAllFiled(params)
     .then((res) => {
-      const { data } = res;
-      let preview: AppT[] = [];
-      data.forEach(function (item, index) {
-        if (item.name === '其他') {
-          preview = data.splice(index, 1);
-          index--;
-        }
-      });
-      pkgData.value = preview.length > 0 ? data.concat(preview) : data;
+      pkgData.value = res.data;
       isLoading.value = false;
     })
     .catch(() => {

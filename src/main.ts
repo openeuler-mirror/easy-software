@@ -13,6 +13,7 @@ import '@/assets/style/theme/dark.token.css';
 import '@/assets/style/markdown.scss';
 import '@/assets/style/theme/index.scss';
 import '@/assets/style/global.scss';
+import '@/assets/style/element-plus/index.scss';
 
 import { initRound } from '@opensig/opendesign';
 

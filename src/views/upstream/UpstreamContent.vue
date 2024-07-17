@@ -17,10 +17,10 @@ const { t } = useI18n();
 
 // 软件包-表头
 const columns = [
-  { label: '应用名称', key: 'name', style: 'width:27%' },
-  { label: '上游最新版本', key: 'upstreamVersion', style: 'width:27%' },
-  { label: '兼容版本', key: 'openeulerVersion', style: 'width:27%' },
-  { label: '状态', key: 'status', style: 'width:19%' },
+  { label: t('upstream.name'), key: 'name', style: 'width:27%', type: 'name' },
+  { label: t('upstream.version'), key: 'upstreamVersion', style: 'width:27%', type: 'upstreamVersion' },
+  { label: t('upstream.compatibility'), key: 'openeulerVersion', style: 'width:27%', type: 'openeulerVersion' },
+  { label: t('upstream.status'), key: 'status', style: 'width:19%', type: 'status' },
 ];
 
 //  ------------  main ------------
@@ -209,7 +209,7 @@ watch(
       </template>
     </div>
     <div class="pkg-main">
-      <FilterHeader title="应用名称" :isSort="false" @sort="changeTimeOrder" :total="total" @clear="clearFilter" />
+      <FilterHeader :title="t('upstream.name')" :isSort="false" @sort="changeTimeOrder" :total="total" @clear="clearFilter" />
       <div v-if="searchOs || isSearch" class="search-result">
         <p v-if="!isPageSearch" class="text">
           为您找到符合条件的筛选<span class="total">{{ total }}</span
@@ -222,7 +222,7 @@ watch(
       </div>
       <div class="pkg-content">
         <AppLoading :loading="isLoading" />
-        <ResultNotApp v-if="isSearchError" type="上游兼容应用全景" />
+        <ResultNoApp v-if="isSearchError" :type="t('upstream.title')" />
         <div v-if="appData.length !== 0 && !isSearchError" class="pkg-panel">
           <OTable :columns="columns" :data="appData" border="all">
             <template #td_name="{ row }">
