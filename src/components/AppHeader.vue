@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { watch } from 'vue';
-import { ODivider } from '@opensig/opendesign';
+import { onMounted, watch } from 'vue';
+import { ODivider, OLink } from '@opensig/opendesign';
 import { useRouter } from 'vue-router';
 import { useLangStore } from '@/stores/common';
 import { OPENEULER } from '@/data/config';
@@ -8,9 +8,14 @@ import { useI18n } from 'vue-i18n';
 import HeaderNav from '@/components/HeaderNav.vue';
 
 import openeulerLogo from '@/assets/openeuler-logo.svg';
+import { doLogin, getUserToken, refreshUserInfo } from '@/shared/login';
+import { useUserInfoStore } from '@/stores/user';
+import { storeToRefs } from 'pinia';
 
 const router = useRouter();
 const { locale, t } = useI18n();
+const token = getUserToken();
+const { userInfo } = storeToRefs(useUserInfoStore());
 
 const goHome = () => {
   router.push({
@@ -28,6 +33,10 @@ watch(
     langStore.setLangStore(val);
   }
 );
+
+onMounted(refreshUserInfo);
+
+const login = () => doLogin();
 </script>
 
 <template>
@@ -44,7 +53,12 @@ watch(
 
         <HeaderNav />
       </div>
-      <div class="header-right"></div>
+      <div v-if="token">
+        {{ userInfo.username }}
+      </div>
+      <div v-else class="header-right">
+        <OLink @click="login">登录</OLink>
+      </div>
     </div>
   </div>
 </template>
