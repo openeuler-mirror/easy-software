@@ -6,16 +6,13 @@ import { useLangStore } from '@/stores/common';
 import { OPENEULER } from '@/data/config';
 import { useI18n } from 'vue-i18n';
 import HeaderNav from '@/components/HeaderNav.vue';
+import AppLogin from '@/components/AppLogin.vue';
 
 import openeulerLogo from '@/assets/openeuler-logo.svg';
-import { doLogin, getUserToken, refreshUserInfo } from '@/shared/login';
-import { useUserInfoStore } from '@/stores/user';
-import { storeToRefs } from 'pinia';
+import { refreshUserInfo } from '@/shared/login';
 
 const router = useRouter();
 const { locale, t } = useI18n();
-const token = getUserToken();
-const { userInfo } = storeToRefs(useUserInfoStore());
 
 const goHome = () => {
   router.push({
@@ -35,8 +32,6 @@ watch(
 );
 
 onMounted(refreshUserInfo);
-
-const login = () => doLogin();
 </script>
 
 <template>
@@ -53,11 +48,8 @@ const login = () => doLogin();
 
         <HeaderNav />
       </div>
-      <div v-if="token">
-        {{ userInfo.username }}
-      </div>
-      <div v-else class="header-right">
-        <OLink @click="login">登录</OLink>
+      <div class="header-right">
+        <AppLogin />
       </div>
     </div>
   </div>

@@ -7,15 +7,15 @@ import { useLangStore } from '@/stores/common';
 const LOGIN_URL = import.meta.env.VITE_LOGIN_URL;
 
 export const LOGIN_KEYS = {
-  USER_TOKEN: '_U_T_',
+  CSRF_TOKEN: '_U_T_',
   USER_INFO: '_U_I_',
 };
 
 /**
- * 从cookie中获取用户token，_U_T_
- * @returns 用户token
+ * 从cookie中获取csrfToken
+ * @returns csrfToken
  */
-export const getUserToken = () => Cookies.get(LOGIN_KEYS.USER_TOKEN) || '';
+export const getCsrfToken = () => Cookies.get(LOGIN_KEYS.CSRF_TOKEN) || '';
 
 // 退出登录
 export function logout() {
@@ -36,7 +36,7 @@ export function doLogin() {
 
 // token失效跳转首页
 export function tokenFailIndicateLogin() {
-  Cookies.remove(LOGIN_KEYS.USER_TOKEN);
+  Cookies.remove(LOGIN_KEYS.CSRF_TOKEN);
   useUserInfoStore().clearUserInfo();
   goToHome();
 }
@@ -75,7 +75,7 @@ const getUserInfoFromSessionStorage = () => {
  * 刷新后页面后store内参数被清除，重新请求登录用户信息
  */
 export function refreshUserInfo() {
-  const token = getUserToken();
+  const token = getCsrfToken();
   if (token) {
     const { setUserInfo } = useUserInfoStore();
     setUserInfo(getUserInfoFromSessionStorage());

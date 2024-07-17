@@ -75,7 +75,7 @@ const requestInterceptorId = request.interceptors.request.use(
   (config: InternalRequestConfig) => {
     const { showLoading, noCsrf } = config;
     if (!noCsrf && !config.headers?.Token) {
-      const cookie = Cookies.get(LOGIN_KEYS.USER_TOKEN);
+      const cookie = Cookies.get(LOGIN_KEYS.CSRF_TOKEN);
       config.headers.Token = cookie;
     }
 
