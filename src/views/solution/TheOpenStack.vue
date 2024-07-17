@@ -108,6 +108,11 @@ const jumpTo = (href: string) => {
             </template>
           </OCard>
         </div>
+        <p class="more">
+          更多信息请参考<OLink color="primary" href="https://pages.openeuler.openatom.cn/openstack/site/" target="_blank" ref="noopener noreferrer"
+            >openEuler OpenStack SIG官方文档</OLink
+          >
+        </p>
       </div>
     </div>
     <div class="solution-panel">
@@ -217,6 +222,12 @@ const jumpTo = (href: string) => {
         --card-main-padding: 0;
         flex: 1;
       }
+    }
+    .more {
+      margin-top: 16px;
+      @include text1;
+      color: var(--o-color-info2);
+      text-align: center;
     }
   }
   .solution-info {

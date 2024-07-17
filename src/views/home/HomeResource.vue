@@ -60,7 +60,7 @@ const resourceLeave = (id: string) => {
       color: var(--o-color-info1);
     }
     .title {
-      @include h2;
+      @include h3;
       color: var(--o-color-info1);
       margin: 16px 0 12px;
       font-weight: 500;

@@ -10,9 +10,11 @@ const bannerInfo = homeData[0];
 </script>
 <template>
   <AppBanner :title="bannerInfo.name" :background-image="bannerImg" :subtitle="bannerInfo.desc" />
-  <ContentWrapper vertical-padding="40px">
+  <ContentWrapper vertical-padding="40px" class="pkg-content-wrap">
     <AppPkgContent />
   </ContentWrapper>
 </template>
 
-<style lang="scss" scoped></style>
+<style scoped lang="scss">
+@import '@/assets/style/category/content/index.scss';
+</style>

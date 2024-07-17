@@ -245,12 +245,13 @@ const searchOptions = computed(() => {
   li {
     @include tip1;
     color: var(--o-color-info1);
-    padding: 3px 12px;
+    padding: 4px 12px;
     cursor: pointer;
     overflow: hidden;
     text-overflow: ellipsis;
+    border-radius: 1px;
     &:hover {
-      background: var(--o-color-control4-light);
+      background: var(--o-color-control2-light);
     }
     :deep(span) {
       color: var(--o-color-primary1);

@@ -131,6 +131,7 @@ const onExternalDialog = () => {
           :input-on-outlimit="false"
           resize="none"
           :rows="4"
+          :clearable="false"
           style="width: 100%"
         />
         <div class="action">

@@ -36,6 +36,7 @@ declare module 'vue' {
     OCodeCopy: typeof import('./src/components/OCodeCopy.vue')['default']
     OCodeDown: typeof import('./src/components/OCodeDown.vue')['default']
     OTableItemNew: typeof import('./src/components/OTableItemNew.vue')['default']
+    ResultNoApp: typeof import('./src/components/ResultNoApp.vue')['default']
     ResultNotApp: typeof import('./src/components/ResultNotApp.vue')['default']
     ResultNotFound: typeof import('./src/components/ResultNotFound.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']

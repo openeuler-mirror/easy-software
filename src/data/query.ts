@@ -26,4 +26,8 @@ export const FLITERMENUOPTIONS = [
     id: 'file',
     name: t('software.filterFile'),
   },
+  {
+    id: 'ubuntu',
+    name: 'ubuntu',
+  },
 ];

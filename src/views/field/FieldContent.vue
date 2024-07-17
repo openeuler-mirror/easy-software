@@ -358,8 +358,8 @@ watch(
           >
           <template v-else>
             为您找到符合条件的筛选<span class="total">{{ total }}</span
-            >个</template
-          >
+            >个
+          </template>
         </p>
         <div v-if="searchOs || searchArch || searchCategory.length > 0" class="search-filter-tags">
           <OTag v-if="searchOs" closable @Close="handleCloseTag('os')">{{ searchOs }}</OTag>
@@ -370,7 +370,7 @@ watch(
       </div>
       <div class="pkg-content">
         <AppLoading :loading="isLoading" />
-        <ResultNotApp v-if="isSearchError" type="领域应用" />
+        <ResultNoApp v-if="isSearchError" type="领域应用" />
         <div v-if="pkgData.length !== 0 && !isSearchError" class="pkg-panel">
           <ORow gap="32px" flex-wrap="wrap">
             <template v-if="pkgData.length > 0">

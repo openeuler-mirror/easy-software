@@ -25,14 +25,14 @@ const { locale } = useLocale();
 
 // EPKG-表头
 const columns = [
-  { label: t('software.columns.name'), key: 'name' },
-  { label: t('software.columns.version'), key: 'version' },
-  { label: t('software.columns.os'), key: 'os' },
-  { label: t('software.columns.arch'), key: 'arch' },
-  { label: t('software.columns.category'), key: 'category' },
-  { label: t('software.columns.timeorder'), key: 'epkgUpdateAt' },
-  { label: t('software.columns.size'), key: 'epkgSize' },
-  { label: t('software.columns.operation'), key: 'operation' },
+  { label: t('software.columns.name'), key: 'name', type: 'name' },
+  { label: t('software.columns.version'), key: 'version', type: 'version' },
+  { label: t('software.columns.os'), key: 'os', type: 'os' },
+  { label: t('software.columns.arch'), key: 'arch', type: 'arch' },
+  { label: t('software.columns.category'), key: 'category', type: 'category' },
+  { label: t('software.columns.timeorder'), key: 'epkgUpdateAt', type: 'time' },
+  { label: t('software.columns.size'), key: 'epkgSize', type: 'size' },
+  { label: t('software.columns.operation'), key: 'operation', type: 'operation' },
 ];
 
 //  ------------  main ------------
@@ -350,7 +350,7 @@ watch(
       </div>
       <div class="pkg-content">
         <AppLoading :loading="isLoading" />
-        <ResultNotApp v-if="isSearchError" type="EPKG" />
+        <ResultNoApp v-if="isSearchError" type="EPKG" />
         <div v-if="pkgData.length !== 0 && !isSearchError" class="pkg-panel">
           <OTableItemNew :data="pkgData" :columns="columns" :type="tabName" />
           <div v-if="pkgData.length < total" class="pagination-box">

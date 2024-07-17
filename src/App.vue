@@ -57,6 +57,8 @@ const { isZh } = useLocale();
 
   --layout-footer-height: 300px;
 
+  --layout-content-banner: 160px;
+
   --layout-content-min-height: calc(100vh - var(--layout-header-height));
 
   @include respond-to('<=laptop') {
@@ -79,7 +81,7 @@ const { isZh } = useLocale();
 }
 .ly-main {
   position: relative;
-  min-height: calc(var(--layout-content-min-height) - var(--layout-footer-height));
+  min-height: calc(var(--layout-content-min-height) + var(--layout-header-height));
   background-color: var(--o-color-fill1);
   padding-top: var(--layout-header-height);
 }

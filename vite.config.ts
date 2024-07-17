@@ -36,7 +36,7 @@ export default defineConfig({
     preprocessorOptions: {
       scss: {
         additionalData: `
-          @use "@/assets/style/element-plus/index.scss" as *;
+          @use "@/assets/style/element-plus/var.scss" as *;
           @use "@/assets/style/mixin/screen.scss" as *;
           @use "@/assets/style/mixin/font.scss" as *;
           @use "@/assets/style/mixin/common.scss" as *;
