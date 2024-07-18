@@ -60,10 +60,6 @@ const paddingBottom = computed(() => {
 
   padding-left: var(--layout-content-padding);
   padding-right: var(--layout-content-padding);
-  @include respond-to('<=laptop') {
-    padding-left: 0;
-    padding-right: 0;
-  }
 
   --content-wrapper-vertical-paddingTop: 32px;
   --content-wrapper-vertical-paddingBottom: 48px;

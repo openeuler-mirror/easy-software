@@ -1,6 +1,5 @@
 <script lang="ts" setup>
-import type { PropType } from 'vue';
-import { ref } from 'vue';
+import { ref, type PropType } from 'vue';
 import { OTable, OLink, ODialog, OIcon, OPopover } from '@opensig/opendesign';
 import { useLocale } from '@/composables/useLocale';
 import { formatDateTime, checkOriginLink, windowOpen, xssAllTag, getPkgName } from '@/utils/common';
@@ -48,21 +47,39 @@ const jumpTo = (id: string) => {
 
 const showDlg = ref(false);
 const codeInput = ref('');
-const openDownloadDialog = (name: string, version: string) => {
+const openDownloadDialog = (name: string, version: string, pkgId: string) => {
   const v = version ? `:${version}` : '';
   codeInput.value = `docker pull openeuler/${xssAllTag(name)}${v}`;
   showDlg.value = true;
+  collectDownloadData(pkgId);
 };
 
 const showExternalDlg = ref(false);
 const externalLink = ref('');
-const onExternalDialog = (href: string) => {
+const onExternalDialog = (href: string, pkgId?: string) => {
   externalLink.value = href;
+  if (pkgId) {
+    collectDownloadData(pkgId);
+  }
   if (checkOriginLink(href)) {
     windowOpen(href, '_blank');
   } else {
     showExternalDlg.value = true;
   }
+};
+
+// ---------------------下载埋点--------------------
+const collectDownloadData = (pkgId: string) => {
+  const sensors = (window as any)['sensorsDataAnalytic201505'];
+  const { href } = window.location;
+  const downloadTime = new Date();
+  sensors?.setProfile({
+    ...(window as any)['sensorsCustomBuriedData'],
+    profileType: 'download',
+    origin: href,
+    pkgId,
+    downloadTime,
+  });
 };
 </script>
 
@@ -118,14 +135,12 @@ const onExternalDialog = (href: string) => {
       <template #td_epkgSize="{ row }">
         <p class="size" style="text-align: right">{{ row.epkgSize }}</p>
       </template>
-      <template #td_dockerStr="{ row }">
-        <div class="docker"><OCodeCopy :code="row.dockerStr" /></div>
-      </template>
+
       <template #td_operation="{ row }">
         <div class="operation-box" :class="type">
           <!-- 容器镜像 -->
           <template v-if="type === 'apppkg'">
-            <OLink color="primary" hover-underline @click="openDownloadDialog(row.name, row.appVer)">{{ t('software.columns.download') }}</OLink>
+            <OLink color="primary" hover-underline @click="openDownloadDialog(row.name, row.appVer, row.pkgId)">{{ t('software.columns.download') }}</OLink>
           </template>
           <template v-else>
             <span class="code-repo">
@@ -137,7 +152,7 @@ const onExternalDialog = (href: string) => {
               </OLink>
             </span>
             <span>
-              <OLink v-if="row.binDownloadUrl" @click="onExternalDialog(row.binDownloadUrl)" color="primary" hover-underline>{{
+              <OLink v-if="row.binDownloadUrl" @click="onExternalDialog(row.binDownloadUrl, row.pkgId)" color="primary" hover-underline>{{
                 t('software.columns.download')
               }}</OLink>
             </span>

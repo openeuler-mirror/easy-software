@@ -17,6 +17,9 @@ const props = defineProps({
 const { t } = useI18n();
 const message = useMessage();
 const codeInput = ref(props.code || '');
+
+const emit = defineEmits(['success']);
+
 const copyText = (e: MouseEvent) => {
   useClipboard({
     text: codeInput.value,
@@ -25,6 +28,7 @@ const copyText = (e: MouseEvent) => {
       message.success({
         content: t('software.columns.copySuccess'),
       });
+      emit('success');
     },
   });
 };

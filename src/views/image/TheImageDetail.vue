@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { OTab, OTabPane, isString } from '@opensig/opendesign';
 import { useRoute } from 'vue-router';
 import { useMarkdown } from '@/composables/useMarkdown';
@@ -10,8 +10,9 @@ import { OPENEULER_CONTACT } from '@/data/config';
 import AppFeedback from '@/components/AppFeedback.vue';
 import DetailHead from '@/components/detail/DetailHeader.vue';
 import DetailAside from '@/components/detail/DetailAside.vue';
+import ImageTags from './ImageTags.vue';
 import defaultImg from '@/assets/default-logo.png';
-import { columnTags, tagList } from '@/data/detail/index';
+import { tagList } from '@/data/detail/index';
 import { useViewStore } from '@/stores/common';
 import { useI18n } from 'vue-i18n';
 import { getCode } from '@/utils/common';
@@ -155,6 +156,28 @@ const queryVer = () => {
     });
   }
 };
+
+const tagsOptions = computed(() => {
+  return {
+    name: appData.value.name,
+    os: tagVer.value[0],
+    arch: tagVer.value[1],
+  };
+});
+
+// ---------------------下载埋点--------------------
+const onCodeSuccess = () => {
+  const sensors = (window as any)['sensorsDataAnalytic201505'];
+  const { href } = window.location;
+  const downloadTime = new Date();
+  sensors?.setProfile({
+    ...(window as any)['sensorsCustomBuriedData'],
+    profileType: 'download',
+    origin: href,
+    pkgId: route.query.pkgId as string,
+    downloadTime,
+  });
+};
 </script>
 
 <template>
@@ -185,12 +208,11 @@ const queryVer = () => {
                   <p class="sp">> {{ t('detail.usage') }}</p>
                   <div v-if="downloadData" class="image-code">
                     <p class="text">获取容器镜像</p>
-                    <OCodeCopy :code="getCode(downloadData)" />
+                    <OCodeCopy :code="getCode(downloadData)" @success="onCodeSuccess" />
                   </div>
                   <div v-if="imageUsage" v-dompurify-html="imageUsage" v-copy-code="true" class="markdown-body download"></div>
                 </template>
-
-                <OTableItemNew v-else :data="tagsValue" :columns="columnTags" />
+                <ImageTags v-else :data="tagsValue" :options="tagsOptions" />
               </OTabPane>
             </OTab>
           </AppSection>
