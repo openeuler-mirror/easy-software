@@ -9,7 +9,7 @@ import { useI18n } from 'vue-i18n';
 import { useLocale } from '@/composables/useLocale';
 import { getParamsRules } from '@/utils/common';
 import { isValidSearchTabName, isValidSearchKey } from '@/utils/query';
-import { TABNAME_OPTIONS, FLITERMENUOPTIONS } from '@/data/query';
+import { TABNAME_OPTIONS, FLITERMENUOPTIONS, COUNT_PAGESIZE } from '@/data/query';
 import { useViewStore } from '@/stores/common';
 
 import FilterCheckbox from '@/components/filter/FilterCheckbox.vue';
@@ -353,7 +353,7 @@ watch(
         <ResultNoApp v-if="isSearchError" type="EPKG" />
         <div v-if="pkgData.length !== 0 && !isSearchError" class="pkg-panel">
           <OTableItemNew :data="pkgData" :columns="columns" :type="tabName" />
-          <div v-if="pkgData.length < total" class="pagination-box">
+          <div v-if="total > COUNT_PAGESIZE[0]" class="pagination-box">
             <AppPagination :current="currentPage" :pagesize="pageSize" :total="total" @size-change="handleSizeChange" @current-change="handleCurrentChange" />
           </div>
         </div>

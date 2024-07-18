@@ -9,7 +9,6 @@ import { getDetails, getVer } from '@/api/api-domain';
 import { useViewStore } from '@/stores/common';
 import { useI18n } from 'vue-i18n';
 import { TABNAME_OPTIONS } from '@/data/query';
-import OCodeDown from '@/components/OCodeDown.vue';
 
 import DetailBasicInfo from '@/components/detail/DetailBasicInfo.vue';
 import AppFeedback from '@/components/AppFeedback.vue';

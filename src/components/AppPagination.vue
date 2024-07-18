@@ -3,6 +3,7 @@ import { ref, onMounted } from 'vue';
 import { useLocale } from '@/composables/useLocale';
 import { useRoute } from 'vue-router';
 import { ElPagination, ElConfigProvider } from 'element-plus';
+import { COUNT_PAGESIZE, COUNT_PAGESIZE_FIELD } from '@/data/query';
 import zhCn from 'element-plus/es/locale/lang/zh-cn';
 import English from 'element-plus/es/locale/lang/en';
 
@@ -49,7 +50,7 @@ onMounted(() => {
       background
       layout="sizes, prev, pager, next, jumper"
       :total="total"
-      :page-sizes="isFieldPage ? pageSizesField : pageSizes"
+      :page-sizes="isFieldPage ? COUNT_PAGESIZE_FIELD : COUNT_PAGESIZE"
       @size-change="handleSizeChange"
       @current-change="handleCurrentChange"
     />
