@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import { doLogin, getCsrfToken, logout } from '@/shared/login';
 import { useUserInfoStore } from '@/stores/user';
-import { OLink, OPopup } from '@opensig/opendesign';
+import { ODropdown, ODropdownItem, OIcon, OPopup } from '@opensig/opendesign';
 import { storeToRefs } from 'pinia';
 import { ref } from 'vue';
+import LoginIcon from '~icons/app/icon-login.svg';
 
-const { userInfo } = storeToRefs(useUserInfoStore());
+const { username, photo } = storeToRefs(useUserInfoStore());
 const userInfoArea = ref();
 const csrfToken = getCsrfToken();
 
@@ -14,20 +15,22 @@ const login = () => doLogin();
 
 <template>
   <template v-if="csrfToken">
-    <div class="user-info" ref="userInfoArea">
-      <img :src="userInfo.photo" />
-      {{ userInfo.username }}
-    </div>
-    <OPopup position="bottom" :target="userInfoArea">
-      <div class="header-user-menu">
-        <div class="item" @click="logout">
-          退出登录
-        </div>
+    <ODropdown trigger="hover" optionPosition="bottom" optionWrapClass="user-dropdown">
+      <div class="user-info" ref="userInfoArea">
+        <img :src="photo" />
+        {{ username }}
       </div>
-    </OPopup>
+      <template #dropdown>
+        <ODropdownItem>
+          <div class="header-user-menu-item" @click="logout">
+            退出登录
+          </div>
+        </ODropdownItem>
+      </template>
+    </ODropdown>
   </template>
-  <div v-else>
-    <OLink @click="login">登录</OLink>
+  <div v-else class="login-btn" @click="login">
+    <OIcon><LoginIcon /></OIcon>
   </div>
 </template>
 
@@ -37,6 +40,8 @@ const login = () => doLogin();
   gap: 8px;
   align-items: center;
   cursor: pointer;
+  position: relative;
+  height: 64px;
 
   img {
     width: 24px;
@@ -45,21 +50,35 @@ const login = () => doLogin();
   }
 }
 
+.header-user-menu-item {
+  padding: 0 16px;
+}
+
 .header-user-menu {
   display: flex;
   flex-direction: column;
   background-color: var(--o-color-white);
   box-shadow: var(--o-shadow-3);
 
-  .item {
+  li {
     cursor: pointer;
-    padding: 8px 24px;
-    font-size: var(--o-font_size-text1);
+    padding: 16px;
+    font-size: var(--o-font_size-tip1);
     border-bottom: 1px solid var(--o-color-control1-light);
+    white-space: nowrap;
 
     &:last-child {
       border-bottom: none;
     }
+
+    &:hover {
+      background-color: rgb(var(--o-kleinblue-6));
+      color: var(--o-color-white);
+    }
   }
+}
+
+.login-btn {
+  cursor: pointer;
 }
 </style>

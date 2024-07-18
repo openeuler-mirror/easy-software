@@ -2,6 +2,12 @@ import type { UserInfoT } from '@/@types/type-user';
 import { request } from '@/shared/axios';
 import { getCsrfToken } from '@/shared/login';
 
+interface UserPermissionResponseT {
+  msg: string;
+  code: number;
+  data: UserInfoT;
+}
+
 /**
  * 获取用户信息
  * @param community community字段，默认openeuler
@@ -11,10 +17,10 @@ export function queryUserInfo(community = 'openeuler') {
   const url = '/api-id/oneid/user/permission';
   const token = getCsrfToken();
   return request
-    .get<UserInfoT>(url, {
+    .get<UserPermissionResponseT>(url, {
       params: { community },
       global: true,
       headers: { token },
     })
-    .then((res) => res.data);
+    .then((res) => res.data.data);
 }

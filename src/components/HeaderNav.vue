@@ -4,9 +4,12 @@ import { navs } from '@/data/nav';
 import { useRoute, useRouter } from 'vue-router';
 import { computed } from 'vue';
 import { useLocale } from '@/composables/useLocale';
+import { getCsrfToken } from '@/shared/login';
+import { useUserInfoStore } from '@/stores/user';
 
 const route = useRoute();
 const router = useRouter();
+const userInfoStore = useUserInfoStore();
 const { isZh, locale } = useLocale();
 
 // -------------------- hover事件 --------------------
@@ -64,25 +67,28 @@ const selectedIndex = computed(() => {
 const jumpTo = (href: string) => {
   router.push(`/${locale.value}` + href);
 };
+
+const loggedIn = computed(() => !!getCsrfToken() && userInfoStore.username && userInfoStore.photo);
 </script>
 
 <template>
   <nav class="header-nav">
     <ul class="nav-list">
-      <li
-        v-for="(item, idx) in navs"
-        :key="item.id"
-        :id="'e2e_headerNav_' + item.id"
-        class="nav-item"
-        :class="{
-          'is-selected': selectedIndex === idx,
-          'is-active': activeIndex === idx,
-        }"
-        @mouseenter="onMouseEnter(idx)"
-        @mouseleave="onMouseLeave"
-      >
-        <span @click="jumpTo(item.href)" class="nav-item-link">{{ isZh ? item.label.zh : item.label.en }}</span>
-      </li>
+      <template  v-for="(item, idx) in navs" :key="item.id">
+        <li
+          v-if="item.id !== 'upstream' || loggedIn"
+          :id="'e2e_headerNav_' + item.id"
+          class="nav-item"
+          :class="{
+            'is-selected': selectedIndex === idx,
+            'is-active': activeIndex === idx,
+          }"
+          @mouseenter="onMouseEnter(idx)"
+          @mouseleave="onMouseLeave"
+        >
+          <span @click="jumpTo(item.href)" class="nav-item-link">{{ isZh ? item.label.zh : item.label.en }}</span>
+        </li>
+      </template>
     </ul>
   </nav>
 </template>

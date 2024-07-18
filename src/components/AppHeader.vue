@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { onMounted, watch } from 'vue';
-import { ODivider, OLink } from '@opensig/opendesign';
+import { watch } from 'vue';
+import { ODivider,  } from '@opensig/opendesign';
 import { useRouter } from 'vue-router';
 import { useLangStore } from '@/stores/common';
 import { OPENEULER } from '@/data/config';
@@ -9,7 +9,6 @@ import HeaderNav from '@/components/HeaderNav.vue';
 import AppLogin from '@/components/AppLogin.vue';
 
 import openeulerLogo from '@/assets/openeuler-logo.svg';
-import { refreshUserInfo } from '@/shared/login';
 
 const router = useRouter();
 const { locale, t } = useI18n();
@@ -30,8 +29,6 @@ watch(
     langStore.setLangStore(val);
   }
 );
-
-onMounted(refreshUserInfo);
 </script>
 
 <template>

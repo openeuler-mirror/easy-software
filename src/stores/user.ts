@@ -1,26 +1,24 @@
 import type { UserInfoT } from '@/@types/type-user';
 import { defineStore } from 'pinia';
-import { reactive } from 'vue';
+import { ref } from 'vue';
 
 /**
  * 用户基本信息
  */
 export const useUserInfoStore = defineStore('userInfo', () => {
   // 登录信息
-  const userInfo = reactive<UserInfoT>({
-    photo: '',
-    username: '',
-  });
-  const setUserInfo = (data?: typeof userInfo) => {
+  const photo = ref('');
+  const username = ref('');
+  const setUserInfo = (data?: UserInfoT) => {
     if (!data) {
       return;
     }
-    userInfo.photo = data.photo || '';
-    userInfo.username = data.username || '';
+    photo.value = data.photo || '';
+    username.value = data.username || '';
   };
   const clearUserInfo = () => {
-    userInfo.photo = '';
-    userInfo.username = '';
+    photo.value = '';
+    username.value = '';
   };
-  return { userInfo, setUserInfo, clearUserInfo };
+  return { photo, username, setUserInfo, clearUserInfo };
 });
