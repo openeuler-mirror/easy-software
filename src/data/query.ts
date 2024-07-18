@@ -31,3 +31,8 @@ export const FLITERMENUOPTIONS = [
     name: 'ubuntu',
   },
 ];
+
+
+// 分页器数量
+export const COUNT_PAGESIZE = [10, 20, 40, 80];
+export const COUNT_PAGESIZE_FIELD = [12, 24, 48, 96];

@@ -1,6 +1,7 @@
 import Markdown from 'markdown-it';
 
 import { addCopyBtn } from '@/utils/markdown';
+import { nextTick } from 'vue';
 
 export const useMarkdown = () => {
   // isCopy： 复制功能
@@ -37,7 +38,9 @@ export const useMarkdown = () => {
     });
 
     if (options.isCopy) {
-      addCopyBtn();
+      nextTick(() => {
+        addCopyBtn();
+      })
     }
 
     return md.render(data);

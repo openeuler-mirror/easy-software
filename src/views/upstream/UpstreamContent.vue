@@ -7,6 +7,7 @@ import { getParamsRules } from '@/utils/common';
 import { getUpstreamColumn, getUpstream } from '@/api/api-upstream';
 import { getSearchData } from '@/api/api-search';
 import { useViewStore } from '@/stores/common';
+import { COUNT_PAGESIZE } from '@/data/query';
 
 import FilterRadio from '@/components/filter/FilterRadio.vue';
 import AppLoading from '@/components/AppLoading.vue';
@@ -238,7 +239,7 @@ watch(
               <OTag v-if="row.status" class="app-tag" :class="row.status.toLocaleLowerCase()">{{ row.status }} </OTag>
             </template>
           </OTable>
-          <div v-if="appData.length < total" class="pagination-box">
+          <div v-if="total > COUNT_PAGESIZE[0]" class="pagination-box">
             <AppPagination :current="currentPage" :pagesize="pageSize" :total="total" @size-change="handleSizeChange" @current-change="handleCurrentChange" />
           </div>
         </div>
