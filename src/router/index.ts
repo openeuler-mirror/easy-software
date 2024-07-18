@@ -2,6 +2,9 @@ import { createRouter, createWebHistory } from 'vue-router';
 
 import { scrollToTop } from '@/utils/common';
 import { useLangStore, useViewStore } from '@/stores/common';
+import { getCsrfToken } from '@/shared/login';
+import { useUserInfoStore } from '@/stores/user';
+import { queryUserInfo } from '@/api/api-user';
 
 const routes = [
   {
@@ -113,17 +116,33 @@ const router = createRouter({
   },
 });
 
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to) => {
   document.body.scrollTop = 0;
   // firefox
   document.documentElement.scrollTop = 0;
+  // to.name
 
   // 设置语言
   const langStore = useLangStore();
   const lang = to.path.startsWith('/en') ? 'en' : 'zh';
   langStore.lang = lang;
 
-  next();
+  const csrfToken = getCsrfToken();
+  const userInfoStore = useUserInfoStore();
+  const isUpstream = to.name === 'upstream';
+  if (!csrfToken) {
+    userInfoStore.clearUserInfo();
+    return isUpstream ? { name: 'notFound' } : true;
+  }
+  if (!userInfoStore.username || !userInfoStore.photo) {
+    try {
+      userInfoStore.setUserInfo(await queryUserInfo());
+    } catch (error) {
+      return isUpstream ? { name: 'notFound' } : true;
+    }
+  }
+
+  return true;
 });
 
 router.afterEach(() => {
