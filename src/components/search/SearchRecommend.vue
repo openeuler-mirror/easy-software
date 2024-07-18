@@ -125,6 +125,12 @@ watch(
 const searchOptions = computed(() => {
   return props.options;
 });
+
+// 搜索数量>=10000 显示10000+
+const DOCCOUNT = 10000;
+const searchDocCount = (v: number) => {
+  return v >= DOCCOUNT ? `${v}+` : `${v}个`;
+};
 </script>
 
 <template>
@@ -137,7 +143,7 @@ const searchOptions = computed(() => {
         </p>
         <p class="info">
           <OLink @click="jumpPages(item.key)">
-            {{ t('software.searchview[0]') }} {{ item.docCount }} {{ t('software.searchview[1]') }}{{ t(`software.${item.key}`) }}
+            {{ t('software.searchview[0]') }}{{ searchDocCount(item.docCount) }}{{ t('software.searchview[1]') }}{{ t(`software.${item.key}`) }}
             <template #suffix><IconChevronRight /></template>
           </OLink>
         </p>
@@ -184,6 +190,7 @@ const searchOptions = computed(() => {
   height: auto;
   padding: 16px 16px 12px;
   border-radius: 4px;
+  transition: all 0.3s;
   .search-all {
     display: flex;
     align-items: center;

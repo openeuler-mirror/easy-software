@@ -117,11 +117,7 @@ const queryAllpkg = () => {
       }
     })
     .catch((err) => {
-      if (err.response.data.code === 404) {
-        isSearchError.value = true;
-      } else {
-        useViewStore().showNotFound();
-      }
+      useViewStore().showNotFound();
       total.value = 0;
       pkgData.value = [];
       isLoading.value = false;

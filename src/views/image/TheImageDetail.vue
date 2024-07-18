@@ -11,11 +11,13 @@ import AppFeedback from '@/components/AppFeedback.vue';
 import DetailHead from '@/components/detail/DetailHeader.vue';
 import DetailAside from '@/components/detail/DetailAside.vue';
 import ImageTags from './ImageTags.vue';
-import defaultImg from '@/assets/default-logo.png';
+
 import { tagList } from '@/data/detail/index';
 import { useViewStore } from '@/stores/common';
 import { useI18n } from 'vue-i18n';
 import { getCode } from '@/utils/common';
+
+import defaultImg from '@/assets/default-logo.png';
 
 const tabValue = ref('apppkg');
 const { t } = useI18n();
@@ -205,12 +207,13 @@ const onCodeSuccess = () => {
                   </AppSection>
 
                   <!-- 使用方式 -->
-                  <p class="sp">> {{ t('detail.usage') }}</p>
-                  <div v-if="downloadData" class="image-code">
-                    <p class="text">获取容器镜像</p>
-                    <OCodeCopy :code="getCode(downloadData)" @success="onCodeSuccess" />
-                  </div>
-                  <div v-if="imageUsage" v-dompurify-html="imageUsage" v-copy-code="true" class="markdown-body download"></div>
+                  <DetailInstall :title="`> ${t('detail.usage')}`">
+                    <div v-if="downloadData" class="image-code">
+                      <p class="text">获取容器镜像</p>
+                      <OCodeCopy :code="getCode(downloadData)" @success="onCodeSuccess" />
+                    </div>
+                    <div v-if="imageUsage" v-dompurify-html="imageUsage" v-copy-code="true" class="markdown-body download"></div>
+                  </DetailInstall>
                 </template>
                 <ImageTags v-else :data="tagsValue" :options="tagsOptions" />
               </OTabPane>

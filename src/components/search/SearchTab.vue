@@ -68,11 +68,18 @@ watch(
     searchKey.value = v;
   }
 );
+
+// 搜索数量>=10000 显示10000+
+const DOCCOUNT = 10000;
+const searchDocCount = (v: number) => {
+  return v >= DOCCOUNT ? `${v}+` : v;
+};
 </script>
 
 <template>
   <OTab v-model="searchCategoryValue" :line="false" variant="text" :style="{ '--tab-nav-justify': 'left' }" @change="(v) => onChangeTabs(v)">
-    <OTabPane v-for="item in menu" :key="item.key" class="pane" :value="item.key" :label="t(`software.${item.key}`) + `（${item.docCount}）`"> </OTabPane>
+    <OTabPane v-for="item in menu" :key="item.key" class="pane" :value="item.key" :label="t(`software.${item.key}`) + `（${searchDocCount(item.docCount)}）`">
+    </OTabPane>
   </OTab>
 </template>
 
