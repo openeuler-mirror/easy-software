@@ -148,7 +148,6 @@ onMounted(() => {
   }
   .pkg-info {
     display: flex;
-    flex: 1;
     height: 60px;
     align-items: flex-start;
   }

@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref, onMounted, type PropType } from 'vue';
+import { ref, onMounted, type PropType, computed } from 'vue';
 import { OTab, OTabPane, OIcon } from '@opensig/opendesign';
 import { useRoute, useRouter } from 'vue-router';
 import { getDetail, getTags, getVer } from '@/api/api-domain';
@@ -7,7 +7,7 @@ import { useMarkdown } from '@/composables/useMarkdown';
 import type { AppInfoT, MaintainerT, DetailItemT, MoreMessgeT, PkgTypeT } from '@/@types/app';
 import { OPENEULER_CONTACT } from '@/data/config';
 import { isValidTags } from '@/utils/query';
-import { columnTags, tagList } from '@/data/detail/index';
+import { tagList } from '@/data/detail/index';
 import { useI18n } from 'vue-i18n';
 import { useLocale } from '@/composables/useLocale';
 import { useViewStore } from '@/stores/common';
@@ -17,6 +17,7 @@ import { getCode } from '@/utils/common';
 import AppFeedback from '@/components/AppFeedback.vue';
 import DetailHead from '@/components/detail/DetailHeader.vue';
 import DetailBasicInfo from '@/components/detail/DetailBasicInfo.vue';
+import ImageTags from '@/views/image/ImageTags.vue';
 
 import DetailAside from '@/components/detail/DetailAside.vue';
 import defaultImg from '@/assets/default-logo.png';
@@ -269,6 +270,10 @@ const queryVer = () => {
   });
 };
 
+const repeatTags = (v: string) => {
+  return v.toLocaleLowerCase() === 'image' ? t('software.apppkg') : v;
+};
+
 // tags切换功能
 const isTags = ref(false);
 const onChangeImage = (v: string) => {
@@ -278,9 +283,13 @@ const onChangeImage = (v: string) => {
   }
 };
 
-const repeatTags = (v: string) => {
-  return v.toLocaleLowerCase() === 'image' ? t('software.apppkg') : v;
-};
+const tagsOptions = computed(() => {
+  return {
+    name: appData.value.name,
+    os: tagVer.value[0],
+    arch: tagVer.value[1],
+  };
+});
 </script>
 <template>
   <ContentWrapper vertical-padding="24px">
@@ -343,8 +352,7 @@ const repeatTags = (v: string) => {
                     </div>
                     <div v-if="imageUsage" v-dompurify-html="imageUsage" v-copy-code="true" class="markdown-body download"></div>
                   </template>
-
-                  <OTableItemNew v-else :data="tagsValue" :columns="columnTags" />
+                  <ImageTags v-else :data="tagsValue" :options="tagsOptions" />
                 </OTabPane>
               </OTab>
             </AppSection>

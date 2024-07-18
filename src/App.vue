@@ -65,8 +65,7 @@ const { isZh } = useLocale();
     --layout-header-max-width: 100%;
     --layout-header-padding: 5%;
 
-    --layout-content-max-width: 100%;
-    --layout-content-padding: 5%;
+    --layout-content-padding: 12px;
   }
 }
 </style>

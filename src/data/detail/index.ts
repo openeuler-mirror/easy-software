@@ -1,9 +1,3 @@
-// 容器镜像更多信息表头
-export const columnTags = [
-  { label: 'Tag', key: 'appVer' },
-  { label: 'Architectures', key: 'arch' },
-  { label: '获取镜像', key: 'dockerStr' },
-];
 
 // 容器镜像tab分类
 export const tagList = [{ lable: '概览', value: 'overview' }, { lable: 'Tags', value: 'tags' }];

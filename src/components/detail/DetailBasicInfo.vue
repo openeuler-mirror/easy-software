@@ -39,7 +39,7 @@ const showMore = () => {
     <div v-for="item in options" :key="item.name" class="basic-info-item">
       <span class="label">{{ item.name }}</span>
       <div class="basic-item-box">
-        <template v-if="item.name === t('detail.warehouse') || item.name === t('detail.source')">
+        <template v-if="item.name === t('detail.warehouse')">
           <OLink @click="onExternalDialog(item.value)" color="primary" class="tag-new" target="_blank" rel="noopener noreferrer">{{ item.type }}</OLink>
         </template>
         <template v-else-if="item.name === t('detail.pkgVersion')">
@@ -57,6 +57,7 @@ const showMore = () => {
             </OLink>
           </div>
         </template>
+        <template v-else-if="item.name === t('detail.source')"> EPOL </template>
         <template v-else> {{ item.value }}</template>
       </div>
     </div>

@@ -10,6 +10,7 @@ import IconCopy from '~icons/app/icon-copy.svg';
 import { useLocale } from '@/composables/useLocale';
 import type { PkgTypeT } from '@/@types/app';
 import { useI18n } from 'vue-i18n';
+import { useRoute } from 'vue-router';
 
 import IconChevronDown from '~icons/app/icon-chevron-down.svg';
 
@@ -72,6 +73,7 @@ const props = defineProps({
   },
 });
 const { t } = useI18n();
+const route = useRoute();
 
 const tableData = ref([
   {
@@ -87,6 +89,8 @@ const showExternalDlg = ref(false);
 const externalLink = ref('');
 const onExternalDialog = (href: string) => {
   externalLink.value = href;
+
+  collectDownloadData();
   showExternalDlg.value = true;
 };
 const show = ref(true);
@@ -136,6 +140,7 @@ const copyText = (e: MouseEvent, val: any) => {
     text: val,
     target: e,
     success: () => {
+      collectDownloadData();
       message.success({
         content: '复制成功',
       });
@@ -143,13 +148,28 @@ const copyText = (e: MouseEvent, val: any) => {
   });
 };
 
+// ---------------------下载埋点--------------------
+const collectDownloadData = () => {
+  const sensors = (window as any)['sensorsDataAnalytic201505'];
+  const { href } = window.location;
+  const downloadTime = new Date();
+  sensors?.setProfile({
+    ...(window as any)['sensorsCustomBuriedData'],
+    profileType: 'download',
+    origin: href,
+    pkgId: route.query.pkgId as string,
+    downloadTime,
+  });
+};
+
+// ---------------------版本支持情况--------------------
 const versionData = ref<EulerverT[]>(props.verData || []);
 
 interface ColumnT {
   key: string;
   label: string;
 }
-//合并单元格
+//版本支持情况合并单元格
 const arraySpanMethod = (rowIndex: number, colIdx: number, row: EulerverT, column: ColumnT) => {
   const fields = ['os'];
   const cellValue = row[column.key];
@@ -200,6 +220,11 @@ watch(
     versionData.value = props.verData;
   }
 );
+
+// 容器镜像埋点
+const onCodeSuccess = () => {
+  collectDownloadData();
+};
 </script>
 
 <template>
@@ -207,7 +232,7 @@ watch(
     <div class="detail">
       <p class="title" v-if="type !== 'IMAGE'">软件包大小：{{ data.size }}</p>
     </div>
-    <OCodeCopy :code="getCode(downloadData)" v-if="type === 'IMAGE' && downloadData" />
+    <OCodeCopy :code="getCode(downloadData)" v-if="type === 'IMAGE' && downloadData" @success="onCodeSuccess" />
     <div v-if="type !== 'IMAGE' && show">
       <div v-for="item in tableData" :key="item.name" class="bt">
         <OButton variant="solid" class="obtn" size="large" @click="onExternalDialog(item.download)">{{ item.name }}</OButton>

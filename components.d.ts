@@ -13,6 +13,7 @@ declare module 'vue' {
     AppFooter: typeof import('./src/components/AppFooter.vue')['default']
     AppHeader: typeof import('./src/components/AppHeader.vue')['default']
     AppLoading: typeof import('./src/components/AppLoading.vue')['default']
+    AppLogin: typeof import('./src/components/AppLogin.vue')['default']
     AppPagination: typeof import('./src/components/AppPagination.vue')['default']
     AppSection: typeof import('./src/components/AppSection.vue')['default']
     AppTableToggle: typeof import('./src/components/AppTableToggle.vue')['default']

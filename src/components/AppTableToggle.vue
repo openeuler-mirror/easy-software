@@ -40,7 +40,7 @@ const { t } = useI18n();
             <template #target>
               <OIcon ref="flagsRef" class="flags-icon"><IconHelp /></OIcon>
             </template>
-            <div class="box">EQ表示相等，表示两个版本或者状态是相同的</div>
+            <div class="box">EQ表示相等，表示两个版本或者状态是相同的，GE表示大于</div>
           </OPopover>
         </span>
       </template>
