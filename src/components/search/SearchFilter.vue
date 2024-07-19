@@ -229,10 +229,31 @@ onMounted(() => {
   background-color: var(--o-color-fill2);
   box-shadow: var(--o-shadow-1);
   height: auto;
+  padding: 16px 16px 12px;
+  border-radius: 4px;
   p {
     text-align: center;
     @include tip1;
     color: var(--o-color-info3);
+  }
+  &.o-layer-open {
+    padding: 24px;
+  }
+  :deep(.o-loading) {
+    .o-loading-main {
+      padding: 0;
+      justify-content: center;
+
+      .o-loading-icon {
+        font-size: 24px;
+        margin-bottom: 0;
+      }
+      svg {
+        width: 24px;
+        height: 24px;
+        margin-bottom: 0;
+      }
+    }
   }
 }
 .search {

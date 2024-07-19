@@ -8,7 +8,7 @@ interface ColumnT {
 }
 
 export function getStat() {
-  const url = `/api-query/field/stat`;
+  const url = `/server/field/stat`;
   return request.get(url).then((res: AxiosResponse) => res?.data);
 }
 
@@ -18,45 +18,43 @@ interface DetailT {
   rpmPkgId: string;
 }
 export function getDetail(params: DetailT) {
-  const url = `/api-query/field/detail`;
+  const url = `/server/field/detail`;
   return request.get(url, { showError: false, params }).then((res: AxiosResponse) => res?.data);
 }
 
 // 领域应用
 export function getSearchAllColumn(params: ColumnT) {
-  const url = `/api-query/field/column`;
+  const url = `/server/field/column`;
   return request.get(url, { showError: false, params }).then((res: AxiosResponse) => res?.data);
 }
 
 export function getSearchAllFiled(params: SearchSQLT) {
-  const url = `/api-query/field`;
+  const url = `/server/field`;
   return request.get(url, { showError: false, params }).then((res: AxiosResponse) => res?.data);
 }
 
 //Tags
 
 export function getTags(id: string) {
-  const url = `/api-query/apppkg/tags?name=${id}`;
+  const url = `/server/apppkg/tags?name=${id}`;
   return request.get(url).then((res: AxiosResponse) => res?.data);
 }
 
 //详情页
 
 export function getDetails(tabValue: string, id: string) {
-  const url = `/api-query/${tabValue}?pkgId=${id}`;
+  const url = `/server/${tabValue}?pkgId=${id}`;
   return request.get(url, { showError: false }).then((res: AxiosResponse) => res?.data);
 }
 
 //支持情况
 
 export function getVer(tabValue: string, id: string) {
-  const url = `/api-query/${tabValue}/eulerver?name=${id}`;
+  const url = `/server/${tabValue}/eulerver?name=${id}`;
   return request.get(url).then((res: AxiosResponse) => res?.data);
 }
 
-
-
 export function getVersionInfo() {
-  const url = `/api-query/field/archnum`;
+  const url = `/server/field/archnum`;
   return request.get(url, { showError: false }).then((res: AxiosResponse) => res?.data);
 }

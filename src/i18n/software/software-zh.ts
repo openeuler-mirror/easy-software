@@ -29,7 +29,7 @@ export default {
   feedback: '我要反馈',
   nofoundApp: '找不到相关应用？',
   history: '历史记录',
-  searchview: ['查看', '个相关'],
+  searchview: ['查看', '相关'],
 
   // 表格
   columns: {

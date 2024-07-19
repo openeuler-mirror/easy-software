@@ -144,8 +144,10 @@ const queryVer = () => {
             <DetailBasicInfo :options="basicInfo" />
 
             <!-- 安装指引 -->
-            <p class="sp">> {{ t('detail.installation') }}</p>
-            <div v-if="installation" v-dompurify-html="installation" v-copy-code="true" class="markdown-body installation"></div>
+            <DetailInstall :title="`> ${t('detail.installation')}`">
+              <div v-if="downloadData" v-dompurify-html="downloadData" v-copy-code="true" class="markdown-body download"></div>
+              <div v-if="installation" v-dompurify-html="installation" v-copy-code="true" class="markdown-body installation"></div>
+            </DetailInstall>
 
             <!-- 更多信息 -->
             <p class="sp">> {{ t('detail.more') }}</p>

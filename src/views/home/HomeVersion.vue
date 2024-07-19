@@ -248,9 +248,14 @@ const showMore = () => {
         {{ timeFormat(scope.row.actualMaintenanceEndtime) }}
       </template>
     </el-table-column>
-    <el-table-column label="状态" width="150">
+    <el-table-column label="状态" width="120">
       <template #default="scope">
         <OTag v-if="scope.row.status" class="app-tag" :color="statusType(scope.row.status)">{{ scope.row.status }} </OTag>
+      </template>
+    </el-table-column>
+    <el-table-column label="操作" width="100">
+      <template #default="scope">
+        <OLink color="primary" target="_blank" rel="noopener noreferrer" :href="scope.row.osUrl">下载</OLink>
       </template>
     </el-table-column>
   </el-table>
@@ -281,7 +286,7 @@ const showMore = () => {
 }
 
 .expand-data {
-  margin: 12px 64px;
+  margin: 12px 48px 12px 64px;
   border: 1px solid var(--el-table-border-color);
   border-radius: 4px;
   .arch-box {

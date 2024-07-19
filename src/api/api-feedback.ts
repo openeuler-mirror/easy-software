@@ -2,13 +2,11 @@ import { request } from '@/shared/axios';
 import type { AxiosResponse } from '@/shared/axios';
 import type { ResponseT } from '@/@types/response';
 
-
 interface FeedbackT {
   feedbackPageUrl: string;
   feedbackText: string;
   feedbackValue: number;
 }
-
 
 /**
  * 用户反馈
@@ -21,6 +19,6 @@ interface FeedbackT {
  */
 
 export function postFeedback(params: FeedbackT): Promise<ResponseT<string>> {
-  const url = '/dsapi/query/nps?community=software';
+  const url = '/api-dsapi/query/nps?community=software';
   return request.post(url, params).then((res: AxiosResponse) => res?.data);
 }

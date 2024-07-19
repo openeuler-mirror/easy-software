@@ -8,11 +8,11 @@ import type { SearchUpstreamT } from '@/@types/domain';
  */
 
 export function getUpstream(params: SearchUpstreamT) {
-  const url = `/api-query/appVersion`;
+  const url = `/server/appVersion`;
   return request.get(url, { params }).then((res: AxiosResponse) => res?.data);
 }
 
 export function getUpstreamColumn(name: string) {
-  const url = `/api-query/appVersion/column?column=${name}`;
+  const url = `/server/appVersion/column?column=${name}`;
   return request.get(url).then((res: AxiosResponse) => res?.data);
 }

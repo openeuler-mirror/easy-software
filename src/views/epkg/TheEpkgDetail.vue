@@ -11,6 +11,7 @@ import { useViewStore } from '@/stores/common';
 import AppFeedback from '@/components/AppFeedback.vue';
 import DetailHead from '@/components/detail/DetailHeader.vue';
 import DetailAside from '@/components/detail/DetailAside.vue';
+import DetailInstall from '@/components/detail/DetailInstall.vue';
 
 import defaultImg from '@/assets/default-logo.png';
 
@@ -149,10 +150,10 @@ const queryVer = () => {
             <!-- 基本信息 -->
             <DetailBasicInfo :options="basicInfo" />
             <!-- 安装指引 -->
-
-            <p class="sp">> {{ t('detail.installation') }}</p>
-            <div v-if="downloadData" v-dompurify-html="downloadData" v-copy-code="true" class="markdown-body download"></div>
-            <div v-if="installation" v-dompurify-html="installation" v-copy-code="true" class="markdown-body installation"></div>
+            <DetailInstall :title="`> ${t('detail.installation')}`">
+              <div v-if="downloadData" v-dompurify-html="downloadData" v-copy-code="true" class="markdown-body download"></div>
+              <div v-if="installation" v-dompurify-html="installation" v-copy-code="true" class="markdown-body installation"></div>
+            </DetailInstall>
 
             <!-- 更多信息 -->
             <p class="sp">> {{ t('detail.more') }}</p>

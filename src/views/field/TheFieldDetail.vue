@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { ref, onMounted, type PropType, computed } from 'vue';
-import { OTab, OTabPane, OIcon } from '@opensig/opendesign';
+import { OTab, OTabPane, OIconCalendar } from '@opensig/opendesign';
 import { useRoute, useRouter } from 'vue-router';
 import { getDetail, getTags, getVer } from '@/api/api-domain';
 import { useMarkdown } from '@/composables/useMarkdown';
@@ -321,8 +321,9 @@ const tagsOptions = computed(() => {
               <DetailBasicInfo :options="basicInfo" />
 
               <!-- 安装指引 -->
-              <p class="sp">> {{ t('detail.installation') }}</p>
-              <div v-if="installation" v-dompurify-html="installation" v-copy-code="true" class="markdown-body installation"></div>
+              <DetailInstall :title="`> ${t('detail.installation')}`">
+                <div v-if="installation" v-dompurify-html="installation" v-copy-code="true" class="markdown-body installation"></div>
+              </DetailInstall>
 
               <!-- 更多信息 -->
               <template v-if="item !== 'IMAGE'">
@@ -345,12 +346,13 @@ const tagsOptions = computed(() => {
                     </AppSection>
 
                     <!-- 使用方式 -->
-                    <p class="sp">> {{ t('detail.usage') }}</p>
-                    <div v-if="downloadData" class="image-code">
-                      <p class="text">获取容器镜像</p>
-                      <OCodeCopy :code="getCode(downloadData)" />
-                    </div>
-                    <div v-if="imageUsage" v-dompurify-html="imageUsage" v-copy-code="true" class="markdown-body download"></div>
+                    <DetailInstall :title="`> ${t('detail.usage')}`">
+                      <div v-if="downloadData" class="image-code">
+                        <p class="text">获取容器镜像</p>
+                        <OCodeCopy :code="getCode(downloadData)" />
+                      </div>
+                      <div v-if="imageUsage" v-dompurify-html="imageUsage" v-copy-code="true" class="markdown-body download"></div>
+                    </DetailInstall>
                   </template>
                   <ImageTags v-else :data="tagsValue" :options="tagsOptions" />
                 </OTabPane>
