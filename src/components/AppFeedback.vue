@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref } from 'vue';
+import { inject, ref } from 'vue';
 import { ORate, OTextarea, useMessage, OIcon, OButton, OTab, OTabPane } from '@opensig/opendesign';
 import { GITEE } from '@/data/config';
 import { useI18n } from 'vue-i18n';
@@ -12,7 +12,7 @@ import AppSection from '@/components/AppSection.vue';
 
 import IconHelp from '~icons/pkg/icon-help.svg';
 import IconIssue from '~icons/pkg/icon-issue.svg';
-import FieldFeedbackHistory from '@/views/field/FieldFeedbackHistory.vue';
+import FeedbackHistory from '@/components/feedbackHistory/FeedbackHistory.vue';
 
 const props = defineProps({
   name: {
@@ -27,14 +27,10 @@ const props = defineProps({
     type: String,
     default: '',
   },
-  pkgId: {
-    type: String,
-    default: '',
-  },
 });
 
 const { t } = useI18n();
-
+const pkgId = inject<string>('pkgId', '');
 // -------------------- 快速反馈 --------------------
 const rateVal = ref(0);
 const feedbackTxa = ref('');
@@ -99,7 +95,7 @@ const issueUrl = ref();
 
 const getIssueUrl = () => {
   const desc = encodeURIComponent(getIssueTemplate());
-  issueUrl.value = `${GITEE}/openeuler/easy-software/issues/new?issue%5Bassignee_id%5D=0&issue%5Bmilestone_id%5D=0&title=【EasySoftware】【${props.type}】${props.pkgId}&description=${desc}`;
+  issueUrl.value = `${GITEE}/openeuler/easy-software/issues/new?issue%5Bassignee_id%5D=0&issue%5Bmilestone_id%5D=0&title=【EasySoftware】【${props.type}】${pkgId}&description=${desc}`;
 };
 
 const showExternalDlg = ref(false);
@@ -153,7 +149,7 @@ const feedbackTabVal = ref<'submit' | 'history'>('submit');
       </OTabPane>
       <OTabPane class="tab-pane" label="history">
         <template #nav>反馈历史消息</template>
-        <FieldFeedbackHistory :pkgId="pkgId" />
+        <FeedbackHistory />
       </OTabPane>
     </OTab>
     

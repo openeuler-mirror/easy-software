@@ -16,6 +16,7 @@ import DetailHead from '@/components/detail/DetailHeader.vue';
 import DetailAside from '@/components/detail/DetailAside.vue';
 
 import defaultImg from '@/assets/default-logo.png';
+import { provide } from 'vue';
 
 const { t } = useI18n();
 const route = useRoute();
@@ -59,6 +60,7 @@ const queryPkg = () => {
   }
 };
 const pkgId = ref('');
+provide('pkgId', pkgId);
 if (isString(route.query?.pkgId)) {
   pkgId.value = encodeURIComponent(route.query?.pkgId.toString());
 }
@@ -155,7 +157,7 @@ const queryVer = () => {
           </AppSection>
 
           <!-- 反馈 -->
-          <AppFeedback :name="appData.name" :version="version" type="RPM" :pkgId="pkgId"/>
+          <AppFeedback :name="appData.name" :version="version" type="RPM" />
         </div>
         <div class="detail-row-side">
           <DetailAside :data="appData" :basicInfo="basicInfo" :maintainer="maintainer" :ver-data="verData" :license="license" :tagVer="tagVer" :type="'RPM'" />

@@ -4,12 +4,10 @@ import type { SorT } from '@/@types/type-sort';
 import { getFeedbackList } from '@/api/api-feedback';
 import AppPagination from '@/components/AppPagination.vue';
 import FilterOrder from '@/components/filter/FilterOrder.vue';
-import { computed, ref, watch } from 'vue';
-import FieldFeedbackHistoryItem from './FieldFeedbackHistoryItem.vue';
+import { computed, inject, ref, watch } from 'vue';
+import FeedbackHistoryItem from './FeedbackHistoryItem.vue';
 
-const props = defineProps<{
-  pkgId: string;
-}>();
+const pkgId = inject<string>('pkgId', '');
 
 const filterItems = [
   { label: '全部', value: '' },
@@ -29,7 +27,7 @@ const queryData = (sort?: SorT) => {
   getFeedbackList(currentPage.value, pageSize.value, currentFilterItem.value, sort)
     .then((res) => {
       const { data } = res.data[0];
-      feedbackList.value = data.filter((item) => item.issue_title.endsWith(props.pkgId));
+      feedbackList.value = data.filter((item) => item.issue_title.endsWith(pkgId));
       totalCount.value = feedbackList.value.length;
     })
     .catch(() => (feedbackList.value = []));
@@ -61,7 +59,7 @@ const handleCurrentChange = (page: number) => {
   </header>
 
   <div>
-    <FieldFeedbackHistoryItem v-for="(item, index) in feedbackList" :key="index" :feedback="item" />
+    <FeedbackHistoryItem v-for="(item, index) in feedbackList" :key="index" :feedback="item" />
   </div>
 
   <div class="pagination-box">
