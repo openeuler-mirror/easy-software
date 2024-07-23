@@ -1,11 +1,11 @@
 <script lang="ts" setup>
 import { ref, onMounted, type PropType, computed } from 'vue';
-import { OTab, OTabPane, OIconCalendar } from '@opensig/opendesign';
+import { OTab, OTabPane } from '@opensig/opendesign';
 import { useRoute, useRouter } from 'vue-router';
 import { getDetail, getTags, getVer } from '@/api/api-domain';
 import { useMarkdown } from '@/composables/useMarkdown';
 import type { AppInfoT, MaintainerT, DetailItemT, MoreMessgeT, PkgTypeT } from '@/@types/app';
-import { OPENEULER_CONTACT } from '@/data/config';
+import { maintainerDefaults } from '@/data/query';
 import { isValidTags } from '@/utils/query';
 import { tagList } from '@/data/detail/index';
 import { useI18n } from 'vue-i18n';
@@ -222,9 +222,9 @@ const getDetailValue = (data: any) => {
   }
   tagVer.value = [data.osSupport, data.arch];
   maintainer.value = {
-    maintainerId: data?.maintainerId || 'openEuler community',
-    maintainerEmail: data?.maintainerEmail || OPENEULER_CONTACT,
-    maintainerGiteeId: data?.maintainerGiteeId || 'openeuler-ci-bot',
+    maintainerId: data?.maintainerId || maintainerDefaults.name,
+    maintainerEmail: data?.maintainerEmail || maintainerDefaults.email,
+    maintainerGiteeId: data?.maintainerGiteeId || maintainerDefaults.gitee_id,
   };
 
   upStream.value = data?.upStream;
@@ -332,7 +332,7 @@ const tagsOptions = computed(() => {
               </template>
             </AppSection>
             <AppSection v-else>
-              <!-- 容器镜像 -->
+              <!-- 应用镜像 -->
               <OTab variant="text" @change="onChangeImage" :line="false" class="domain-tabs tabs-switch" v-model="imgName">
                 <OTabPane class="tab-pane" v-for="item in tagList" :key="item.value" :label="item.lable">
                   <template v-if="item.value === tagList[0].value">
@@ -348,7 +348,7 @@ const tagsOptions = computed(() => {
                     <!-- 使用方式 -->
                     <DetailInstall :title="`> ${t('detail.usage')}`">
                       <div v-if="downloadData" class="image-code">
-                        <p class="text">获取容器镜像</p>
+                        <p class="text">获取应用镜像</p>
                         <OCodeCopy :code="getCode(downloadData)" />
                       </div>
                       <div v-if="imageUsage" v-dompurify-html="imageUsage" v-copy-code="true" class="markdown-body download"></div>

@@ -49,18 +49,18 @@ const routes = [
     alias: '/en/image',
     component: () => import('@/views/image/TheImage.vue'),
   },
-  {
-    path: '/zh/epkg',
-    name: 'epkg',
-    alias: '/en/epkg',
-    component: () => import('@/views/epkg/TheEpkg.vue'),
-  },
-  {
-    path: '/zh/epkg/detail',
-    name: 'epkg-detail',
-    alias: '/en/epkg/detail',
-    component: () => import('@/views/epkg/TheEpkgDetail.vue'),
-  },
+  // {
+  //   path: '/zh/epkg',
+  //   name: 'epkg',
+  //   alias: '/en/epkg',
+  //   component: () => import('@/views/epkg/TheEpkg.vue'),
+  // },
+  // {
+  //   path: '/zh/epkg/detail',
+  //   name: 'epkg-detail',
+  //   alias: '/en/epkg/detail',
+  //   component: () => import('@/views/epkg/TheEpkgDetail.vue'),
+  // },
   {
     path: '/zh/oepkg',
     name: 'oepkg',

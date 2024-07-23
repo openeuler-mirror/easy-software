@@ -46,17 +46,17 @@ const selectedIndex = computed(() => {
     return idx;
   }
 
-  if (route.path.includes('/epkg')) {
-    idx = 4;
-    return idx;
-  }
+  // if (route.path.includes('/epkg')) {
+  //   idx = 4;
+  //   return idx;
+  // }
   if (route.path.includes('/oepkg')) {
-    idx = 5;
+    idx = 4;
     return idx;
   }
 
   if (route.path.includes('/upstream')) {
-    idx = 6;
+    idx = 5;
     return idx;
   }
 
@@ -74,7 +74,7 @@ const loggedIn = computed(() => !!getCsrfToken() && userInfoStore.username && us
 <template>
   <nav class="header-nav">
     <ul class="nav-list">
-      <template  v-for="(item, idx) in navs" :key="item.id">
+      <template v-for="(item, idx) in navs" :key="item.id">
         <li
           v-if="item.id !== 'upstream' || loggedIn"
           :id="'e2e_headerNav_' + item.id"

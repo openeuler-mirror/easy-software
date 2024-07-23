@@ -1,15 +1,17 @@
 <script lang="ts" setup>
-import { ref } from 'vue';
+import { ref, type PropType } from 'vue';
 import { OLink, OIcon } from '@opensig/opendesign';
 import { checkOriginLink, windowOpen } from '@/utils/common';
 import { scrollToTop } from '@/utils/common';
 import { useRoute } from 'vue-router';
 import ExternalLink from '@/components/ExternalLink.vue';
 
+import type { MaintainerT } from '@/@types/app';
+import { GITEE } from '@/data/config';
+
 import Email from '@/assets/email.svg';
 import Gitee from '@/assets/gitee.svg';
 import IconOutlink from '~icons/pkg/icon-outlink.svg';
-import { GITEE } from '@/data/config';
 import IconHelp from '~icons/pkg/icon-help.svg';
 
 defineProps({
@@ -20,7 +22,7 @@ defineProps({
     },
   },
   maintainer: {
-    type: Object,
+    type: Object as PropType<MaintainerT>,
     default: () => {
       return {};
     },

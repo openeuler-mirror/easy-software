@@ -255,7 +255,7 @@ const showMore = () => {
     </el-table-column>
     <el-table-column label="操作" width="100">
       <template #default="scope">
-        <OLink color="primary" target="_blank" rel="noopener noreferrer" :href="scope.row.osUrl">下载</OLink>
+        <OLink color="primary" v-if="scope.row.osUrl" :href="scope.row.osUrl" target="_blank" rel="noopener noreferrer">下载</OLink>
       </template>
     </el-table-column>
   </el-table>

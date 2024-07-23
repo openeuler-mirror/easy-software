@@ -138,7 +138,7 @@ const collectDownloadData = (pkgId: string) => {
 
       <template #td_operation="{ row }">
         <div class="operation-box" :class="type">
-          <!-- 容器镜像 -->
+          <!-- 应用镜像 -->
           <template v-if="type === 'apppkg'">
             <OLink color="primary" hover-underline @click="openDownloadDialog(row.name, row.appVer, row.pkgId)">{{ t('software.columns.download') }}</OLink>
           </template>
@@ -160,7 +160,7 @@ const collectDownloadData = (pkgId: string) => {
         </div>
       </template>
     </OTable>
-    <!-- 安装下载容器镜像 -->
+    <!-- 安装下载应用镜像 -->
     <ODialog v-model:visible="showDlg" :unmount-on-hide="true" size="small" class="nss-dialog">
       <template #header>
         <p class="feedback-title">{{ t('software.installImage.title') }}</p>

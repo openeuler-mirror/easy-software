@@ -41,7 +41,7 @@ onMounted(() => {
 
       <div :class="{ action: actionVisible }" class="community-pkg">
         <span class="num">{{ apppkg }}</span>
-        容器镜像
+        应用镜像
         <ODivider direction="v" style="--o-divider-bd-color: #fff" />
         <span class="num">{{ total }}</span> 软件包
       </div>

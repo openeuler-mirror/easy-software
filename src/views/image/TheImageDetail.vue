@@ -209,7 +209,7 @@ const onCodeSuccess = () => {
                   <!-- 使用方式 -->
                   <DetailInstall :title="`> ${t('detail.usage')}`">
                     <div v-if="downloadData" class="image-code">
-                      <p class="text">获取容器镜像</p>
+                      <p class="text">获取应用镜像</p>
                       <OCodeCopy :code="getCode(downloadData)" @success="onCodeSuccess" />
                     </div>
                     <div v-if="imageUsage" v-dompurify-html="imageUsage" v-copy-code="true" class="markdown-body download"></div>
@@ -219,7 +219,7 @@ const onCodeSuccess = () => {
               </OTabPane>
             </OTab>
           </AppSection>
-          <AppFeedback v-if="!isTags" :name="appData.name" :version="version" type="容器镜像" />
+          <AppFeedback v-if="!isTags" :name="appData.name" :version="version" type="应用镜像" />
         </div>
         <div v-if="!isTags" class="detail-row-side">
           <DetailAside

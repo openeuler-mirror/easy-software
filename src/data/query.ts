@@ -36,3 +36,11 @@ export const FLITERMENUOPTIONS = [
 // 分页器数量
 export const COUNT_PAGESIZE = [10, 20, 40, 80];
 export const COUNT_PAGESIZE_FIELD = [12, 24, 48, 96];
+
+// maintainer
+export const maintainerDefaults = {
+  name: 'George.Cao',
+  email: 'caozhi1214@qq.com',
+  gitee_id: 'georgecao',
+}
+

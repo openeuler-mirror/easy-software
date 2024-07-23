@@ -1,9 +1,9 @@
 <script lang="ts" setup>
-import { ref } from 'vue';
-import type { PropType } from 'vue';
+import { ref, type PropType, onMounted } from 'vue';
 import { useVModel } from '@vueuse/core';
 import { OCheckbox, OCheckboxGroup, OLink, OIcon } from '@opensig/opendesign';
 import { useI18n } from 'vue-i18n';
+import { useRoute } from 'vue-router';
 
 import IconChevronDown from '~icons/app/icon-chevron-down.svg';
 
@@ -18,6 +18,7 @@ const props = defineProps({
 });
 
 const { t } = useI18n();
+const route = useRoute();
 
 const emits = defineEmits<{
   (e: 'update:modelValue', val: string[]): void;
@@ -38,6 +39,13 @@ const showMoreItem = () => {
   showLen.value = isAll.value ? DEFAULT_NUM : props.options.length;
   isAll.value = !isAll.value;
 };
+
+onMounted(() => {
+  if (route.query.os) {
+    isAll.value = false;
+    showLen.value = props.options.length;
+  }
+});
 </script>
 
 <template>

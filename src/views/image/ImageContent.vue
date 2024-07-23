@@ -310,7 +310,7 @@ watch(
     </div>
 
     <div class="pkg-main">
-      <FilterHeader title="容器镜像" :isSort="false" @sort="changeTimeOrder" :total="total" @clear="clearFilter" />
+      <FilterHeader title="应用镜像" :isSort="false" @sort="changeTimeOrder" :total="total" @clear="clearFilter" />
       <div v-if="isSearchDocs || filterList.length > 0" class="search-result">
         <p v-if="!isPageSearch" class="text">
           <template v-if="isSearchDocs">
@@ -331,7 +331,7 @@ watch(
       </div>
       <div class="pkg-content">
         <AppLoading :loading="isLoading" />
-        <ResultNoApp v-if="isSearchError" type="容器镜像" />
+        <ResultNoApp v-if="isSearchError" type="应用镜像" />
         <div v-if="pkgData.length !== 0 && !isSearchError" class="pkg-panel">
           <OTableItemNew :data="pkgData" :columns="columns" :type="tabName" />
           <div v-if="total > COUNT_PAGESIZE[0]" class="pagination-box">

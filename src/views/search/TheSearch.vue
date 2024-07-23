@@ -87,7 +87,7 @@ watch(
       <AppPkgContent v-if="tabName === DATATYPE[0]" />
       <!-- 软件包 -->
       <RpmContent v-if="tabName === DATATYPE[1]" />
-      <!-- 容器镜像  -->
+      <!-- 应用镜像  -->
       <ImageContent v-if="tabName === DATATYPE[2]" />
       <!-- EPKG -->
       <EpkgContent v-if="tabName === DATATYPE[3]" />

@@ -26,19 +26,19 @@ export const navs = [
   {
     id: 'apppkg',
     label: {
-      zh: '容器镜像',
+      zh: '应用镜像',
       en: 'Image',
     },
     href: '/image',
   },
-  {
-    id: 'epkg',
-    label: {
-      zh: 'EPKG',
-      en: 'EPKG',
-    },
-    href: '/epkg',
-  },
+  // {
+  //   id: 'epkg',
+  //   label: {
+  //     zh: 'EPKG',
+  //     en: 'EPKG',
+  //   },
+  //   href: '/epkg',
+  // },
   {
     id: 'oepkg',
     label: {

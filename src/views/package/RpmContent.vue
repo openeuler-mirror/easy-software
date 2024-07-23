@@ -10,6 +10,7 @@ import { isValidSearchTabName, isValidSearchKey } from '@/utils/query';
 import { TABNAME_OPTIONS, FLITERMENUOPTIONS, COUNT_PAGESIZE } from '@/data/query';
 import { getParamsRules } from '@/utils/common';
 import { useViewStore } from '@/stores/common';
+import { os, arch } from '@/data/filter/';
 
 import FilterCheckbox from '@/components/filter/FilterCheckbox.vue';
 import AppLoading from '@/components/AppLoading.vue';
@@ -140,26 +141,8 @@ const filterCategoryList = ref<string[]>([]);
 const isFilterLoading = ref(false);
 
 const rpmColumn = {
-  os: [
-    'openEuler-24.03-LTS',
-    'openEuler-23.09',
-    'openEuler-23.03',
-    'openEuler-22.09',
-    'openEuler-22.03-LTS-SP3',
-    'openEuler-22.03-LTS-SP2',
-    'openEuler-22.03-LTS-SP1',
-    'openEuler-22.03-LTS',
-    'openEuler-21.09',
-    'openEuler-21.03',
-    'openEuler-20.09',
-    'openEuler-20.03-LTS-SP4',
-    'openEuler-20.03-LTS-SP3',
-    'openEuler-20.03-LTS-SP2',
-    'openEuler-20.03-LTS-SP1',
-    'openEuler-20.03-LTS',
-    'openEuler-preview',
-  ],
-  arch: ['aarch64', 'noarch', 'x86_64', 'loongarch64', 'riscv64', 'sw_64'],
+  os,
+  arch,
   category: ['AI', 'HPC', '云服务', '分布式存储', '大数据', '其他'],
 };
 

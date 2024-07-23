@@ -221,14 +221,14 @@ watch(
   }
 );
 
-// 容器镜像埋点
+// 应用镜像埋点
 const onCodeSuccess = () => {
   collectDownloadData();
 };
 </script>
 
 <template>
-  <AppSection :title="type === 'IMAGE' ? '获取容器镜像' : `${type}下载安装`" v-if="type === 'IMAGE' || data.size !== 0">
+  <AppSection :title="type === 'IMAGE' ? '获取应用镜像' : `${type}下载安装`" v-if="type === 'IMAGE' || data.size !== 0">
     <div class="detail">
       <p class="title" v-if="type !== 'IMAGE'">软件包大小：{{ data.size }}</p>
     </div>

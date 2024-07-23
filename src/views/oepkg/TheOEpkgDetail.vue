@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { ref, onMounted } from 'vue';
 import { isString } from '@opensig/opendesign';
-import { OPENEULER_CONTACT } from '@/data/config';
+import { maintainerDefaults } from '@/data/query';
 import { useRoute } from 'vue-router';
 import { useMarkdown } from '@/composables/useMarkdown';
 import type { AppInfoT, MaintainerT, DetailItemT, MoreMessgeT } from '@/@types/app';
@@ -105,9 +105,9 @@ const getDetailValue = (data: any) => {
   appData.value.size = data.rpmSize;
   tagVer.value = [data.osSupport, data.arch];
   maintainer.value = {
-    maintainerId: data?.maintainerId || 'openEuler community',
-    maintainerEmail: data?.maintainerEmail || OPENEULER_CONTACT,
-    maintainerGiteeId: data?.maintainerGiteeId || 'openeuler-ci-bot',
+    maintainerId: data?.maintainerId || maintainerDefaults.name,
+    maintainerEmail: data?.maintainerEmail || maintainerDefaults.email,
+    maintainerGiteeId: data?.maintainerGiteeId || maintainerDefaults.gitee_id,
   };
   version.value = data?.version;
   license.value = data.license;

@@ -56,15 +56,18 @@ onMounted(() => {
           </OAnchor>
         </div>
         <div id="all" class="pkg-main">
-          <h2>领域应用</h2>
+          <div class="pkg-title"><h2>领域应用</h2></div>
           <HomeField :data="pkgData" />
           <div id="resource" class="domain-resource">
-            <h2>获取资源</h2>
+            <div class="pkg-title"><h2>获取资源</h2></div>
             <HomeResource />
           </div>
 
           <div id="solution" class="domain-solution">
-            <h2>解决方案</h2>
+            <div class="pkg-title">
+              <h2>解决方案</h2>
+              <p class="text">通过提供一系列软件工具和技术方案，提供高效、稳定和可扩展的软件产品和服务</p>
+            </div>
             <div class="solution-content">
               <OCard
                 v-for="item in solutionData"
@@ -81,11 +84,13 @@ onMounted(() => {
           </div>
 
           <div id="version" class="domain-news">
-            <h2>openEuler社区版本</h2>
+            <div class="pkg-title"><h2>openEuler社区版本</h2></div>
             <HomeVersion />
           </div>
           <div id="news" class="domain-news">
-            <h2>最新资讯</h2>
+            <div class="pkg-title">
+              <h2>最新资讯</h2>
+            </div>
             <HomeNews />
           </div>
         </div>
@@ -96,11 +101,19 @@ onMounted(() => {
 
 <style lang="scss" scoped>
 .pkg-main {
-  h2 {
-    @include display3;
-    text-align: center;
-    font-weight: 500;
+  .pkg-title {
     margin-bottom: 32px;
+    text-align: center;
+    h2 {
+      @include display3;
+      font-weight: 500;
+      color: var(--o-color-info1);
+    }
+    .text {
+      @include h4;
+      margin-top: 16px;
+      color: var(--o-color-info2);
+    }
   }
 }
 

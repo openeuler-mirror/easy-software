@@ -2,8 +2,6 @@ import { request } from '@/shared/axios';
 import type { AxiosResponse } from '@/shared/axios';
 import type { SearchESParamsT } from '@/@types/domain';
 
-import { DOCS_SEARCH_API } from '@/data/config';
-
 /**
  * 搜索
  * @name getSearchData
@@ -16,16 +14,16 @@ import { DOCS_SEARCH_API } from '@/data/config';
  */
 
 export function getSearchData(params: SearchESParamsT) {
-  const url = DOCS_SEARCH_API + '/software/docs';
+  const url = '/api-search/software/docs';
   return request.post(url, params).then((res: AxiosResponse) => res?.data);
 }
 
 export function getSearchCount(params: { keyword: string }) {
-  const url = DOCS_SEARCH_API + '/software/count';
+  const url = '/api-search/software/count';
   return request.post(url, params).then((res: AxiosResponse) => res?.data);
 }
 
 export function getSearchDataAll(params: SearchESParamsT) {
-  const url = DOCS_SEARCH_API + '/software/docsAll';
+  const url = '/api-search/software/docsAll';
   return request.post(url, params).then((res: AxiosResponse) => res?.data);
 }

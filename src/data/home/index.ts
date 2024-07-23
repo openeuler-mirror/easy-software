@@ -16,7 +16,7 @@ export const homeData = [
   {
     id: 'field',
     name: '领域应用',
-    desc: 'openEuler操作系统支持的软件集合(包括RPM、容器镜像、EPKG软件包等）',
+    desc: 'openEuler操作系统支持的软件集合(包括RPM、应用镜像、EPKG软件包等）',
     icon: FieldIcon,
     href: '/field',
   },
@@ -29,18 +29,18 @@ export const homeData = [
   },
   {
     id: 'image',
-    name: '容器镜像',
-    desc: '一系列基于openEuler操作系统安装特定应用的容器镜像，提供开箱即用的部署体验',
+    name: '应用镜像',
+    desc: '一系列基于openEuler操作系统安装特定应用的应用镜像，提供开箱即用的部署体验',
     icon: ImageIcon,
     href: '/image',
   },
-  {
-    id: 'epkg',
-    name: 'EPKG',
-    desc: '一种支持多版本多环境，一次适配，处处运行的新型软件包',
-    icon: EpkgIcon,
-    href: '/epkg',
-  },
+  // {
+  //   id: 'epkg',
+  //   name: 'EPKG',
+  //   desc: '一种支持多版本多环境，一次适配，处处运行的新型软件包',
+  //   icon: EpkgIcon,
+  //   href: '/epkg',
+  // },
   {
     id: 'oepkg',
     name: 'OEPKG',
