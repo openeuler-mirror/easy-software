@@ -6,6 +6,7 @@ import { getTagsIcon } from '@/utils/common';
 import { useLocale } from '@/composables/useLocale';
 import { useI18n } from 'vue-i18n';
 import { useRoute } from 'vue-router';
+import { maintainerDefaults } from '@/data/query';
 
 import defaultImg from '@/assets/default-logo.png';
 import IconUser from '~icons/app/icon-user.svg';
@@ -42,17 +43,21 @@ function getQueryStr(params: PkgIdsT) {
 // Maintainer数据
 function getMaintainersStr(params: PkgIdsT) {
   let maintainers = '';
-  if (params.RPM) {
-    maintainers += `${params.RPM}、`;
-  }
-  if (params.IMAGE) {
-    maintainers += `${params.IMAGE}、`;
-  }
-  if (params.EPKG) {
-    maintainers += `${params.EPKG}、`;
-  }
-  if (params.OEPKG) {
-    maintainers += `${params.OEPKG}、`;
+  if (Object.keys(params).length > 0) {
+    if (params.RPM) {
+      maintainers += `${params.RPM}、`;
+    }
+    if (params.IMAGE) {
+      maintainers += `${params.IMAGE}、`;
+    }
+    if (params.EPKG) {
+      maintainers += `${params.EPKG}、`;
+    }
+    if (params.OEPKG) {
+      maintainers += `${params.OEPKG}、`;
+    }
+  } else {
+    maintainers = maintainerDefaults.name;
   }
   return maintainers.replace(/、+$/, '');
 }
@@ -103,7 +108,7 @@ onMounted(() => {
           </a>
         </div>
         <p v-if="data.description" v-dompurify-html="data.description" class="desc"></p>
-        <p v-if="data.maintainers && Object.keys(data.maintainers).length > 0" class="maintainers">
+        <p class="maintainers">
           <OIcon><IconUser /></OIcon>{{ getMaintainersStr(data.maintainers) }}
         </p>
       </div>

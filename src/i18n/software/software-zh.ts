@@ -39,7 +39,7 @@ export default {
     arch: '架构',
     category: '领域',
     timeorder: '更新时间',
-    repository: '源码仓',
+    repository: '源码地址',
     size: '软件包大小',
     download: '下载',
     copySuccess: '复制成功',

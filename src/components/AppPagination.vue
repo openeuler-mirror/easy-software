@@ -23,8 +23,6 @@ defineProps({
 });
 const route = useRoute();
 
-const pageSizesField = [12, 24, 48, 96];
-const pageSizes = [10, 20, 40, 90];
 const emit = defineEmits(['size-change', 'current-change']);
 const { isZh } = useLocale();
 

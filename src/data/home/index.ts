@@ -37,7 +37,7 @@ export const homeData = [
   // {
   //   id: 'epkg',
   //   name: 'EPKG',
-  //   desc: '一种支持多版本多环境，一次适配，处处运行的新型软件包',
+  //   desc: '一种支持多版本多环节的一次性适配，基于openEuler操作系统预编译的epkg格式的软件包',
   //   icon: EpkgIcon,
   //   href: '/epkg',
   // },
