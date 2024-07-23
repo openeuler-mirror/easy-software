@@ -18,6 +18,7 @@ import AppFeedback from '@/components/AppFeedback.vue';
 import DetailHead from '@/components/detail/DetailHeader.vue';
 import DetailBasicInfo from '@/components/detail/DetailBasicInfo.vue';
 import ImageTags from '@/views/image/ImageTags.vue';
+import FieldFeedbackHistory from './FieldFeedbackHistory.vue';
 
 import DetailAside from '@/components/detail/DetailAside.vue';
 import defaultImg from '@/assets/default-logo.png';
@@ -290,6 +291,9 @@ const tagsOptions = computed(() => {
     arch: tagVer.value[1],
   };
 });
+
+// 反馈
+const feedbackTabVal = ref<'submit' | 'history'>('submit');
 </script>
 <template>
   <ContentWrapper vertical-padding="24px">
@@ -360,7 +364,7 @@ const tagsOptions = computed(() => {
             </AppSection>
 
             <!-- 反馈 -->
-            <AppFeedback v-if="!isTags" :name="appData.name" :version="version" :type="typePkg" />
+            <AppFeedback v-if="!isTags" :name="appData.name" :version="version" :type="typePkg" :pkgId="pkgId" :maintainer="maintainer" />
           </div>
           <div v-if="!isTags" class="detail-row-side">
             <DetailAside

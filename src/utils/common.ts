@@ -147,3 +147,22 @@ export const getTarget = (data: any, key: any) => {
 
 // 输入框文字校验
 export const inputValidator = new RegExp("^[\u4E00-\u9FA5A-Za-z0-9.()$\\-]+$");
+
+/**
+ * 对象转URL参数
+ * @param queries 要转成query的键值对
+ * @returns query字符串，如?key1=value1&key2=value2
+ */
+export const generateQuery = (queries: Record<string, any>): string => {
+  const parseResultArr = Object.entries(queries).reduce((arr, [key, value]) => {
+    if (value === undefined || value === null || value === '') {
+      return arr;
+    }
+    arr.push(`${key}=${value}`);
+    return arr;
+  }, [] as string[]);
+  if (parseResultArr?.length) {
+    return `?${parseResultArr.join("&")}`;
+  }
+  return '';
+}

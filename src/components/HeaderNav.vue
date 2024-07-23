@@ -68,7 +68,7 @@ const jumpTo = (href: string) => {
   router.push(`/${locale.value}` + href);
 };
 
-const loggedIn = computed(() => !!getCsrfToken() && userInfoStore.username && userInfoStore.photo);
+const upstreamPermission = computed(() => !!getCsrfToken() && userInfoStore.username && userInfoStore.photo && userInfoStore.upstreamPermission);
 </script>
 
 <template>
@@ -76,7 +76,7 @@ const loggedIn = computed(() => !!getCsrfToken() && userInfoStore.username && us
     <ul class="nav-list">
       <template v-for="(item, idx) in navs" :key="item.id">
         <li
-          v-if="item.id !== 'upstream' || loggedIn"
+          v-if="item.id !== 'upstream' || upstreamPermission"
           :id="'e2e_headerNav_' + item.id"
           class="nav-item"
           :class="{

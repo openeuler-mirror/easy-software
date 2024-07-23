@@ -165,7 +165,7 @@ const queryVer = () => {
           </AppSection>
 
           <!-- 反馈 -->
-          <AppFeedback :name="appData.name" :version="version" type="OEPKG" />
+          <AppFeedback :name="appData.name" :version="version" type="OEPKG" :pkgId="pkgId"/>
         </div>
         <div class="detail-row-side">
           <DetailAside

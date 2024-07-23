@@ -11,6 +11,8 @@ import { isBoolean, useLoading, useMessage, isNull, isUndefined } from '@opensig
 import type { LoadingPropsT } from '@opensig/opendesign/lib/loading/types';
 import Cookies from 'js-cookie';
 import { LOGIN_KEYS } from '../login';
+import { useUserInfoStore } from '@/stores/user';
+import router from '@/router';
 
 interface RequestConfig<D = any> extends AxiosRequestConfig {
   data?: D;
@@ -174,6 +176,12 @@ const responseInterceptorId = request.interceptors.response.use(
         content: err.message,
         status: 'danger',
       });
+    }
+
+    if (err.response?.status === 401) {
+      Cookies.remove(LOGIN_KEYS.CSRF_TOKEN);
+      useUserInfoStore().$reset();
+      router.push('/');
     }
 
     return Promise.reject(err);

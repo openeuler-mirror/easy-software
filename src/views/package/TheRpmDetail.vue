@@ -155,7 +155,7 @@ const queryVer = () => {
           </AppSection>
 
           <!-- 反馈 -->
-          <AppFeedback :name="appData.name" :version="version" type="RPM" />
+          <AppFeedback :name="appData.name" :version="version" type="RPM" :pkgId="pkgId"/>
         </div>
         <div class="detail-row-side">
           <DetailAside :data="appData" :basicInfo="basicInfo" :maintainer="maintainer" :ver-data="verData" :license="license" :tagVer="tagVer" :type="'RPM'" />

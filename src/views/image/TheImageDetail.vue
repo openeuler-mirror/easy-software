@@ -219,7 +219,7 @@ const onCodeSuccess = () => {
               </OTabPane>
             </OTab>
           </AppSection>
-          <AppFeedback v-if="!isTags" :name="appData.name" :version="version" type="应用镜像" />
+          <AppFeedback v-if="!isTags" :name="appData.name" :version="version" type="应用镜像" :pkgId="pkgId"/>
         </div>
         <div v-if="!isTags" class="detail-row-side">
           <DetailAside

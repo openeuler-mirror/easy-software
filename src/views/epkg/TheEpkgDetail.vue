@@ -163,7 +163,7 @@ const queryVer = () => {
           </AppSection>
 
           <!-- 反馈 -->
-          <AppFeedback :name="appData.name" :version="version" type="EPKG" />
+          <AppFeedback :name="appData.name" :version="version" type="EPKG" :pkgId="pkgId"/>
         </div>
         <div class="detail-row-side">
           <DetailAside :data="appData" :basicInfo="basicInfo" :maintainer="maintainer" :ver-data="verData" :license="license" :tagVer="tagVer" :type="'EPKG'" />
