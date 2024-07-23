@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted, computed, provide } from 'vue';
 import { OTab, OTabPane, isString } from '@opensig/opendesign';
 import { useRoute } from 'vue-router';
 import { useMarkdown } from '@/composables/useMarkdown';
@@ -61,6 +61,7 @@ const queryPkg = () => {
 };
 
 const pkgId = ref('');
+provide('pkgId', pkgId);
 if (isString(route.query?.pkgId)) {
   pkgId.value = encodeURIComponent(route.query?.pkgId.toString());
 }

@@ -1,3 +1,4 @@
+import type { ResponseT } from '@/@types/response';
 import type { UserInfoT } from '@/@types/type-user';
 import { request } from '@/shared/axios';
 import { getCsrfToken } from '@/shared/login';
@@ -23,4 +24,9 @@ export function queryUserInfo(community = 'openeuler') {
       headers: { token },
     })
     .then((res) => res.data.data);
+}
+
+export function queryUpstreamPermission() {
+  const url = '/server/appVersion/permission';
+  return request.get<ResponseT<{ allow_access: boolean }>>(url).then((res) => res.data);
 }

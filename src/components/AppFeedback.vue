@@ -1,6 +1,6 @@
 <script lang="ts" setup>
-import { ref } from 'vue';
-import { ORate, OTextarea, useMessage, OIcon, OButton } from '@opensig/opendesign';
+import { inject, ref } from 'vue';
+import { ORate, OTextarea, useMessage, OIcon, OButton, OTab, OTabPane } from '@opensig/opendesign';
 import { GITEE } from '@/data/config';
 import { useI18n } from 'vue-i18n';
 import { OPENEULER_FORUM } from '@/data/config';
@@ -12,6 +12,7 @@ import AppSection from '@/components/AppSection.vue';
 
 import IconHelp from '~icons/pkg/icon-help.svg';
 import IconIssue from '~icons/pkg/icon-issue.svg';
+import FeedbackHistory from '@/components/feedbackHistory/FeedbackHistory.vue';
 
 const props = defineProps({
   name: {
@@ -29,7 +30,7 @@ const props = defineProps({
 });
 
 const { t } = useI18n();
-
+const pkgId = inject<string>('pkgId', '');
 // -------------------- 快速反馈 --------------------
 const rateVal = ref(0);
 const feedbackTxa = ref('');
@@ -94,7 +95,7 @@ const issueUrl = ref();
 
 const getIssueUrl = () => {
   const desc = encodeURIComponent(getIssueTemplate());
-  issueUrl.value = `${GITEE}/openeuler/easy-software/issues/new?issue%5Bassignee_id%5D=0&issue%5Bmilestone_id%5D=0&title=【${props.type}】-${props.name}-${props.version}&description=${desc}`;
+  issueUrl.value = `${GITEE}/openeuler/easy-software/issues/new?issue%5Bassignee_id%5D=0&issue%5Bmilestone_id%5D=0&title=【EasySoftware】【${props.type}】${pkgId}&description=${desc}`;
 };
 
 const showExternalDlg = ref(false);
@@ -114,33 +115,44 @@ const onExternalDialog = () => {
   externalLink.value = decodeURIComponent(issueUrl.value);
   showExternalDlg.value = true;
 };
+const feedbackTabVal = ref<'submit' | 'history'>('submit');
 </script>
 
 <template>
   <AppSection :title="t('software.feedbackTitle')" class="feedback">
-    <div class="feedback-content">
-      <div class="rate-box">
-        <ORate v-model="rateVal" color="primary" size="large" />
-      </div>
-      <div class="feedback-from">
-        <OTextarea
-          v-model="feedbackTxa"
-          round="4px"
-          :placeholder="t('software.feedbackPlaceholder')"
-          :max-length="200"
-          :input-on-outlimit="false"
-          resize="none"
-          :rows="4"
-          :clearable="false"
-          style="width: 100%"
-        />
-        <div class="action">
-          <OButton color="primary" variant="solid" size="large" @click="clickSubmit">{{ t('software.feedbackButton[0]') }}</OButton>
-          <OButton color="primary" size="large" @click="onExternalDialog">提交issue</OButton>
+    <OTab variant="text" :line="false" class="domain-tabs tabs-switch" v-model="feedbackTabVal">
+      <OTabPane class="tab-pane" label="submit">
+        <template #nav>提交反馈</template>
+        <div class="feedback-content">
+          <div class="rate-box">
+            <ORate v-model="rateVal" color="primary" size="large" />
+          </div>
+          <div class="feedback-from">
+            <OTextarea
+              v-model="feedbackTxa"
+              round="4px"
+              :placeholder="t('software.feedbackPlaceholder')"
+              :max-length="200"
+              :input-on-outlimit="false"
+              resize="none"
+              :rows="4"
+              :clearable="false"
+              style="width: 100%"
+            />
+            <div class="action">
+              <OButton color="primary" variant="solid" size="large" @click="clickSubmit">{{ t('software.feedbackButton[0]') }}</OButton>
+              <OButton color="primary" size="large" @click="onExternalDialog">提交issue</OButton>
+            </div>
+            <p class="other-text">您也可以使用<a :href="OPENEULER_FORUM" target="_blank" rel="noopener noreferrer"> 发帖求助 </a>进行反馈</p>
+          </div>
         </div>
-        <p class="other-text">您也可以使用<a :href="OPENEULER_FORUM" target="_blank" rel="noopener noreferrer"> 发帖求助 </a>进行反馈</p>
-      </div>
-    </div>
+      </OTabPane>
+      <OTabPane class="tab-pane" label="history">
+        <template #nav>反馈历史消息</template>
+        <FeedbackHistory />
+      </OTabPane>
+    </OTab>
+    
   </AppSection>
   <ExternalLink v-if="showExternalDlg" :href="externalLink" @change="showExternalDlg = false" />
 </template>

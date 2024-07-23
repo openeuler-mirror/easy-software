@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, provide } from 'vue';
 import { isString } from '@opensig/opendesign';
 import { maintainerDefaults } from '@/data/query';
 import { useRoute } from 'vue-router';
@@ -61,6 +61,7 @@ const queryPkg = () => {
 };
 
 const pkgId = ref('');
+provide('pkgId', pkgId);
 if (isString(route.query?.pkgId)) {
   pkgId.value = encodeURIComponent(route.query?.pkgId.toString());
 }

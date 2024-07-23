@@ -1,6 +1,9 @@
 import { request } from '@/shared/axios';
 import type { AxiosResponse } from '@/shared/axios';
 import type { ResponseT } from '@/@types/response';
+import { generateQuery } from '@/utils/common';
+import type { SorT } from '@/@types/type-sort';
+import type { FeedbackHistoryT } from '@/@types/feedback';
 
 interface FeedbackT {
   feedbackPageUrl: string;
@@ -21,4 +24,12 @@ interface FeedbackT {
 export function postFeedback(params: FeedbackT): Promise<ResponseT<string>> {
   const url = '/api-dsapi/query/nps?community=software';
   return request.post(url, params).then((res: AxiosResponse) => res?.data);
+}
+
+export function getFeedbackList(page?: number, pageSize?: number, filter?: string, sort?: SorT) {
+  const query = generateQuery({ page, pageSize, filter, sort, community: 'openeuler', repo: 'easy-software' });
+  const url = `/api-dsapi/query/repo/issues${query}`;
+  return request
+    .get<ResponseT<{ total: number; data: FeedbackHistoryT[] }[]>>(url, { headers: { Accept: 'application/json' } })
+    .then((res) => res?.data);
 }

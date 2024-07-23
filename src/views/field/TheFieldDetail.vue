@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref, onMounted, type PropType, computed } from 'vue';
+import { ref, onMounted, type PropType, computed, provide } from 'vue';
 import { OTab, OTabPane } from '@opensig/opendesign';
 import { useRoute, useRouter } from 'vue-router';
 import { getDetail, getTags, getVer } from '@/api/api-domain';
@@ -67,10 +67,12 @@ const filterEmptyParams = (data: any) => {
 // 获取tab分类
 const tabList = ref([] as PropType<PkgTypeT>);
 const pkgId = ref('');
+const appDataName = ref('');
 const epkgData = ref();
 const rpmData = ref();
 const imgData = ref();
 const isLoading = ref(true);
+provide('pkgId', pkgId);
 const queryEntity = () => {
   const query = route.query;
   const { type, appPkgId, epkgPkgId, rpmPkgId } = query;
@@ -87,7 +89,8 @@ const queryEntity = () => {
       epkgData.value = data['EPKG'];
       rpmData.value = data['RPM'];
       imgData.value = data['IMAGE'];
-      pkgId.value = data[data.tags[0]].name;
+      appDataName.value = data[data.tags[0]].name;
+      pkgId.value = data[data.tags[0]].pkgId;
       if (isValidTags(type)) {
         activeName.value = type?.toString();
       } else {
@@ -155,6 +158,7 @@ const latestOsSupport = ref();
 const tagVer = ref();
 const summary = ref();
 const getDetailValue = (data: any) => {
+  pkgId.value = data.pkgId;
   if (typePkg.value === 'RPM') {
     basicInfo.value = [
       { name: '详细描述', value: data?.description },
@@ -247,7 +251,7 @@ const getDetailValue = (data: any) => {
 const imgName = ref(tagList[0].lable);
 const tagsValue = ref([]);
 const queryTags = () => {
-  getTags(encodeURIComponent(pkgId.value)).then((res) => {
+  getTags(encodeURIComponent(appDataName.value)).then((res) => {
     tagsValue.value = res.data.list;
   });
 };
@@ -265,7 +269,7 @@ const getTabIcon = (tab: string) => {
 //获取支持
 const verData = ref();
 const queryVer = () => {
-  getVer(tabValue.value, encodeURIComponent(pkgId.value)).then((res) => {
+  getVer(tabValue.value, encodeURIComponent(appDataName.value)).then((res) => {
     verData.value = res.data.list;
   });
 };

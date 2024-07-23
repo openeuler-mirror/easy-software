@@ -4,7 +4,7 @@ import { scrollToTop } from '@/utils/common';
 import { useLangStore, useViewStore } from '@/stores/common';
 import { getCsrfToken } from '@/shared/login';
 import { useUserInfoStore } from '@/stores/user';
-import { queryUserInfo } from '@/api/api-user';
+import { queryUpstreamPermission, queryUserInfo } from '@/api/api-user';
 
 const routes = [
   {
@@ -131,12 +131,14 @@ router.beforeEach(async (to) => {
   const userInfoStore = useUserInfoStore();
   const isUpstream = to.name === 'upstream';
   if (!csrfToken) {
-    userInfoStore.clearUserInfo();
+    userInfoStore.$reset();
     return isUpstream ? { name: 'notFound' } : true;
   }
   if (!userInfoStore.username || !userInfoStore.photo) {
     try {
-      userInfoStore.setUserInfo(await queryUserInfo());
+      const [userInfo, upstreamPermission] = await Promise.all([queryUserInfo(), queryUpstreamPermission()]);
+      userInfoStore.setUserInfo(userInfo);
+      userInfoStore.upstreamPermission = upstreamPermission.data.allow_access;
     } catch (error) {
       return isUpstream ? { name: 'notFound' } : true;
     }
