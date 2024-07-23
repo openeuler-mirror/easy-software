@@ -39,7 +39,7 @@ const columnTags = [
 ];
 
 // ---------------------下载埋点--------------------
-// 容器镜像埋点
+// 应用镜像埋点
 const onCodeSuccess = (row: EulerverT) => {
   const sensors = (window as any)['sensorsDataAnalytic201505'];
   const { href } = window.location;

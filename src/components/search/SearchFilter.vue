@@ -1,13 +1,15 @@
 <script lang="ts" setup>
 import { ref, onMounted, watch } from 'vue';
-import { OSelect, OOption, OInput, OIcon, vLoading, useMessage } from '@opensig/opendesign';
+import { OSelect, OOption, OInput, OIcon, vLoading, useMessage, isUndefined } from '@opensig/opendesign';
+
+import { isValidSearchTabName, isValidSearchKey } from '@/utils/query';
 import { useRouter, useRoute } from 'vue-router';
 import { getSearchDataAll } from '@/api/api-search';
 import type { RecommendItemT } from '@/@types/search';
 import { onClickOutside } from '@vueuse/core';
 import { useLocale } from '@/composables/useLocale';
 import { useI18n } from 'vue-i18n';
-import { FLITERMENUOPTIONS } from '@/data/query';
+import { TABNAME_OPTIONS, FLITERMENUOPTIONS } from '@/data/query';
 
 import SearchRecommend from '@/components/search/SearchRecommend.vue';
 
@@ -51,7 +53,8 @@ const changeSearchInput = (v: string) => {
       status: 'danger',
     });
   }
-  isLoading.value = true;
+
+  isLoading.value = false;
   isFocus.value = false;
   searchInput.value = v;
   replaceWinUrl();
@@ -65,27 +68,10 @@ const replaceWinUrl = () => {
     query: {
       name: searchInput.value,
       tab: tabName.value,
-      key: fliterSelected.value,
+      key: defaultValue.value,
     },
   });
 };
-
-// 监听搜索关键字
-watch(
-  () => route.query.name as string,
-  (v: string) => {
-    if (v !== '') {
-      searchInput.value = v;
-    }
-  }
-);
-
-watch(
-  () => route.query?.tab as string,
-  (v) => {
-    tabName.value = v;
-  }
-);
 
 // ----------------- 联想搜索 -------------------------
 const searchRef = ref();
@@ -158,20 +144,42 @@ const trottleSearch = (v: string) => {
       status: 'danger',
     });
   }
-
+  isLoading.value = true;
   timer = setTimeout(() => {
     queryDocsAll();
   }, 500);
 };
 
-onMounted(() => {
-  defaultValue.value = (route.query.key as string) || 'all';
-  isLoading.value = false;
+// -------------------- 监听 url query 变化 触发搜索 ---------------------
+const handleQueryData = () => {
+  const query = route.query;
+  const { name, tab, key } = query;
 
-  if (route.query.name) {
-    searchInput.value = decodeURIComponent(route.query.name as string);
+  if (!isUndefined(name) && name) {
+    searchInput.value = decodeURIComponent(name as string);
   }
-});
+  // 判断key参数
+  if (isValidSearchKey(key)) {
+    defaultValue.value = key as string;
+  } else {
+    defaultValue.value = FLITERMENUOPTIONS[0].id;
+  }
+
+  if (isValidSearchTabName(tab)) {
+    tabName.value = tab as string;
+  } else {
+    tabName.value = TABNAME_OPTIONS[0];
+  }
+};
+handleQueryData();
+
+watch(
+  () => route.query,
+  () => {
+    handleQueryData();
+  },
+  { deep: true }
+);
 </script>
 
 <template>

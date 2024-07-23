@@ -4,8 +4,8 @@ export default {
   field: '领域应用',
   rpmpkg: 'RPM',
   rpm: 'RPM',
-  apppkg: '容器镜像',
-  image: '容器镜像',
+  apppkg: '应用镜像',
+  image: '应用镜像',
   epkgpkg: 'EPKG',
   epkg: 'EPKG',
   oepkg: 'OEPKG',
@@ -76,7 +76,7 @@ export default {
 
   // detail
   installImage: {
-    title: '安装下载容器镜像',
+    title: '安装下载应用镜像',
     text: '拉取镜像到本地',
   },
 
