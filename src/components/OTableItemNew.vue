@@ -137,27 +137,17 @@ const collectDownloadData = (pkgId: string) => {
       </template>
 
       <template #td_operation="{ row }">
-        <div class="operation-box" :class="type">
-          <!-- 应用镜像 -->
-          <template v-if="type === 'apppkg'">
-            <OLink color="primary" hover-underline @click="openDownloadDialog(row.name, row.appVer, row.pkgId)">{{ t('software.columns.download') }}</OLink>
-          </template>
-          <template v-else>
-            <span class="code-repo">
-              <OLink v-if="row.srcRepo" @click="onExternalDialog(row.srcRepo)" color="primary" hover-underline>
-                {{ t('software.columns.repository') }}
-                <template #suffix
-                  ><OIcon><IconOutlink /></OIcon
-                ></template>
-              </OLink>
-            </span>
-            <span>
-              <OLink v-if="row.binDownloadUrl" @click="onExternalDialog(row.binDownloadUrl, row.pkgId)" color="primary" hover-underline>{{
-                t('software.columns.download')
-              }}</OLink>
-            </span>
-          </template>
-        </div>
+        <!-- 应用镜像 -->
+        <template v-if="type === 'apppkg'">
+          <OLink color="primary" hover-underline @click="openDownloadDialog(row.name, row.appVer, row.pkgId)">{{ t('software.columns.download') }}</OLink>
+        </template>
+        <template v-else>
+          <span>
+            <OLink v-if="row.binDownloadUrl" @click="onExternalDialog(row.binDownloadUrl, row.pkgId)" color="primary" hover-underline>{{
+              t('software.columns.download')
+            }}</OLink>
+          </span>
+        </template>
       </template>
     </OTable>
     <!-- 安装下载应用镜像 -->
@@ -276,7 +266,7 @@ const collectDownloadData = (pkgId: string) => {
       width: 180px;
     }
     .arch {
-      width: 100px;
+      width: 110px;
     }
     .category {
       width: 90px;
@@ -289,7 +279,7 @@ const collectDownloadData = (pkgId: string) => {
       text-align: right;
     }
     .operation {
-      width: 175px;
+      width: 100px;
     }
   }
 }

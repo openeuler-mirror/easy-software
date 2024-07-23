@@ -9,10 +9,10 @@ import { queryUserInfo } from '@/api/api-user';
 const routes = [
   {
     path: '/',
-    redirect: '/zh/',
+    redirect: '/zh',
   },
-  { path: '/zh/', name: 'home', component: () => import('@/views/home/TheHome.vue') },
-  { path: '/en/', redirect: '/zh/' },
+  { path: '/zh', name: 'home', component: () => import('@/views/home/TheHome.vue') },
+  { path: '/en/', redirect: '/zh' },
   {
     path: '/zh/field',
     name: 'field',

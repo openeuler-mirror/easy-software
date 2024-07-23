@@ -40,8 +40,8 @@ const showMoreItem = () => {
 
 onMounted(() => {
   if (route.query.os) {
-    isAll.value = false;
     showLen.value = props.options.length;
+    isAll.value = true;
   }
 });
 </script>

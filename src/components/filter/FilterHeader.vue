@@ -53,7 +53,9 @@ const changePkgInput = (v: string) => {
 };
 
 const clearSearchData = () => {
-  replaceWinUrl();
+  router.push({
+    path: `/${locale.value}/` + (route.name as string),
+  });
 };
 
 const replaceWinUrl = () => {
