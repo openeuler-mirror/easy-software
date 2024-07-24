@@ -38,6 +38,7 @@ const appData = ref<AppInfoT>({
   source_code: '',
   bin_code: '',
 });
+const srcRepo = ref('');
 
 const isLoading = ref(true);
 
@@ -47,6 +48,7 @@ const queryPkg = () => {
     getDetails(tabValue.value, pkgId.value)
       .then((res) => {
         const data = res.data.list[0];
+        srcRepo.value = data.srcRepo;
         getDetailValue(data);
         isLoading.value = false;
       })
@@ -220,7 +222,7 @@ const onCodeSuccess = () => {
               </OTabPane>
             </OTab>
           </AppSection>
-          <AppFeedback v-if="!isTags" :name="appData.name" :version="version" type="应用镜像" />
+          <AppFeedback v-if="!isTags" :name="appData.name" :version="version" type="应用镜像" :maintainer="maintainer" :srcRepo="srcRepo" />
         </div>
         <div v-if="!isTags" class="detail-row-side">
           <DetailAside

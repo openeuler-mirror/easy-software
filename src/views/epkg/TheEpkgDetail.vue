@@ -38,6 +38,7 @@ const appData = ref<AppInfoT>({
   source_code: '',
   bin_code: '',
 });
+const srcRepo = ref('');
 
 const isLoading = ref(true);
 
@@ -47,6 +48,7 @@ const queryPkg = () => {
     getDetails(tabValue.value, pkgId.value)
       .then((res) => {
         const data = res.data.list[0];
+        srcRepo.value = data.srcRepo;
         getDetailValue(data);
         isLoading.value = false;
       })
@@ -164,7 +166,7 @@ const queryVer = () => {
           </AppSection>
 
           <!-- 反馈 -->
-          <AppFeedback :name="appData.name" :version="version" type="EPKG" />
+          <AppFeedback :name="appData.name" :version="version" type="EPKG" :maintainer="maintainer" :srcRepo="srcRepo" />
         </div>
         <div class="detail-row-side">
           <DetailAside :data="appData" :basicInfo="basicInfo" :maintainer="maintainer" :ver-data="verData" :license="license" :tagVer="tagVer" :type="'EPKG'" />
