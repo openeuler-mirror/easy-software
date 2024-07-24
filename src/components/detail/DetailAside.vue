@@ -218,6 +218,13 @@ watch(
   () => props.verData,
   () => {
     versionData.value = props.verData;
+    // 处理当前版本在最前面
+    versionData.value.forEach((item, index) => {
+      if (item.os === props.tagVer[0]) {
+        versionData.value.splice(index, 1);
+        versionData.value.unshift(item);
+      }
+    });
   }
 );
 

@@ -16,7 +16,7 @@ export const homeData = [
   {
     id: 'field',
     name: '领域应用',
-    desc: 'openEuler操作系统支持的软件集合(包括RPM、应用镜像、EPKG软件包等）',
+    desc: 'openEuler操作系统支持的软件集合(包括RPM、应用镜像、OEPKG软件包等）',
     icon: FieldIcon,
     href: '/field',
   },
