@@ -10,6 +10,7 @@ import { getParamsRules } from '@/utils/common';
 import { isValidSearchTabName, isValidSearchKey } from '@/utils/query';
 import { TABNAME_OPTIONS, FLITERMENUOPTIONS, COUNT_PAGESIZE } from '@/data/query';
 import { useViewStore } from '@/stores/common';
+import { useSearchStore } from '@/stores/search';
 import { useLocale } from '@/composables/useLocale';
 
 import FilterCheckbox from '@/components/filter/FilterCheckbox.vue';
@@ -22,6 +23,7 @@ const { locale } = useLocale();
 const route = useRoute();
 const router = useRouter();
 const { t } = useI18n();
+const searchStore = useSearchStore();
 
 // EPKG-表头
 const columns = [
@@ -74,6 +76,9 @@ const querySearch = () => {
     .then((res) => {
       pkgData.value = res.data.oepkg;
       total.value = res.data.total;
+      if (searchStore.nameOrder) {
+        searchStore.changeNameOrderCount(total.value);
+      }
       isLoading.value = false;
       isSearchDocs.value = true;
       if (pkgData.value.length === 0) {

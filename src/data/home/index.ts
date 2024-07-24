@@ -44,7 +44,7 @@ export const homeData = [
   {
     id: 'oepkg',
     name: 'OEPKG',
-    desc: 'OEPKGS是openEuler第三方扩展软件包',
+    desc: 'OEPKG是openEuler第三方扩展软件包',
     icon: OepkgIcon,
     href: '/oepkg',
   },

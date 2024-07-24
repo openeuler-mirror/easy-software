@@ -6,6 +6,7 @@ import { getSearchAllColumn, getSearchAllFiled } from '@/api/api-domain';
 import { useRoute, useRouter } from 'vue-router';
 import { useLocale } from '@/composables/useLocale';
 import { useViewStore } from '@/stores/common';
+import { useSearchStore } from '@/stores/search';
 import { useI18n } from 'vue-i18n';
 import { getParamsRules } from '@/utils/common';
 import { isValidSearchTabName, isValidSearchKey } from '@/utils/query';
@@ -22,6 +23,7 @@ const { locale } = useLocale();
 const route = useRoute();
 const router = useRouter();
 const { t } = useI18n();
+const searchStore = useSearchStore();
 
 const pkgData = ref([]);
 const tabName = ref('all');
@@ -89,6 +91,9 @@ const querySearch = () => {
     .then((res) => {
       pkgData.value = res.data.all;
       total.value = res.data.total;
+      if (searchStore.nameOrder) {
+        searchStore.changeNameOrderCount(total.value);
+      }
       isSearchDocs.value = true;
       if (pkgData.value.length === 0) {
         isSearchError.value = true;

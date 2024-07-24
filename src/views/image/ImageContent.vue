@@ -9,6 +9,7 @@ import { isValidSearchTabName, isValidSearchKey } from '@/utils/query';
 import { TABNAME_OPTIONS, FLITERMENUOPTIONS, COUNT_PAGESIZE } from '@/data/query';
 import { getParamsRules } from '@/utils/common';
 import { useViewStore } from '@/stores/common';
+import { useSearchStore } from '@/stores/search';
 import { useLocale } from '@/composables/useLocale';
 
 import FilterCheckbox from '@/components/filter/FilterCheckbox.vue';
@@ -21,6 +22,7 @@ const { locale } = useLocale();
 const route = useRoute();
 const { t } = useI18n();
 const router = useRouter();
+const searchStore = useSearchStore();
 
 // 软件包-表头
 const columns = [
@@ -68,6 +70,9 @@ const querySearch = () => {
     .then((res) => {
       pkgData.value = res.data.apppkg;
       total.value = res.data.total;
+      if (searchStore.nameOrder) {
+        searchStore.changeNameOrderCount(total.value);
+      }
       isSearchDocs.value = true;
       isLoading.value = false;
       if (pkgData.value.length === 0) {

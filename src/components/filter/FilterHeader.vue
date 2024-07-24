@@ -5,6 +5,8 @@ import { useLocale } from '@/composables/useLocale';
 import { useI18n } from 'vue-i18n';
 import { useRouter, useRoute } from 'vue-router';
 import type { SorT } from '@/@types/type-sort';
+import { useSearchStore } from '@/stores/search';
+
 import IconTimeOrder from '~icons/app/icon-time-order.svg';
 import IconSearch from '~icons/app/icon-search.svg';
 
@@ -30,6 +32,8 @@ const router = useRouter();
 const route = useRoute();
 const { t } = useI18n();
 const { locale } = useLocale();
+
+const searchStore = useSearchStore();
 
 const searchValue = ref(route.query.name as string | '');
 const showPanel = ref(false);
@@ -89,12 +93,16 @@ const changeSortBy = (type: string, name: string) => {
     isTimeOrder.value = !isTimeOrder.value;
     v = isTimeOrder.value ? 'asc' : 'desc';
     path?.children[isTimeOrder.value ? 1 : 0].setAttribute('fill', '#000');
+
+    searchStore.changeNameOrderState(false);
   } else if (type === 'nameOrder') {
     isTimeOrder.value = false;
     activeIndex.value = 1;
     isNameOrder.value = !isNameOrder.value;
     v = isNameOrder.value ? 'asc' : 'desc';
     path?.children[isNameOrder.value ? 1 : 0].setAttribute('fill', '#000');
+    // 修改状态
+    searchStore.changeNameOrderState(true);
   }
   emits('sort', [type, v]);
 };
@@ -116,6 +124,7 @@ const clearAll = () => {
   isNameOrder.value = false;
   activeIndex.value = -1;
   clearSvgFill();
+  searchStore.changeNameOrderState(false);
   emits('clear');
 };
 
