@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { ref, onMounted, type PropType, computed, provide, reactive } from 'vue';
-import { OTab, OTabPane } from '@opensig/opendesign';
+import { OTab, OTabPane, OIcon } from '@opensig/opendesign';
 import { useRoute, useRouter } from 'vue-router';
 import { getDetail, getTags, getVer } from '@/api/api-domain';
 import { useMarkdown } from '@/composables/useMarkdown';
@@ -369,7 +369,7 @@ const tagsOptions = computed(() => {
             </AppSection>
 
             <!-- 反馈 -->
-            <AppFeedback v-if="!isTags" :name="appData.name" :version="version" :type="typePkg" :srcRepo="currentSrcRepo"/>
+            <AppFeedback v-if="!isTags" :name="appData.name" :version="version" :type="typePkg" :srcRepo="currentSrcRepo" />
           </div>
           <div v-if="!isTags" class="detail-row-side">
             <DetailAside

@@ -10,6 +10,7 @@ import { isValidSearchTabName, isValidSearchKey } from '@/utils/query';
 import { TABNAME_OPTIONS, FLITERMENUOPTIONS, COUNT_PAGESIZE } from '@/data/query';
 import { getParamsRules } from '@/utils/common';
 import { useViewStore } from '@/stores/common';
+import { useSearchStore } from '@/stores/search';
 import { os, arch } from '@/data/filter/';
 
 import FilterCheckbox from '@/components/filter/FilterCheckbox.vue';
@@ -22,6 +23,7 @@ const { locale } = useLocale();
 const route = useRoute();
 const router = useRouter();
 const { t } = useI18n();
+const searchStore = useSearchStore();
 
 const columns = [
   { label: t('software.columns.name'), key: 'name', type: 'name' },
@@ -72,6 +74,9 @@ const querySearch = () => {
     .then((res) => {
       pkgData.value = res.data.rpmpkg;
       total.value = res.data.total;
+      if (searchStore.nameOrder) {
+        searchStore.changeNameOrderCount(total.value);
+      }
       isLoading.value = false;
       isSearchDocs.value = true;
       if (pkgData.value.length === 0) {
