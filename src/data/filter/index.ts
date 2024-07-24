@@ -1,4 +1,5 @@
 export const os = [
+  'openEuler-24.03-LTS',
   'openEuler-20.03-LTS-SP1',
   'openEuler-20.03-LTS-SP2',
   'openEuler-20.03-LTS-SP3',

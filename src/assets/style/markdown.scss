@@ -131,7 +131,8 @@
   }
 
   // 详情安装指引修改   &.installation
-  &.download {
+  &.download,
+  &.installation {
     ul {
       list-style: none;
       padding-left: 0;
