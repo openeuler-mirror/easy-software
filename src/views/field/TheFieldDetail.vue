@@ -369,7 +369,7 @@ const tagsOptions = computed(() => {
             </AppSection>
 
             <!-- 反馈 -->
-            <AppFeedback v-if="!isTags" :name="appData.name" :version="version" :type="typePkg" :srcRepo="currentSrcRepo"/>
+            <AppFeedback v-if="!isTags" :name="appData.name" :version="version" :type="typePkg" :srcRepo="currentSrcRepo" :maintainer="maintainer" />
           </div>
           <div v-if="!isTags" class="detail-row-side">
             <DetailAside
