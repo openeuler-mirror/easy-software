@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { inject, ref } from 'vue';
+import { inject, ref, type Ref } from 'vue';
 import { ORate, OTextarea, useMessage, OIcon, OButton, OTab, OTabPane } from '@opensig/opendesign';
 import { GITEE } from '@/data/config';
 import { useI18n } from 'vue-i18n';
@@ -27,10 +27,21 @@ const props = defineProps({
     type: String,
     default: '',
   },
+  maintainer: {
+    type: Object,
+    default: () => ({
+      maintainerEmail: '',
+      maintainerGiteeId: '',
+    }),
+  },
+  srcRepo: {
+    type: String,
+    default: '',
+  },
 });
 
 const { t } = useI18n();
-const pkgId = inject<string>('pkgId', '');
+const pkgId = inject<Ref<string>>('pkgId', ref(''));
 // -------------------- 快速反馈 --------------------
 const rateVal = ref(0);
 const feedbackTxa = ref('');
@@ -51,6 +62,9 @@ const clickSubmit = () => {
     feedbackPageUrl: window.location.href,
     feedbackText: xss(feedbackTxa.value),
     feedbackValue: rateVal.value,
+    maintainer: props.maintainer.maintainerGiteeId || null,
+    maintainerEmail: props.maintainer.maintainerEmail || null,
+    srcRepo: props.srcRepo || null,
   };
 
   if (feedbackTxa.value.includes('$')) {
@@ -95,7 +109,7 @@ const issueUrl = ref();
 
 const getIssueUrl = () => {
   const desc = encodeURIComponent(getIssueTemplate());
-  issueUrl.value = `${GITEE}/openeuler/easy-software/issues/new?issue%5Bassignee_id%5D=0&issue%5Bmilestone_id%5D=0&title=【EasySoftware】【${props.type}】${pkgId}&description=${desc}`;
+  issueUrl.value = `${GITEE}/openeuler/easy-software/issues/new?issue%5Bassignee_id%5D=0&issue%5Bmilestone_id%5D=0&title=【EasySoftware】【${props.type}】${pkgId.value}&description=${desc}`;
 };
 
 const showExternalDlg = ref(false);
@@ -152,7 +166,6 @@ const feedbackTabVal = ref<'submit' | 'history'>('submit');
         <FeedbackHistory />
       </OTabPane>
     </OTab>
-    
   </AppSection>
   <ExternalLink v-if="showExternalDlg" :href="externalLink" @change="showExternalDlg = false" />
 </template>

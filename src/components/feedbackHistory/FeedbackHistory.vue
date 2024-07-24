@@ -4,10 +4,10 @@ import type { SorT } from '@/@types/type-sort';
 import { getFeedbackList } from '@/api/api-feedback';
 import AppPagination from '@/components/AppPagination.vue';
 import FilterOrder from '@/components/filter/FilterOrder.vue';
-import { computed, inject, ref, watch } from 'vue';
+import { computed, inject, ref, watch, type Ref } from 'vue';
 import FeedbackHistoryItem from './FeedbackHistoryItem.vue';
 
-const pkgId = inject<string>('pkgId', '');
+const pkgId = inject<Ref<string>>('pkgId', ref(''));
 
 const filterItems = [
   { label: '全部', value: '' },
@@ -27,7 +27,7 @@ const queryData = (sort?: SorT) => {
   getFeedbackList(currentPage.value, pageSize.value, currentFilterItem.value, sort)
     .then((res) => {
       const { data } = res.data[0];
-      feedbackList.value = data.filter((item) => item.issue_title.endsWith(pkgId));
+      feedbackList.value = data.filter((item) => item.issue_title.endsWith(pkgId.value));
       totalCount.value = feedbackList.value.length;
     })
     .catch(() => (feedbackList.value = []));

@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref, onMounted, type PropType, computed, provide } from 'vue';
+import { ref, onMounted, type PropType, computed, provide, reactive } from 'vue';
 import { OTab, OTabPane } from '@opensig/opendesign';
 import { useRoute, useRouter } from 'vue-router';
 import { getDetail, getTags, getVer } from '@/api/api-domain';
@@ -67,6 +67,8 @@ const filterEmptyParams = (data: any) => {
 // 获取tab分类
 const tabList = ref([] as PropType<PkgTypeT>);
 const pkgId = ref('');
+const srcRepos = reactive<Record<string, string | undefined>>({});
+const currentSrcRepo = computed(() => srcRepos[activeName.value]);
 const appDataName = ref('');
 const epkgData = ref();
 const rpmData = ref();
@@ -86,6 +88,9 @@ const queryEntity = () => {
     .then((res) => {
       const data = res.data;
       tabList.value = data.tags;
+      for (const tag of data.tags) {
+        srcRepos[tag] = data[tag].srcRepo;
+      }
       epkgData.value = data['EPKG'];
       rpmData.value = data['RPM'];
       imgData.value = data['IMAGE'];
@@ -364,7 +369,7 @@ const tagsOptions = computed(() => {
             </AppSection>
 
             <!-- 反馈 -->
-            <AppFeedback v-if="!isTags" :name="appData.name" :version="version" :type="typePkg" />
+            <AppFeedback v-if="!isTags" :name="appData.name" :version="version" :type="typePkg" :srcRepo="currentSrcRepo"/>
           </div>
           <div v-if="!isTags" class="detail-row-side">
             <DetailAside
