@@ -1,20 +1,24 @@
 <script setup lang="ts">
 import type { SorT } from '@/@types/type-sort';
 import { OLink } from '@opensig/opendesign';
-import { ref, watch } from 'vue';
+import { watch } from 'vue';
 import IconTimeOrder from '~icons/app/icon-time-order.svg';
 
-defineProps<{
-  text: string;
-}>();
+const props = withDefaults(
+  defineProps<{
+    text: string;
+    sort?: SorT;
+  }>(),
+  {
+    sort: '',
+  }
+);
 const emits = defineEmits<{
-  (event: 'change', value: SorT): void
+  (event: 'update:sort', value: SorT): void;
 }>();
-
-const sort = ref<SorT>('');
 
 watch(
-  sort,
+  () => props.sort,
   (val) => {
     const path = document.querySelector(`.filter-sort svg`);
     path?.children[0].setAttribute('fill', '#bdbdbd');
@@ -23,12 +27,17 @@ watch(
       return;
     }
     path?.children[val === 'desc' ? 1 : 0].setAttribute('fill', '#000');
-    emits('change', val);
   },
   { immediate: true }
 );
 
-const changeSort = () => sort.value = sort.value !== 'asc' ? 'asc' : 'desc';
+const changeSort = () => {
+  if (props.sort !== 'asc') {
+    emits('update:sort', 'asc');
+  } else {
+    emits('update:sort', 'desc');
+  }
+};
 </script>
 
 <template>

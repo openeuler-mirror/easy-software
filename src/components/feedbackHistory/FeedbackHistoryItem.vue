@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { FeedbackHistoryT } from '@/@types/feedback';
-import { ODivider, OIcon, OLink } from '@opensig/opendesign';
+import { ODivider, OIcon, OLink, OTag } from '@opensig/opendesign';
 import { computed } from 'vue';
 import IconUser from '~icons/app/icon-user.svg';
 import IconOutlink from '~icons/app/icon-outlink.svg';
@@ -14,13 +14,24 @@ const desc = computed(() => {
   return title.substring(title.indexOf('】') + 1);
 });
 
-const to = () => {};
+const tagColor = (tag: string) => {
+  switch (tag) {
+    case '待办的':
+      return 'warning';
+    case '已完成':
+      return 'success';
+    case '已取消':
+      return 'danger';
+    default:
+      return 'normal';
+  }
+};
 </script>
 <template>
   <div class="feedback-history-item">
     <p class="feedback-content">
       {{ feedback.feedback }}
-      <span class="tag" :type="feedback.issue_customize_state">{{ feedback.issue_customize_state }}</span>
+      <OTag :color="tagColor(feedback.issue_customize_state)">{{ feedback.issue_customize_state }}</OTag>
     </p>
     <p class="feedback-desc">
       {{ desc }}
@@ -28,7 +39,7 @@ const to = () => {};
       <OIcon><IconUser /></OIcon>
       {{ feedback.user_login }}
     </p>
-    <OLink :href="feedback.url" class="out-link" color="primary" hover-underline @click="to" target="_blank" rel="noopener noreferrer">
+    <OLink :href="feedback.url" class="out-link" color="primary" hover-underline target="_blank" rel="noopener noreferrer">
       查看详情
       <OIcon class="icon"><IconOutlink /></OIcon>
     </OLink>
@@ -65,23 +76,6 @@ const to = () => {};
     @include text1;
     word-break: break-all;
     max-width: 660px;
-
-    .tag {
-      border-radius: 2px;
-      font-size: 10px;
-      color: rgb(var(--o-white));
-      padding: 2px 8px;
-
-      &[type='待办的'] {
-        background-color: #fa7305;
-      }
-      &[type='已完成'] {
-        background-color: #0bb151;
-      }
-      &[type='已完成'] {
-        background-color: #c7000b;
-      }
-    }
   }
 
   .feedback-desc {
