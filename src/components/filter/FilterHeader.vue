@@ -50,7 +50,7 @@ const changePkgInput = (v: string) => {
     return;
   }
   if (v.length > 100) {
-    return msg.warning({
+    return msg.danger({
       content: '文字长度不能超过100字符',
     });
   }

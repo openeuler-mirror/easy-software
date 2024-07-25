@@ -34,6 +34,8 @@ const isLoading = ref(false);
 
 const searchKey = ref((route.query.name as string) || '');
 const searchOs = ref('');
+const searchType = ref('');
+const searchStatus = ref('');
 
 const queryAppVersion = () => {
   const params = {
@@ -101,7 +103,7 @@ const isFilterLoading = ref(false);
 const queryFilter = () => {
   filterOsList.value = [];
   isFilterLoading.value = true;
-  getUpstreamColumn('eulerOsVersion')
+  getUpstreamColumn('eulerOsVersion,type,status')
     .then((res) => {
       filterOsList.value = res.data.eulerOsVersion;
       isFilterLoading.value = false;
@@ -141,6 +143,7 @@ const pageSize = ref(10);
 const total = ref(0);
 const handleSizeChange = (val: number) => {
   pageSize.value = val;
+  currentPage.value = 1;
   queryAppVersion();
 };
 const handleCurrentChange = (val: number) => {

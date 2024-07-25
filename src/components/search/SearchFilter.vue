@@ -48,9 +48,8 @@ const changeSearchInput = (v: string) => {
     return;
   }
   if (v.length > 100) {
-    return msg.show({
+    return msg.danger({
       content: '文字长度不能超过100字符',
-      status: 'danger',
     });
   }
 
@@ -139,9 +138,8 @@ let timer: any;
 const trottleSearch = (v: string) => {
   clearTimeout(timer);
   if (v.length > 100) {
-    return msg.show({
+    return msg.danger({
       content: '文字长度不能超过100字符',
-      status: 'danger',
     });
   }
   isLoading.value = true;

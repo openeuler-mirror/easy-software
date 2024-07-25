@@ -24,6 +24,8 @@ declare module 'vue' {
     DetailInstall: typeof import('./src/components/detail/DetailInstall.vue')['default']
     DetailMoreInfo: typeof import('./src/components/detail/DetailMoreInfo.vue')['default']
     DetailSkeleton: typeof import('./src/components/skeleton/DetailSkeleton.vue')['default']
+    ElTable: typeof import('element-plus/es')['ElTable']
+    ElTableColumn: typeof import('element-plus/es')['ElTableColumn']
     ExternalLink: typeof import('./src/components/ExternalLink.vue')['default']
     FeedbackHistory: typeof import('./src/components/feedbackHistory/FeedbackHistory.vue')['default']
     FeedbackHistoryItem: typeof import('./src/components/feedbackHistory/FeedbackHistoryItem.vue')['default']
