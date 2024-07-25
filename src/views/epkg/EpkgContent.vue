@@ -180,11 +180,13 @@ const closeTag = (idx: string | number, type: string) => {
 };
 
 // 重置筛选结果
+const isClear = ref(false);
 const resetTag = () => {
   searchOs.value = [];
   searchArch.value = [];
   searchCategory.value = [];
   isSearchDocs.value = false;
+  isClear.value = true;
   nameOrder.value = '';
   timeOrder.value = '';
   currentPage.value = 1;
@@ -197,21 +199,24 @@ const resetTag = () => {
 };
 
 // 更新时间排序
-const changeTimeOrder = (v: string[]) => {
+const changeSortValue = (v: string[] | string) => {
   nameOrder.value = '';
   timeOrder.value = '';
-  if (v[0] === 'timeOrder') {
-    timeOrder.value = v[1];
-  } else if (v[0] === 'nameOrder') {
-    nameOrder.value = v[1];
-  }
   currentPage.value = 1;
+  if (Array.isArray(v)) {
+    if (v[0] === 'timeOrder') {
+      timeOrder.value = v[1];
+    } else if (v[0] === 'nameOrder') {
+      nameOrder.value = v[1];
+    }
+  } else {
+    isClear.value = false;
+  }
 };
 
-// 清除排序
-const clearFilter = () => {
-  nameOrder.value = '';
-  timeOrder.value = '';
+// 清除input数据
+const clearFilterInput = () => {
+  searchKey.value = '';
 };
 
 // 分页
@@ -328,7 +333,7 @@ watch(
     </div>
 
     <div class="pkg-main">
-      <FilterHeader title="EPKG" @sort="changeTimeOrder" :total="total" @clear="clearFilter" />
+      <FilterHeader title="EPKG" @sort="changeSortValue" :total="total" @clear="clearFilterInput" />
       <div v-if="isSearchDocs || searchArch.length > 0 || searchOs.length > 0 || searchCategory.length > 0" class="search-result">
         <p v-if="!isPageSearch" class="text">
           <template v-if="isSearchDocs">

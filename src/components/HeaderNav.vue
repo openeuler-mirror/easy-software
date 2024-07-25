@@ -26,7 +26,7 @@ const onMouseLeave = () => {
 const selectedIndex = computed(() => {
   let idx = -1;
 
-  if (route.path === `/${locale.value}/`) {
+  if (route.path === `/${locale.value}` || route.path === `/${locale.value}/`) {
     idx = 0;
     return idx;
   }

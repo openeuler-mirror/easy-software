@@ -174,13 +174,15 @@ const handleCloseTag = (idx: string | number, type: string) => {
 };
 
 // 重置筛选结果
+const isClear = ref(false);
 const handleResettingTag = () => {
   searchOs.value = [];
   searchArch.value = [];
   searchCategory.value = [];
-  timeOrder.value = '';
-  nameOrder.value = '';
   isSearchDocs.value = false;
+  isClear.value = true;
+  nameOrder.value = '';
+  timeOrder.value = '';
   currentPage.value = 1;
 
   if (route.query.os || route.query.arch) {
@@ -191,21 +193,24 @@ const handleResettingTag = () => {
 };
 
 // 更新时间、字母排序
-const changeTimeOrder = (v: string[]) => {
+const changeSortValue = (v: string[] | string) => {
   nameOrder.value = '';
   timeOrder.value = '';
-  if (v[0] === 'timeOrder') {
-    timeOrder.value = v[1];
-  } else if (v[0] === 'nameOrder') {
-    nameOrder.value = v[1];
+  if (Array.isArray(v)) {
+    if (v[0] === 'timeOrder') {
+      timeOrder.value = v[1];
+    } else if (v[0] === 'nameOrder') {
+      nameOrder.value = v[1];
+    }
+  } else {
+    isClear.value = false;
   }
   currentPage.value = 1;
 };
 
 // 清除排序
-const clearFilter = () => {
-  nameOrder.value = '';
-  timeOrder.value = '';
+const clearFilterInput = () => {
+  searchKey.value = '';
 };
 
 // 分页
@@ -331,7 +336,7 @@ watch(
     </div>
 
     <div class="pkg-main">
-      <FilterHeader title="RPM" @sort="changeTimeOrder" :total="total" @clear="clearFilter" />
+      <FilterHeader title="RPM" @sort="changeSortValue" :total="total" @clear="clearFilterInput" :is-clear="isClear" />
       <div v-if="isSearchDocs || searchArch.length > 0 || searchOs.length > 0 || searchCategory.length > 0" class="search-result">
         <p v-if="!isPageSearch" class="text">
           <template v-if="isSearchDocs">
