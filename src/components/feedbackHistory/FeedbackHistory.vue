@@ -8,8 +8,19 @@ import { inject, ref, watch, type Ref } from 'vue';
 import notFoundImage from '@/assets/404.png';
 import FeedbackHistoryItem from './FeedbackHistoryItem.vue';
 import { ORadio, ORadioGroup, OResult, OToggle } from '@opensig/opendesign';
+import { currentFieldDetailTabInjection, pkgIdInjection } from '@/data/injectionKeys';
 
-const pkgId = inject<Ref<string>>('pkgId', ref(''));
+const pkgId = inject<Ref<string>>(pkgIdInjection, ref(''));
+
+// 如果是在领域应用详情内，当前页面选择展示的tab是哪一个
+const currentFieldDetailTab = inject<Ref<string> | null>(currentFieldDetailTabInjection, null);
+
+const props = defineProps<{
+  /**
+   * 如果是在领域应用详情内，当前反馈历史列表所属的tab是哪一个
+   */
+  fieldDetailTab?: string;
+}>();
 
 const filterItems = [
   { label: '全部', value: '' },
@@ -26,6 +37,9 @@ const sort = ref<SorT>('');
 const feedbackList = ref<FeedbackHistoryT[]>([]);
 
 const queryData = () => {
+  if (props.fieldDetailTab && currentFieldDetailTab?.value !== props.fieldDetailTab) {
+    return;
+  }
   getFeedbackList(currentPage.value, pageSize.value, radioVal.value, sort.value)
     .then((res) => {
       const { data } = res.data[0];
@@ -33,12 +47,20 @@ const queryData = () => {
     })
     .catch(() => {
       feedbackList.value = [];
-    }).finally(() => {
+    })
+    .finally(() => {
       totalCount.value = feedbackList.value.length;
     });
 };
 
 watch([radioVal, sort], queryData, { immediate: true });
+
+watch(pkgId, () => {
+  if (feedbackList.value.length > 0) {
+    return;
+  }
+  queryData();
+});
 
 const handleSizeChange = (size: number) => {
   pageSize.value = size;

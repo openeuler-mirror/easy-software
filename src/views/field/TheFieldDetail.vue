@@ -24,6 +24,7 @@ import defaultImg from '@/assets/default-logo.png';
 import IconEpkg from '~icons/pkg/epkg.svg';
 import IconImage from '~icons/pkg/image.svg';
 import IconRpm from '~icons/pkg/rpm.svg';
+import { currentFieldDetailTabInjection, pkgIdInjection } from '@/data/injectionKeys';
 
 const { locale } = useLocale();
 const { t } = useI18n();
@@ -74,7 +75,9 @@ const epkgData = ref();
 const rpmData = ref();
 const imgData = ref();
 const isLoading = ref(true);
-provide('pkgId', pkgId);
+provide(pkgIdInjection, pkgId);
+provide(currentFieldDetailTabInjection, activeName);
+
 const queryEntity = () => {
   const query = route.query;
   const { type, appPkgId, epkgPkgId, rpmPkgId } = query;
@@ -369,7 +372,7 @@ const tagsOptions = computed(() => {
             </AppSection>
 
             <!-- 反馈 -->
-            <AppFeedback v-if="!isTags" :name="appData.name" :version="version" :type="typePkg" :srcRepo="currentSrcRepo" :maintainer="maintainer" />
+            <AppFeedback v-if="!isTags" :name="appData.name" :version="version" :type="typePkg" :srcRepo="currentSrcRepo" :maintainer="maintainer" :fieldDetailTab="item" />
           </div>
           <div v-if="!isTags" class="detail-row-side">
             <DetailAside
