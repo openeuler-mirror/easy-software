@@ -13,6 +13,7 @@ import AppSection from '@/components/AppSection.vue';
 import IconHelp from '~icons/pkg/icon-help.svg';
 import IconIssue from '~icons/pkg/icon-issue.svg';
 import FeedbackHistory from '@/components/feedbackHistory/FeedbackHistory.vue';
+import { pkgIdInjection } from '@/data/injectionKeys';
 
 const props = defineProps({
   name: {
@@ -38,10 +39,17 @@ const props = defineProps({
     type: String,
     default: '',
   },
+  /**
+   * 如果是在领域应用详情内，当前反馈历史列表所属的tab是哪一个
+   */
+  fieldDetailTab: {
+    type: String,
+    default: '',
+  }
 });
 
 const { t } = useI18n();
-const pkgId = inject<Ref<string>>('pkgId', ref(''));
+const pkgId = inject<Ref<string>>(pkgIdInjection, ref(''));
 // -------------------- 快速反馈 --------------------
 const rateVal = ref(0);
 const feedbackTxa = ref('');
@@ -163,7 +171,7 @@ const feedbackTabVal = ref<'submit' | 'history'>('submit');
       </OTabPane>
       <OTabPane class="tab-pane" label="history">
         <template #nav>反馈历史消息</template>
-        <FeedbackHistory />
+        <FeedbackHistory :fieldDetailTab="props.fieldDetailTab" />
       </OTabPane>
     </OTab>
   </AppSection>

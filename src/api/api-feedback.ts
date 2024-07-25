@@ -26,6 +26,14 @@ export function postFeedback(params: FeedbackT): Promise<ResponseT<string>> {
   return request.post(url, params).then((res: AxiosResponse) => res?.data);
 }
 
+/**
+ * 查询反馈历史列表
+ * @param page 当前页码
+ * @param pageSize 单页大小
+ * @param filter 查询条件
+ * @param sort 排序
+ * @returns 反馈历史列表
+ */
 export function getFeedbackList(page?: number, pageSize?: number, filter?: string, sort?: SorT) {
   const query = generateQuery({ page, pageSize, filter, sort, community: 'openeuler', repo: 'easy-software' });
   const url = `/api-dsapi/query/repo/issues${query}`;
