@@ -12,6 +12,9 @@ import { COUNT_PAGESIZE } from '@/data/query';
 import FilterRadio from '@/components/filter/FilterRadio.vue';
 import AppLoading from '@/components/AppLoading.vue';
 import IconOs from '~icons/pkg/icon-os.svg';
+import IconAppType from '~icons/pkg/icon-app-type.svg';
+import IconStatus from '~icons/pkg/icon-status.svg';
+import FilterCheckbox from '@/components/filter/FilterCheckbox.vue';
 
 const route = useRoute();
 const { t } = useI18n();
@@ -21,7 +24,7 @@ const columns = [
   { label: t('upstream.name'), key: 'name', style: 'width:27%', type: 'name' },
   { label: t('upstream.version'), key: 'upstreamVersion', style: 'width:27%', type: 'upstreamVersion' },
   { label: t('upstream.compatibility'), key: 'openeulerVersion', style: 'width:27%', type: 'openeulerVersion' },
-  { label: t('upstream.status'), key: 'status', style: 'width:19%', type: 'status' },
+  { label: t('upstream.state'), key: 'status', style: 'width:19%', type: 'status' },
 ];
 
 //  ------------  main ------------
@@ -35,11 +38,13 @@ const isLoading = ref(false);
 const searchKey = ref((route.query.name as string) || '');
 const searchOs = ref('');
 const searchType = ref('');
-const searchStatus = ref('');
+const searchStatus = ref<string[]>([]);
 
 const queryAppVersion = () => {
   const params = {
     eulerOsVersion: searchOs.value,
+    type: searchType.value,
+    status: searchStatus.value.join(),
     pageNum: currentPage.value,
     nameOrder: nameOrder.value,
     pageSize: pageSize.value,
@@ -67,6 +72,8 @@ const searchParams = computed(() => {
     pageSize: pageSize.value,
     dataType: 'appversion',
     eulerOsVersion: searchOs.value,
+    type: searchType.value,
+    status: searchStatus.value.join(),
     nameOrder: nameOrder.value,
   };
 });
@@ -98,14 +105,24 @@ const querySearch = () => {
 
 // ----------- 左侧菜单交互-------------
 // 获取筛选参数列表
+const OTHER = { label: '其他', value: '其他' };
 const filterOsList = ref<string[]>([]);
+const appTypeList = ref<{ label: string; value: string }[]>([]);
+const statusList = ref<string[]>([]);
 const isFilterLoading = ref(false);
+const appTypeListDisplayNames: Record<string, string> = {
+  rpm: 'RPM',
+  image: '容器镜像',
+};
 const queryFilter = () => {
   filterOsList.value = [];
   isFilterLoading.value = true;
   getUpstreamColumn('eulerOsVersion,type,status')
     .then((res) => {
       filterOsList.value = res.data.eulerOsVersion;
+      appTypeList.value = res.data.type.map((item: string) => ({ label: appTypeListDisplayNames[item], value: item }));
+      appTypeList.value.push(OTHER);
+      statusList.value = res.data.status;
       isFilterLoading.value = false;
     })
     .catch(() => {
@@ -113,15 +130,23 @@ const queryFilter = () => {
     });
 };
 
-const handleCloseTag = (type: string) => {
+const showSearchFilterTags = computed(() => searchType.value || searchStatus.value.length || searchOs.value);
+
+const handleCloseTag = (type: string, index?: number) => {
   if (type === 'os') {
     searchOs.value = '';
+  } else if (type === 'type') {
+    searchType.value = '';
+  } else if (type === 'category') {
+    searchStatus.value.splice(Number(index), 1);
   }
 };
 
 // 重置筛选结果
 const handleResettingTag = () => {
   searchOs.value = '';
+  searchStatus.value = [];
+  searchType.value = '';
   nameOrder.value = '';
   isSearch.value = false;
 };
@@ -179,7 +204,7 @@ const pageSearch = () => {
 };
 
 watch(
-  () => [searchOs.value, nameOrder.value],
+  () => [searchOs.value, nameOrder.value, searchType.value, searchStatus.value],
   () => {
     currentPage.value = 1;
     pageSearch();
@@ -207,6 +232,13 @@ watch(
     <div class="filter-sidebar">
       <template v-if="isFilterLoading"><FilterItemSkeleton /></template>
       <template v-else>
+        <FilterRadio v-if="appTypeList.length" v-model="searchType" :options="appTypeList">
+          <template #header>
+            <div class="filter-title">
+              <OIcon><IconAppType /></OIcon>应用类型
+            </div>
+          </template>
+        </FilterRadio>
         <FilterRadio v-if="filterOsList.length" v-model="searchOs" :options="filterOsList">
           <template #header>
             <div class="filter-title">
@@ -214,18 +246,27 @@ watch(
             </div>
           </template>
         </FilterRadio>
+        <FilterCheckbox v-if="statusList.length" v-model="searchStatus" :options="statusList">
+          <template #header>
+            <div class="filter-title">
+              <OIcon><IconStatus /></OIcon>状态
+            </div>
+          </template>
+        </FilterCheckbox>
       </template>
     </div>
     <div class="pkg-main">
       <FilterHeader :title="t('upstream.name')" :isSort="false" @sort="changeSortValue" :total="total" @clear="clearFilterInput" />
-      <div v-if="searchOs || isSearch" class="search-result">
+      <div v-if="searchOs || isSearch || showSearchFilterTags" class="search-result">
         <p v-if="!isPageSearch" class="text">
           为您找到符合条件的筛选<span class="total">{{ total }}</span
           >个
         </p>
-        <div class="search-filter-tags">
+        <div v-if="showSearchFilterTags" class="search-filter-tags">
+          <OTag v-for="(item, index) in searchStatus" :key="item" closable @Close="handleCloseTag('category', index)">{{ item }}</OTag>
+          <OTag v-if="searchType" closable @Close="handleCloseTag('type')">{{ searchType }}</OTag>
           <OTag v-if="searchOs" closable @Close="handleCloseTag('os')">{{ searchOs }}</OTag>
-          <OLink v-if="searchOs" color="primary" class="resetting" @click="handleResettingTag">{{ t('software.filterSider.clear') }}</OLink>
+          <OLink color="primary" class="resetting" @click="handleResettingTag">{{ t('software.filterSider.clear') }}</OLink>
         </div>
       </div>
       <div class="pkg-content">

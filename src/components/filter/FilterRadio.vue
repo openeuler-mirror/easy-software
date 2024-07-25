@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref, type PropType, onMounted } from 'vue';
+import { ref, type PropType, onMounted, computed } from 'vue';
 import { useVModel } from '@vueuse/core';
 import { useRoute } from 'vue-router';
 import { ORadioGroup, ORadio, OLink, OIcon } from '@opensig/opendesign';
@@ -8,12 +8,24 @@ import IconChevronDown from '~icons/app/icon-chevron-down.svg';
 
 const props = defineProps({
   options: {
-    type: Array as PropType<Array<string>>,
+    type: Array as PropType<Array<string> | Array<{ label: string; value: string }>>,
     required: true,
   },
   modelValue: {
     type: String,
   },
+});
+
+const actualOptions = computed(() => {
+  if (!props.options?.length) {
+    return [];
+  }
+  return props.options.map((option) => {
+    if (typeof option ==='string') {
+      return { label: option, value: option };
+    }
+    return option;
+  });
 });
 
 const { t } = useI18n();
@@ -53,9 +65,9 @@ onMounted(() => {
     </div>
 
     <ORadioGroup class="filter-options" v-model="checkboxValue" @change="() => onChange">
-      <template v-for="(option, idx) in options">
-        <ORadio v-if="idx < showLen" :key="option" :value="option">
-          {{ option }}
+      <template v-for="(option, idx) in actualOptions">
+        <ORadio v-if="idx < showLen" :key="option.value" :value="option.value">
+          {{ option.label }}
         </ORadio>
       </template>
     </ORadioGroup>
