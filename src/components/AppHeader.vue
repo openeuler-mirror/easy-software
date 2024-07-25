@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { watch } from 'vue';
-import { ODivider,  } from '@opensig/opendesign';
+import { ODivider } from '@opensig/opendesign';
 import { useLangStore } from '@/stores/common';
 import { OPENEULER } from '@/data/config';
 import { useI18n } from 'vue-i18n';
@@ -9,9 +9,7 @@ import AppLogin from '@/components/AppLogin.vue';
 
 import openeulerLogo from '@/assets/openeuler-logo.svg';
 
-
 const { locale, t } = useI18n();
-
 
 const langStore = useLangStore();
 
@@ -34,7 +32,7 @@ watch(
             <img :src="openeulerLogo" />
           </a>
           <ODivider direction="v" :darker="true" />
-          <span  class="logo-text">{{ t('software.softwareHome') }}</span>
+          <span class="logo-text">{{ t('software.softwareHome') }}</span>
         </div>
 
         <HeaderNav />
@@ -69,7 +67,6 @@ watch(
     .logo-text {
       @include h4;
       color: #000;
-      cursor: pointer;
       font-weight: bold;
     }
     .header-left,

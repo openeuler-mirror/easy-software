@@ -138,16 +138,22 @@ const onExternalDialog = () => {
   showExternalDlg.value = true;
 };
 const feedbackTabVal = ref<'submit' | 'history'>('submit');
+
+// 跳出本站点 清空数据
+const jumpOut = () => {
+  showExternalDlg.value = false;
+  clearData();
+};
 </script>
 
 <template>
   <AppSection :title="t('software.feedbackTitle')" class="feedback">
-    <OTab variant="text" :line="false" class="domain-tabs tabs-switch" v-model="feedbackTabVal">
+    <OTab variant="text" :line="false" class="domain-tabs tabs-switch" v-model="feedbackTabVal" size="small">
       <OTabPane class="tab-pane" label="submit">
         <template #nav>提交反馈</template>
         <div class="feedback-content">
           <div class="rate-box">
-            <ORate v-model="rateVal" color="primary" size="large" />
+            <ORate v-model="rateVal" color="danger" size="large" />
           </div>
           <div class="feedback-from">
             <OTextarea
@@ -175,7 +181,7 @@ const feedbackTabVal = ref<'submit' | 'history'>('submit');
       </OTabPane>
     </OTab>
   </AppSection>
-  <ExternalLink v-if="showExternalDlg" :href="externalLink" @change="showExternalDlg = false" />
+  <ExternalLink v-if="showExternalDlg" :href="externalLink" @change="jumpOut" />
 </template>
 
 <style lang="scss" scoped>

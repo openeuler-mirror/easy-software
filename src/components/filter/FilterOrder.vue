@@ -41,7 +41,7 @@ const changeSort = () => {
 </script>
 
 <template>
-  <OLink @click="changeSort" class="filter-sort">
+  <OLink @click="changeSort" class="filter-sort" size="small">
     {{ text }}
     <template #suffix><IconTimeOrder /></template>
   </OLink>

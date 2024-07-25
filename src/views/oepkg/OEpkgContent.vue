@@ -241,6 +241,7 @@ const pageSize = ref(10);
 const total = ref(0);
 const handleSizeChange = (val: number) => {
   pageSize.value = val;
+  currentPage.value = 1;
 };
 const handleCurrentChange = (val: number) => {
   currentPage.value = val;

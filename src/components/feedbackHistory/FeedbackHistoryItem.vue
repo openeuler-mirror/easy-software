@@ -18,9 +18,11 @@ const tagColor = (tag: string) => {
   switch (tag) {
     case '待办的':
       return 'warning';
+    case '进行中':
+      return 'primary';
     case '已完成':
       return 'success';
-    case '已取消':
+    case '已拒绝':
       return 'danger';
     default:
       return 'normal';
@@ -31,7 +33,7 @@ const tagColor = (tag: string) => {
   <div class="feedback-history-item">
     <p class="feedback-content">
       {{ feedback.feedback }}
-      <OTag :color="tagColor(feedback.issue_customize_state)">{{ feedback.issue_customize_state }}</OTag>
+      <OTag :color="tagColor(feedback.issue_customize_state)" size="small">{{ feedback.issue_customize_state }}</OTag>
     </p>
     <p class="feedback-desc">
       {{ desc }}
@@ -52,7 +54,7 @@ const tagColor = (tag: string) => {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  padding: 16px;
+  padding: 24px 16px 16px;
   border-bottom: 1px solid rgb(var(--o-black), 0.1);
 
   .out-link {

@@ -24,10 +24,10 @@ const props = defineProps<{
 
 const filterItems = [
   { label: '全部', value: '' },
-  { label: '开启的', value: '开启的' },
+  { label: '待办的', value: '待办的' },
   { label: '进行中', value: '进行中' },
   { label: '已完成', value: '已完成' },
-  { label: '已关闭', value: '已关闭' },
+  { label: '已拒绝', value: '已拒绝' },
 ];
 const radioVal = ref('');
 const currentPage = ref(1);
@@ -128,6 +128,15 @@ const handleCurrentChange = (page: number) => {
     display: flex;
     gap: 16px;
     align-items: center;
+    @include tip1;
+    color: var(--o-color-info1);
+    :deep(.o-radio) {
+      @include tip2;
+      .o-toggle {
+        --toggle-size: 28px;
+        --toggle-padding: 0 12px;
+      }
+    }
   }
 }
 
