@@ -172,11 +172,13 @@ const closeTag = (idx: string | number, type: string) => {
 };
 
 // 重置筛选结果
+const isClear = ref(false);
 const resetTag = () => {
   searchArch.value = [];
   searchOs.value = [];
   searchCategory.value = [];
   isSearchDocs.value = false;
+  isClear.value = true;
   nameOrder.value = '';
   currentPage.value = 1;
 
@@ -192,14 +194,20 @@ const filterList = computed(() => {
 });
 
 // 更新时间、字母排序
-const changeTimeOrder = (v: string[]) => {
-  if (v[0] === 'nameOrder') {
-    nameOrder.value = v[1];
+const changeSortValue = (v: string[] | string) => {
+  nameOrder.value = '';
+  currentPage.value = 1;
+  if (Array.isArray(v)) {
+    if (v[0] === 'nameOrder') {
+      nameOrder.value = v[1];
+    }
+  } else {
+    isClear.value = false;
   }
 };
-// 清除排序
-const clearFilter = () => {
-  nameOrder.value = '';
+// 清除input数据
+const clearFilterInput = () => {
+  searchKey.value = '';
 };
 
 // 分页
@@ -316,7 +324,7 @@ watch(
     </div>
 
     <div class="pkg-main">
-      <FilterHeader title="应用镜像" :isSort="false" @sort="changeTimeOrder" :total="total" @clear="clearFilter" />
+      <FilterHeader title="应用镜像" :isSort="false" @sort="changeSortValue" :total="total" :is-clear="isClear" @clear="clearFilterInput" />
       <div v-if="isSearchDocs || filterList.length > 0" class="search-result">
         <p v-if="!isPageSearch" class="text">
           <template v-if="isSearchDocs">

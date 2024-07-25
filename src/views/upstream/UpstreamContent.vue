@@ -127,14 +127,18 @@ const handleResettingTag = () => {
 };
 
 // 更新时间、字母排序
-const changeTimeOrder = (v: string[]) => {
-  if (v[0] === 'nameOrder') {
-    nameOrder.value = v[1];
+const changeSortValue = (v: string[] | string) => {
+  nameOrder.value = '';
+  currentPage.value = 1;
+  if (Array.isArray(v)) {
+    if (v[0] === 'nameOrder') {
+      nameOrder.value = v[1];
+    }
   }
 };
 // 清除排序
-const clearFilter = () => {
-  nameOrder.value = '';
+const clearFilterInput = () => {
+  searchKey.value = '';
 };
 
 // 分页
@@ -213,7 +217,7 @@ watch(
       </template>
     </div>
     <div class="pkg-main">
-      <FilterHeader :title="t('upstream.name')" :isSort="false" @sort="changeTimeOrder" :total="total" @clear="clearFilter" />
+      <FilterHeader :title="t('upstream.name')" :isSort="false" @sort="changeSortValue" :total="total" @clear="clearFilterInput" />
       <div v-if="searchOs || isSearch" class="search-result">
         <p v-if="!isPageSearch" class="text">
           为您找到符合条件的筛选<span class="total">{{ total }}</span

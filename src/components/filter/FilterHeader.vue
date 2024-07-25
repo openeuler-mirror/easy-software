@@ -10,7 +10,7 @@ import { useSearchStore } from '@/stores/search';
 import IconTimeOrder from '~icons/app/icon-time-order.svg';
 import IconSearch from '~icons/app/icon-search.svg';
 
-defineProps({
+const props = defineProps({
   title: {
     type: String,
     default: () => {
@@ -20,6 +20,10 @@ defineProps({
   isSort: {
     type: Boolean,
     default: () => true,
+  },
+  isClear: {
+    type: Boolean,
+    default: () => false,
   },
   total: {
     type: Number,
@@ -32,6 +36,11 @@ const router = useRouter();
 const route = useRoute();
 const { t } = useI18n();
 const { locale } = useLocale();
+
+const emits = defineEmits<{
+  (e: 'sort', value: string[] | string): void;
+  (e: 'clear'): void;
+}>();
 
 const searchStore = useSearchStore();
 
@@ -57,6 +66,7 @@ const changePkgInput = (v: string) => {
 };
 
 const clearSearchData = () => {
+  emits('clear');
   router.push({
     path: `/${locale.value}/` + (route.name as string),
   });
@@ -70,10 +80,6 @@ const replaceWinUrl = () => {
     },
   });
 };
-const emits = defineEmits<{
-  (e: 'sort', value: string[]): void;
-  (e: 'clear'): void;
-}>();
 
 const isTimeOrder = ref(false);
 const isNameOrder = ref(false);
@@ -125,7 +131,7 @@ const clearAll = () => {
   activeIndex.value = -1;
   clearSvgFill();
   searchStore.changeNameOrderState(false);
-  emits('clear');
+  emits('sort', '');
 };
 
 const isPageSearch = ref(false);
@@ -137,6 +143,15 @@ watch(
   () => route.query.name as string,
   (v: string) => {
     searchValue.value = v;
+  }
+);
+
+watch(
+  () => props.isClear,
+  (v: boolean) => {
+    if (v) {
+      clearAll();
+    }
   }
 );
 </script>

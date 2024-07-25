@@ -148,11 +148,13 @@ const handleCloseTag = (type: string, idx?: string | number) => {
 };
 
 // 重置筛选结果
-const onResetTag = () => {
+const isClear = ref(false);
+const resetTag = () => {
   searchOs.value = '';
   searchArch.value = '';
   searchCategory.value = [];
   isSearchDocs.value = false;
+  isClear.value = true;
   nameOrder.value = '';
   currentPage.value = 1;
 
@@ -164,16 +166,21 @@ const onResetTag = () => {
 };
 
 // 更新时间、字母排序
-const changeTimeOrder = (v: string[]) => {
-  if (v[0] === 'nameOrder') {
-    nameOrder.value = v[1];
-  }
+const changeSortValue = (v: string[] | string) => {
+  nameOrder.value = '';
   currentPage.value = 1;
+  if (Array.isArray(v)) {
+    if (v[0] === 'nameOrder') {
+      nameOrder.value = v[1];
+    }
+  } else {
+    isClear.value = false;
+  }
 };
 
-// 清除排序
-const clearFilter = () => {
-  nameOrder.value = '';
+// 清除input数据
+const clearFilterInput = () => {
+  searchKey.value = '';
 };
 
 // 分页
@@ -255,14 +262,6 @@ const handleQueryData = () => {
     keywordType.value = FLITERMENUOPTIONS[0].id;
   }
 
-  if (!isUndefined(name) && name) {
-    searchKey.value = name?.toString();
-    currentPage.value = 1;
-  } else if (name === '') {
-    searchKey.value = '';
-    isSearchDocs.value = false;
-  }
-
   //判断主页领域应用更多跳转
   if (!isUndefined(type) && type) {
     searchCategory.value.push(type as string);
@@ -327,14 +326,7 @@ watch(
     </div>
 
     <div class="pkg-main">
-      <FilterHeader
-        v-if="pkgData.length > 0 || isSearchError"
-        :title="t('software.all')"
-        @sort="changeTimeOrder"
-        :isSort="false"
-        :total="total"
-        @clear="clearFilter"
-      />
+      <FilterHeader :title="t('software.all')" @sort="changeSortValue" :isSort="false" :is-clear="isClear" :total="total" @clear="clearFilterInput" />
 
       <div v-if="isSearchDocs || searchOs || searchArch || searchCategory.length > 0" class="search-result">
         <p v-if="!isPageSearch" class="text">
@@ -351,7 +343,7 @@ watch(
           <OTag v-if="searchOs" closable @Close="handleCloseTag('os')">{{ searchOs }}</OTag>
           <OTag v-if="searchArch" closable @Close="handleCloseTag('arch')">{{ searchArch }}</OTag>
           <OTag v-for="(item, index) in searchCategory" :key="item" closable @Close="handleCloseTag('category', index)">{{ item }}</OTag>
-          <OLink color="primary" class="resetting" @click="onResetTag">{{ t('software.filterSider.clear') }}</OLink>
+          <OLink color="primary" class="resetting" @click="resetTag">{{ t('software.filterSider.clear') }}</OLink>
         </div>
       </div>
       <div class="pkg-content">

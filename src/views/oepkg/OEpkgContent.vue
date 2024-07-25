@@ -203,12 +203,18 @@ const filterLength = computed(() => {
 });
 
 // 重置筛选结果
+const isClear = ref(false);
 const resetTag = () => {
   searchOs.value = [];
   searchArch.value = [];
   searchCategory.value = [];
   isSearchDocs.value = false;
-  clearFilter();
+
+  timeOrder.value = '';
+  nameOrder.value = '';
+
+  isClear.value = true;
+
   currentPage.value = 1;
 
   if (route.query.os || route.query.arch) {
@@ -218,21 +224,24 @@ const resetTag = () => {
   }
 };
 
-// 更新时间排序
-const changeTimeOrder = (v: string[]) => {
+// 更新时间、字母排序
+const changeSortValue = (v: string[] | string) => {
   timeOrder.value = '';
   nameOrder.value = '';
-  if (v[0] === 'timeOrder') {
-    timeOrder.value = v[1];
-  } else if (v[0] === 'nameOrder') {
-    nameOrder.value = v[1];
-  }
   currentPage.value = 1;
+  if (Array.isArray(v)) {
+    if (v[0] === 'timeOrder') {
+      timeOrder.value = v[1];
+    } else if (v[0] === 'nameOrder') {
+      nameOrder.value = v[1];
+    }
+  } else {
+    isClear.value = false;
+  }
 };
 // 清除排序
-const clearFilter = () => {
-  nameOrder.value = '';
-  timeOrder.value = '';
+const clearFilterInput = () => {
+  searchKey.value = '';
 };
 
 // 分页
@@ -349,7 +358,7 @@ watch(
     </div>
 
     <div class="pkg-main">
-      <FilterHeader title="OEPKG" @sort="changeTimeOrder" :total="total" @clear="clearFilter" />
+      <FilterHeader title="OEPKG" @sort="changeSortValue" :total="total" :is-clear="isClear" @clear="clearFilterInput" />
       <div v-if="isSearchDocs || filterLength > 0" class="search-result">
         <p v-if="!isPageSearch" class="text">
           <template v-if="isSearchDocs">
