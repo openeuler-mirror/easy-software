@@ -17,6 +17,7 @@ import DetailAside from '@/components/detail/DetailAside.vue';
 
 import defaultImg from '@/assets/default-logo.png';
 import { provide } from 'vue';
+import { pkgIdInjection } from '@/data/injectionKeys';
 
 const { t } = useI18n();
 const route = useRoute();
@@ -62,7 +63,7 @@ const queryPkg = () => {
   }
 };
 const pkgId = ref('');
-provide('pkgId', pkgId);
+provide(pkgIdInjection, pkgId);
 if (isString(route.query?.pkgId)) {
   pkgId.value = encodeURIComponent(route.query?.pkgId.toString());
 }
