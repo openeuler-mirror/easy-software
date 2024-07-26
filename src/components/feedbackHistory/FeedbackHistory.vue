@@ -22,6 +22,10 @@ const props = defineProps<{
   fieldDetailTab?: string;
 }>();
 
+defineEmits<{
+  (event: 'goToUrl', url: string): void;
+}>();
+
 const filterItems = [
   { label: '全部', value: '' },
   { label: '待办的', value: '待办的' },
@@ -92,7 +96,7 @@ const handleCurrentChange = (page: number) => {
   </header>
 
   <template v-if="feedbackList.length">
-    <FeedbackHistoryItem v-for="(item, index) in feedbackList" :key="index" :feedback="item" />
+    <FeedbackHistoryItem v-for="(item, index) in feedbackList" :key="index" :feedback="item" @goToUrl="$emit('goToUrl', $event)" />
     <div class="pagination-box">
       <AppPagination :current="currentPage" :pagesize="pageSize" :total="totalCount" @size-change="handleSizeChange" @current-change="handleCurrentChange" />
     </div>
@@ -121,8 +125,6 @@ const handleCurrentChange = (page: number) => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding-bottom: 24px;
-  border-bottom: 1px solid var(--o-color-control4);
 
   .filter-left {
     display: flex;

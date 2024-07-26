@@ -9,6 +9,10 @@ const props = defineProps<{
   feedback: FeedbackHistoryT;
 }>();
 
+defineEmits<{
+  (event: 'goToUrl', url: string): void;
+}>();
+
 const desc = computed(() => {
   const title = props.feedback.issue_title;
   return title.substring(title.indexOf('】') + 1);
@@ -35,16 +39,18 @@ const tagColor = (tag: string) => {
       {{ feedback.feedback }}
       <OTag :color="tagColor(feedback.issue_customize_state)" size="small">{{ feedback.issue_customize_state }}</OTag>
     </p>
-    <p class="feedback-desc">
-      {{ desc }}
-      <ODivider direction="v" style="margin: 0" :darker="true"></ODivider>
-      <OIcon><IconUser /></OIcon>
-      {{ feedback.user_login }}
-    </p>
-    <OLink :href="feedback.url" class="out-link" color="primary" hover-underline target="_blank" rel="noopener noreferrer">
-      查看详情
-      <OIcon class="icon"><IconOutlink /></OIcon>
-    </OLink>
+    <div class="feedback-desc">
+      <div class="feedback-desc-left">
+        <p>{{ desc }}</p>
+        <ODivider direction="v" style="margin: 0" :darker="true"></ODivider>
+        <OIcon><IconUser /></OIcon>
+        {{ feedback.user_login }}
+      </div>
+      <OLink @click="$emit('goToUrl', feedback.url)" class="out-link" color="primary" hover-underline target="_blank" rel="noopener noreferrer">
+        查看详情
+        <OIcon class="icon"><IconOutlink /></OIcon>
+      </OLink>
+    </div>
   </div>
 </template>
 
@@ -57,23 +63,6 @@ const tagColor = (tag: string) => {
   padding: 24px 16px 16px;
   border-bottom: 1px solid rgb(var(--o-black), 0.1);
 
-  .out-link {
-    position: absolute;
-    right: 16px;
-    bottom: 16px;
-
-    :deep(.o-link-label) {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-
-      svg {
-        width: 16px;
-        margin-right: 4px;
-      }
-    }
-  }
-
   .feedback-content {
     @include text1;
     word-break: break-all;
@@ -82,9 +71,39 @@ const tagColor = (tag: string) => {
 
   .feedback-desc {
     display: flex;
-    gap: 8px;
+    justify-content: space-between;
+    align-items: center;
     color: var(--o-color-info3);
-    @include tip2;
+
+    .out-link {
+      flex-shrink: 0;
+
+      :deep(.o-link-label) {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+
+        svg {
+          width: 16px;
+          margin-right: 4px;
+        }
+      }
+    }
+
+    .feedback-desc-left {
+      margin-right: 24px;
+      width: 0;
+      flex: 1;
+      display: flex;
+      gap: 8px;
+      @include tip2;
+
+      p {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+    }
   }
 }
 </style>

@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { inject, ref, type Ref } from 'vue';
-import { ORate, OTextarea, useMessage, OIcon, OButton, OTab, OTabPane } from '@opensig/opendesign';
+import { ORate, OTextarea, useMessage, OIcon, OButton, ODivider, OPopover } from '@opensig/opendesign';
 import { GITEE } from '@/data/config';
 import { useI18n } from 'vue-i18n';
 import { OPENEULER_FORUM } from '@/data/config';
@@ -10,8 +10,7 @@ import xss from 'xss';
 import ExternalLink from '@/components/ExternalLink.vue';
 import AppSection from '@/components/AppSection.vue';
 
-import IconHelp from '~icons/pkg/icon-help.svg';
-import IconIssue from '~icons/pkg/icon-issue.svg';
+import IconHelp from '~icons/app/icon-help.svg';
 import FeedbackHistory from '@/components/feedbackHistory/FeedbackHistory.vue';
 import { pkgIdInjection } from '@/data/injectionKeys';
 
@@ -45,7 +44,7 @@ const props = defineProps({
   fieldDetailTab: {
     type: String,
     default: '',
-  }
+  },
 });
 
 const { t } = useI18n();
@@ -120,6 +119,7 @@ const getIssueUrl = () => {
   issueUrl.value = `${GITEE}/openeuler/easy-software/issues/new?issue%5Bassignee_id%5D=0&issue%5Bmilestone_id%5D=0&title=【EasySoftware】【${props.type}】${pkgId.value}&description=${desc}`;
 };
 
+let clearDataAfterJump = false;
 const showExternalDlg = ref(false);
 const externalLink = ref('');
 const onExternalDialog = () => {
@@ -136,55 +136,87 @@ const onExternalDialog = () => {
   getIssueUrl();
   externalLink.value = decodeURIComponent(issueUrl.value);
   showExternalDlg.value = true;
+  clearDataAfterJump = true;
 };
-const feedbackTabVal = ref<'submit' | 'history'>('submit');
+
+
+const goToFeedbackDetailUrl = (url: string) => {
+  externalLink.value = decodeURIComponent(url);
+  showExternalDlg.value = true;
+  clearDataAfterJump = false;
+};
 
 // 跳出本站点 清空数据
 const jumpOut = () => {
   showExternalDlg.value = false;
-  clearData();
+  if (clearDataAfterJump) {
+    clearData();
+  }
 };
 </script>
 
 <template>
   <AppSection :title="t('software.feedbackTitle')" class="feedback">
-    <OTab variant="text" :line="false" class="domain-tabs tabs-switch" v-model="feedbackTabVal" size="small">
-      <OTabPane class="tab-pane" label="submit">
-        <template #nav>提交反馈</template>
-        <div class="feedback-content">
-          <div class="rate-box">
-            <ORate v-model="rateVal" color="danger" size="large" />
-          </div>
-          <div class="feedback-from">
-            <OTextarea
-              v-model="feedbackTxa"
-              round="4px"
-              :placeholder="t('software.feedbackPlaceholder')"
-              :max-length="200"
-              :input-on-outlimit="false"
-              resize="none"
-              :rows="4"
-              :clearable="false"
-              style="width: 100%"
-            />
-            <div class="action">
-              <OButton color="primary" variant="solid" size="large" @click="clickSubmit">{{ t('software.feedbackButton[0]') }}</OButton>
-              <OButton color="primary" size="large" @click="onExternalDialog">提交issue</OButton>
-            </div>
-            <p class="other-text">您也可以使用<a :href="OPENEULER_FORUM" target="_blank" rel="noopener noreferrer"> 发帖求助 </a>进行反馈</p>
-          </div>
+    <div class="feedback-content">
+      <div class="rate-box">
+        <ORate v-model="rateVal" color="danger" size="large" />
+      </div>
+      <div class="feedback-from">
+        <OTextarea
+          v-model="feedbackTxa"
+          round="4px"
+          :placeholder="t('software.feedbackPlaceholder')"
+          :max-length="200"
+          :input-on-outlimit="false"
+          resize="none"
+          :rows="4"
+          :clearable="false"
+          style="width: 100%"
+        />
+        <div class="action">
+          <OButton color="primary" variant="solid" size="large" @click="clickSubmit">{{ t('software.feedbackButton[0]') }}</OButton>
+          <OButton color="primary" size="large" @click="onExternalDialog">提交issue</OButton>
         </div>
-      </OTabPane>
-      <OTabPane class="tab-pane" label="history">
-        <template #nav>反馈历史消息</template>
-        <FeedbackHistory :fieldDetailTab="props.fieldDetailTab" />
-      </OTabPane>
-    </OTab>
+        <p class="other-text">您也可以使用<a :href="OPENEULER_FORUM" target="_blank" rel="noopener noreferrer"> 发帖求助 </a>进行反馈</p>
+      </div>
+    </div>
+    <ODivider style="--o-divider-gap: 24px" />
+    <h3 class="history-title">
+      历史反馈信息
+      <OPopover position="top" trigger="hover" style="width: 184px">
+        <template #target>
+          <OIcon ref="flagsRef" class="flags-icon"><IconHelp /></OIcon>
+        </template>
+        <div class="popover-content">数据同步存在延迟，反馈内容需等待一段时间后才可见</div>
+      </OPopover>
+    </h3>
+    <FeedbackHistory :fieldDetailTab="props.fieldDetailTab" @goToUrl="goToFeedbackDetailUrl" />
   </AppSection>
   <ExternalLink v-if="showExternalDlg" :href="externalLink" @change="jumpOut" />
 </template>
 
 <style lang="scss" scoped>
+.popover-content {
+  @include text1;
+}
+
+.history-title {
+  font-size: 22px;
+  line-height: 30px;
+  font-weight: 500;
+  color: var(--o-color-info1);
+  margin-bottom: 16px;
+
+  .flags-icon {
+    font-size: 16px;
+    cursor: pointer;
+    color: var(--o-color-info1);
+    svg {
+      width: 16px;
+      height: 16px;
+    }
+  }
+}
 .other-text {
   margin: 24px 0 0;
   @include text1;
