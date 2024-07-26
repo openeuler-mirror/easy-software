@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { watch } from 'vue';
 import { ODivider } from '@opensig/opendesign';
+import { useRouter } from 'vue-router';
 import { useLangStore } from '@/stores/common';
 import { OPENEULER } from '@/data/config';
 import { useI18n } from 'vue-i18n';
@@ -10,7 +11,7 @@ import AppLogin from '@/components/AppLogin.vue';
 import openeulerLogo from '@/assets/openeuler-logo.svg';
 
 const { locale, t } = useI18n();
-
+const router = useRouter();
 const langStore = useLangStore();
 
 watch(
@@ -21,6 +22,12 @@ watch(
     langStore.setLangStore(val);
   }
 );
+
+const goHome = () => {
+  router.push({
+    path: `/${locale.value}`,
+  });
+};
 </script>
 
 <template>
@@ -32,7 +39,7 @@ watch(
             <img :src="openeulerLogo" />
           </a>
           <ODivider direction="v" :darker="true" />
-          <span class="logo-text">{{ t('software.softwareHome') }}</span>
+          <span @click="goHome" class="logo-text">{{ t('software.softwareHome') }}</span>
         </div>
 
         <HeaderNav />
@@ -68,6 +75,7 @@ watch(
       @include h4;
       color: #000;
       font-weight: bold;
+      cursor: pointer;
     }
     .header-left,
     .header-right {
