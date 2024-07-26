@@ -264,7 +264,7 @@ watch(
         </p>
         <div v-if="showSearchFilterTags" class="search-filter-tags">
           <OTag v-for="(item, index) in searchStatus" :key="item" closable @Close="handleCloseTag('category', index)">{{ item }}</OTag>
-          <OTag v-if="searchType" closable @Close="handleCloseTag('type')">{{ searchType }}</OTag>
+          <OTag v-if="searchType" closable @Close="handleCloseTag('type')">{{ searchType === '其他' ? '其他' : appTypeListDisplayNames[searchType] }}</OTag>
           <OTag v-if="searchOs" closable @Close="handleCloseTag('os')">{{ searchOs }}</OTag>
           <OLink color="primary" class="resetting" @click="handleResettingTag">{{ t('software.filterSider.clear') }}</OLink>
         </div>
