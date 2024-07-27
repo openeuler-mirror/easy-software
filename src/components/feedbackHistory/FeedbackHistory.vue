@@ -1,14 +1,14 @@
 <script setup lang="ts">
+import { computed, inject, ref, watch, type Ref } from 'vue';
+import { ORadio, ORadioGroup, OToggle } from '@opensig/opendesign';
 import type { FeedbackHistoryT } from '@/@types/feedback';
 import type { SorT } from '@/@types/type-sort';
 import { getFeedbackList } from '@/api/api-feedback';
+import { currentFieldDetailTabInjection, pkgIdInjection } from '@/data/injectionKeys';
+
 import AppPagination from '@/components/AppPagination.vue';
 import FilterOrder from '@/components/filter/FilterOrder.vue';
-import { inject, ref, watch, type Ref } from 'vue';
-import notFoundImage from '@/assets/404.png';
 import FeedbackHistoryItem from './FeedbackHistoryItem.vue';
-import { ORadio, ORadioGroup, OResult, OToggle } from '@opensig/opendesign';
-import { currentFieldDetailTabInjection, pkgIdInjection } from '@/data/injectionKeys';
 
 const pkgId = inject<Ref<string>>(pkgIdInjection, ref(''));
 
@@ -26,6 +26,9 @@ defineEmits<{
   (event: 'goToUrl', url: string): void;
 }>();
 
+/** 是否首次进入 */
+let initialized = false;
+const showFilter = ref(false);
 const filterItems = [
   { label: '全部', value: '' },
   { label: '待办的', value: '待办的' },
@@ -38,48 +41,62 @@ const currentPage = ref(1);
 const pageSize = ref(10);
 const totalCount = ref(0);
 const sort = ref<SorT>('');
-const feedbackList = ref<FeedbackHistoryT[]>([]);
+const totalList = ref<FeedbackHistoryT[]>([]);
+const feedbackList = computed(() => totalList.value.slice((currentPage.value - 1) * pageSize.value, currentPage.value * pageSize.value));
 
 const queryData = () => {
   if (props.fieldDetailTab && currentFieldDetailTab?.value !== props.fieldDetailTab) {
     return;
   }
-  getFeedbackList(currentPage.value, pageSize.value, radioVal.value, sort.value)
+  getFeedbackList(1, 1000, radioVal.value, sort.value)
     .then((res) => {
       const { data } = res.data[0];
-      feedbackList.value = data.filter((item) => item.issue_title.endsWith(pkgId.value));
+      totalList.value = data.filter((item) => item.issue_title.endsWith(pkgId.value));
+      if (!initialized) {
+        initialized = true;
+        if (!totalList.value.length) {
+          showFilter.value = false;
+        } else {
+          showFilter.value = true;
+        }
+      }
     })
     .catch(() => {
-      feedbackList.value = [];
+      totalList.value = [];
     })
     .finally(() => {
-      totalCount.value = feedbackList.value.length;
+      totalCount.value = totalList.value.length;
     });
 };
 
-watch([radioVal, sort], queryData, { immediate: true });
+queryData();
+
+watch([radioVal, sort], () => {
+  currentPage.value = 1;
+  queryData();
+});
 
 watch(pkgId, () => {
-  if (feedbackList.value.length > 0) {
+  if (totalList.value.length > 0) {
     return;
   }
+  initialized = false;
+  showFilter.value = false;
   queryData();
 });
 
 const handleSizeChange = (size: number) => {
   pageSize.value = size;
   currentPage.value = 1;
-  queryData();
 };
 
 const handleCurrentChange = (page: number) => {
   currentPage.value = page;
-  queryData();
 };
 </script>
 
 <template>
-  <header class="filter-items">
+  <header class="filter-items" v-if="showFilter">
     <div class="filter-left">
       共{{ totalCount }}条反馈信息
       <ORadioGroup v-model="radioVal" :style="{ '--radio-group-gap': '16px' }">
@@ -101,24 +118,15 @@ const handleCurrentChange = (page: number) => {
       <AppPagination :current="currentPage" :pagesize="pageSize" :total="totalCount" @size-change="handleSizeChange" @current-change="handleCurrentChange" />
     </div>
   </template>
-  <div v-else class="not-found">
-    <OResult>
-      <template #image>
-        <slot name="image">
-          <img class="not-found-image" alt="notFound" :src="notFoundImage" />
-        </slot>
-      </template>
-      <template #extra>
-        <p class="text404">暂无数据</p>
-      </template>
-    </OResult>
-  </div>
+  <p v-else class="not-found">
+    暂无历史反馈信息
+  </p>
 </template>
 
 <style scoped lang="scss">
 .not-found {
-  padding-top: 106px;
-  padding-bottom: 100px;
+  padding-top: 24px;
+  @include tip1;
 }
 
 .filter-items {
@@ -137,6 +145,7 @@ const handleCurrentChange = (page: number) => {
       .o-toggle {
         --toggle-size: 28px;
         --toggle-padding: 0 12px;
+        --toggle-bg-color: #F3F3F5;
       }
     }
   }

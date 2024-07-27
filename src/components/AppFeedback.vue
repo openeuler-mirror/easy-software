@@ -5,6 +5,7 @@ import { GITEE } from '@/data/config';
 import { useI18n } from 'vue-i18n';
 import { OPENEULER_FORUM } from '@/data/config';
 import { postFeedback } from '@/api/api-feedback';
+import { pkgIdInjection } from '@/data/injectionKeys';
 
 import xss from 'xss';
 import ExternalLink from '@/components/ExternalLink.vue';
@@ -12,7 +13,6 @@ import AppSection from '@/components/AppSection.vue';
 
 import IconHelp from '~icons/app/icon-help.svg';
 import FeedbackHistory from '@/components/feedbackHistory/FeedbackHistory.vue';
-import { pkgIdInjection } from '@/data/injectionKeys';
 
 const props = defineProps({
   name: {
