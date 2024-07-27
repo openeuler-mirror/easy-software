@@ -90,7 +90,7 @@ const scrollToAnchor = (id: string) => {
       <p v-if="maintainer.maintainerEmail" class="text">
         <a class="email" :href="`mailto:${maintainer.maintainerEmail}`">
           <img :src="Email" class="icon-img" alt="" />
-          <span>{{ `mailto:${maintainer.maintainerEmail}` }}</span>
+          <span>{{ maintainer.maintainerEmail }}</span>
         </a>
       </p>
       <p v-if="maintainer.maintainerGiteeId" class="text">
