@@ -1,7 +1,7 @@
 <script lang="ts" setup>
-import { ref, onMounted, watch } from 'vue';
+import { ref, watch } from 'vue';
 import { OSelect, OOption, OInput, OIcon, vLoading, useMessage, isUndefined } from '@opensig/opendesign';
-
+import { useDebounceFn } from '@vueuse/core';
 import { isValidSearchTabName, isValidSearchKey } from '@/utils/query';
 import { useRouter, useRoute } from 'vue-router';
 import { getSearchDataAll } from '@/api/api-search';
@@ -88,17 +88,19 @@ const clickRecommend = (v: string) => {
 };
 
 const isFocus = ref(false);
-const changeFocusState = (state: boolean) => {
+const changeSearchFocus = (state: boolean) => {
   isFocus.value = state;
 };
 
-const init = () => {
-  isFocus.value = false;
-  clearTimeout(timer);
+const changeSearchBlur = () => {
+  const name = route.query.name as string;
+  if (searchInput.value === '' && name !== '') {
+    searchInput.value = name;
+  }
 };
 
 onClickOutside(searchRef, () => {
-  init();
+  isFocus.value = false;
 });
 
 const recommendList = ref<RecommendItemT[]>([]);
@@ -134,18 +136,19 @@ const queryDocsAll = () => {
     });
 };
 
-let timer: any;
+//搜索防抖
+const debouncedFn = useDebounceFn(() => {
+  queryDocsAll();
+}, 350);
+
 const trottleSearch = (v: string) => {
-  clearTimeout(timer);
   if (v.length > 100) {
     return msg.danger({
       content: '文字长度不能超过100字符',
     });
   }
   isLoading.value = true;
-  timer = setTimeout(() => {
-    queryDocsAll();
-  }, 500);
+  debouncedFn();
 };
 
 // -------------------- 监听 url query 变化 触发搜索 ---------------------
@@ -205,7 +208,8 @@ watch(
         @press-enter="(v) => changeSearchInput(v)"
         @input="trottleSearch"
         @clear="clearInput"
-        @focus="changeFocusState(true)"
+        @focus="changeSearchFocus(true)"
+        @blur="changeSearchBlur"
       >
         <template #prefix>
           <OIcon class="search-icon"><IconSearch /></OIcon>
