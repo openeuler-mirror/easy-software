@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { ref, type PropType } from 'vue';
-import { OTable, OLink, ODialog, OIcon, OPopover } from '@opensig/opendesign';
+import { OTable, OLink, ODialog, OPopover } from '@opensig/opendesign';
 import { useLocale } from '@/composables/useLocale';
 import { formatDateTime, checkOriginLink, windowOpen, xssAllTag, getPkgName } from '@/utils/common';
 import { useI18n } from 'vue-i18n';
@@ -8,7 +8,6 @@ import { useI18n } from 'vue-i18n';
 import OCodeCopy from '@/components/OCodeCopy.vue';
 import ExternalLink from '@/components/ExternalLink.vue';
 
-import IconOutlink from '~icons/pkg/icon-outlink.svg';
 import IconUbuntu from '@/assets/ubuntu.png';
 
 interface ColumnsT {

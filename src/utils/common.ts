@@ -120,6 +120,9 @@ export const getPkgName = (type: string) => {
     case 'oepkg':
       name = 'oepkg';
       break;
+    case 'all':
+      name = 'filed';
+      break;
   }
   return name;
 };

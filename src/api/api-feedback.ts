@@ -22,7 +22,7 @@ interface FeedbackT {
  */
 
 export function postFeedback(params: FeedbackT): Promise<ResponseT<string>> {
-  const url = '/api-dsapi/query/nps?community=software';
+  const url = '/api-dsapi/query/nps/issue?community=software';
   return request.post(url, params).then((res: AxiosResponse) => res?.data);
 }
 

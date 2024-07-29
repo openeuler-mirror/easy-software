@@ -159,8 +159,8 @@ const oepkgColumn = {
     'openEuler-20.03-LTS-SP1',
     'openEuler-20.03-LTS',
   ],
-  arch: ['aarch64', 'noarch', 'x86_64', 's390x', 'i686'],
-  category: ['其他'],
+  arch: ['aarch64', 'i686', 'noarch', 's390x', 'x86_64'],
+  category: ['云服务', '数据库', 'AI', '大数据', 'HPC', '分布式存储', '其他'],
 };
 
 const filterOsList = ref<string[]>([]);

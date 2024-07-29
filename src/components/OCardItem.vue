@@ -45,21 +45,21 @@ function getMaintainersStr(params: PkgIdsT) {
   let maintainers = '';
   if (Object.keys(params).length > 0) {
     if (params.RPM) {
-      maintainers += `${params.RPM}、`;
+      maintainers += `${params.RPM};`;
     }
     if (params.IMAGE) {
-      maintainers += `${params.IMAGE}、`;
+      maintainers += `${params.IMAGE};`;
     }
     if (params.EPKG) {
-      maintainers += `${params.EPKG}、`;
+      maintainers += `${params.EPKG};`;
     }
     if (params.OEPKG) {
-      maintainers += `${params.OEPKG}、`;
+      maintainers += `${params.OEPKG};`;
     }
   } else {
     maintainers = maintainerDefaults.name;
   }
-  return maintainers.replace(/、+$/, '');
+  return maintainers.replace(/;+$/, '');
 }
 
 const jumpTo = (id: PkgIdsT, type?: PkgTypeT) => {
@@ -136,11 +136,8 @@ onMounted(() => {
   }
 }
 
-.o-card-main {
-  width: 100%;
-  position: relative;
-  height: 100%;
-  --card-main-padding: 24px;
+:deep(.o-card-main) {
+  justify-content: space-between;
   &:hover {
     .name-info {
       color: var(--o-color-primary1);
@@ -186,6 +183,9 @@ onMounted(() => {
     }
   }
   .pkg-box {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
     .tags-box {
       margin-top: 24px;
     }
