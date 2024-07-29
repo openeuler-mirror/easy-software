@@ -187,7 +187,7 @@ const jumpOut = () => {
         <template #target>
           <OIcon ref="flagsRef" class="flags-icon"><IconHelp /></OIcon>
         </template>
-        <div class="popover-content">数据同步存在延迟，反馈内容需等待一段时间后才可见</div>
+        <div class="popover-content">历史反馈信息内容更新有延迟，请耐心等待</div>
       </OPopover>
     </h3>
     <FeedbackHistory :fieldDetailTab="props.fieldDetailTab" @goToUrl="goToFeedbackDetailUrl" />
@@ -205,7 +205,6 @@ const jumpOut = () => {
   line-height: 30px;
   font-weight: 500;
   color: var(--o-color-info1);
-  margin-bottom: 16px;
 
   .flags-icon {
     font-size: 16px;

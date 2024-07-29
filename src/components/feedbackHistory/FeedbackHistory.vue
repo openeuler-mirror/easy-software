@@ -40,7 +40,7 @@ const radioVal = ref('');
 const currentPage = ref(1);
 const pageSize = ref(10);
 const totalCount = ref(0);
-const sort = ref<SorT>('');
+const sort = ref<SorT>('desc');
 const totalList = ref<FeedbackHistoryT[]>([]);
 const feedbackList = computed(() => totalList.value.slice((currentPage.value - 1) * pageSize.value, currentPage.value * pageSize.value));
 
@@ -133,6 +133,7 @@ const handleCurrentChange = (page: number) => {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  margin-top: 16px;
 
   .filter-left {
     display: flex;

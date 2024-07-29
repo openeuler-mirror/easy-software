@@ -37,7 +37,7 @@ const tagColor = (tag: string) => {
   <div class="feedback-history-item">
     <p class="feedback-content">
       {{ feedback.feedback }}
-      <OTag :color="tagColor(feedback.issue_customize_state)" size="small">{{ feedback.issue_customize_state }}</OTag>
+      <OTag class="tag" :color="tagColor(feedback.issue_customize_state)" size="small">{{ feedback.issue_customize_state }}</OTag>
     </p>
     <div class="feedback-desc">
       <div class="feedback-desc-left">
@@ -67,6 +67,14 @@ const tagColor = (tag: string) => {
     @include text1;
     word-break: break-all;
     max-width: 660px;
+
+    .tag {
+      border: none;
+      --layout-pkg-radius: 2px;
+      --tag-padding: 0 8px;
+      margin-left: 6px;
+      transform: translateY(-1px);
+    }
   }
 
   .feedback-desc {
