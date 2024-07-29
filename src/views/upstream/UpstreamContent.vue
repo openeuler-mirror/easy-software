@@ -112,7 +112,7 @@ const statusList = ref<string[]>([]);
 const isFilterLoading = ref(false);
 const appTypeListDisplayNames: Record<string, string> = {
   rpm: 'RPM',
-  image: '容器镜像',
+  image: '应用镜像',
 };
 const queryFilter = () => {
   filterOsList.value = [];
