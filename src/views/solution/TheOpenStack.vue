@@ -191,7 +191,7 @@ const jumpTo = (href: string) => {
   }
   .solution-adv {
     background: var(--o-color-fill2);
-    padding: 48px 48px 32px;
+    padding: 48px;
     .text {
       margin: 40px 0 0;
       @include tip1;

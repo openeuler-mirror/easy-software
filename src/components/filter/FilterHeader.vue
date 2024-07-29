@@ -73,11 +73,29 @@ const clearSearchData = () => {
 };
 
 const replaceWinUrl = () => {
+  collectDownloadData(searchValue.value);
+
   router.push({
     path: `/${locale.value}/` + (route.name as string),
     query: {
       name: searchValue.value,
     },
+  });
+};
+
+// ---------------------搜索埋点--------------------
+const collectDownloadData = (keyword: string) => {
+  const sensors = (window as any)['sensorsDataAnalytic201505'];
+  const { href } = window.location;
+  const downloadTime = new Date();
+  sensors?.setProfile({
+    ...(window as any)['sensorsCustomBuriedData'],
+    profileType: 'search',
+    origin: href,
+    keyword,
+    filter: 'all',
+    pkg: props.title,
+    downloadTime,
   });
 };
 
@@ -201,12 +219,6 @@ watch(
 </template>
 
 <style lang="scss" scoped>
-svg.asc {
-  color: red;
-  path {
-    fill: blue;
-  }
-}
 .filter-header {
   height: 40px;
   display: flex;
@@ -246,7 +258,7 @@ svg.asc {
     }
     &.active {
       color: var(--o-color-info1);
-      font-weight: 600;
+      font-weight: 500;
     }
   }
   .search-left {

@@ -61,7 +61,7 @@ const changeSearchInput = (v: string) => {
 
 const replaceWinUrl = () => {
   searchRecommendRef.value?.getSearchHistory(searchInput.value);
-
+  collectDownloadData(searchInput.value, defaultValue.value, tabName.value);
   router.push({
     path: `/${locale.value}/search`,
     query: {
@@ -69,6 +69,22 @@ const replaceWinUrl = () => {
       tab: tabName.value,
       key: defaultValue.value,
     },
+  });
+};
+
+// ---------------------搜索埋点--------------------
+const collectDownloadData = (keyword: string, filter: string, pkg: string) => {
+  const sensors = (window as any)['sensorsDataAnalytic201505'];
+  const { href } = window.location;
+  const downloadTime = new Date();
+  sensors?.setProfile({
+    ...(window as any)['sensorsCustomBuriedData'],
+    profileType: 'search',
+    origin: href,
+    keyword,
+    filter,
+    pkg,
+    downloadTime,
   });
 };
 

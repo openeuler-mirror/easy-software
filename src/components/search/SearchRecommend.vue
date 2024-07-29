@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { ref, defineExpose, watch, computed, type PropType } from 'vue';
-import { OLink, OIcon } from '@opensig/opendesign';
+import { OLink, OIcon, useMessage } from '@opensig/opendesign';
 import type { RecommendItemT } from '@/@types/search';
 import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
@@ -31,7 +31,7 @@ const props = defineProps({
     default: () => false,
   },
 });
-
+const msg = useMessage();
 const { t } = useI18n();
 const router = useRouter();
 const { locale } = useLocale();
@@ -45,11 +45,18 @@ const jumpPages = (type: string) => {
 };
 
 const goDetail = (key: string, id: string) => {
-  const type = getPkgName(key).toLocaleUpperCase();
-  router.push({
-    path: `/${locale.value}/${getPkgName(key)}/detail`,
-    query: { type: type, pkgId: id },
-  });
+  const type = getPkgName(key);
+  const pkgName = ['filed','rpm', 'epkg', 'image', 'oepkg'];
+  if (pkgName.includes(type)) {
+    router.push({
+      path: `/${locale.value}/${getPkgName(key)}/detail`,
+      query: { type: type, pkgId: id },
+    });
+  } else {
+    return msg.danger({
+      content: '参数错误',
+    });
+  }
 };
 
 const goSearch = (name: string) => {

@@ -19,4 +19,12 @@ export const os = [
   'openEuler-preview',
 ]
 
-export const arch = ['aarch64', 'noarch', 'x86_64', 'src', 'loongarch64', 'riscv64', 'sw_64'];
+export const arch = [
+  "aarch64",
+  "loongarch64",
+  "noarch",
+  "riscv64",
+  "src",
+  "sw_64",
+  "x86_64"
+]
