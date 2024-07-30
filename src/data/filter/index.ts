@@ -20,10 +20,10 @@ export const os = [
 ]
 
 export const arch = [
+  "x86_64",
   "aarch64",
-  "loongarch64",
   "noarch",
   "riscv64",
+  "loongarch64",
   "sw_64",
-  "x86_64"
 ]
