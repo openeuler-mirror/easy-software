@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { SorT } from '@/@types/type-sort';
 import { OLink } from '@opensig/opendesign';
-import { watch } from 'vue';
+import { onMounted, watch } from 'vue';
 import IconTimeOrder from '~icons/app/icon-time-order.svg';
 
 const props = withDefaults(
@@ -17,6 +17,13 @@ const emits = defineEmits<{
   (event: 'update:sort', value: SorT): void;
 }>();
 
+onMounted(() => {
+  const path = document.querySelector(`.filter-sort svg`);
+  path?.children[0].setAttribute('fill', '#bdbdbd');
+  path?.children[1].setAttribute('fill', '#bdbdbd');
+  path?.children[props.sort === 'desc' ? 1 : 0].setAttribute('fill', '#000');
+});
+
 watch(
   () => props.sort,
   (val) => {
@@ -27,8 +34,7 @@ watch(
       return;
     }
     path?.children[val === 'desc' ? 1 : 0].setAttribute('fill', '#000');
-  },
-  { immediate: true }
+  }
 );
 
 const changeSort = () => {
