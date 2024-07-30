@@ -21,7 +21,6 @@ interface RequestConfig<D = any> extends AxiosRequestConfig {
   ignoreError?: number; // 忽略某个状态码错误提示
   ignoreDuplicates?: boolean; // false: 取消重复请求； true: 允许重复请求
   global?: boolean; // 是否为全局请求，全局请求在清除请求池时，不清除
-  noCsrf?: boolean; // 是否禁用csrf防护，默认为false
 }
 
 interface RequestInstance extends AxiosInstance {
@@ -75,13 +74,7 @@ const getLoadingInstance = (showLoading: boolean | { opt?: Partial<LoadingPropsT
  */
 const requestInterceptorId = request.interceptors.request.use(
   (config: InternalRequestConfig) => {
-    const { showLoading, noCsrf } = config;
-    if (!noCsrf && !config.headers?.Token) {
-      const cookie = Cookies.get(LOGIN_KEYS.CSRF_TOKEN);
-      if (cookie) {
-        config.headers.Token = cookie;
-      }
-    }
+    const { showLoading } = config;
 
     if (loadingCount === 0 && config.showLoading) {
       if (showLoading) {
@@ -184,9 +177,7 @@ const responseInterceptorId = request.interceptors.response.use(
       Cookies.remove(LOGIN_KEYS.CSRF_TOKEN);
       useUserInfoStore().$reset();
       useLoginStore().setLoginStatus(LOGIN_STATUS.FAILED);
-      if (!config.url?.endsWith('/appVersion/permission')) {
-        router.push('/');
-      }
+      router.push('/');
     }
 
     return Promise.reject(err);
