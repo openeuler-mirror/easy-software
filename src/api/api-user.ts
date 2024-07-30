@@ -26,6 +26,10 @@ export function queryUserInfo(community = 'openeuler') {
     .then((res) => res.data.data);
 }
 
+/**
+ * 查询当前用户是否具有查看上游应用的权限
+ * @returns 是否具有查看上游应用的权限
+ */
 export function queryUpstreamPermission() {
   const url = '/server/appVersion/permission';
   return request.get<ResponseT<{ allow_access: boolean }>>(url).then((res) => res.data);

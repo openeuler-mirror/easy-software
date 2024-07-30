@@ -1,20 +1,20 @@
 <script setup lang="ts">
-import { doLogin, getCsrfToken, logout } from '@/shared/login';
-import { useUserInfoStore } from '@/stores/user';
-import { ODropdown, ODropdownItem, OIcon, OPopup } from '@opensig/opendesign';
+import { doLogin, logout } from '@/shared/login';
+import { useLoginStore, useUserInfoStore } from '@/stores/user';
+import { ODropdown, ODropdownItem, OIcon } from '@opensig/opendesign';
 import { storeToRefs } from 'pinia';
 import { ref } from 'vue';
 import LoginIcon from '~icons/app/icon-login.svg';
 
 const { username, photo } = storeToRefs(useUserInfoStore());
 const userInfoArea = ref();
-const csrfToken = getCsrfToken();
+const loginStore = useLoginStore();
 
 const login = () => doLogin();
 </script>
 
 <template>
-  <template v-if="csrfToken">
+  <template v-if="loginStore.isLogined">
     <ODropdown trigger="hover" optionPosition="bottom" optionWrapClass="user-dropdown">
       <div class="user-info" ref="userInfoArea">
         <img v-if="photo" :src="photo" />

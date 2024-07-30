@@ -72,6 +72,9 @@ const clickSubmit = () => {
     maintainer: props.maintainer.maintainerGiteeId || null,
     maintainerEmail: props.maintainer.maintainerEmail || null,
     srcRepo: props.srcRepo || null,
+    name: props.name || null,
+    type: props.type || null,
+    version: props.version || null,
   };
 
   if (feedbackTxa.value.includes('$')) {
