@@ -122,6 +122,10 @@ const linksData2 = {
       URL: OPENEULER + '/zh/other/brand/',
     },
     {
+      NAME: '隐私政策',
+      URL: OPENEULER + '/zh/other/privacy/',
+    },
+    {
       NAME: '法律声明',
       URL: OPENEULER + '/zh/other/legal/',
     },

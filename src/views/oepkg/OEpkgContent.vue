@@ -159,7 +159,7 @@ const oepkgColumn = {
     'openEuler-20.03-LTS-SP1',
     'openEuler-20.03-LTS',
   ],
-  arch: ['aarch64', 'i686', 'noarch', 's390x', 'x86_64'],
+  arch: ['x86_64', 'aarch64', 'noarch', 'i686', 's390x'],
   category: ['AI', 'HPC', '云服务', '分布式存储', '大数据', '数据库', '其他'],
 };
 
@@ -172,20 +172,6 @@ const queryFilter = () => {
   filterCategoryList.value = oepkgColumn.category;
   filterArchList.value = oepkgColumn.arch;
   filterOsList.value = oepkgColumn.os;
-  // isFilterLoading.value = true;
-  // getSearchAllColumn({
-  //   name: tabName.value,
-  //   column: 'arch,category',
-  // })
-  //   .then((res) => {
-  //     const { arch, category } = res.data;
-  //     filterCategoryList.value = category;
-  //     filterArchList.value = arch;
-  //     isFilterLoading.value = false;
-  //   })
-  //   .catch(() => {
-  //     isFilterLoading.value = false;
-  //   });
 };
 
 const closeTag = (idx: string | number, type: string) => {
