@@ -2,9 +2,9 @@ import { createRouter, createWebHistory } from 'vue-router';
 
 import { scrollToTop } from '@/utils/common';
 import { useLangStore, useViewStore } from '@/stores/common';
-import { LOGIN_STATUS, getCsrfToken } from '@/shared/login';
+import { tryLogin } from '@/shared/login';
 import { useLoginStore, useUserInfoStore } from '@/stores/user';
-import { queryUpstreamPermission, queryUserInfo } from '@/api/api-user';
+import { queryUpstreamPermission } from '@/api/api-user';
 
 const routes = [
   {
@@ -137,25 +137,19 @@ router.beforeEach(async (to) => {
     return true;
   }
 
-  const csrfToken = getCsrfToken();
-  if (!csrfToken) {
-    userInfoStore.$reset();
-    loginStore.setLoginStatus(LOGIN_STATUS.NOT);
-    return isUpstream ? { name: 'notFound' } : true;
-  }
-  try {
-    const userInfo =  await queryUserInfo()
-    userInfoStore.setUserInfo(userInfo);
-    const upstreamPermission = await queryUpstreamPermission()
-    userInfoStore.upstreamPermission = upstreamPermission.data.allow_access;
-    loginStore.setLoginStatus(LOGIN_STATUS.DONE);
-  } catch (error) {
-    loginStore.setLoginStatus(LOGIN_STATUS.FAILED);
-    return isUpstream ? { name: 'notFound' } : true;
+  await tryLogin();
+  if (userInfoStore.upstreamPermission === null && loginStore.isLogined) {
+    try {
+      const upstreamPermission = await queryUpstreamPermission();
+      userInfoStore.upstreamPermission = upstreamPermission.data.allow_access;
+    } catch {
+      // 如果queryUpstreamPermission不是401
+      return isUpstream ? { name: 'notFound' } : true;
+    }
   }
 
   if (isUpstream) {
-    return userInfoStore.upstreamPermission ? true : { name: 'notFound' };
+    return loginStore.isLogined && userInfoStore.upstreamPermission ? true : { name: 'notFound' };
   }
 
   return true;
