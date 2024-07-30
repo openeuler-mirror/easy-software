@@ -50,15 +50,15 @@ const openDownloadDialog = (name: string, version: string, pkgId: string) => {
   const v = version ? `:${version}` : '';
   codeInput.value = `docker pull openeuler/${xssAllTag(name)}${v}`;
   showDlg.value = true;
-  collectDownloadData(pkgId);
+  collectDownloadData(pkgId, name, version);
 };
 
 const showExternalDlg = ref(false);
 const externalLink = ref('');
-const onExternalDialog = (href: string, pkgId?: string) => {
+const onExternalDialog = (href: string, name: string, version: string, pkgId?: string) => {
   externalLink.value = href;
   if (pkgId) {
-    collectDownloadData(pkgId);
+    collectDownloadData(pkgId, name, version);
   }
   if (checkOriginLink(href)) {
     windowOpen(href, '_blank');
@@ -68,7 +68,7 @@ const onExternalDialog = (href: string, pkgId?: string) => {
 };
 
 // ---------------------下载埋点--------------------
-const collectDownloadData = (pkgId: string) => {
+const collectDownloadData = (pkgId: string, name: string, version: string) => {
   const sensors = (window as any)['sensorsDataAnalytic201505'];
   const { href } = window.location;
   const downloadTime = new Date();
@@ -76,6 +76,8 @@ const collectDownloadData = (pkgId: string) => {
     ...(window as any)['sensorsCustomBuriedData'],
     profileType: 'download',
     origin: href,
+    name,
+    version,
     pkgId,
     downloadTime,
   });
@@ -142,7 +144,7 @@ const collectDownloadData = (pkgId: string) => {
         </template>
         <template v-else>
           <span>
-            <OLink v-if="row.binDownloadUrl" @click="onExternalDialog(row.binDownloadUrl, row.pkgId)" color="primary" hover-underline>{{
+            <OLink v-if="row.binDownloadUrl" @click="onExternalDialog(row.binDownloadUrl, row.name, row.appVer, row.pkgId)" color="primary" hover-underline>{{
               t('software.columns.download')
             }}</OLink>
           </span>

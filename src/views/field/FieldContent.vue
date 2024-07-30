@@ -110,6 +110,8 @@ const querySearch = () => {
     });
 };
 
+const arch = ['x86_64', 'aarch64', 'noarch', 'riscv64', 'loongarch64'];
+
 // 获取筛选参数列表
 const filterOsList = ref<string[]>([]);
 const filterArchList = ref<string[]>([]);
@@ -117,18 +119,17 @@ const filterCategoryList = ref<string[]>([]);
 const isFilterLoading = ref(false);
 
 filterOsList.value = os;
+filterArchList.value = arch;
 const queryFilter = () => {
-  filterArchList.value = [];
   filterCategoryList.value = [];
   isFilterLoading.value = true;
   getSearchAllColumn({
     name: 'domain',
-    column: 'arch,category',
+    column: 'category',
   })
     .then((res) => {
       const { arch, category } = res.data;
       filterCategoryList.value = category;
-      filterArchList.value = arch;
       isFilterLoading.value = false;
     })
     .catch(() => {

@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref, watch } from 'vue';
+import { ref, watch, onMounted } from 'vue';
 import { OSelect, OOption, OInput, OIcon, vLoading, useMessage, isUndefined } from '@opensig/opendesign';
 import { useDebounceFn } from '@vueuse/core';
 import { isValidSearchTabName, isValidSearchKey } from '@/utils/query';
@@ -110,8 +110,10 @@ const changeSearchFocus = (state: boolean) => {
 
 const changeSearchBlur = () => {
   const name = route.query.name as string;
-  if (searchInput.value === '' || name !== searchInput.value) {
-    searchInput.value = name;
+  if (isPageSearch.value) {
+    if (searchInput.value === '' || name !== searchInput.value) {
+      searchInput.value = name;
+    }
   }
 };
 
@@ -166,6 +168,13 @@ const trottleSearch = (v: string) => {
   isLoading.value = true;
   debouncedFn();
 };
+
+// 判断是否是搜索页
+const isPageSearch = ref(false);
+
+onMounted(() => {
+  isPageSearch.value = route.name === 'search';
+});
 
 // -------------------- 监听 url query 变化 触发搜索 ---------------------
 const handleQueryData = () => {

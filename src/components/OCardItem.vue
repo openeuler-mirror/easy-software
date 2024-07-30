@@ -43,23 +43,29 @@ function getQueryStr(params: PkgIdsT) {
 // Maintainer数据
 function getMaintainersStr(params: PkgIdsT) {
   let maintainers = '';
-  if (Object.keys(params).length > 0) {
-    if (params.RPM) {
-      maintainers += `${params.RPM};`;
+  const line = ' ; ';
+
+  Object.keys(params).forEach((key) => {
+    if (!params[key]) {
+      params[key] = maintainerDefaults.name;
     }
-    if (params.IMAGE) {
-      maintainers += `${params.IMAGE};`;
-    }
-    if (params.EPKG) {
-      maintainers += `${params.EPKG};`;
-    }
-    if (params.OEPKG) {
-      maintainers += `${params.OEPKG};`;
-    }
-  } else {
-    maintainers = maintainerDefaults.name;
+  });
+
+  console.log(params);
+  if (params.RPM) {
+    maintainers += `${params.RPM}${line}`;
   }
-  return maintainers.replace(/;+$/, '');
+  if (params.IMAGE) {
+    maintainers += `${params.IMAGE}${line}`;
+  }
+  if (params.EPKG) {
+    maintainers += `${params.EPKG}${line}`;
+  }
+  if (params.OEPKG) {
+    maintainers += `${params.OEPKG}${line}`;
+  }
+
+  return maintainers.replace(/ ; +$/, '');
 }
 
 const jumpTo = (id: PkgIdsT, type?: PkgTypeT) => {
