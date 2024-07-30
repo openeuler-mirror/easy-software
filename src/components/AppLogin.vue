@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { doLogin, logout } from '@/shared/login';
 import { useLoginStore, useUserInfoStore } from '@/stores/user';
-import { ODropdown, ODropdownItem, OIcon } from '@opensig/opendesign';
+import { ODropdown, ODropdownItem, OIcon, OIconLoading } from '@opensig/opendesign';
 import { storeToRefs } from 'pinia';
 import { ref } from 'vue';
 import LoginIcon from '~icons/app/icon-login.svg';
@@ -29,6 +29,9 @@ const login = () => doLogin();
       </template>
     </ODropdown>
   </template>
+  <div v-else-if="loginStore.isLoggingIn" class="o-rotating">
+    <OIconLoading />
+  </div>
   <div v-else class="login-btn" @click="login">
     <OIcon><LoginIcon /></OIcon>
   </div>

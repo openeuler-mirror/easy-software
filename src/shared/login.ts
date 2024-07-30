@@ -1,5 +1,7 @@
 import Cookies from 'js-cookie';
 import { useLangStore } from '@/stores/common';
+import { useLoginStore, useUserInfoStore } from '@/stores/user';
+import { queryUpstreamPermission, queryUserInfo } from '@/api/api-user';
 
 const LOGIN_URL = import.meta.env.VITE_LOGIN_URL;
 const XSRF_COOKIE_NAME = import.meta.env.VITE_XSRF_COOKIE_NAME;
@@ -34,4 +36,34 @@ export function logout() {
  */
 export function doLogin() {
   location.href = `${LOGIN_URL}/login?redirect_uri=${encodeURIComponent(location.href)}&lang=${useLangStore().lang}`;
+}
+
+// 清除用户认证凭据
+export function clearUserAuth() {
+  // 清除内存中用户信息
+  useUserInfoStore().$reset();
+  // 清除cookie
+  Cookies.remove(LOGIN_KEYS.CSRF_TOKEN);
+}
+
+/**
+ * 尝试登录
+ * @returns 登录结果
+ */
+export async function tryLogin() {
+  const userInfoStore = useUserInfoStore();
+  const loginStore = useLoginStore();
+  const csrfToken = getCsrfToken();
+  if (!csrfToken) {
+    userInfoStore.$reset();
+    loginStore.setLoginStatus(LOGIN_STATUS.NOT);
+    return;
+  }
+  try {
+    loginStore.setLoginStatus(LOGIN_STATUS.DOING);
+    userInfoStore.$patch(await queryUserInfo());
+    loginStore.setLoginStatus(LOGIN_STATUS.DONE);
+  } catch (error) {
+    loginStore.setLoginStatus(LOGIN_STATUS.FAILED);
+  }
 }

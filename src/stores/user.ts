@@ -1,4 +1,3 @@
-import type { UserInfoT } from '@/@types/type-user';
 import { LOGIN_STATUS, type LoginStatusT } from '@/shared/login';
 import { defineStore } from 'pinia';
 
@@ -8,17 +7,11 @@ import { defineStore } from 'pinia';
 export const useUserInfoStore = defineStore('userInfo', {
   state: () => {
     return {
-      photo: '',
-      username: '',
-      upstreamPermission: false,
+      photo: '' as string,
+      username: '' as string,
+      upstreamPermission: null as boolean | null,
     }
   },
-  actions: {
-    setUserInfo(data: UserInfoT) {
-      this.photo = data.photo || '';
-      this.username = data.username || '';
-    },
-  }
 });
 
 /**
