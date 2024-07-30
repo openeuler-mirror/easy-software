@@ -17,7 +17,7 @@ interface RequestConfig<D = any> extends AxiosRequestConfig {
   data?: D;
   showLoading?: boolean | { opt?: Partial<LoadingPropsT>; wrap: Ref<HTMLElement> | HTMLElement | string }; // 加载时是否出现Loading框，默认为false
   showError?: boolean; // 请求报错是否出现错误提示，默认为true
-  ignoreError?: number; // 忽略某个状态码错误提示
+  ignoreError?: 403; // 忽略某个状态码错误提示
   ignoreDuplicates?: boolean; // false: 取消重复请求； true: 允许重复请求
   global?: boolean; // 是否为全局请求，全局请求在清除请求池时，不清除
 }
