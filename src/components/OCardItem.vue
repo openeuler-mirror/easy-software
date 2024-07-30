@@ -51,7 +51,6 @@ function getMaintainersStr(params: PkgIdsT) {
     }
   });
 
-  console.log(params);
   if (params.RPM) {
     maintainers += `${params.RPM}${line}`;
   }
