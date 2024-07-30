@@ -46,7 +46,7 @@ const jumpPages = (type: string) => {
 
 const goDetail = (key: string, id: string) => {
   const type = getPkgName(key);
-  const pkgName = ['filed','rpm', 'epkg', 'image', 'oepkg'];
+  const pkgName = ['filed', 'rpm', 'epkg', 'image', 'oepkg'];
   if (pkgName.includes(type)) {
     router.push({
       path: `/${locale.value}/${getPkgName(key)}/detail`,

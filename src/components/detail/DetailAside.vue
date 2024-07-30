@@ -157,6 +157,9 @@ const collectDownloadData = () => {
     ...(window as any)['sensorsCustomBuriedData'],
     profileType: 'download',
     origin: href,
+    name:props.data.name,
+    os:props.tagVer[0],
+    arch:props.tagVer[1],
     pkgId: route.query.pkgId as string,
     downloadTime,
   });

@@ -49,7 +49,8 @@ const onCodeSuccess = (row: EulerverT) => {
     profileType: 'download',
     origin: href,
     pkgId: route.query.pkgId as string,
-    tagId: row.appVer + row.arch,
+    os: row.appVer[0],
+    arch: row.appVer[1],
     downloadTime,
   });
 };

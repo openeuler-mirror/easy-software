@@ -180,6 +180,9 @@ const onCodeSuccess = () => {
     ...(window as any)['sensorsCustomBuriedData'],
     profileType: 'download',
     origin: href,
+    name: appData.value.name,
+    os: tagVer.value[0],
+    arch: tagVer.value[1],
     pkgId: route.query.pkgId as string,
     downloadTime,
   });
