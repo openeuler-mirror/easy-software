@@ -1,4 +1,6 @@
 import type { AxiosStatic } from 'axios';
+const XSRF_COOKIE_NAME = import.meta.env.VITE_XSRF_COOKIE_NAME;
+const XSRF_HEADER_NAME = import.meta.env.VITE_XSRF_HEADER_NAME;
 
 /**
  * @param {axios} axios实例
@@ -10,8 +12,8 @@ export default (axios: AxiosStatic, config = {}) => {
     headers: {
       'Content-Type': 'application/json;charset=UTF-8',
     },
-    xsrfCookieName: 'csrf_token',
-    xsrfHeaderName: 'csrf-token',
+    xsrfCookieName: XSRF_COOKIE_NAME,
+    xsrfHeaderName: XSRF_HEADER_NAME,
   };
   Object.assign(axios.defaults, defaultConfig, config);
   return axios;

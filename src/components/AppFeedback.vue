@@ -69,12 +69,12 @@ const clickSubmit = () => {
     feedbackPageUrl: window.location.href,
     feedbackText: xss(feedbackTxa.value),
     feedbackValue: rateVal.value,
-    maintainer: props.maintainer.maintainerGiteeId || null,
-    maintainerEmail: props.maintainer.maintainerEmail || null,
-    srcRepo: props.srcRepo || null,
-    name: props.name || null,
-    type: props.type || null,
-    version: props.version || null,
+    maintainer: props.maintainer?.maintainerGiteeId,
+    maintainerEmail: props.maintainer?.maintainerEmail,
+    srcRepo: props.srcRepo,
+    name: props.name,
+    type: props.type,
+    version: props.version,
   };
 
   if (feedbackTxa.value.includes('$')) {

@@ -2,7 +2,7 @@ import Cookies from 'js-cookie';
 import { useLangStore } from '@/stores/common';
 
 const LOGIN_URL = import.meta.env.VITE_LOGIN_URL;
-
+const XSRF_COOKIE_NAME = import.meta.env.VITE_XSRF_COOKIE_NAME;
 
 // 登录状态
 export enum LOGIN_STATUS {
@@ -14,7 +14,7 @@ export enum LOGIN_STATUS {
 export type LoginStatusT = typeof LOGIN_STATUS.FAILED | LOGIN_STATUS.NOT | LOGIN_STATUS.DOING | LOGIN_STATUS.DONE;
 
 export const LOGIN_KEYS = {
-  CSRF_TOKEN: '_U_T_',
+  CSRF_TOKEN: XSRF_COOKIE_NAME,
   USER_INFO: '_U_I_',
 };
 
