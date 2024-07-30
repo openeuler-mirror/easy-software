@@ -110,7 +110,7 @@ const changeSearchFocus = (state: boolean) => {
 
 const changeSearchBlur = () => {
   const name = route.query.name as string;
-  if (searchInput.value === '' && name !== '') {
+  if (searchInput.value === '' || name !== searchInput.value) {
     searchInput.value = name;
   }
 };
