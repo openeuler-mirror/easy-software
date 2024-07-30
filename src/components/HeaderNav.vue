@@ -4,13 +4,15 @@ import { navs } from '@/data/nav';
 import { useRoute, useRouter } from 'vue-router';
 import { computed } from 'vue';
 import { useLocale } from '@/composables/useLocale';
-import { getCsrfToken } from '@/shared/login';
-import { useUserInfoStore } from '@/stores/user';
+import { useLoginStore, useUserInfoStore } from '@/stores/user';
 
 const route = useRoute();
 const router = useRouter();
 const userInfoStore = useUserInfoStore();
+const loginStore = useLoginStore();
 const { isZh, locale } = useLocale();
+
+const upstreamPermission = computed(() => loginStore.isLogined && userInfoStore.upstreamPermission);
 
 // -------------------- hover事件 --------------------
 const activeIndex = ref(-1);
@@ -67,8 +69,6 @@ const selectedIndex = computed(() => {
 const jumpTo = (href: string) => {
   router.push(`/${locale.value}` + href);
 };
-
-const upstreamPermission = computed(() => !!getCsrfToken() && userInfoStore.username && userInfoStore.photo && userInfoStore.upstreamPermission);
 </script>
 
 <template>

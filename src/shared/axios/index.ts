@@ -10,8 +10,8 @@ import setConfig from './setConfig';
 import { isBoolean, useLoading, useMessage, isNull, isUndefined } from '@opensig/opendesign';
 import type { LoadingPropsT } from '@opensig/opendesign/lib/loading/types';
 import Cookies from 'js-cookie';
-import { LOGIN_KEYS } from '../login';
-import { useUserInfoStore } from '@/stores/user';
+import { LOGIN_KEYS, LOGIN_STATUS } from '../login';
+import { useLoginStore, useUserInfoStore } from '@/stores/user';
 import router from '@/router';
 
 interface RequestConfig<D = any> extends AxiosRequestConfig {
@@ -78,7 +78,9 @@ const requestInterceptorId = request.interceptors.request.use(
     const { showLoading, noCsrf } = config;
     if (!noCsrf && !config.headers?.Token) {
       const cookie = Cookies.get(LOGIN_KEYS.CSRF_TOKEN);
-      config.headers.Token = cookie;
+      if (cookie) {
+        config.headers.Token = cookie;
+      }
     }
 
     if (loadingCount === 0 && config.showLoading) {
@@ -181,7 +183,10 @@ const responseInterceptorId = request.interceptors.response.use(
     if (err.response?.status === 401) {
       Cookies.remove(LOGIN_KEYS.CSRF_TOKEN);
       useUserInfoStore().$reset();
-      router.push('/');
+      useLoginStore().setLoginStatus(LOGIN_STATUS.FAILED);
+      if (!config.url?.endsWith('/appVersion/permission')) {
+        router.push('/');
+      }
     }
 
     return Promise.reject(err);

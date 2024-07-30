@@ -2,8 +2,8 @@ import { createRouter, createWebHistory } from 'vue-router';
 
 import { scrollToTop } from '@/utils/common';
 import { useLangStore, useViewStore } from '@/stores/common';
-import { getCsrfToken } from '@/shared/login';
-import { useUserInfoStore } from '@/stores/user';
+import { LOGIN_STATUS, getCsrfToken } from '@/shared/login';
+import { useLoginStore, useUserInfoStore } from '@/stores/user';
 import { queryUpstreamPermission, queryUserInfo } from '@/api/api-user';
 
 const routes = [
@@ -127,21 +127,35 @@ router.beforeEach(async (to) => {
   const lang = to.path.startsWith('/en') ? 'en' : 'zh';
   langStore.lang = lang;
 
-  const csrfToken = getCsrfToken();
   const userInfoStore = useUserInfoStore();
   const isUpstream = to.name === 'upstream';
+  const loginStore = useLoginStore();
+  if (loginStore.isLogined) {
+    if (isUpstream) {
+      return userInfoStore.upstreamPermission ? true : { name: 'notFound' };
+    }
+    return true;
+  }
+
+  const csrfToken = getCsrfToken();
   if (!csrfToken) {
     userInfoStore.$reset();
+    loginStore.setLoginStatus(LOGIN_STATUS.NOT);
     return isUpstream ? { name: 'notFound' } : true;
   }
-  if (!userInfoStore.username || !userInfoStore.photo) {
-    try {
-      const [userInfo, upstreamPermission] = await Promise.all([queryUserInfo(), queryUpstreamPermission()]);
-      userInfoStore.setUserInfo(userInfo);
-      userInfoStore.upstreamPermission = upstreamPermission.data.allow_access;
-    } catch (error) {
-      return isUpstream ? { name: 'notFound' } : true;
-    }
+  try {
+    const userInfo =  await queryUserInfo()
+    userInfoStore.setUserInfo(userInfo);
+    const upstreamPermission = await queryUpstreamPermission()
+    userInfoStore.upstreamPermission = upstreamPermission.data.allow_access;
+    loginStore.setLoginStatus(LOGIN_STATUS.DONE);
+  } catch (error) {
+    loginStore.setLoginStatus(LOGIN_STATUS.FAILED);
+    return isUpstream ? { name: 'notFound' } : true;
+  }
+
+  if (isUpstream) {
+    return userInfoStore.upstreamPermission ? true : { name: 'notFound' };
   }
 
   return true;
