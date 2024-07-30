@@ -24,7 +24,6 @@ export const arch = [
   "loongarch64",
   "noarch",
   "riscv64",
-  "src",
   "sw_64",
   "x86_64"
 ]

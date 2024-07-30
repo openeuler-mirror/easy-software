@@ -51,7 +51,10 @@
       margin-top: 24px;
       .total {
         color: var(--o-color-info1);
-        font-weight: 600;
+        font-weight: 500;
+        margin: 0 4px;
+      }
+      .search-value {
         margin: 0 4px;
       }
     }

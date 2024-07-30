@@ -160,7 +160,7 @@ const oepkgColumn = {
     'openEuler-20.03-LTS',
   ],
   arch: ['aarch64', 'i686', 'noarch', 's390x', 'x86_64'],
-  category: ['云服务', '数据库', 'AI', '大数据', 'HPC', '分布式存储', '其他'],
+  category: ['AI', 'HPC', '云服务', '分布式存储', '大数据', '数据库', '其他'],
 };
 
 const filterOsList = ref<string[]>([]);
@@ -363,7 +363,8 @@ watch(
         <p v-if="!isPageSearch" class="text">
           <template v-if="isSearchDocs">
             为您找到<span class="total">{{ total }}</span
-            >个与{{ searchKey }} 匹配的搜索结果
+            >个与<span class="search-value">{{ searchKey }}</span
+            >匹配的搜索结果
           </template>
           <template v-else>
             为您找到符合条件的筛选<span class="total">{{ total }}</span

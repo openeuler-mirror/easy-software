@@ -338,7 +338,8 @@ watch(
         <p v-if="!isPageSearch" class="text">
           <template v-if="isSearchDocs">
             为您找到<span class="total">{{ total }}</span
-            >个与{{ searchKey }} 匹配的搜索结果</template
+            >个与<span class="search-value">{{ searchKey }}</span
+            >匹配的搜索结果</template
           >
           <template v-else>
             为您找到符合条件的筛选<span class="total">{{ total }}</span

@@ -179,7 +179,8 @@ watch(
     <div class="search-left">
       <template v-if="isPageSearch">
         <p class="text">
-          为您找到<span class="total">{{ total }}</span> 个与 <span class="search-value">{{ searchValue }}</span> 匹配的搜索结果
+          为您找到<span class="total">{{ total }}</span> 个与 <span class="search-value">{{ searchValue }}</span
+          >匹配的搜索结果
         </p>
       </template>
       <OInput
@@ -250,12 +251,7 @@ watch(
     margin-left: 24px;
     user-select: none;
     align-items: center;
-    &.asc {
-      color: var(--o-color-info3);
-      svg path:first-child {
-        color: var(--o-color-primary1);
-      }
-    }
+    color: var(--o-color-info2);
     &.active {
       color: var(--o-color-info1);
       font-weight: 500;
@@ -268,6 +264,7 @@ watch(
       overflow: hidden;
       text-overflow: ellipsis;
       display: inline-block;
+      margin: 0 4px;
     }
     .text {
       @include tip1;
@@ -277,7 +274,7 @@ watch(
 
       .total {
         color: var(--o-color-info1);
-        font-weight: 600;
+        font-weight: 500;
         margin: 0 4px;
       }
     }
