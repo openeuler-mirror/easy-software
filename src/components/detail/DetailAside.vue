@@ -27,18 +27,6 @@ const props = defineProps({
       return {};
     },
   },
-  maintainer: {
-    type: Object,
-    default: () => {
-      return {};
-    },
-  },
-  basicInfo: {
-    type: Object,
-    default: () => {
-      return {};
-    },
-  },
   type: {
     type: String as PropType<PkgTypeT>,
     default: () => {
@@ -50,20 +38,10 @@ const props = defineProps({
       return '';
     },
   },
-  allShow: {
-    default: () => {
-      return false;
-    },
-  },
   verData: {
     type: Array as PropType<EulerverT[]>,
     default: () => {
       return [];
-    },
-  },
-  license: {
-    default: () => {
-      return '';
     },
   },
   tagVer: {
@@ -157,10 +135,10 @@ const collectDownloadData = () => {
     ...(window as any)['sensorsCustomBuriedData'],
     profileType: 'download',
     origin: href,
-    name:props.data.name,
-    os:props.tagVer[0],
-    arch:props.tagVer[1],
+    softwareName: props.data.name,
+    version: props.data.version,
     pkgId: route.query.pkgId as string,
+    type: props.type,
     downloadTime,
   });
 };
@@ -252,10 +230,10 @@ const onCodeSuccess = () => {
       </div>
     </div>
   </AppSection>
-  <AppSection title="软件合规" v-if="license">
+  <AppSection title="软件合规" v-if="data.license">
     <div class="license">
       <p>License</p>
-      <p>{{ license }}</p>
+      <p>{{ data.license }}</p>
     </div>
   </AppSection>
   <AppSection :title="`${data.name}版本支持情况`">

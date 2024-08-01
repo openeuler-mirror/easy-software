@@ -76,9 +76,10 @@ const collectDownloadData = (pkgId: string, name: string, version: string) => {
     ...(window as any)['sensorsCustomBuriedData'],
     profileType: 'download',
     origin: href,
-    name,
+    softwareName: name,
     version,
     pkgId,
+    type: getPkgName(props.type).toLocaleUpperCase(),
     downloadTime,
   });
 };
