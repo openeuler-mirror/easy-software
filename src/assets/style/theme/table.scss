@@ -1,0 +1,17 @@
+.o-table {
+  --table-head-bg: var(--o-color-control3-light);
+  --table-color: var(--o-color-info1);
+  th {
+    font-weight: 500;
+    border-right: 0;
+  }
+  &.table-version {
+    --table-head-bg: var(--o-color-primary1);
+    th {
+      color: #fff;
+    }
+  }
+  td {
+    word-break: break-word;
+  }
+}

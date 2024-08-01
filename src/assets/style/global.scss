@@ -1,0 +1,64 @@
+html {
+  --layout-pkg-radius: 4px;
+}
+:root {
+  --o-radius_control-xs: 4px;
+  --o-radius_control-s: 4px;
+  --o-radius_control-m: 4px;
+  --o-radius_control-l: 4px;
+
+  --pkg-bg: rgba(var(--o-kleinblue-6), 0.05);
+
+  --el-box-shadow-light: var(--o-shadow-2);
+  --el-color-primary: var(--o-color-primary1);
+}
+
+// tag
+.tags-box {
+  display: flex;
+  margin: 12px 0 0;
+  :deep(.o-tag-icon) {
+    width: 16px;
+    height: 16px;
+  }
+  > a + a {
+    margin-left: 8px;
+  }
+  .o-tag {
+    cursor: pointer;
+    --tag-padding: 2px 4px;
+    &.image-icon .o-icon {
+      color: #007af0;
+    }
+    &.epkg-icon .o-icon {
+      color: #e00070;
+    }
+    &.rpm-icon .o-icon {
+      color: #00a7b3;
+    }
+    &:hover {
+      --tag-bg-color: var(--o-color-primary4-light);
+    }
+    .o-tag-icon {
+      height: 16px;
+    }
+    svg {
+      width: 16px;
+      height: 16px;
+      color: currentColor;
+    }
+  }
+  .o-tag + .o-tag {
+    margin-left: 8px;
+  }
+}
+
+.o-icon {
+  svg {
+    fill: currentColor;
+  }
+}
+
+.o-tab-nav-active {
+  font-weight: 500;
+}

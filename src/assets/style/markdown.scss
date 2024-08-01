@@ -1,0 +1,176 @@
+@use 'github-markdown-css/github-markdown-light.css' as *;
+
+.markdown-body {
+  details {
+    display: block !important;
+  }
+
+  ol {
+    list-style-type: decimal !important;
+  }
+
+  ul {
+    list-style-type: disc;
+  }
+  li > p {
+    &:first-child {
+      margin-top: 0;
+    }
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    color: var(--o-color-info1);
+  }
+
+  a {
+    color: var(--o-color-link1);
+
+    @include hover {
+      color: var(--o-color-link2);
+    }
+  }
+
+  h1,
+  h2 {
+    border-bottom: 1px solid var(--o-color-control4);
+  }
+
+  hr {
+    background-color: var(--o-color-control4);
+  }
+  code {
+    border-radius: var(--layout-pkg-radius);
+  }
+
+  pre {
+    position: relative;
+    border-radius: var(--layout-pkg-radius);
+    background-color: var(--pkg-bg);
+    padding: 0;
+    overflow: hidden;
+
+    code {
+      display: block;
+      overflow-x: auto;
+      padding: 16px 36px 16px 16px;
+      @include scrollbar;
+    }
+  }
+
+  table {
+    --table-padding: 2px 12px;
+    --table-radius: var(--layout-pkg-radius);
+    border-spacing: 0;
+
+    @include respond-to('<=laptop') {
+      --table-head-cell-padding: 8px 16px;
+    }
+
+    @include respond-to('<=pad') {
+      --table-head-cell-padding: 9px 12px;
+    }
+
+    @include respond-to('<=phone') {
+      --table-head-cell-padding: 7px 12px;
+    }
+
+    border-radius: var(--table-radius);
+
+    th {
+      background-color: var(--o-color-control3-light);
+      text-align: left;
+      border: 0 none !important;
+      height: 40px;
+    }
+    th,
+    td {
+      box-sizing: border-box;
+      padding: var(--table-padding);
+      @include tip1;
+      color: var(--o-color-info2);
+      border-color: var(--o-color-control4);
+    }
+    tr {
+      background: var(--o-color-fill2) !important;
+      border: 0 !important;
+    }
+
+    td {
+      box-sizing: border-box;
+      height: 48px;
+    }
+  }
+
+  .pre-copy {
+    cursor: pointer;
+    position: absolute;
+    top: 0;
+    right: 0;
+    background-color: var(--o-color-fill1);
+    opacity: 1;
+    transition: all var(--o-duration-m1) var(--o-easing-standard-in);
+    padding: 12px 12px 0 0;
+    .icon-copy {
+      display: block;
+      width: 24px;
+      height: 24px;
+      -webkit-mask-image: url(@/assets/icon-copy.svg);
+      mask-image: url(@/assets/icon-copy.svg);
+      -webkit-mask-size: cover;
+      background-color: var(--o-color-primary1);
+    }
+
+    @include respond-to('phone') {
+      top: 4px;
+    }
+  }
+
+  // 详情安装指引修改   &.installation
+  &.download,
+  &.installation {
+    ul {
+      list-style: none;
+      padding-left: 0;
+      counter-reset: num;
+      > li {
+        position: relative;
+        counter-increment: num 1;
+        padding-left: 32px;
+        overflow: hidden;
+        margin: 0;
+        > p:first-child {
+          font-weight: 500;
+        }
+        &::after {
+          height: 24px;
+          width: 24px;
+          background: var(--o-color-primary1);
+          content: counter(num);
+          position: absolute;
+          border-radius: 50%;
+          color: var(--o-color-info1-inverse);
+          @include text1;
+          text-align: center;
+          top: 0;
+          left: 0;
+          display: block;
+        }
+        &:not(:last-child):before {
+          width: 1px;
+          background: var(--o-color-primary1);
+          content: '';
+          position: absolute;
+          top: 32px;
+          left: 11px;
+          bottom: 8px;
+          display: block;
+        }
+      }
+    }
+  }
+}

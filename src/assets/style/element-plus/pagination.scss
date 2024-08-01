@@ -1,0 +1,34 @@
+.el-pagination {
+  --el-pagination-border-radius: 4px;
+  .el-pager {
+    li {
+      &:hover {
+        background-color: var(--o-color-primary2);
+        color: var(--o-color-info1-inverse);
+      }
+    }
+  }
+  .btn-prev,
+  .btn-next {
+    border: 1px solid var(--o-color-control1);
+    &:hover {
+      border-color: var(--o-color-control2);
+    }
+    .el-icon {
+      font-size: 18px;
+    }
+    &:disabled {
+      border-color: var(--o-color-control1-light);
+    }
+    &:focus {
+      border-color: var(--o-color-primary3) !important;
+    }
+  }
+}
+.el-input__wrapper {
+  box-shadow: none !important;
+  border: 1px solid var(--o-color-control1);
+  &:hover {
+    border-color: var(--o-color-control2);
+  }
+}
