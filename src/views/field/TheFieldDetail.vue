@@ -35,7 +35,6 @@ const { mkit } = useMarkdown();
 const activeName = ref();
 const typePkg = ref();
 const basicInfo = ref<DetailItemT[]>([]);
-const version = ref();
 const installation = ref('');
 const downloadData = ref('');
 const files = ref([]);
@@ -47,6 +46,8 @@ const description = ref();
 const appData = ref<AppInfoT>({
   name: '',
   cover: '',
+  license: '',
+  version: '',
   repository: '',
   size: '',
   source_code: '',
@@ -161,7 +162,6 @@ onMounted(() => {
   queryEntity();
 });
 const imageUsage = ref();
-const license = ref();
 const latestOsSupport = ref();
 const tagVer = ref();
 const summary = ref();
@@ -170,7 +170,6 @@ const getDetailValue = (data: any) => {
   if (typePkg.value === 'RPM') {
     basicInfo.value = [
       { name: '详细描述', value: data?.description },
-      // { name: '版本号', value: data?.version },
       { name: '版本支持情况', value: data.osSupport },
       { name: '架构', value: data.arch },
       { name: '软件包分类', value: data.rpmCategory || '其他' },
@@ -191,12 +190,11 @@ const getDetailValue = (data: any) => {
     });
 
     appData.value.size = data.rpmSize || 0;
+    appData.value.version = data.version;
     summary.value = data.summary;
-    version.value = data?.version;
   } else if (typePkg.value === 'EPKG') {
     basicInfo.value = [
       { name: '详细描述', value: data?.description },
-      // { name: '版本号', value: data.version },
       { name: '版本支持情况', value: data.osSupport },
       { name: '架构', value: data.arch },
       { name: '软件包分类', value: data.epkgCategory || '其他' },
@@ -218,8 +216,8 @@ const getDetailValue = (data: any) => {
     });
 
     appData.value.size = data.epkgSize || 0;
+    appData.value.version = data.version;
     summary.value = data.summary;
-    version.value = data?.version;
   } else if (typePkg.value === 'IMAGE') {
     basicInfo.value = [
       { name: '版本支持情况', value: data.osSupport },
@@ -230,7 +228,7 @@ const getDetailValue = (data: any) => {
     appData.value.size = data.appSize || 0;
     latestOsSupport.value = data.latestOsSupport === 'true';
     summary.value = data.description;
-    version.value = data?.appVer;
+    appData.value.version = data.appVer;
   }
   tagVer.value = [data.osSupport, data.arch];
   maintainer.value = {
@@ -242,7 +240,6 @@ const getDetailValue = (data: any) => {
   upStream.value = data?.upStream;
   security.value = data?.securityLevel;
   description.value = data?.description;
-  license.value = data.license;
 
   downloadData.value = mkit(data?.download || '', { isCopy: true, Tag: data.appVer });
   installation.value = mkit(data?.installation || '', { isCopy: true, Tag: data.appVer });
@@ -253,6 +250,7 @@ const getDetailValue = (data: any) => {
   appData.value.bin_code = data.binDownloadUrl;
   appData.value.cover = data?.iconUrl || defaultImg;
   appData.value.repository = data.srcRepo;
+  appData.value.license = data.license;
 };
 
 // 获取img分类
@@ -327,7 +325,7 @@ const tagsOptions = computed(() => {
           <div class="detail-row-main" :class="{ tags: isTags }">
             <AppSection :title="`> ${t('detail.information')}`" v-if="item !== 'IMAGE'">
               <template #append>
-                <span v-if="version" class="ver"> {{ t('detail.number') }}: {{ version }}</span>
+                <span v-if="appData.version" class="ver"> {{ t('detail.number') }}: {{ appData.version }}</span>
               </template>
               <!-- 基本信息 -->
               <DetailBasicInfo :options="basicInfo" />
@@ -351,7 +349,7 @@ const tagsOptions = computed(() => {
                     <!-- 基本信息 -->
                     <AppSection :title="`> ${t('detail.information')}`">
                       <template #append>
-                        <span v-if="version" class="ver">{{ t('detail.number') }}: {{ version }}</span>
+                        <span v-if="appData.version" class="ver">{{ t('detail.number') }}: {{ appData.version }}</span>
                       </template>
 
                       <DetailBasicInfo :options="basicInfo" />
@@ -372,20 +370,18 @@ const tagsOptions = computed(() => {
             </AppSection>
 
             <!-- 反馈 -->
-            <AppFeedback v-if="!isTags" :name="appData.name" :version="version" :type="typePkg" :srcRepo="currentSrcRepo" :maintainer="maintainer" :fieldDetailTab="item" />
+            <AppFeedback
+              v-if="!isTags"
+              :name="appData.name"
+              :version="appData.version"
+              :type="typePkg"
+              :srcRepo="currentSrcRepo"
+              :maintainer="maintainer"
+              :fieldDetailTab="item"
+            />
           </div>
           <div v-if="!isTags" class="detail-row-side">
-            <DetailAside
-              :data="appData"
-              :basicInfo="basicInfo"
-              :maintainer="maintainer"
-              :type="item"
-              :downloadData="downloadData"
-              :all-show="true"
-              :ver-data="verData"
-              :license="license"
-              :tagVer="tagVer"
-            />
+            <DetailAside :data="appData" :type="item" :downloadData="downloadData" :ver-data="verData" :tagVer="tagVer" />
           </div>
         </div>
       </ContentWrapper>

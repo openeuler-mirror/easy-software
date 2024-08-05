@@ -40,7 +40,7 @@ const columnTags = [
 
 // ---------------------下载埋点--------------------
 // 应用镜像埋点
-const onCodeSuccess = (row: EulerverT) => {
+const onCodeSuccess = (version: string) => {
   const sensors = (window as any)['sensorsDataAnalytic201505'];
   const { href } = window.location;
   const downloadTime = new Date();
@@ -48,9 +48,10 @@ const onCodeSuccess = (row: EulerverT) => {
     ...(window as any)['sensorsCustomBuriedData'],
     profileType: 'download',
     origin: href,
+    softwareName: props.options.name,
+    version,
     pkgId: route.query.pkgId as string,
-    os: row.appVer[0],
-    arch: row.appVer[1],
+    type: 'IMAGE',
     downloadTime,
   });
 };
@@ -59,7 +60,7 @@ const onCodeSuccess = (row: EulerverT) => {
 <template>
   <OTable :columns="columnTags" :data="data" :loading="loading" border="all">
     <template #td_dockerStr="{ row }">
-      <div class="docker"><OCodeCopy :code="row.dockerStr" @success="onCodeSuccess(row)" /></div>
+      <div class="docker"><OCodeCopy :code="row.dockerStr" @success="onCodeSuccess(row.appVer)" /></div>
     </template>
   </OTable>
 </template>
