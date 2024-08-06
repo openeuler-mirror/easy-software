@@ -15,7 +15,7 @@ interface DataSubT {
 }
 
 interface DataT {
-  type: string;
+  type?: string;
   id: string;
   children: DataSubT[];
 }
@@ -89,7 +89,7 @@ const formatArchItem = (items: DataItem) => {
 };
 
 const formatArchData = (data: { [key: string]: DataItem }) => {
-  const newChildren: DataT[] = Object.entries(data).reduce((acc, [type, items]) => {
+  const newChildren: DataT[] = Object.entries(data).reduce((acc: DataT[], [type, items]) => {
     acc.push({
       id: type,
       children: formatArchItem(items),

@@ -278,9 +278,7 @@ const onCodeSuccess = () => {
 
 .detail {
   margin: 0 0 24px;
-}
-.sp {
-  margin-right: 20px;
+  color: var(--o-color-info1);
 }
 .bt {
   height: 100%;
@@ -309,11 +307,12 @@ const onCodeSuccess = () => {
   }
 }
 .license {
-  border-top: 1px rgba(0, 0, 0, 0.1) solid;
+  border-top: 1px solid var(--o-color-control4);
   padding-top: 25px;
   width: 100%;
   display: flex;
   justify-content: space-between;
+  color: var(--o-color-info1);
   p + p {
     margin-left: 24px;
   }

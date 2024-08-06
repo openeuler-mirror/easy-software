@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { SorT } from '@/@types/type-sort';
-import { OLink } from '@opensig/opendesign';
+import { OLink, OIcon } from '@opensig/opendesign';
 import { onMounted, watch } from 'vue';
 import IconTimeOrder from '~icons/app/icon-time-order.svg';
 
@@ -17,10 +17,18 @@ const emits = defineEmits<{
   (event: 'update:sort', value: SorT): void;
 }>();
 
+// 重置svg颜色
+const clearSvgFill = () => {
+  const path = document.querySelectorAll(`.filter-sort svg`);
+  path.forEach((item) => {
+    item?.children[0].removeAttribute('fill');
+    item?.children[1].removeAttribute('fill');
+  });
+};
+
 onMounted(() => {
+  clearSvgFill();
   const path = document.querySelector(`.filter-sort svg`);
-  path?.children[0].setAttribute('fill', '#bdbdbd');
-  path?.children[1].setAttribute('fill', '#bdbdbd');
   path?.children[props.sort === 'desc' ? 1 : 0].setAttribute('fill', '#000');
 });
 
@@ -28,8 +36,7 @@ watch(
   () => props.sort,
   (val) => {
     const path = document.querySelector(`.filter-sort svg`);
-    path?.children[0].setAttribute('fill', '#bdbdbd');
-    path?.children[1].setAttribute('fill', '#bdbdbd');
+    clearSvgFill();
     if (!val) {
       return;
     }
@@ -49,6 +56,24 @@ const changeSort = () => {
 <template>
   <OLink @click="changeSort" class="filter-sort" size="small">
     {{ text }}
-    <template #suffix><IconTimeOrder /></template>
+    <template #suffix
+      ><OIcon><IconTimeOrder /></OIcon
+    ></template>
   </OLink>
 </template>
+
+<style lang="scss" scoped>
+.filter-sort {
+  display: flex;
+  user-select: none;
+  align-items: center;
+  color: var(--o-color-info2);
+  &.active {
+    color: var(--o-color-info1);
+    font-weight: 500;
+  }
+  .o-icon {
+    color: var(--o-color-info4);
+  }
+}
+</style>

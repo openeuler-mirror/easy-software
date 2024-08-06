@@ -22,9 +22,7 @@ const login = () => doLogin();
       </div>
       <template #dropdown>
         <ODropdownItem>
-          <div class="header-user-menu-item" @click="logout">
-            退出登录
-          </div>
+          <div class="header-user-menu-item" @click="logout">退出登录</div>
         </ODropdownItem>
       </template>
     </ODropdown>
@@ -32,9 +30,8 @@ const login = () => doLogin();
   <div v-else-if="loginStore.isLoggingIn" class="o-rotating">
     <OIconLoading />
   </div>
-  <div v-else class="login-btn" @click="login">
-    <OIcon><LoginIcon /></OIcon>
-  </div>
+
+  <OIcon v-else class="login-btn" @click="login"><LoginIcon /></OIcon>
 </template>
 
 <style scoped lang="scss">
@@ -58,6 +55,7 @@ const login = () => doLogin();
 }
 
 .login-btn {
+  color: var(--o-color-info1);
   cursor: pointer;
 }
 </style>

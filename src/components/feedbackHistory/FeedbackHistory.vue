@@ -121,15 +121,14 @@ const handleCurrentChange = (page: number) => {
       <AppPagination :current="currentPage" :pagesize="pageSize" :total="totalCount" @size-change="handleSizeChange" @current-change="handleCurrentChange" />
     </div>
   </template>
-  <p v-else class="not-found">
-    暂无历史反馈信息
-  </p>
+  <p v-else class="not-found">暂无历史反馈信息</p>
 </template>
 
 <style scoped lang="scss">
 .not-found {
   padding-top: 24px;
   @include tip1;
+  color: var(--o-color-info3);
 }
 
 .filter-items {
@@ -149,7 +148,7 @@ const handleCurrentChange = (page: number) => {
       .o-toggle {
         --toggle-size: 28px;
         --toggle-padding: 0 12px;
-        --toggle-bg-color: #F3F3F5;
+        --toggle-bg-color: #f3f3f5;
       }
     }
   }

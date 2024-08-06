@@ -2,6 +2,9 @@
 @use '../mixin/font.scss' as *;
 // 屏蔽loading 遮罩
 .o-layer {
+  .o-dlg-header {
+    color: var(--o-color-info1);
+  }
   &.o-loading {
     --layer-mask: var(--o-color-fill1);
     --loading-mask-icon-color: var(--o-color-info1);

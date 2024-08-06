@@ -139,6 +139,12 @@ const jumpTo = (href: string) => {
 </template>
 
 <style lang="scss" scoped>
+@include in-dark {
+  .solution-overview .cover {
+    @include img-in-dark;
+  }
+}
+
 .solution-panel {
   padding: 72px 0 0;
   &:last-child {
@@ -185,6 +191,7 @@ const jumpTo = (href: string) => {
         svg {
           width: 48px;
           height: 48px;
+          fill: currentColor;
         }
       }
     }

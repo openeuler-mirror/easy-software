@@ -1,7 +1,11 @@
 .el-pagination {
   --el-pagination-border-radius: 4px;
+  --el-pagination-button-bg-color: var(--o-color-fill2);
+  --el-disabled-bg-color: var(--o-color-fill2);
+  --el-pagination-button-color: var(--o-color-info1);
   .el-pager {
     li {
+      --el-pagination-button-color: var(--o-color-info1);
       &:hover {
         background-color: var(--o-color-primary2);
         color: var(--o-color-info1-inverse);
@@ -28,6 +32,9 @@
 .el-input__wrapper {
   box-shadow: none !important;
   border: 1px solid var(--o-color-control1);
+  background-color: var(--o-color-fill2);
+  --el-disabled-bg-color: var(--o-color-fill2);
+  --el-pagination-button-color: var(--o-color-info1);
   &:hover {
     border-color: var(--o-color-control2);
   }

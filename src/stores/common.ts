@@ -30,3 +30,10 @@ export const useViewStore = defineStore('view', {
     },
   },
 });
+
+
+export const useAppearance = defineStore('appearance', {
+  state: () => ({
+    theme: 'light',
+  }),
+});

@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { onMounted, ref, watch } from 'vue';
-import { OLink, OInput, useMessage } from '@opensig/opendesign';
+import { OLink, OInput, useMessage, OIcon } from '@opensig/opendesign';
 import { useLocale } from '@/composables/useLocale';
 import { useI18n } from 'vue-i18n';
 import { useRouter, useRoute } from 'vue-router';
@@ -30,7 +30,6 @@ const props = defineProps({
     default: () => 0,
   },
 });
-
 const msg = useMessage();
 const router = useRouter();
 const route = useRoute();
@@ -107,16 +106,13 @@ const changeSortBy = (type: string, name: string) => {
   clearSvgFill();
 
   const path = document.querySelector(`.filter-sort.${name} svg`);
-  // 重置svg颜色
-  path?.children[0].setAttribute('fill', '#bdbdbd');
-  path?.children[1].setAttribute('fill', '#bdbdbd');
 
   if (type === 'timeOrder') {
     isNameOrder.value = false;
     activeIndex.value = 0;
     isTimeOrder.value = !isTimeOrder.value;
     v = isTimeOrder.value ? 'asc' : 'desc';
-    path?.children[isTimeOrder.value ? 1 : 0].setAttribute('fill', '#000');
+    path?.children[isTimeOrder.value ? 1 : 0].setAttribute('fill', 'var(--o-color-info1)');
 
     searchStore.changeNameOrderState(false);
   } else if (type === 'nameOrder') {
@@ -124,7 +120,7 @@ const changeSortBy = (type: string, name: string) => {
     activeIndex.value = 1;
     isNameOrder.value = !isNameOrder.value;
     v = isNameOrder.value ? 'asc' : 'desc';
-    path?.children[isNameOrder.value ? 1 : 0].setAttribute('fill', '#000');
+    path?.children[isNameOrder.value ? 1 : 0].setAttribute('fill', 'var(--o-color-info1)');
     // 修改状态
     searchStore.changeNameOrderState(true);
   }
@@ -135,8 +131,8 @@ const changeSortBy = (type: string, name: string) => {
 const clearSvgFill = () => {
   const path = document.querySelectorAll(`.filter-sort svg`);
   path.forEach((item) => {
-    item?.children[0].setAttribute('fill', '#bdbdbd');
-    item?.children[1].setAttribute('fill', '#bdbdbd');
+    item?.children[0].removeAttribute('fill');
+    item?.children[1].removeAttribute('fill');
   });
 };
 
@@ -197,7 +193,7 @@ watch(
         @clear="clearSearchData"
       >
         <template #prefix>
-          <IconSearch @click="changeSearchInput(searchValue)" />
+          <OIcon> <IconSearch @click="changeSearchInput(searchValue)" /></OIcon>
         </template>
       </OInput>
     </div>
@@ -208,12 +204,16 @@ watch(
       <template v-if="isSort">
         <OLink @click="changeSortBy('timeOrder', 'time')" class="filter-sort time" :class="{ active: activeIndex === 0 }">
           {{ t('software.timeOrder') }}
-          <template #suffix><IconTimeOrder /></template>
+          <template #suffix
+            ><OIcon><IconTimeOrder /></OIcon
+          ></template>
         </OLink>
       </template>
       <OLink @click="changeSortBy('nameOrder', 'name')" class="filter-sort name" :class="{ active: activeIndex === 1 }">
         {{ t('software.nameOrder') }}
-        <template #suffix><IconTimeOrder /></template>
+        <template #suffix
+          ><OIcon><IconTimeOrder /></OIcon
+        ></template>
       </OLink>
     </div>
   </div>
@@ -255,6 +255,9 @@ watch(
     &.active {
       color: var(--o-color-info1);
       font-weight: 500;
+    }
+    .o-icon {
+      color: var(--o-color-info4);
     }
   }
   .search-left {
