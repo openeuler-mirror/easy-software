@@ -51,6 +51,11 @@ onMounted(() => {
 </template>
 
 <style lang="scss" scoped>
+@include in-dark {
+  .head-wrap {
+    @include img-in-dark;
+  }
+}
 .head-wrap {
   background: var(--o-color-primary1) url(@/assets/banner.jpg) no-repeat top center/cover;
   display: flex;
@@ -65,7 +70,9 @@ onMounted(() => {
   transform: translateY(100px);
   opacity: 0;
   &.action {
-    transition: all 1500ms 0.25s var(--o-easing-standard-in);
+    transition:
+      transform 1500ms 0.25s var(--o-easing-standard-in),
+      opacity 1500ms 0.25s var(--o-easing-standard-in);
     transform: translateY(0);
     opacity: 1;
   }

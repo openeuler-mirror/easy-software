@@ -5,14 +5,18 @@ import { useRouter } from 'vue-router';
 import { useLangStore } from '@/stores/common';
 import { OPENEULER } from '@/data/config';
 import { useI18n } from 'vue-i18n';
-import HeaderNav from '@/components/HeaderNav.vue';
-import AppLogin from '@/components/AppLogin.vue';
+import { useTheme } from '@/composables/useTheme';
+import HeaderNav from '@/components/header/HeaderNav.vue';
+import AppLogin from '@/components/header/AppLogin.vue';
+import HeaderTheme from '@/components/header/HeaderTheme.vue';
 
 import openeulerLogo from '@/assets/openeuler-logo.svg';
+import openeulerLogoDark from '@/assets/openeuler-logo-dark.svg';
 
 const { locale, t } = useI18n();
 const router = useRouter();
 const langStore = useLangStore();
+const { isDark } = useTheme();
 
 watch(
   () => {
@@ -36,7 +40,7 @@ const goHome = () => {
       <div class="header-left">
         <div class="logo">
           <a target="_blank" :href="`${OPENEULER}/zh/`" class="community-logo" rel="noopener noreferrer">
-            <img :src="openeulerLogo" />
+            <img :src="isDark ? openeulerLogoDark : openeulerLogo" />
           </a>
           <ODivider direction="v" :darker="true" />
           <span @click="goHome" class="logo-text">{{ t('software.softwareHome') }}</span>
@@ -45,6 +49,7 @@ const goHome = () => {
         <HeaderNav />
       </div>
       <div class="header-right">
+        <HeaderTheme />
         <AppLogin />
       </div>
     </div>
@@ -72,10 +77,10 @@ const goHome = () => {
     justify-content: space-between;
     margin: 0 auto;
     .logo-text {
-      @include h4;
-      color: #000;
+      color: var(--o-color-info1);
       font-weight: bold;
       cursor: pointer;
+      @include h4;
     }
     .header-left,
     .header-right {

@@ -6,6 +6,7 @@ import { getTagsIcon } from '@/utils/common';
 import { useLocale } from '@/composables/useLocale';
 import { useI18n } from 'vue-i18n';
 import { useRoute } from 'vue-router';
+import { useTheme } from '@/composables/useTheme';
 import { maintainerDefaults } from '@/data/query';
 
 import defaultImg from '@/assets/default-logo.png';
@@ -20,51 +21,34 @@ defineProps({
 const route = useRoute();
 const { locale } = useLocale();
 const { t } = useI18n();
+const { isDark } = useTheme();
+
+// 名称转换
+const pkgNameConversion = (v: string) => {
+  return v === 'IMAGE' ? 'app' : v.toLocaleLowerCase();
+};
 
 // 跳转id
 function getQueryStr(params: PkgIdsT) {
-  let queryStr = '';
+  if (Object.entries(params).length > 0) {
+    const ids = Object.entries(params)
+      .filter(([key, value]) => value)
+      .map(([key, value]) => `${pkgNameConversion(key)}PkgId=${encodeURIComponent(value)}`);
 
-  if (params.RPM) {
-    queryStr += `&rpmPkgId=${encodeURIComponent(params.RPM)}`;
+    return ids.join('&').replace(/^&/, '');
   }
-  if (params.IMAGE) {
-    queryStr += `&appPkgId=${encodeURIComponent(params.IMAGE)}`;
-  }
-  if (params.EPKG) {
-    queryStr += `&epkgPkgId=${encodeURIComponent(params.EPKG)}`;
-  }
-  if (params.OEPKG) {
-    queryStr += `&oepkgPkgId=${encodeURIComponent(params.OEPKG)}`;
-  }
-  return queryStr.replace(/^&/, '');
 }
 
 // Maintainer数据
 function getMaintainersStr(params: PkgIdsT) {
-  let maintainers = '';
   const line = ' ; ';
-
-  Object.keys(params).forEach((key) => {
-    if (!params[key]) {
-      params[key] = maintainerDefaults.name;
-    }
-  });
-
-  if (params.RPM) {
-    maintainers += `${params.RPM}${line}`;
+  const defaultName = maintainerDefaults.name;
+  if (params && Object.entries(params).length > 0) {
+    const maintainers = Object.entries(params).map(([key, value]) => (value ? value : defaultName));
+    return maintainers.join(line).replace(/ ; +$/, '');
+  } else {
+    return defaultName;
   }
-  if (params.IMAGE) {
-    maintainers += `${params.IMAGE}${line}`;
-  }
-  if (params.EPKG) {
-    maintainers += `${params.EPKG}${line}`;
-  }
-  if (params.OEPKG) {
-    maintainers += `${params.OEPKG}${line}`;
-  }
-
-  return maintainers.replace(/ ; +$/, '');
 }
 
 const jumpTo = (id: PkgIdsT, type?: PkgTypeT) => {
@@ -112,7 +96,7 @@ onMounted(() => {
             </OTag>
           </a>
         </div>
-        <p v-if="data.description" v-dompurify-html="data.description" class="desc"></p>
+        <p v-if="data.description" v-dompurify-html="data.description" class="desc" :class="{ dark: isDark }"></p>
         <p class="maintainers">
           <OIcon><IconUser /></OIcon>{{ getMaintainersStr(data.maintainers) }}
         </p>
@@ -175,7 +159,7 @@ onMounted(() => {
     flex: 1;
     word-break: break-word;
     font-weight: 500;
-
+    transition: all 0.3s ease;
     display: -webkit-box;
     height: 60px;
     overflow: hidden;
@@ -205,6 +189,7 @@ onMounted(() => {
       margin-top: 16px;
       .o-icon {
         margin-right: 8px;
+        color: var(--o-color-info3);
         svg {
           width: 16px;
           height: 16px;
@@ -212,7 +197,6 @@ onMounted(() => {
       }
     }
     .desc {
-      @include text1;
       margin-top: 8px;
       color: var(--o-color-info2);
       overflow: hidden;
@@ -221,11 +205,14 @@ onMounted(() => {
       position: relative;
       word-break: break-all;
       height: 48px;
-      span {
-        color: var(--o-color-primary1);
+
+      --linear-gradient: var(--o-mixedgray-1);
+      &.dark {
+        --linear-gradient: var(--o-mixedgray-4);
       }
+      @include text1;
       &::after {
-        background-image: linear-gradient(90deg, hsla(0, 0%, 93%, 0), hsla(0, 0%, 100%, 0.8) 59%, var(--o-color-control-light) 100%);
+        background-image: linear-gradient(90deg, rgba(var(--linear-gradient), 0), rgba(var(--linear-gradient), 0.8) 59%, var(--o-color-control-light) 100%);
         bottom: 0;
         content: '';
         height: 24px;
@@ -233,6 +220,9 @@ onMounted(() => {
         position: absolute;
         right: 0;
         width: 4em;
+      }
+      span {
+        color: var(--o-color-primary1);
       }
     }
   }

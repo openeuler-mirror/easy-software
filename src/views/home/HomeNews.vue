@@ -1,7 +1,10 @@
 <script lang="ts" setup>
 import { OCard, OTag, ORow, OCol } from '@opensig/opendesign';
 
+import { useTheme } from '@/composables/useTheme';
 import { homeNewsData } from '@/data/home/index';
+
+const { isDark } = useTheme();
 </script>
 
 <template>
@@ -15,7 +18,16 @@ import { homeNewsData } from '@/data/home/index';
       :pad-v="{ flex: '0 1 100%' }"
       :phone="{ flex: '0 1 100%' }"
     >
-      <OCard :href="subItem.url" target="_blank" rel="noopener noreferrer" :title="subItem.title" :title-row="2" :cover="subItem.banner" hoverable>
+      <OCard
+        :href="subItem.url"
+        class="news-item"
+        target="_blank"
+        rel="noopener noreferrer"
+        :title="subItem.title"
+        :title-row="2"
+        :cover="subItem.banner"
+        hoverable
+      >
         <template #default>
           <div class="tag-box">
             <OTag v-for="tag in subItem.tags" :key="tag">{{ tag }}</OTag>
@@ -23,7 +35,7 @@ import { homeNewsData } from '@/data/home/index';
         </template>
 
         <template #footer>
-          <div class="desc">
+          <div class="desc" :class="{ dark: isDark }">
             {{ subItem.summary }}
           </div>
         </template>
@@ -33,11 +45,6 @@ import { homeNewsData } from '@/data/home/index';
 </template>
 
 <style lang="scss" scoped>
-.pkg-item {
-  display: flex;
-  background: var(--o-color-fill2);
-}
-
 :deep(.o-card) {
   --card-footer-gap: 16px;
   .o-card-cover {
@@ -60,9 +67,14 @@ import { homeNewsData } from '@/data/home/index';
     -webkit-line-clamp: 2;
     overflow: hidden;
     position: relative;
+    --linear-gradient: var(--o-mixedgray-1);
+    &.dark {
+      --linear-gradient: var(--o-mixedgray-4);
+    }
+
     @include text1;
     &::after {
-      background-image: linear-gradient(90deg, hsla(0, 0%, 93%, 0), hsla(0, 0%, 100%, 0.8) 59%, var(--o-color-control-light) 100%);
+      background-image: linear-gradient(90deg, rgba(var(--linear-gradient), 0), rgba(var(--linear-gradient), 0.8) 59%, var(--o-color-control-light) 100%);
       bottom: 0;
       content: '';
       height: 24px;
@@ -121,35 +133,5 @@ import { homeNewsData } from '@/data/home/index';
       }
     }
   }
-  .tag-box {
-    display: flex;
-    .o-tag {
-      border: none;
-      cursor: pointer;
-
-      & ~ .o-tag {
-        margin-left: 8px;
-      }
-    }
-    .rpm {
-      background-color: #009ce5;
-      color: #ffffff;
-    }
-    .mirror {
-      background-color: #27c298;
-      color: #ffffff;
-    }
-    .epkg {
-      background-color: #eca52f;
-      color: #ffffff;
-    }
-  }
-}
-</style>
-
-<style>
-.o-card-icon {
-  display: flex;
-  align-items: center;
 }
 </style>

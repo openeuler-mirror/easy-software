@@ -172,6 +172,7 @@ const jumpTo = (href: string) => {
           svg {
             width: 48px;
             height: 48px;
+            fill: currentColor;
           }
         }
       }
@@ -216,6 +217,9 @@ const jumpTo = (href: string) => {
     :deep(.o-card) {
       --card-main-padding: 40px;
       flex: 1;
+      .o-card-title {
+        cursor: pointer;
+      }
       &:hover {
         .o-card-title {
           color: var(--o-color-primary1);
