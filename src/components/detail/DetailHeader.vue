@@ -9,7 +9,7 @@ import ExternalLink from '@/components/ExternalLink.vue';
 import type { MaintainerT } from '@/@types/app';
 import { GITEE } from '@/data/config';
 
-import IconEmail from '~icons/pkg//email.svg';
+import IconEmail from '~icons/pkg/email.svg';
 import IconGitee from '~icons/pkg/gitee.svg';
 import IconOutlink from '~icons/pkg/icon-outlink.svg';
 import IconHelp from '~icons/pkg/icon-help.svg';
@@ -106,6 +106,12 @@ const scrollToAnchor = (id: string) => {
 </template>
 
 <style lang="scss" scoped>
+@include in-dark {
+  .cover {
+    @include img-in-dark;
+  }
+}
+
 .domain-head {
   margin-top: 24px;
   margin-bottom: 40px;

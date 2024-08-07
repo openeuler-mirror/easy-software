@@ -52,7 +52,7 @@
   pre {
     position: relative;
     border-radius: var(--layout-pkg-radius);
-    background-color: var(--pkg-bg);
+    background-color: var(--o-color-fill3);
     padding: 0;
     overflow: hidden;
 
@@ -113,7 +113,7 @@
     position: absolute;
     top: 12px;
     right: 12px;
-    background-color: var(--pkg-bg);
+    background-color: var(--o-color-fill3);
     opacity: 1;
     .icon-copy {
       display: block;

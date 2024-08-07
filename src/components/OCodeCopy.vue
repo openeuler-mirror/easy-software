@@ -43,7 +43,7 @@ const copyText = (e: MouseEvent) => {
 
 <style lang="scss" scoped>
 .download-code {
-  background: var(--pkg-bg);
+  background: var(--o-color-fill3);
   border-radius: var(--layout-pkg-radius);
   height: auto;
   width: 100%;
@@ -62,11 +62,10 @@ const copyText = (e: MouseEvent) => {
     color: var(--o-color-primary1);
     cursor: pointer;
     position: absolute;
-    top: 0;
-    right: 0;
     font-size: 24px;
-    padding: 12px 12px 0 0;
-    background-color: var(--o-color-fill1);
+    top: 12px;
+    right: 12px;
+    background-color: var(--o-color-fill3);
     transition: all var(--o-duration-m1) var(--o-easing-standard-in);
     height: 24px;
     box-sizing: content-box;

@@ -330,6 +330,11 @@ const onCodeSuccess = () => {
   th {
     font-weight: 500;
   }
+  tr:has(+ .last) {
+    td:first-child {
+      border-bottom: 0 none;
+    }
+  }
 }
 
 .obtn {

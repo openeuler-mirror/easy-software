@@ -20,49 +20,49 @@
    * @group kleinblue
    * @description 
    */
-  --o-kleinblue-1: 11, 21, 55;
+  --o-kleinblue-1: 14, 26, 69;
   /**
    * @name 
    * @type palette
    * @group kleinblue
    * @description 
    */
-  --o-kleinblue-2: 16, 30, 77;
+  --o-kleinblue-2: 18, 35, 87;
   /**
    * @name 
    * @type palette
    * @group kleinblue
    * @description 
    */
-  --o-kleinblue-3: 27, 48, 113;
+  --o-kleinblue-3: 29, 51, 119;
   /**
    * @name 
    * @type palette
    * @group kleinblue
    * @description 
    */
-  --o-kleinblue-4: 40, 68, 149;
+  --o-kleinblue-4: 42, 72, 158;
   /**
    * @name 
    * @type palette
    * @group kleinblue
    * @description 
    */
-  --o-kleinblue-5: 56, 94, 191;
+  --o-kleinblue-5: 51, 91, 196;
   /**
    * @name 
    * @type palette
    * @group kleinblue
    * @description 
    */
-  --o-kleinblue-6: 77, 124, 235;
+  --o-kleinblue-6: 67, 116, 242;
   /**
    * @name 
    * @type palette
    * @group kleinblue
    * @description 
    */
-  --o-kleinblue-7: 107, 146, 232;
+  --o-kleinblue-7: 104, 142, 237;
   /**
    * @name 
    * @type palette
@@ -1252,14 +1252,14 @@
    * @group primary
    * @description 常规
    */
-  --o-color-primary1: rgb(var(--o-kleinblue-5));
+  --o-color-primary1: rgb(var(--o-kleinblue-6));
   /**
    * @name 
    * @type color
    * @group primary
    * @description 悬浮
    */
-  --o-color-primary2: rgb(var(--o-kleinblue-4));
+  --o-color-primary2: rgb(var(--o-kleinblue-5));
   /**
    * @name 
    * @type color
@@ -1273,7 +1273,7 @@
    * @group primary
    * @description 禁用
    */
-  --o-color-primary4: rgb(var(--o-kleinblue-3));
+  --o-color-primary4: rgb(var(--o-kleinblue-4));
   /**
    * @name 
    * @type color
@@ -1630,14 +1630,14 @@
    * @group link
    * @description 常规
    */
-  --o-color-link1: rgba(var(--o-kleinblue-5));
+  --o-color-link1: rgba(var(--o-kleinblue-6));
   /**
    * @name 
    * @type color
    * @group link
    * @description 悬浮
    */
-  --o-color-link2: rgba(var(--o-kleinblue-4));
+  --o-color-link2: rgba(var(--o-kleinblue-5));
   /**
    * @name 
    * @type color
@@ -1651,7 +1651,7 @@
    * @group link
    * @description 禁用
    */
-  --o-color-link4: rgba(var(--o-kleinblue-3));
+  --o-color-link4: rgba(var(--o-kleinblue-4));
   /**
    * @name 阴影1
    * @type shadow
