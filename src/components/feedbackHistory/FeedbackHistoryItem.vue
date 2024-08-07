@@ -42,9 +42,9 @@ const tagColor = (tag: string) => {
     <div class="feedback-desc">
       <div class="feedback-desc-left">
         <p>{{ desc }}</p>
-        <ODivider direction="v" style="margin: 0" :darker="true"></ODivider>
-        <OIcon><IconUser /></OIcon>
-        {{ feedback.user_login }}
+        <ODivider class="divider" direction="v" :darker="true"></ODivider>
+        <OIcon class="icon-user"><IconUser /></OIcon>
+        <span>{{ feedback.user_login }}</span>
       </div>
       <OLink @click="$emit('goToUrl', feedback.url)" class="out-link" color="primary" hover-underline target="_blank" rel="noopener noreferrer">
         查看详情
@@ -67,6 +67,7 @@ const tagColor = (tag: string) => {
     @include text1;
     word-break: break-all;
     max-width: 660px;
+    color: var(--o-color-info1);
 
     .tag {
       border: none;
@@ -103,8 +104,20 @@ const tagColor = (tag: string) => {
       width: 0;
       flex: 1;
       display: flex;
-      gap: 8px;
+      align-items: center;
       @include tip2;
+
+      & > :not(:first-child) {
+        margin-left: 8px;
+      }
+
+      .divider {
+        margin-right: 0;
+      }
+
+      .icon-user {
+        width: 16px;
+      }
 
       p {
         overflow: hidden;

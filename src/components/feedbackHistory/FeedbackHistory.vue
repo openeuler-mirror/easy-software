@@ -148,7 +148,6 @@ const handleCurrentChange = (page: number) => {
       .o-toggle {
         --toggle-size: 28px;
         --toggle-padding: 0 12px;
-        --toggle-bg-color: #f3f3f5;
       }
     }
   }
