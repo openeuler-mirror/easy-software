@@ -9,7 +9,6 @@
 }
 
 .domain-tabs {
-  padding-top: 26px;
   &.min {
     > .o-tab-head {
       .o-tab-nav-anchor {
@@ -19,7 +18,6 @@
       .o-tab-nav-active {
         color: var(--o-color-info1);
         cursor: default;
-        padding: 0;
       }
     }
   }

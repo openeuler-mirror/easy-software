@@ -47,6 +47,10 @@
   }
   code {
     border-radius: var(--layout-pkg-radius);
+    margin: 0 4px;
+  }
+  p code:first-child {
+    margin-left: 0;
   }
 
   pre {
@@ -60,6 +64,7 @@
       display: block;
       overflow-x: auto;
       padding: 16px 36px 16px 16px;
+      margin: 0;
       @include scrollbar;
     }
   }

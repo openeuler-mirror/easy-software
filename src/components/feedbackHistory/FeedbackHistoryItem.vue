@@ -61,7 +61,7 @@ const tagColor = (tag: string) => {
   flex-direction: column;
   gap: 8px;
   padding: 24px 16px 16px;
-  border-bottom: 1px solid rgb(var(--o-black), 0.1);
+  border-bottom: 1px solid var(--o-color-control4);
 
   .feedback-content {
     @include text1;
