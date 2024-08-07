@@ -106,6 +106,12 @@ const scrollToAnchor = (id: string) => {
 </template>
 
 <style lang="scss" scoped>
+@include in-dark {
+  .cover {
+    @include img-in-dark;
+  }
+}
+
 .domain-head {
   margin-top: 24px;
   margin-bottom: 40px;

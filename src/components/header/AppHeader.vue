@@ -76,6 +76,7 @@ const goHome = () => {
     padding: 0 var(--layout-content-padding);
     justify-content: space-between;
     margin: 0 auto;
+    height: 100%;
     .logo-text {
       color: var(--o-color-info1);
       font-weight: bold;

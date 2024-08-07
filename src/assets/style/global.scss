@@ -7,13 +7,8 @@ html {
   --o-radius_control-m: 4px;
   --o-radius_control-l: 4px;
 
-  --pkg-bg: #f2f4fb;
-
   --el-box-shadow-light: var(--o-shadow-2);
   --el-color-primary: var(--o-color-primary1);
-}
-[data-o-theme='dark'] {
-  --pkg-bg: #252831;
 }
 
 // tag

@@ -50,8 +50,9 @@ const clickFeedback = () => {
       <OFigure :src="result404" fit="contain" />
     </template>
     <template #description>
-      {{ t('software.nofoundApp') }}
-      <OLink hover-underline color="primary" @click="clickFeedback">{{ t('software.feedbackPkg.btn') }}</OLink>
+      <p class="text">
+        {{ t('software.nofoundApp') }} <OLink hover-underline color="primary" @click="clickFeedback">{{ t('software.feedbackPkg.btn') }}</OLink>
+      </p>
     </template>
   </OResult>
 
