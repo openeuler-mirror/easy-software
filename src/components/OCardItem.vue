@@ -45,7 +45,9 @@ function getMaintainersStr(params: PkgIdsT) {
   const defaultName = maintainerDefaults.name;
   if (params && Object.entries(params).length > 0) {
     const maintainers = Object.entries(params).map(([key, value]) => (value ? value : defaultName));
-    return maintainers.join(line).replace(/ ; +$/, '');
+    // 去重
+    const uniqueVal = [...new Set(maintainers)];
+    return uniqueVal.join(line).replace(/ ; +$/, '');
   } else {
     return defaultName;
   }

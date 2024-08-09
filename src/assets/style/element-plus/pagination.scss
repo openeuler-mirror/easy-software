@@ -8,9 +8,12 @@
       --el-pagination-button-color: var(--o-color-info1);
       &:hover {
         background-color: var(--o-color-primary2);
-        color: var(--o-color-info1-inverse);
+        color: var(--o-color-white);
       }
     }
+  }
+  .el-pagination__jump {
+    color: var(--o-color-info2);
   }
   .btn-prev,
   .btn-next {
