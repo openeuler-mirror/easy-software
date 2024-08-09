@@ -9,7 +9,7 @@ const { locale } = useLocale();
 const resourceHover = (id: string) => {
   const path = document.querySelector(`.resource-item #${id}-icon`);
   if (path) {
-    path.setAttribute('fill', '#002fa7');
+    path.setAttribute('fill', 'var(--o-color-primary1)');
   }
 };
 const resourceLeave = (id: string) => {
