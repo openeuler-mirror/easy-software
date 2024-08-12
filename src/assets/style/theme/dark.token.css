@@ -1,5 +1,5 @@
 /* theme: opendesign.dark */
-[data-o-theme='dark'] {
+[data-o-theme="dark"] {
   /**
    * @name 
    * @type palette
@@ -27,7 +27,7 @@
    * @group kleinblue
    * @description 
    */
-  --o-kleinblue-2: 18, 35, 87;
+  --o-kleinblue-2: 18, 34, 87;
   /**
    * @name 
    * @type palette
@@ -62,7 +62,7 @@
    * @group kleinblue
    * @description 
    */
-  --o-kleinblue-7: 104, 142, 237;
+  --o-kleinblue-7: 104, 142, 237 ;
   /**
    * @name 
    * @type palette
@@ -951,7 +951,7 @@
    * @group mixedgray
    * @description 
    */
-  --o-mixedgray-14: 255, 255, 255;
+  --o-mixedgray-14: 255,255, 255;
   /**
    * @name 
    * @type palette
@@ -1497,35 +1497,35 @@
    * @group control
    * @description 常规，常用于边框
    */
-  --o-color-control1: rgba(var(--o-mixedgray-10), 0.25);
+  --o-color-control1: rgba(var(--o-mixedgray-14), 0.25);
   /**
    * @name 
    * @type color
    * @group control
    * @description 悬浮，常用于边框
    */
-  --o-color-control2: rgba(var(--o-mixedgray-10), 0.6);
+  --o-color-control2: rgba(var(--o-mixedgray-14), 0.6);
   /**
    * @name 
    * @type color
    * @group control
    * @description 激活，常用于边框
    */
-  --o-color-control3: rgba(var(--o-mixedgray-10), 0.8);
+  --o-color-control3: rgba(var(--o-mixedgray-14), 0.8);
   /**
    * @name 
    * @type color
    * @group control
    * @description 禁用，常用于边框
    */
-  --o-color-control4: rgba(var(--o-mixedgray-10), 0.15);
+  --o-color-control4: rgba(var(--o-mixedgray-14), 0.15);
   /**
    * @name 
    * @type color
    * @group control
    * @description 常规-浅，常用于背景
    */
-  --o-color-control1-light: rgb(var(--o-mixedgray-7), 1);
+  --o-color-control1-light: rgb(var(--o-mixedgray-7), 1.0);
   /**
    * @name 
    * @type color
@@ -1553,14 +1553,14 @@
    * @group control
    * @description 很浅，常用于表格背景色
    */
-  --o-color-control-light: rgb(var(--o-mixedgray-4), 1);
+  --o-color-control-light: rgb(var(--o-mixedgray-4), 1.0);
   /**
    * @name 
    * @type color
    * @group info
    * @description 一级/强调/标题
    */
-  --o-color-info1: rgba(var(--o-mixedgray-14), 1);
+  --o-color-info1: rgba(var(--o-mixedgray-14), 1.0);
   /**
    * @name 
    * @type color
@@ -1588,7 +1588,7 @@
    * @group info
    * @description 一级/次强调/正文反色
    */
-  --o-color-info1-inverse: rgba(var(--o-mixedgray-1), 1);
+  --o-color-info1-inverse: rgba(var(--o-mixedgray-1), 1.0);
   /**
    * @name 
    * @type color
@@ -1616,7 +1616,7 @@
    * @group mask
    * @description 全局遮罩
    */
-  --o-color-mask1: rgba(var(--o-mixedgray-14), 0.4);
+  --o-color-mask1: rgba(var(--o-mixedgray-1), 0.4);
   /**
    * @name 
    * @type color

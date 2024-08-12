@@ -266,9 +266,9 @@ const searchDocCount = (v: number) => {
     cursor: pointer;
     overflow: hidden;
     text-overflow: ellipsis;
-    border-radius: 1px;
+    border-radius: 4px;
     &:hover {
-      background: var(--o-color-control2-light);
+      background: var(--o-color-control1-light);
     }
     :deep(span) {
       color: var(--o-color-primary1);

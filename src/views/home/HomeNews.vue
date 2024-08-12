@@ -9,15 +9,7 @@ const { isDark } = useTheme();
 
 <template>
   <ORow gap="32px" flex-wrap="wrap">
-    <OCol
-      v-for="subItem in homeNewsData"
-      :key="subItem.title"
-      flex="0 1 33%"
-      :laptop="{ flex: '0 1 33%' }"
-      :pad="{ flex: '0 1 50%' }"
-      :pad-v="{ flex: '0 1 100%' }"
-      :phone="{ flex: '0 1 100%' }"
-    >
+    <OCol v-for="subItem in homeNewsData" :key="subItem.title" flex="0 1 33%" :laptop="{ flex: '0 1 33%' }">
       <OCard
         :href="subItem.url"
         class="news-item"
