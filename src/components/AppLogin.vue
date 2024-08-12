@@ -1,16 +1,22 @@
 <script setup lang="ts">
+import { ref } from 'vue';
+import { storeToRefs } from 'pinia';
+import { ODropdown, ODropdownItem, OIcon, OIconLoading } from '@opensig/opendesign';
 import { doLogin, logout } from '@/shared/login';
 import { useLoginStore, useUserInfoStore } from '@/stores/user';
-import { ODropdown, ODropdownItem, OIcon, OIconLoading } from '@opensig/opendesign';
-import { storeToRefs } from 'pinia';
-import { ref } from 'vue';
 import LoginIcon from '~icons/app/icon-login.svg';
+
+const USER_CENTER = import.meta.env.VITE_LOGIN_URL;
 
 const { username, photo } = storeToRefs(useUserInfoStore());
 const userInfoArea = ref();
 const loginStore = useLoginStore();
 
 const login = () => doLogin();
+
+const toUserCenter = () => {
+  window.open(USER_CENTER);
+}
 </script>
 
 <template>
@@ -21,6 +27,11 @@ const login = () => doLogin();
         {{ username }}
       </div>
       <template #dropdown>
+        <ODropdownItem>
+          <div class="header-user-menu-item" @click="toUserCenter">
+            个人中心
+          </div>
+        </ODropdownItem>
         <ODropdownItem>
           <div class="header-user-menu-item" @click="logout">
             退出登录
