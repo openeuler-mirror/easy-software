@@ -59,15 +59,14 @@ const goHome = () => {
 <style lang="scss" scoped>
 .header-wrap {
   height: 64px;
-  width: 100%;
   position: fixed;
   top: 0;
   left: 0;
   z-index: 9999;
   background: var(--o-color-fill2);
   box-shadow: var(--o-shadow-1);
-
   min-width: 1440px;
+  width: 100%;
   .header-content {
     display: flex;
     align-items: center;
@@ -88,7 +87,6 @@ const goHome = () => {
       height: 100%;
       display: flex;
       align-items: center;
-      animation: anim-header-trans-in var(--o-duration-xl);
     }
   }
   .logo {
@@ -232,4 +230,3 @@ const goHome = () => {
   }
 }
 </style>
-@/stores/common

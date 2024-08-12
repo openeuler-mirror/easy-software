@@ -26,6 +26,7 @@
       @include text1;
       font-weight: 500;
       color: var(--o-color-info1);
+      border-bottom: 0 none;
     }
   }
   tr:last-child {

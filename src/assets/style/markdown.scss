@@ -47,6 +47,7 @@
   }
   code {
     border-radius: var(--layout-pkg-radius);
+    background-color: var(--o-color-fill3);
     margin: 0 4px;
   }
   p code:first-child {
@@ -91,7 +92,7 @@
     th {
       background-color: var(--o-color-control3-light);
       text-align: left;
-      border: 0 none !important;
+      border-color: var(--o-color-control3-light) !important;
       height: 40px;
     }
     th,
@@ -116,10 +117,11 @@
   .pre-copy {
     cursor: pointer;
     position: absolute;
-    top: 12px;
-    right: 12px;
+    top: 0;
+    right: 0;
     background-color: var(--o-color-fill3);
     opacity: 1;
+    padding: 12px 12px 0 0;
     .icon-copy {
       display: block;
       width: 24px;

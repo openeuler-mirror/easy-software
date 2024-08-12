@@ -45,7 +45,7 @@
       border-top: 1px solid var(--o-color-control4);
     }
     .label {
-      background: rgba(0, 47, 167, 0.05);
+      background: var(--o-color-fill3);
       padding: 16px 24px;
       color: var(--o-color-info2);
       min-width: 150px;
@@ -86,7 +86,7 @@
     align-items: center;
     justify-content: center;
     background-color: var(--o-color-primary1);
-    color: #fff;
+    color: var(--o-color-info1);
     padding: 10px 0px;
   }
 }
@@ -129,7 +129,7 @@
 }
 
 .ver {
-  background: rgba(var(--o-kleinblue-6), 0.05);
+  background: var(--o-color-fill3);
   @include text2;
   border: none;
   border-radius: var(--layout-pkg-radius);

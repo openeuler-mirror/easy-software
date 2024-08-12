@@ -71,21 +71,25 @@ initSensor();
 
   --layout-content-banner: 160px;
 
-  --layout-content-min-height: calc(100vh - var(--layout-header-height));
+  --layout-screen-height: 100vh;
+
+  --layout-content-min-height: calc(var(--layout-screen-height) - var(--layout-header-height));
 
   @include respond-to('<=laptop') {
     --layout-header-max-width: 100%;
     --layout-header-padding: 5%;
 
     --layout-content-padding: 12px;
+
+    --layout-screen-height: 100%;
   }
 }
 </style>
 <style scoped lang="scss">
 .o-scroller {
-  height: 100vh;
+  height: var(--layout-screen-height);
   background-color: var(--o-color-fill1);
-  --scrollbar-height: calc(100vh - var(--layout-header-height) * 2 - 10px);
+  --scrollbar-height: calc(var(--layout-screen-height) - var(--layout-header-height) * 2 - 10px);
   :deep(.o-scroller-container) {
     scroll-padding-top: var(--layout-header-height);
   }
@@ -95,5 +99,8 @@ initSensor();
   min-height: calc(var(--layout-content-min-height) + var(--layout-header-height));
   background-color: var(--o-color-fill1);
   padding-top: var(--layout-header-height);
+  @include respond-to('<=laptop') {
+    min-height: calc(var(--layout-content-min-height) - var(--layout-footer-height));
+  }
 }
 </style>

@@ -63,10 +63,10 @@ const copyText = (e: MouseEvent) => {
     cursor: pointer;
     position: absolute;
     font-size: 24px;
-    top: 12px;
-    right: 12px;
+    padding: 12px 12px 0 0;
+    top: 0;
+    right: 0;
     background-color: var(--o-color-fill3);
-    transition: all var(--o-duration-m1) var(--o-easing-standard-in);
     height: 24px;
     box-sizing: content-box;
     border-radius: 0 4px 0 0;

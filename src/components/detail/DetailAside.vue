@@ -339,7 +339,7 @@ const onCodeSuccess = () => {
 
 .obtn {
   border-radius: 4px;
-  background: rgba(var(--o-kleinblue-6), 0.05);
+  background: var(--o-color-fill3);
   border: none;
   --btn-color: var(--o-color-info1);
   &:hover {

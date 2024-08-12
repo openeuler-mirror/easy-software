@@ -4,6 +4,7 @@ import { OLink, OIcon } from '@opensig/opendesign';
 import { checkOriginLink, windowOpen } from '@/utils/common';
 import { scrollToTop } from '@/utils/common';
 import { useRoute } from 'vue-router';
+import { useTheme } from '@/composables/useTheme';
 import ExternalLink from '@/components/ExternalLink.vue';
 
 import type { MaintainerT } from '@/@types/app';
@@ -13,6 +14,9 @@ import IconEmail from '~icons/pkg/email.svg';
 import IconGitee from '~icons/pkg/gitee.svg';
 import IconOutlink from '~icons/pkg/icon-outlink.svg';
 import IconHelp from '~icons/pkg/icon-help.svg';
+
+import coverBg from '@/assets/default-logo-cover.png';
+import coverBgDark from '@/assets/default-logo-cover_dark.png';
 
 defineProps({
   data: {
@@ -34,6 +38,7 @@ defineProps({
   },
 });
 
+const { isDark } = useTheme();
 const route = useRoute();
 const showExternalDlg = ref(false);
 const externalLink = ref('');
@@ -60,7 +65,7 @@ const scrollToAnchor = (id: string) => {
 <template>
   <div class="domain-head">
     <div class="left">
-      <div class="cover"><img :src="data.cover" alt="" /></div>
+      <div class="cover" :style="{ 'background-image': `url(${isDark ? coverBgDark : coverBg})` }"><img :src="data.cover" alt="" /></div>
       <div class="box">
         <p class="title">
           {{ data.name }}
@@ -121,7 +126,7 @@ const scrollToAnchor = (id: string) => {
   .left {
     display: flex;
     width: 70%;
-    border-right: 1px solid rgba(0, 0, 0, 0.1);
+    border-right: 1px solid var(--o-color-control4);
     padding-right: 64px;
     .box {
       margin-left: 32px;
@@ -200,7 +205,7 @@ const scrollToAnchor = (id: string) => {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: url(@/assets/default-logo-cover.png) no-repeat center;
+    background: no-repeat center;
     padding: 12px;
     img {
       max-width: 100%;

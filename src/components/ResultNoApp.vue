@@ -4,9 +4,11 @@ import { OLink, OResult, OFigure } from '@opensig/opendesign';
 import { useRoute } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { GITEE } from '@/data/config';
+import { useTheme } from '@/composables/useTheme';
 import ExternalLink from '@/components/ExternalLink.vue';
 
 import result404 from '@/assets/404.png';
+import result404Dark from '@/assets/404-dark.png';
 
 const props = defineProps({
   type: {
@@ -14,6 +16,8 @@ const props = defineProps({
     default: '',
   },
 });
+
+const { isDark } = useTheme();
 
 const route = useRoute();
 const { t } = useI18n();
@@ -47,7 +51,7 @@ const clickFeedback = () => {
 <template>
   <OResult class="result-tips">
     <template #image>
-      <OFigure :src="result404" fit="contain" />
+      <OFigure :src="isDark ? result404Dark : result404" fit="contain" />
     </template>
     <template #description>
       <p class="text">
