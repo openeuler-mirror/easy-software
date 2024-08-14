@@ -1,20 +1,19 @@
 import openHPC from '@/assets/solution/openhpc/cover.png';
 import img1 from '@/assets/solution/openhpc/img1.png';
+import img1Dark from '@/assets/solution/openhpc/img1-dark.png';
 import hpc1 from '~icons/pkg/openhpc1.svg';
 import hpc2 from '~icons/pkg/openhpc2.svg';
 import hpc3 from '~icons/pkg/openhpc3.svg';
 import hpc4 from '~icons/pkg/openhpc4.svg';
 import hpc5 from '~icons/pkg/openhpc5.svg';
-import openhpcLogo from '@/assets/solution/openhpc/openhpc-logo.png';
-import Add from '@/assets/solution/openhpc/add.png';
-import openeulerLogo from '@/assets/solution/openhpc/openeuler-logo.png';
+
 
 export default {
   overview: {
     cover: openHPC,
     desc: 'OpenHPC是Linux基金会开源的超算项目，致力于为高性能计算（HPC）构建一个开源框架，以适应现在工业和学术研究的需求。同时，OpenHPC也是一套基于Linux的HPC社区驱动的FOSS（Free and open source software）工具，提供了一个集成且经过测试的软件组件集合，以及支持的标准Linux发行版，可用于实现功能齐全的计算集群。',
   },
-  coreImg: img1,
+  coreImg: [img1, img1Dark],
   coreList: [
     {
       icon: hpc1,
@@ -32,7 +31,6 @@ export default {
       desc: '支持在HPC集群上运行容器化应用，提高应用的部署效率和可移植性',
     },
   ],
-  advImg: [openhpcLogo, Add, openeulerLogo],
   advInfo: [
     {
       name: '持续集成',
