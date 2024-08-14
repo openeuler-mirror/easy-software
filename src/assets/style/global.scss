@@ -7,10 +7,8 @@ html {
   --o-radius_control-m: 4px;
   --o-radius_control-l: 4px;
 
-  --pkg-bg: rgba(var(--o-kleinblue-6), 0.05);
-
   --el-box-shadow-light: var(--o-shadow-2);
-  --el-color-primary: var(--o-color-primary1);
+  --el-color-primary: var(--o-color-primary1) !important;
 }
 
 // tag
@@ -27,6 +25,7 @@ html {
   .o-tag {
     cursor: pointer;
     --tag-padding: 2px 4px;
+    --tag-bd-color: var(--o-color-control3-light);
     &.image-icon .o-icon {
       color: #007af0;
     }
@@ -37,7 +36,7 @@ html {
       color: #00a7b3;
     }
     &:hover {
-      --tag-bg-color: var(--o-color-primary4-light);
+      --tag-bg-color: var(--o-color-control1-light);
     }
     .o-tag-icon {
       height: 16px;

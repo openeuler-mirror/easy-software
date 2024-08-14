@@ -16,7 +16,7 @@ const login = () => doLogin();
 
 const toUserCenter = () => {
   window.open(USER_CENTER);
-}
+};
 </script>
 
 <template>
@@ -28,14 +28,10 @@ const toUserCenter = () => {
       </div>
       <template #dropdown>
         <ODropdownItem>
-          <div class="header-user-menu-item" @click="toUserCenter">
-            个人中心
-          </div>
+          <div class="header-user-menu-item" @click="toUserCenter">个人中心</div>
         </ODropdownItem>
         <ODropdownItem>
-          <div class="header-user-menu-item" @click="logout">
-            退出登录
-          </div>
+          <div class="header-user-menu-item" @click="logout">退出登录</div>
         </ODropdownItem>
       </template>
     </ODropdown>
@@ -43,9 +39,8 @@ const toUserCenter = () => {
   <div v-else-if="loginStore.isLoggingIn" class="o-rotating">
     <OIconLoading />
   </div>
-  <div v-else class="login-btn" @click="login">
-    <OIcon><LoginIcon /></OIcon>
-  </div>
+
+  <OIcon v-else class="login-btn" @click="login"><LoginIcon /></OIcon>
 </template>
 
 <style scoped lang="scss">
@@ -56,7 +51,7 @@ const toUserCenter = () => {
   cursor: pointer;
   position: relative;
   height: 64px;
-
+  color: var(--o-color-info1);
   img {
     width: 24px;
     height: 24px;
@@ -69,6 +64,7 @@ const toUserCenter = () => {
 }
 
 .login-btn {
+  color: var(--o-color-info1);
   cursor: pointer;
 }
 </style>

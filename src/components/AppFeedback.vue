@@ -142,7 +142,6 @@ const onExternalDialog = () => {
   clearDataAfterJump = true;
 };
 
-
 const goToFeedbackDetailUrl = (url: string) => {
   externalLink.value = decodeURIComponent(url);
   showExternalDlg.value = true;
@@ -241,8 +240,5 @@ const jumpOut = () => {
       margin-left: 16px;
     }
   }
-}
-:deep(.o-rate) {
-  --rate-size: 24px;
 }
 </style>

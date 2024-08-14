@@ -300,6 +300,23 @@ const tagsOptions = computed(() => {
     arch: tagVer.value[1],
   };
 });
+
+// ---------------------下载埋点--------------------
+const onCodeSuccess = () => {
+  const sensors = (window as any)['sensorsDataAnalytic201505'];
+  const { href } = window.location;
+  const downloadTime = new Date();
+  sensors?.setProfile({
+    ...(window as any)['sensorsCustomBuriedData'],
+    profileType: 'download',
+    origin: href,
+    softwareName: appData.value.name,
+    version: appData.value.version,
+    pkgId: route.query.pkgId as string,
+    type: 'IMAGE',
+    downloadTime,
+  });
+};
 </script>
 <template>
   <ContentWrapper vertical-padding="24px">
@@ -359,7 +376,7 @@ const tagsOptions = computed(() => {
                     <DetailInstall :title="`> ${t('detail.usage')}`">
                       <div v-if="downloadData" class="image-code">
                         <p class="text">获取应用镜像</p>
-                        <OCodeCopy :code="getCode(downloadData)" />
+                        <OCodeCopy :code="getCode(downloadData)" @success="onCodeSuccess" />
                       </div>
                       <div v-if="imageUsage" v-dompurify-html="imageUsage" v-copy-code="true" class="markdown-body download"></div>
                     </DetailInstall>

@@ -5,9 +5,10 @@ import img3 from '@/assets/solution/openstack/img3.png';
 import openstack1 from '~icons/pkg/openstack1.svg';
 import openstack2 from '~icons/pkg/openstack2.svg';
 import openstack3 from '~icons/pkg/openstack3.svg';
-import openstackLogo from '@/assets/solution/openstack/openstacklogo.png';
-import Add from '@/assets/solution/openstack/add.png';
-import openeulerLogo from '@/assets/solution/openstack/openEulerlogo.png';
+
+
+
+
 
 export default {
   overview: {
@@ -35,7 +36,6 @@ export default {
       desc: 'OpenStack 提供了插件式、可扩展、API 驱动型的网络及IP管理功能，能够高自动化地管理网络',
     },
   ],
-  advImg: [openstackLogo, Add, openeulerLogo],
   advInfo: [
     {
       name: '快速部署',

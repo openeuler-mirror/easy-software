@@ -29,11 +29,12 @@ defineProps({
 
 <style lang="scss" scoped>
 .title {
+  color: var(--o-color-info1);
   margin: 32px 0 24px;
-  @include h3;
   font-weight: 500;
   display: flex;
   align-items: center;
+  @include h3;
 }
 .install-icon {
   width: 20px;

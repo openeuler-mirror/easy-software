@@ -42,8 +42,10 @@ const showMoreItem = () => {
 
 onMounted(() => {
   if (route.query.os) {
-    isAll.value = false;
-    showLen.value = props.options.length;
+    if (checkboxValue.value && checkboxValue.value?.length > 0) {
+      isAll.value = false;
+      showMoreItem();
+    }
   }
 });
 </script>

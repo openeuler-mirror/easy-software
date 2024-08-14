@@ -15,7 +15,7 @@ interface DataSubT {
 }
 
 interface DataT {
-  type: string;
+  type?: string;
   id: string;
   children: DataSubT[];
 }
@@ -89,7 +89,7 @@ const formatArchItem = (items: DataItem) => {
 };
 
 const formatArchData = (data: { [key: string]: DataItem }) => {
-  const newChildren: DataT[] = Object.entries(data).reduce((acc, [type, items]) => {
+  const newChildren: DataT[] = Object.entries(data).reduce((acc: DataT[], [type, items]) => {
     acc.push({
       id: type,
       children: formatArchItem(items),
@@ -213,11 +213,7 @@ const showMore = () => {
             <el-table-column label="架构 (软件包个数)">
               <template #default="scope">
                 <div class="arch-box">
-                  <OLink
-                    v-for="item in scope.row.children"
-                    @click="goJump(scope.row.id, item)"
-                    :key="item.name"
-                    :color="item.value !== 0 ? 'primary' : 'normal'"
+                  <OLink v-for="item in scope.row.children" @click="goJump(scope.row.id, item)" :key="item.name" color="primary" :disabled="item.value === 0"
                     >{{ item.name }}({{ item.value }})</OLink
                   >
                 </div>

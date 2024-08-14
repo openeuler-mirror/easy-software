@@ -4,6 +4,7 @@ import { ODivider } from '@opensig/opendesign';
 import { getStat } from '@/api/api-domain';
 
 import SearchFilter from '@/components/search/SearchFilter.vue';
+import homeBanner from '@/assets/banner.jpg';
 
 // -------------------- 社区应用数据接口 --------------------
 const total = ref(0);
@@ -35,37 +36,63 @@ onMounted(() => {
 
 <template>
   <div class="head-wrap">
-    <div class="community-content">
-      <h1 :class="{ action: actionVisible }">openEuler软件中心</h1>
-      <p class="slog" :class="{ action: actionVisible }">用最easy的方式帮助每个开发者找到自己想要的</p>
+    <img :src="homeBanner" class="home-banner" />
+    <div class="head-content">
+      <div class="community-content">
+        <h1 :class="{ action: actionVisible }">openEuler软件中心</h1>
+        <p class="slog" :class="{ action: actionVisible }">用最easy的方式帮助每个开发者找到自己想要的</p>
 
-      <div :class="{ action: actionVisible }" class="community-pkg">
-        <span class="num">{{ apppkg }}</span>
-        应用镜像
-        <ODivider direction="v" style="--o-divider-bd-color: #fff" />
-        <span class="num">{{ total }}</span> 软件包
+        <div :class="{ action: actionVisible }" class="community-pkg">
+          <span class="num">{{ apppkg }}</span>
+          应用镜像
+          <ODivider direction="v" style="--o-divider-bd-color: #fff" />
+          <span class="num">{{ total }}</span> 软件包
+        </div>
       </div>
+      <SearchFilter :class="{ action: actionVisible }" class="home-search" />
     </div>
-    <SearchFilter :class="{ action: actionVisible }" class="home-search" />
   </div>
 </template>
 
 <style lang="scss" scoped>
+@include in-dark {
+  .home-banner {
+    @include img-in-dark;
+  }
+}
 .head-wrap {
-  background: var(--o-color-primary1) url(@/assets/banner.jpg) no-repeat top center/cover;
+  background-color: var(--o-color-primary1);
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 48px 0;
   height: 280px;
   position: relative;
   z-index: 99;
+  .home-banner {
+    position: absolute;
+    inset: 0;
+    height: 100%;
+    width: 100%;
+  }
 }
+
+.head-content {
+  padding: 48px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  z-index: 2;
+  height: 100%;
+}
+
 .home-search {
   transform: translateY(100px);
   opacity: 0;
   &.action {
-    transition: all 1500ms 0.25s var(--o-easing-standard-in);
+    transition:
+      transform 1500ms 0.25s var(--o-easing-standard-in),
+      opacity 1500ms 0.25s var(--o-easing-standard-in);
     transform: translateY(0);
     opacity: 1;
   }

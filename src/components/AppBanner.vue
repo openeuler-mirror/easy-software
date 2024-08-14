@@ -75,7 +75,11 @@ defineExpose({
   background-color: var(--o-color-primary1);
   overflow: hidden;
 }
-
+@include in-dark {
+  .banner-bg {
+    @include img-in-dark;
+  }
+}
 .banner-bg {
   position: absolute;
   height: 100%;
