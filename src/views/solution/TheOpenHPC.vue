@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import { OCard, ODivider } from '@opensig/opendesign';
 import AppBanner from '@/components/AppBanner.vue';
 import ContentWrapper from '@/components/ContentWrapper.vue';
@@ -7,13 +7,22 @@ import ExternalLink from '@/components/ExternalLink.vue';
 import bannerImg from '@/assets/banner/banner1.jpg';
 import OpenHPC from '@/data/solution/openhpc';
 import { GITHUB } from '@/data/config';
+import { useTheme } from '@/composables/useTheme';
 
 import { checkOriginLink, windowOpen } from '@/utils/common';
+
+import openhpcLogo from '@/assets/solution/openhpc/openhpc-logo.png';
+import openhpcLogoDark from '@/assets/solution/openhpc/openhpc-logo-dark.png';
+import Add from '@/assets/solution/openhpc/add.png';
+import openeulerLogo from '@/assets/solution/openhpc/openeuler-logo.png';
+import openeulerLogoDark from '@/assets/solution/openhpc/openeuler-dark.png';
 
 const solutionInfo = {
   title: 'OpenHPC',
   desc: 'OpenHPC是一个开源的高性能计算解决方案，它提供了构建、部署和管理高性能计算(HPC)集群所需要的工具，包括系统工具、资源管理器、I/O客户端、开发工具和各种科学库',
 };
+
+const { isDark } = useTheme();
 
 const showExternalDlg = ref(false);
 const externalLink = ref('');
@@ -25,6 +34,10 @@ const jumpTo = (href: string) => {
     showExternalDlg.value = true;
   }
 };
+
+const advImg = computed(() => {
+  return [isDark.value ? openhpcLogoDark : openhpcLogo, Add, isDark.value ? openeulerLogoDark : openeulerLogo];
+});
 </script>
 <template>
   <AppBanner :title="solutionInfo.title" :background-image="bannerImg" :subtitle="solutionInfo.desc" />
@@ -45,7 +58,7 @@ const jumpTo = (href: string) => {
         <h2>核心功能</h2>
       </div>
       <div class="solution-core">
-        <img class="cover" :src="OpenHPC.coreImg" alt="" />
+        <img class="cover" :src="isDark ? OpenHPC.coreImg[1] : OpenHPC.coreImg[0]" alt="" />
         <div class="solution-core-box">
           <OCard
             v-for="item in OpenHPC.coreList"
@@ -71,7 +84,7 @@ const jumpTo = (href: string) => {
       </div>
       <div class="solution-adv">
         <div class="adv-img-box">
-          <img v-for="(item, index) in OpenHPC.advImg" :src="item" :key="item" :class="`img${index}`" />
+          <img v-for="(item, index) in advImg" :src="item" :key="item" :class="`img${index}`" />
         </div>
         <ODivider style="--o-divider-gap: 40px" />
         <div class="solution-adv-box">

@@ -271,7 +271,10 @@ const handleQueryData = () => {
   } else if (name === '') {
     searchKey.value = '';
     isSearchDocs.value = false;
+  } else {
+    searchKey.value = '';
   }
+
   if (isValidSearchTabName(tab) && tab) {
     tabName.value = tab as string;
   } else {
