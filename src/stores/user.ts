@@ -10,6 +10,10 @@ export const useUserInfoStore = defineStore('userInfo', {
       photo: '' as string,
       username: '' as string,
       upstreamPermission: null as boolean | null,
+      // 协作平台admin权限
+      platformAdminPermission: null as boolean | null,
+      // 协作平台maintainer权限
+      platformMaintainerPermission: null as boolean | null,
     }
   },
 });

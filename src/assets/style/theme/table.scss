@@ -1,4 +1,8 @@
 .o-table {
+  --table-edge-padding: 32px;
+  --table-cell-padding: 16px 20px;
+  --table-head-cell-padding: 12px 20px;
+  --table-cell-height: 80px;
   --table-head-bg: var(--o-color-control3-light);
   --table-color: var(--o-color-info1);
   th {

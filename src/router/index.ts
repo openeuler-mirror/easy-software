@@ -5,6 +5,7 @@ import { useLangStore, useViewStore } from '@/stores/common';
 import { tryLogin } from '@/shared/login';
 import { useLoginStore, useUserInfoStore } from '@/stores/user';
 import { queryUpstreamPermission } from '@/api/api-user';
+import { getAdminPermission } from '@/api/api-collaboration';
 
 const routes = [
   {
@@ -82,6 +83,22 @@ const routes = [
     name: 'openstack',
     component: () => import('@/views/solution/TheOpenStack.vue'),
   },
+  {
+    path: '/zh/collaboration',
+    name: 'collaboration',
+    component: () => import('@/views/collaboration/TheCollaboration.vue'),
+  },
+
+  {
+    path: '/zh/todo/:type',
+    name: 'todo',
+    component: () => import('@/views/todo/TheTodo.vue'),
+  },
+  {
+    path: '/zh/todo/:type/:id',
+    name: 'todo-detail',
+    component: () => import('@/views/todo/TheTodoDetail.vue'),
+  },
   // 默认路由
   {
     path: '/:path(.*)*',
@@ -114,27 +131,41 @@ router.beforeEach(async (to) => {
 
   const userInfoStore = useUserInfoStore();
   const isUpstream = to.name === 'upstream';
+  const isCollaboration = to.name === 'collaboration';
   const loginStore = useLoginStore();
+
   if (loginStore.isLogined) {
     if (isUpstream) {
       return userInfoStore.upstreamPermission ? true : { name: 'notFound' };
     }
+    if (isCollaboration) {
+      return userInfoStore.platformAdminPermission ? true : { name: 'notFound' };
+    }
+
     return true;
   }
 
   await tryLogin();
-  if (userInfoStore.upstreamPermission === null && loginStore.isLogined) {
-    try {
-      const upstreamPermission = await queryUpstreamPermission();
-      userInfoStore.upstreamPermission = upstreamPermission.data.allow_access;
-    } catch {
-      // 如果queryUpstreamPermission不是401
-      return isUpstream ? { name: 'notFound' } : true;
-    }
-  }
+  // if (userInfoStore.upstreamPermission === null && loginStore.isLogined) {
+  //   try {
+  //     // const upstreamPermission = await queryUpstreamPermission();
+  //     // userInfoStore.upstreamPermission = upstreamPermission.data.allow_access;
+  //   } catch {
+  //     // 如果queryUpstreamPermission不是401
+  //     return isUpstream ? { name: 'notFound' } : true;
+  //   }
+  // }
 
-  if (isUpstream) {
-    return loginStore.isLogined && userInfoStore.upstreamPermission ? true : { name: 'notFound' };
+
+  // 协作平台管理员权限
+  if (userInfoStore.platformAdminPermission === null && loginStore.isLogined) {
+    try {
+      const queryAdminPermission = await getAdminPermission();
+      userInfoStore.platformAdminPermission = queryAdminPermission.data.allow_access;
+    } catch {
+      console.log('queryAdminPermission :>> ');
+      return isCollaboration ? { name: 'notFound' } : true;
+    }
   }
 
   return true;
