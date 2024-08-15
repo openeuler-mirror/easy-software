@@ -12,7 +12,7 @@ const { isDark } = useTheme();
     <OCol v-for="subItem in homeNewsData" :key="subItem.title" flex="0 1 33%" :laptop="{ flex: '0 1 33%' }">
       <OCard
         :href="subItem.url"
-        class="news-item"
+        class="news-item o-card-pkg"
         target="_blank"
         rel="noopener noreferrer"
         :title="subItem.title"
@@ -50,30 +50,6 @@ const { isDark } = useTheme();
   .o-figure {
     img {
       height: 255px;
-    }
-  }
-  .desc {
-    display: flex;
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 2;
-    overflow: hidden;
-    position: relative;
-    --linear-gradient: var(--o-mixedgray-1);
-    &.dark {
-      --linear-gradient: var(--o-mixedgray-4);
-    }
-
-    @include text1;
-    &::after {
-      background-image: linear-gradient(90deg, rgba(var(--linear-gradient), 0), rgba(var(--linear-gradient), 0.8) 59%, var(--o-color-control-light) 100%);
-      bottom: 0;
-      content: '';
-      height: 24px;
-      pointer-events: none;
-      position: absolute;
-      right: 0;
-      width: 4em;
     }
   }
 }

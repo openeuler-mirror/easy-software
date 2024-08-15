@@ -77,6 +77,7 @@ onMounted(() => {
       '--card-main-padding': '24px',
     }"
     hoverable
+    class="o-card-pkg"
     :class="{ search: isPageSearch, home: isPageHome }"
   >
     <template #main>
@@ -196,35 +197,6 @@ onMounted(() => {
           width: 16px;
           height: 16px;
         }
-      }
-    }
-    .desc {
-      margin-top: 8px;
-      color: var(--o-color-info2);
-      overflow: hidden;
-      -webkit-line-clamp: 2;
-      -webkit-box-orient: vertical;
-      position: relative;
-      word-break: break-all;
-      height: 48px;
-
-      --linear-gradient: var(--o-mixedgray-1);
-      &.dark {
-        --linear-gradient: var(--o-mixedgray-4);
-      }
-      @include text1;
-      &::after {
-        background-image: linear-gradient(90deg, rgba(var(--linear-gradient), 0), rgba(var(--linear-gradient), 0.8) 59%, var(--o-color-control-light) 100%);
-        bottom: 0;
-        content: '';
-        height: 24px;
-        pointer-events: none;
-        position: absolute;
-        right: 0;
-        width: 4em;
-      }
-      span {
-        color: var(--o-color-primary1);
       }
     }
   }
