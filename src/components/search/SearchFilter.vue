@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { ref, watch, onMounted } from 'vue';
-import { OSelect, OOption, OInput, OIcon, vLoading, useMessage, isUndefined } from '@opensig/opendesign';
+import { OSelect, OOption, OInput, OIcon, vLoading, useMessage, isUndefined, ODivider } from '@opensig/opendesign';
 import { useDebounceFn } from '@vueuse/core';
 import { isValidSearchTabName, isValidSearchKey } from '@/utils/query';
 import { useRouter, useRoute } from 'vue-router';
@@ -221,6 +221,7 @@ watch(
     >
       <OOption v-for="item in FLITERMENUOPTIONS" :key="item.id" :label="item.name" :value="item.id" />
     </OSelect>
+    <ODivider direction="v" :darker="true" :style="{ '--o-divider-label-gap': 0 }" />
     <div class="search-box">
       <OInput
         v-model="searchInput"
@@ -259,10 +260,10 @@ watch(
 .recommend {
   position: absolute;
   z-index: 99;
-  top: 60px;
+  top: 52px;
   width: 100%;
-  background-color: var(--o-color-fill2);
-  box-shadow: var(--o-shadow-1);
+  background-color: var(--o-color-control-light);
+  box-shadow: var(--o-shadow-2);
   height: auto;
   padding: 16px 16px 12px;
   border-radius: 4px;
@@ -294,10 +295,13 @@ watch(
 .search {
   display: flex;
   justify-content: center;
+  align-items: center;
   background: var(--o-color-fill2);
   box-shadow: var(--o-shadow-1);
-  border-radius: var(--layout-pkg-radius);
+  border-radius: 8px;
   transition: all var(--o-duration-m1) var(--o-easing-standard-in);
+  border: 1px solid var(--o-color-control1);
+
   .search-icon {
     font-size: 24px;
   }
@@ -322,6 +326,7 @@ watch(
 :deep(.o-input-wrap) {
   background: none;
   border: 0 none;
+  padding-right: 0;
 }
 
 .search-input {

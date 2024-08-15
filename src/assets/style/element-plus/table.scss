@@ -2,7 +2,13 @@
 #app .el-table {
   --el-table-header-bg-color: var(--o-color-control3-light);
   --el-table-border-color: var(--o-color-control4);
+  --el-table-tr-bg-color: var(--o-color-fill2);
+  --el-table-expanded-cell-bg-color: var(--o-color-fill2);
+  --el-table-bg-color: var(--o-color-fill2);
+  --el-table-row-hover-bg-color: var(--o-color-control2-light);
   border-radius: 4px;
+  --el-table-border: 1px solid var(--o-color-control4);
+  border-spacing: 0;
   @include text1;
   color: var(--o-color-info1);
   .el-table__inner-wrapper::before {
@@ -10,6 +16,7 @@
   }
   .el-table__cell {
     padding: 12px 0;
+    transition: none;
     .cell {
       padding: 0 16px;
     }
@@ -19,6 +26,7 @@
       @include text1;
       font-weight: 500;
       color: var(--o-color-info1);
+      border-bottom: 0 none;
     }
   }
   tr:last-child {

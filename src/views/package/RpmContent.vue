@@ -164,6 +164,9 @@ const queryFilter = () => {
 const handleCloseTag = (idx: string | number, type: string) => {
   if (type === 'os') {
     searchOs.value.splice(Number(idx), 1);
+    if (searchOs.value.length === 0) {
+      console.log(route.query);
+    }
   }
   if (type === 'arch') {
     searchArch.value.splice(Number(idx), 1);
@@ -262,10 +265,11 @@ const handleQueryData = () => {
   if (!isUndefined(name) && name) {
     searchKey.value = name?.toString();
     currentPage.value = 1;
-  } else if (name === '') {
+  } else {
     searchKey.value = '';
     isSearchDocs.value = false;
   }
+
   if (isValidSearchTabName(tab) && tab) {
     tabName.value = tab as string;
   } else {

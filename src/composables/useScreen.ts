@@ -77,8 +77,8 @@ export const useScreen = () => {
   const isPadVToLaptop = computed(() => compare('gt', Size.PadV) && compare('le', Size.Laptop));
 
   const onWindowResize = () => {
-    const { innerWidth, innerHeight, outerWidth } = window;
-    screenSize.width = outerWidth < innerWidth ? outerWidth : innerWidth;
+    const { innerWidth, innerHeight } = window;
+    screenSize.width = innerWidth;
     screenSize.height = innerHeight;
     current.value = getSize();
   };

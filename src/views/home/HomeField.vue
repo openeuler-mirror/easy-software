@@ -57,9 +57,10 @@ const jumpTo = (name: string) => {
 .domain-item {
   margin: 0 0 40px;
   h3 {
-    @include h2;
     text-align: center;
     font-weight: 500;
+    color: var(--o-color-info1);
+    @include h2;
   }
 
   .domain-item-title {
