@@ -47,7 +47,7 @@
   }
   code {
     border-radius: var(--layout-pkg-radius);
-    background-color: var(--o-color-fill3);
+    background-color: var(--o-color-control2-light);
     margin: 0 4px;
   }
   p code:first-child {
@@ -57,7 +57,7 @@
   pre {
     position: relative;
     border-radius: var(--layout-pkg-radius);
-    background-color: var(--o-color-fill3);
+    background-color: var(--o-color-control2-light);
     padding: 0;
     overflow: hidden;
 
@@ -119,7 +119,7 @@
     position: absolute;
     top: 0;
     right: 0;
-    background-color: var(--o-color-fill3);
+    background-color: var(--o-color-control2-light);
     opacity: 1;
     padding: 12px 12px 0 0;
     .icon-copy {
