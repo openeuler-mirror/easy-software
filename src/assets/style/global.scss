@@ -25,7 +25,7 @@ html {
   .o-tag {
     cursor: pointer;
     --tag-padding: 2px 4px;
-    --tag-bd-color: var(--o-color-control3-light);
+    --tag-bd-color: var(--o-color-control1-light);
     &.image-icon .o-icon {
       color: #007af0;
     }
@@ -36,7 +36,7 @@ html {
       color: #00a7b3;
     }
     &:hover {
-      --tag-bg-color: var(--o-color-control1-light);
+      --tag-bg-color: var(--o-color-control2-light);
     }
     .o-tag-icon {
       height: 16px;
