@@ -63,7 +63,7 @@ const revokeApplication = (id: number) => {
         {{ formatDateTime(row.updateAt) }}
       </template>
       <template #td_applyStatus="{ row }">
-        <OTag class="app-tag" :class="row.applyStatus?.toLocaleLowerCase()">{{ applyStatus[row.applyStatus] }} </OTag>
+        <OTag v-if="row.applyStatus" class="app-tag" :class="row.applyStatus?.toLocaleLowerCase()">{{ applyStatus[row.applyStatus] }} </OTag>
       </template>
       <template #td_operation="{ row }">
         <template v-if="type === 'application'">
@@ -75,7 +75,7 @@ const revokeApplication = (id: number) => {
         <template v-if="type === 'approval'">
           <OLink color="primary" hover-underline @click="jumpTo(row.applyId)">审批</OLink>
         </template>
-        <template v-if="type === 'approvalHistory'">
+        <template v-if="type === 'approved'">
           <OLink color="primary" hover-underline @click="jumpTo(row.applyId)">审批详情</OLink>
         </template>
       </template>
@@ -161,7 +161,31 @@ const revokeApplication = (id: number) => {
     align-items: center;
   }
 }
+thead {
+  .repo {
+    width: 180px;
+  }
+  .metric,
+  .metricStatus,
+  .description {
+    width: 150px;
+  }
+  .applyStatus,
+  .adminstrator,
+  .applyId {
+    width: 120px;
+  }
 
+  .maintainer {
+    width: 180px;
+  }
+  .updateAt {
+    width: 130px;
+  }
+  .operation {
+    width: 220px;
+  }
+}
 .application {
   :deep(.o-table) {
     @mixin liner {
@@ -204,31 +228,7 @@ const revokeApplication = (id: number) => {
         background: var(--table-row-hover);
       }
     }
-    thead {
-      .repo {
-        width: 180px;
-      }
-      .metric,
-      .metricStatus,
-      .description {
-        width: 150px;
-      }
-      .applyStatus,
-      .adminstrator,
-      .applyId {
-        width: 120px;
-      }
 
-      .maintainer {
-        width: 180px;
-      }
-      .updateAt {
-        width: 130px;
-      }
-      .operation {
-        width: 220px;
-      }
-    }
     th {
       &:last-child {
         width: 220px;

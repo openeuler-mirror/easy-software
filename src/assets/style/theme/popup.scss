@@ -1,3 +1,10 @@
 .o-popup {
   --popup-shadow: var(--o-shadow-2);
+  .o-popup-wrap {
+    border: 1px solid var(--o-color-control4);
+  }
+  .o-popover-anchor {
+    border: 1px solid var(--o-color-control4);
+    border-width: 1px 0 0 1px;
+  }
 }

@@ -64,6 +64,7 @@ const optionLists = [
 // 重置表单数据
 const reset = () => {
   formRef.value?.resetFields();
+  emits('close');
 };
 
 const onChange = () => {

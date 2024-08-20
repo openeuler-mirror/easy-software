@@ -1,5 +1,5 @@
 import Cookies from 'js-cookie';
-import { useLangStore } from '@/stores/common';
+import { useLangStore, useViewStore } from '@/stores/common';
 import { useLoginStore, useUserInfoStore } from '@/stores/user';
 import { queryUpstreamPermission, queryUserInfo } from '@/api/api-user';
 
@@ -43,7 +43,7 @@ export function clearUserAuth() {
   // 清除内存中用户信息
   useUserInfoStore().$reset();
   // 清除cookie
-  Cookies.remove(LOGIN_KEYS.CSRF_TOKEN);
+  Cookies.remove(LOGIN_KEYS.CSRF_TOKEN, { domain: import.meta.env.VITE_COOKIE_DOMAIN, path: '/', secure: true });
 }
 
 /**
@@ -57,13 +57,17 @@ export async function tryLogin() {
   if (!csrfToken) {
     userInfoStore.$reset();
     loginStore.setLoginStatus(LOGIN_STATUS.NOT);
-    return;
+
+
+    return false;
   }
   try {
     loginStore.setLoginStatus(LOGIN_STATUS.DOING);
-    // userInfoStore.$patch(await queryUserInfo());
+    userInfoStore.$patch(await queryUserInfo());
     loginStore.setLoginStatus(LOGIN_STATUS.DONE);
   } catch (error) {
     loginStore.setLoginStatus(LOGIN_STATUS.FAILED);
+
+
   }
 }

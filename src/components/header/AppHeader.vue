@@ -7,6 +7,7 @@ import { OPENEULER } from '@/data/config';
 import { useI18n } from 'vue-i18n';
 import { navs, collaborationNav } from '@/data/nav';
 import { useLoginStore, useUserInfoStore } from '@/stores/user';
+import { COLLABORATIONPERMISSION } from '@/data/query';
 
 import { useTheme } from '@/composables/useTheme';
 import HeaderNav from '@/components/header/HeaderNav.vue';
@@ -40,9 +41,9 @@ const goHome = () => {
 };
 
 // 判断是否是协作平台
-const collaborationRouteName = ['todo', 'collaboration', 'todo-detail'];
+
 const isCollaboration = computed(() => {
-  return collaborationRouteName.includes(route.name as string);
+  return COLLABORATIONPERMISSION.includes(route.name as string);
 });
 </script>
 
@@ -61,8 +62,10 @@ const isCollaboration = computed(() => {
         <HeaderNav :options="isCollaboration ? collaborationNav : navs" />
       </div>
       <div class="header-right">
-        <OLink v-if="isCollaboration" class="collaboration" :href="`/${locale}/todo/application`">待办中心</OLink>
-        <OLink v-else class="collaboration" target="_blank" :href="`/${locale}/collaboration`">协作平台</OLink>
+        <template v-if="loginStore.isLogined && (userInfoStore.platformAdminPermission || userInfoStore.platformMaintainerPermission)">
+          <OLink v-if="isCollaboration" class="collaboration" :href="`/${locale}/todo/application`">待办中心</OLink>
+          <OLink v-else class="collaboration" target="_blank" :href="`/${locale}/collaboration`">协作平台</OLink>
+        </template>
         <HeaderTheme />
         <AppLogin />
       </div>

@@ -5,7 +5,8 @@ import { useLangStore, useViewStore } from '@/stores/common';
 import { tryLogin } from '@/shared/login';
 import { useLoginStore, useUserInfoStore } from '@/stores/user';
 import { queryUpstreamPermission } from '@/api/api-user';
-import { getAdminPermission } from '@/api/api-collaboration';
+import { getAdminPermission, getMaintainerPermission } from '@/api/api-collaboration';
+import { COLLABORATIONPERMISSION } from '@/data/query';
 
 const routes = [
   {
@@ -131,14 +132,14 @@ router.beforeEach(async (to) => {
 
   const userInfoStore = useUserInfoStore();
   const isUpstream = to.name === 'upstream';
-  const isCollaboration = to.name === 'collaboration';
+  const isPlatform = COLLABORATIONPERMISSION.includes(to.name as string);
   const loginStore = useLoginStore();
 
   if (loginStore.isLogined) {
     if (isUpstream) {
       return userInfoStore.upstreamPermission ? true : { name: 'notFound' };
     }
-    if (isCollaboration) {
+    if (isPlatform) {
       return userInfoStore.platformAdminPermission ? true : { name: 'notFound' };
     }
 
@@ -146,25 +147,40 @@ router.beforeEach(async (to) => {
   }
 
   await tryLogin();
-  // if (userInfoStore.upstreamPermission === null && loginStore.isLogined) {
-  //   try {
-  //     // const upstreamPermission = await queryUpstreamPermission();
-  //     // userInfoStore.upstreamPermission = upstreamPermission.data.allow_access;
-  //   } catch {
-  //     // 如果queryUpstreamPermission不是401
-  //     return isUpstream ? { name: 'notFound' } : true;
-  //   }
-  // }
+
+  // 没登陆、没权限 直接404
+  if (!loginStore.isLogined && (isUpstream || isPlatform)) {
+    return { name: 'notFound' };
+  }
+
+  if (userInfoStore.upstreamPermission === null && loginStore.isLogined) {
+    try {
+      const upstreamPermission = await queryUpstreamPermission();
+      userInfoStore.upstreamPermission = upstreamPermission.data.allow_access;
+    } catch {
+      // 如果queryUpstreamPermission不是401
+      return isUpstream ? { name: 'notFound' } : true;
+    }
+  }
 
 
-  // 协作平台管理员权限
+  // 协作平台Admin权限
   if (userInfoStore.platformAdminPermission === null && loginStore.isLogined) {
     try {
       const queryAdminPermission = await getAdminPermission();
       userInfoStore.platformAdminPermission = queryAdminPermission.data.allow_access;
     } catch {
-      console.log('queryAdminPermission :>> ');
-      return isCollaboration ? { name: 'notFound' } : true;
+      return isPlatform ? { name: 'notFound' } : true;
+    }
+  }
+
+  // 协作平台Maintainer权限
+  if (userInfoStore.platformMaintainerPermission === null && loginStore.isLogined) {
+    try {
+      const queryMaintainerPermission = await getMaintainerPermission();
+      userInfoStore.platformMaintainerPermission = queryMaintainerPermission.data.allow_access;
+    } catch {
+      return isPlatform ? { name: 'notFound' } : true;
     }
   }
 

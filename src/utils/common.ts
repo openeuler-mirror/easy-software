@@ -88,10 +88,10 @@ export const checkOriginLink = (path: string) => {
  */
 import type { SearchSQLT, SearchESParamsT } from '@/@types/domain';
 export const getParamsRules = (data: any) => {
-  type ParamsKeyT = keyof SearchSQLT | SearchESParamsT;
+  type ParamsKeyT = keyof any;
 
   type NewDataT = {
-    [x: string]: SearchSQLT | SearchESParamsT;
+    [x: string]: any;
   };
 
   const newData: NewDataT = {};
