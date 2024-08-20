@@ -1,6 +1,6 @@
 import { request } from '@/shared/axios';
 import type { AxiosResponse } from '@/shared/axios';
-import type { AdminAppryT } from '@/@types/collaboration'
+import type { AdminAppryT, CollaborationRepoT } from '@/@types/collaboration'
 
 // maintainer权限
 export function getMaintainerPermission() {
@@ -15,15 +15,15 @@ export function getAdminPermission() {
 }
 
 // 软件维护详情 maintainer
-export function getMaintainerRepos() {
+export function getMaintainerRepos(params: CollaborationRepoT) {
   const url = `/server/collaboration/maintainer/user/repos`;
-  return request.get(url).then((res: AxiosResponse) => res?.data);
+  return request.get(url, { params }).then((res: AxiosResponse) => res?.data);
 }
 
 // 软件维护详情 admin
-export function getAdminRepos() {
+export function getAdminRepos(params: CollaborationRepoT) {
   const url = `/server/collaboration/admin/user/repos`;
-  return request.get(url).then((res: AxiosResponse) => res?.data);
+  return request.get(url, { params }).then((res: AxiosResponse) => res?.data);
 }
 
 
@@ -63,5 +63,16 @@ interface FeedbackT {
 
 export function getApplyFeedback(params: FeedbackT) {
   const url = `/server/collaboration/maintainer/apply`;
-  return request.post(url, { params }).then((res: AxiosResponse) => res?.data);
+  return request.post(url, { ...params }).then((res: AxiosResponse) => res?.data);
+}
+
+interface ProcessT {
+  applyId: string;
+  comment: string;
+  applyStatus: string;
+}
+
+export function getAdminProcess(params: ProcessT) {
+  const url = `/server/collaboration/admin/process`;
+  return request.post(url, { ...params }).then((res: AxiosResponse) => res?.data);
 }

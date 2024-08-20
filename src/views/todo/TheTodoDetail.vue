@@ -1,17 +1,26 @@
 <script lang="ts" setup>
-import { ref, onMounted } from 'vue';
-import { OButton, OTag, OTextarea } from '@opensig/opendesign';
-import { useRoute, useRouter } from 'vue-router';
-import { getAdminRecords, getMaintainerApply } from '@/api/api-collaboration';
+import { ref, onMounted, computed, reactive } from 'vue';
+import { OButton, OTag, OForm, OTextarea, OFormItem, useMessage, type FieldResultT } from '@opensig/opendesign';
+import { useRoute } from 'vue-router';
+import { getAdminApply, getMaintainerApply, getAdminProcess } from '@/api/api-collaboration';
 import { applyStatus } from '@/data/todo';
 import { formatDateTime } from '@/utils/common';
+import { useUserInfoStore } from '@/stores/user';
 
 const route = useRoute();
-const router = useRouter();
+const message = useMessage();
+const userInfoStore = useUserInfoStore();
+const isAdminPer = computed(() => userInfoStore.platformAdminPermission);
 
 const type = ref();
 const applyId = ref(Number(route.params.id) || 0);
 const todoData = ref();
+const formRef = ref<InstanceType<typeof OForm>>();
+const formData = reactive({
+  applyId: applyId.value,
+  comment: '',
+  applyStatus: '',
+});
 
 // 我的申请
 const queryApplicationApply = () => {
@@ -22,16 +31,75 @@ const queryApplicationApply = () => {
 
 // 待我审批
 const queryApprovalApply = () => {
-  getAdminRecords(applyId.value).then((res) => {
+  getAdminApply({ name: 'formContent', applyId: applyId.value }).then((res) => {
     todoData.value = res.data.list[0];
   });
 };
+
+// --------------------审批开始------------------------
+
+// 审批意见验证
+const commentRules = [
+  {
+    required: true,
+    triggers: ['blur'],
+    message: '请输入审批意见',
+    validator: (value: string) => {
+      if (value.length > 1000) {
+        return {
+          type: 'danger',
+          message: '最多不能超过1000字',
+        };
+      }
+    },
+  },
+];
+
+// 通过
+const onSubmit = (results: FieldResultT[]) => {
+  if (results.find((item) => item?.type === 'danger')) {
+    return;
+  } else {
+    formData.applyStatus = 'approved';
+    queryAdminProcess();
+  }
+};
+
+// 驳回
+const rejected = async () => {
+  const items = await formRef.value?.validate();
+  if (items?.find((item) => item?.type === 'danger')) {
+    return;
+  }
+  formData.applyStatus = 'rejected';
+  queryAdminProcess();
+};
+
+const queryAdminProcess = () => {
+  getAdminProcess(formData)
+    .then((res) => {
+      if (res.code === 200) {
+        message.success({
+          content: '审批成功',
+        });
+        formRef.value?.resetFields();
+      }
+    })
+    .catch(() => {
+      message.danger({
+        content: '审批失败',
+      });
+      formRef.value?.resetFields();
+    });
+};
+
+// --------------------审批结束------------------------
 
 onMounted(() => {
   type.value = route.params.type;
   if (type.value === 'application') {
     queryApplicationApply();
-  } else if (type.value === 'approval') {
+  } else if (type.value === 'approval' || type.value === 'approved') {
     queryApprovalApply();
   }
 });
@@ -45,35 +113,51 @@ onMounted(() => {
         <h2>{{ todoData.repo }}</h2>
         <OTag class="app-tag" :class="todoData.applyStatus.toLocaleLowerCase()">{{ applyStatus[todoData.applyStatus] }} </OTag>
       </div>
-      <dl>
-        <dt>基本信息</dt>
-        <dd><span class="label">申请单号：</span>{{ todoData.applyId }}</dd>
-        <dd><span class="label">申请类型：</span>{{ todoData.metric }}</dd>
-        <dd><span class="label">修改状态：</span>{{ todoData.metricStatus }}</dd>
-        <dd><span class="label">修改理由：</span>{{ todoData.description }}</dd>
-        <dd><span class="label">申请时间：</span>{{ formatDateTime(todoData.updateAt) }}</dd>
-      </dl>
-      <dl>
-        <dt>审批信息</dt>
-        <dd><span class="label">审批人：</span>{{ todoData.adminstrator }}</dd>
-        <dd>
-          <span class="label">审批意见：</span>
-        </dd>
-        <dd>
-          <span class="label">审批时间：</span>
-        </dd>
-      </dl>
-      <dl>
-        <dt>审批</dt>
-        <dd>
-          <span class="label">审批意见：</span>
-          <OTextarea></OTextarea>
-        </dd>
-        <dd>
-          <OButton variant="solid" color="primary">通过</OButton>
-          <OButton color="primary">驳回</OButton>
-        </dd>
-      </dl>
+
+      <h3 class="caption">基本信息</h3>
+      <OForm label-width="92px" label-align="top">
+        <OFormItem label="申请单号：">
+          {{ todoData.applyId }}
+        </OFormItem>
+        <OFormItem label="申请类型：">
+          {{ todoData.metric }}
+        </OFormItem>
+        <OFormItem label="修改状态："> {{ todoData.metricStatus }} </OFormItem>
+        <OFormItem label="修改理由：">{{ todoData.description }} </OFormItem>
+        <OFormItem label="申请时间："> {{ formatDateTime(todoData.updateAt) }} </OFormItem>
+      </OForm>
+      <template v-if="todoData.applyStatus !== 'PENDDING'">
+        <h3 class="caption">审批信息</h3>
+        <OForm label-width="92px" label-align="top">
+          <OFormItem label="审批人：">
+            {{ todoData.adminstrator }}
+          </OFormItem>
+          <OFormItem label="审批意见：">
+            {{ todoData.comment }}
+          </OFormItem>
+          <OFormItem label="审批时间："> - </OFormItem>
+        </OForm>
+      </template>
+      <template v-if="todoData.applyStatus === 'PENDDING' && type === 'approval'">
+        <h3 class="caption">审批</h3>
+        <OForm ref="formRef" has-required :model="formData" label-width="92px" label-align="top" @submit="onSubmit">
+          <OFormItem label="审批意见：" required field="comment" :rules="commentRules">
+            <OTextarea
+              v-model="formData.comment"
+              :max-length="1000"
+              placeholder="请输入审批意见"
+              resize="none"
+              :rows="4"
+              :input-on-outlimit="false"
+              style="width: 480px"
+            ></OTextarea>
+          </OFormItem>
+          <div class="button-box">
+            <OButton variant="solid" color="primary" size="large" type="submit">通过</OButton>
+            <OButton variant="outline" color="primary" size="large" class="reset" @click="rejected">驳回</OButton>
+          </div>
+        </OForm>
+      </template>
     </div>
   </ContentWrapper>
 </template>
@@ -96,20 +180,27 @@ onMounted(() => {
       @include h3;
     }
   }
-  dt {
+  .caption {
     color: var(--o-color-info1);
-    margin-top: 24px;
+    margin: 24px 0 16px;
     font-weight: 500;
     @include h4;
   }
-  dd {
-    color: var(--o-color-info1);
-    display: flex;
-    margin-top: 16px;
+  :deep(.o-form) {
+    --form-item-gap: 16px;
+    --form-label-gap-top: 0;
+    --form-label-main-gap: 24px;
+    .o-form-item-main-wrap {
+      min-height: 24px;
+    }
     @include text1;
-    .label {
-      min-width: 80px;
-      margin-right: 24px;
+  }
+
+  .button-box {
+    display: flex;
+    margin-top: 32px;
+    .o-btn + .o-btn {
+      margin-left: 24px;
     }
   }
 }

@@ -9,6 +9,7 @@ import { useUserInfoStore } from '@/stores/user';
 import Result404 from '@/components/Result404.vue';
 import ApprovalTable from './ApprovalTable.vue';
 import { COUNT_PAGESIZE } from '@/data/query';
+import { getParamsRules } from '@/utils/common';
 
 const tabList = [
   {
@@ -20,7 +21,7 @@ const tabList = [
     label: '待我审批',
   },
   {
-    id: 'approval-history',
+    id: 'approved',
     label: '我审批过的',
   },
 ];
@@ -56,7 +57,7 @@ const applicationData = ref([]);
 // 审批
 const approvalData = ref([]);
 // 审批历史
-const approvalHistoryData = ref([]);
+const approvedData = ref([]);
 const isLoading = ref(false);
 
 const activeName = ref();
@@ -78,7 +79,8 @@ const handleCurrentChange = (val: number) => {
 
 // 我的申请
 const queryMyApplication = () => {
-  getMaintainerApply({ name: todoName.value })
+  const newData = getParamsRules(todoParams.value);
+  getMaintainerApply(newData)
     .then((res) => {
       applicationData.value = res.data.list;
       total.value = res.data.total;
@@ -90,6 +92,7 @@ const queryMyApplication = () => {
     });
 };
 
+// 撤销申请
 const revokeApplication = (applyId: number) => {
   getMaintainerRevoke(applyId)
     .then((res) => {
@@ -109,9 +112,26 @@ const revokeApplication = (applyId: number) => {
 // 待我审批
 const queryApprovalApply = () => {
   if (isAdminPermission.value) {
-    getAdminApply({ name: todoName.value })
+    const newData = getParamsRules(todoParams.value);
+    getAdminApply(newData)
       .then((res) => {
         approvalData.value = res.data.list;
+        total.value = res.data.total;
+        isLoading.value = false;
+      })
+      .catch(() => {
+        isError.value = true;
+      });
+  }
+};
+
+// 待我审批
+const queryApprovedApply = () => {
+  if (isAdminPermission.value) {
+    // { name: todoName.value, applyStatus: 'PASSED,DISMISSED' }
+    getAdminApply({ name: 'approved' })
+      .then((res) => {
+        approvedData.value = res.data.list;
         total.value = res.data.total;
         isLoading.value = false;
       })
@@ -127,6 +147,8 @@ const pageInit = () => {
     queryMyApplication();
   } else if (activeName.value === 'approval') {
     queryApprovalApply();
+  } else if (activeName.value === 'approved') {
+    queryApprovedApply();
   }
 };
 
@@ -140,6 +162,16 @@ watch(
   (v: string) => {
     activeName.value = v || 'application';
     pageInit();
+  }
+);
+
+watch(
+  () => todoParams.value,
+  () => {
+    pageInit();
+  },
+  {
+    immediate: true,
   }
 );
 </script>
@@ -167,11 +199,16 @@ watch(
             <AppPagination :current="currentPage" :pagesize="pageSize" :total="total" @size-change="handleSizeChange" @current-change="handleCurrentChange" />
           </div>
         </template>
-        <template v-if="item.id === 'approvalHistory' && approvalHistoryData.length > 0">approvalHistoryData {{ approvalHistoryData.length }} </template>
+        <template v-if="item.id === 'approved' && approvedData.length > 0">
+          <ApprovalTable :columns="approvalColumns" :type="item.id" :data="approvedData" :loading="isLoading" />
+          <div v-if="total > COUNT_PAGESIZE[0]" class="pagination-box">
+            <AppPagination :current="currentPage" :pagesize="pageSize" :total="total" @size-change="handleSizeChange" @current-change="handleCurrentChange" />
+          </div>
+        </template>
       </template>
 
       <!-- 暂无记录 -->
-      <template v-if="(item.id === 'application' && isError) || (item.id === 'approval' && isError) || (item.id === 'approvalHistory' && isError)">
+      <template v-if="(item.id === 'application' && isError) || (item.id === 'approval' && isError) || (item.id === 'approved' && isError)">
         <Result404>
           <template #description>
             <p class="text404">暂无{{ item.id === 'application' ? '申请' : '审批' }}记录</p>
@@ -183,6 +220,11 @@ watch(
 </template>
 
 <style lang="scss" scoped>
+.pagination-box {
+  margin-top: 24px;
+  display: flex;
+  justify-content: end;
+}
 .loading-box {
   position: relative;
 }

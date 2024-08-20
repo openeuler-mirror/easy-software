@@ -12,3 +12,11 @@ export interface AdminAppryT extends CollaborationT {
   timeOrder?: string;
 }
 
+export interface CollaborationRepoT {
+  pageNum: number;
+  pageSize: number;
+  repo?: string;
+  kind?: string;
+  sigName?: string;
+  status?: string;
+}

@@ -34,10 +34,17 @@ const currentPage = ref(1);
 const pageSize = ref(10);
 const total = ref(0);
 
+const searchParams = computed(() => {
+  return {
+    pageNum: currentPage.value,
+    pageSize: pageSize.value,
+  };
+});
+
 const data = ref([]);
 const isLoading = ref(false);
 const queryMaintainerRepos = () => {
-  getMaintainerRepos()
+  getMaintainerRepos(searchParams.value)
     .then((res) => {
       data.value = res.data.list;
       total.value = res.data.total;
@@ -47,7 +54,7 @@ const queryMaintainerRepos = () => {
 };
 
 const queryAdminRepos = () => {
-  getAdminRepos()
+  getAdminRepos(searchParams.value)
     .then((res) => {
       data.value = res.data.list;
       total.value = res.data.total;
@@ -57,12 +64,10 @@ const queryAdminRepos = () => {
 };
 
 const pageInit = () => {
-  // if (isMainPer) {
-  //   queryMaintainerRepos();
-  // }
-
   if (isAdminPer.value) {
     queryAdminRepos();
+  } else {
+    queryMaintainerRepos();
   }
 };
 
@@ -97,6 +102,16 @@ const changeFeedback = (v: string) => {
 onMounted(() => {
   pageInit();
 });
+
+watch(
+  () => searchParams.value,
+  () => {
+    pageInit();
+  },
+  {
+    immediate: true,
+  }
+);
 </script>
 <template>
   <div class="platform-header">
@@ -109,7 +124,7 @@ onMounted(() => {
       <span @click="showDlg = true" class="text">状态指标说明</span>
       <Indicators v-if="showDlg" @change="showDlg = false" />
     </div>
-    <div class="platform-main" :class="isAdminPer ? 'maintainer' : 'admin'">
+    <div class="platform-main" :class="isMainPer ? 'maintainer' : 'admin'">
       <OTable :columns="columns" :data="data" :loading="loading" border="row">
         <template #head="{ columns }">
           <th v-for="item in columns" :key="item.type" :class="item.type">{{ item.label }}</th>
