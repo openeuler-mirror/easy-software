@@ -20,6 +20,8 @@ const props = defineProps<{
    * 如果是在领域应用详情内，当前反馈历史列表所属的tab是哪一个
    */
   fieldDetailTab?: string;
+  name: string;
+  version: string;
 }>();
 
 defineEmits<{
@@ -42,6 +44,7 @@ const pageSize = ref(10);
 const totalCount = ref(0);
 const sort = ref<SorT>('desc');
 const totalList = ref<FeedbackHistoryT[]>([]);
+const lookupKey = computed(() => `${props.name}-${props.version}`);
 const feedbackList = computed(() => totalList.value.slice((currentPage.value - 1) * pageSize.value, currentPage.value * pageSize.value));
 
 const queryData = () => {
@@ -51,7 +54,7 @@ const queryData = () => {
   getFeedbackList(1, 1000, radioVal.value, sort.value)
     .then((res) => {
       const { data } = res.data[0];
-      totalList.value = data.filter((item) => item.issue_title.endsWith(pkgId.value));
+      totalList.value = data.filter((item) => item.issue_title.endsWith(lookupKey.value));
       if (!initialized) {
         initialized = true;
         if (!totalList.value.length) {
@@ -118,15 +121,14 @@ const handleCurrentChange = (page: number) => {
       <AppPagination :current="currentPage" :pagesize="pageSize" :total="totalCount" @size-change="handleSizeChange" @current-change="handleCurrentChange" />
     </div>
   </template>
-  <p v-else class="not-found">
-    暂无历史反馈信息
-  </p>
+  <p v-else class="not-found">暂无历史反馈信息</p>
 </template>
 
 <style scoped lang="scss">
 .not-found {
   padding-top: 24px;
   @include tip1;
+  color: var(--o-color-info3);
 }
 
 .filter-items {
@@ -143,10 +145,11 @@ const handleCurrentChange = (page: number) => {
     color: var(--o-color-info1);
     :deep(.o-radio) {
       @include tip2;
+
       .o-toggle {
         --toggle-size: 28px;
         --toggle-padding: 0 12px;
-        --toggle-bg-color: #F3F3F5;
+        --toggle-bd-color: transparent;
       }
     }
   }

@@ -179,7 +179,7 @@ const searchDocCount = (v: number) => {
   </div>
   <div v-else-if="searchOptions.length === 0 && isShow" class="recommend">
     <span class="text">{{ t('software.nofound') }}</span>
-    <p>
+    <p class="nofound">
       {{ t('software.nofoundApp') }} <OLink color="primary" @click="clickFeedback"> {{ t('software.feedback') }}</OLink>
     </p>
     <ExternalLink v-if="showExternalDlg" :href="externalLink" @change="showExternalDlg = false" />
@@ -190,10 +190,10 @@ const searchDocCount = (v: number) => {
 .recommend {
   position: absolute;
   z-index: 99;
-  top: 60px;
+  top: 52px;
   width: 100%;
-  background-color: var(--o-color-fill2);
-  box-shadow: var(--o-shadow-1);
+  background-color: var(--o-color-control-light);
+  box-shadow: var(--o-shadow-2);
   height: auto;
   padding: 16px 16px 12px;
   border-radius: 4px;
@@ -250,6 +250,9 @@ const searchDocCount = (v: number) => {
     display: block;
     color: var(--o-color-info1);
   }
+  .nofound {
+    color: var(--o-color-info1);
+  }
   .history {
     @include tip2;
     color: var(--o-color-info3);
@@ -263,9 +266,9 @@ const searchDocCount = (v: number) => {
     cursor: pointer;
     overflow: hidden;
     text-overflow: ellipsis;
-    border-radius: 1px;
+    border-radius: 4px;
     &:hover {
-      background: var(--o-color-control2-light);
+      background: var(--o-color-control1-light);
     }
     :deep(span) {
       color: var(--o-color-primary1);

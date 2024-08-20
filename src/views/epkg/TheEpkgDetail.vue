@@ -21,7 +21,6 @@ const { mkit } = useMarkdown();
 const { t } = useI18n();
 
 const basicInfo = ref<DetailItemT[]>([]);
-const version = ref();
 const installation = ref('');
 const tabValue = ref('epkgpkg');
 const downloadData = ref('');
@@ -34,6 +33,8 @@ const description = ref();
 const appData = ref<AppInfoT>({
   name: '',
   cover: '',
+  license: '',
+  version: '',
   repository: '',
   size: '',
   source_code: '',
@@ -73,7 +74,6 @@ onMounted(() => {
   queryPkg();
 });
 const summary = ref();
-const license = ref();
 const tagVer = ref();
 const getDetailValue = (data: any) => {
   try {
@@ -112,8 +112,6 @@ const getDetailValue = (data: any) => {
     maintainerGiteeId: data?.maintainerGiteeId || maintainerDefaults.gitee_id,
   };
 
-  version.value = data?.version;
-  license.value = data.license;
   upStream.value = data?.upStream;
   security.value = data?.securityLevel;
   description.value = data?.description;
@@ -124,6 +122,8 @@ const getDetailValue = (data: any) => {
   appData.value.bin_code = data.binDownloadUrl;
   appData.value.cover = data?.iconUrl || defaultImg;
   appData.value.repository = data.srcRepo;
+  appData.value.version = data.version;
+  appData.value.license = data.license;
   queryVer();
 };
 
@@ -151,7 +151,7 @@ const queryVer = () => {
         <div class="detail-row-main">
           <AppSection :title="`> ${t('detail.information')}`">
             <template #append>
-              <span v-if="version" class="ver">{{ t('detail.number') }}:{{ version }}</span>
+              <span v-if="appData.version" class="ver">{{ t('detail.number') }}:{{ appData.version }}</span>
             </template>
             <!-- 基本信息 -->
             <DetailBasicInfo :options="basicInfo" />
@@ -167,10 +167,10 @@ const queryVer = () => {
           </AppSection>
 
           <!-- 反馈 -->
-          <AppFeedback :name="appData.name" :version="version" type="EPKG" :maintainer="maintainer" :srcRepo="srcRepo" />
+          <AppFeedback :name="appData.name" :version="appData.version" type="EPKG" :maintainer="maintainer" :srcRepo="srcRepo" />
         </div>
         <div class="detail-row-side">
-          <DetailAside :data="appData" :basicInfo="basicInfo" :maintainer="maintainer" :ver-data="verData" :license="license" :tagVer="tagVer" :type="'EPKG'" />
+          <DetailAside :data="appData" :ver-data="verData" :tagVer="tagVer" :type="'EPKG'" />
         </div>
       </div>
     </template>

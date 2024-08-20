@@ -1,7 +1,7 @@
 import Cookies from 'js-cookie';
 import { useLangStore } from '@/stores/common';
 import { useLoginStore, useUserInfoStore } from '@/stores/user';
-import { queryUpstreamPermission, queryUserInfo } from '@/api/api-user';
+import { queryUserInfo } from '@/api/api-user';
 
 const LOGIN_URL = import.meta.env.VITE_LOGIN_URL;
 const XSRF_COOKIE_NAME = import.meta.env.VITE_XSRF_COOKIE_NAME;
@@ -43,7 +43,7 @@ export function clearUserAuth() {
   // 清除内存中用户信息
   useUserInfoStore().$reset();
   // 清除cookie
-  Cookies.remove(LOGIN_KEYS.CSRF_TOKEN);
+  Cookies.remove(LOGIN_KEYS.CSRF_TOKEN, { domain: import.meta.env.VITE_COOKIE_DOMAIN, path: '/', secure: true });
 }
 
 /**

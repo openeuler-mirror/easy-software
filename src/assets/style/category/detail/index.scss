@@ -26,76 +26,6 @@
     margin-bottom: 16px;
   }
 }
-:deep(.domain-tabs) {
-  padding-top: 26px;
-  &.min {
-    > .o-tab-head {
-      .o-tab-nav-anchor {
-        display: none;
-      }
-
-      .o-tab-nav-active {
-        color: var(--o-color-info1);
-        cursor: default;
-        padding: 0;
-      }
-    }
-  }
-  .o-tab-head {
-    display: block !important;
-  }
-  .o-tab-navs {
-    --tab-nav-justify: left;
-    margin-bottom: 24px;
-  }
-  .o-table {
-    word-break: break-word;
-    --table-edge-padding: 24px;
-    .arch,
-    .appVer {
-      width: 250px;
-    }
-    tbody tr:hover {
-      background: none;
-    }
-  }
-
-  // 应用镜像样式
-  &.tabs-switch {
-    .o-tab-nav-list {
-      background: #ededf0;
-      border-radius: 8px;
-      height: 40px;
-      padding: 4px;
-      .o-tab-nav {
-        margin: 0 !important;
-        position: relative;
-        padding: 2px 12px;
-        z-index: 3;
-      }
-    }
-    .o-tab-nav-anchor {
-      top: 0;
-      padding: 4px 0;
-      .o-tab-nav-anchor-line {
-        box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.1);
-        border-radius: 4px;
-        height: 100%;
-        background: var(--o-color-fill2);
-      }
-    }
-  }
-  &.tabs-one {
-    .o-tab-nav-active {
-      color: var(--o-color-info1);
-      cursor: default;
-      padding: 0;
-    }
-    .o-tab-nav-anchor {
-      display: none;
-    }
-  }
-}
 
 .code-box {
   position: relative;
@@ -109,13 +39,13 @@
     color: var(--o-color-info1);
     display: flex;
     align-items: top;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-    border-right: 1px solid rgba(0, 0, 0, 0.1);
+    border-bottom: 1px solid var(--o-color-control4);
+    border-right: 1px solid var(--o-color-control4);
     &:first-child {
-      border-top: 1px solid rgba(0, 0, 0, 0.1);
+      border-top: 1px solid var(--o-color-control4);
     }
     .label {
-      background: rgba(0, 47, 167, 0.05);
+      background: var(--o-color-control2-light);
       padding: 16px 24px;
       color: var(--o-color-info2);
       min-width: 150px;
@@ -156,7 +86,7 @@
     align-items: center;
     justify-content: center;
     background-color: var(--o-color-primary1);
-    color: #fff;
+    color: var(--o-color-info1);
     padding: 10px 0px;
   }
 }
@@ -185,19 +115,21 @@
 }
 .sp {
   margin: 32px 0 24px;
-  @include h3;
+  color: var(--o-color-info1);
   font-weight: 500;
+  @include h3;
 }
 .title {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  @include h3;
   font-weight: 500;
+  color: var(--o-color-info1);
+  @include h3;
 }
 
 .ver {
-  background: rgba(var(--o-kleinblue-6), 0.05);
+  background: var(--o-color-control2-light);
   @include text2;
   border: none;
   border-radius: var(--layout-pkg-radius);

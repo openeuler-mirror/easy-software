@@ -1,6 +1,5 @@
 /* theme: opendesign.light */
-:root,
-[data-o-theme='light'] {
+:root,[data-o-theme="light"] {
   /**
    * @name 
    * @type palette
@@ -21,7 +20,7 @@
    * @group kleinblue
    * @description 
    */
-  --o-kleinblue-1: 235, 241, 250;
+  --o-kleinblue-1: 235, 241, 246;
   /**
    * @name 
    * @type palette
@@ -924,7 +923,7 @@
    * @group mixedgray
    * @description 
    */
-  --o-mixedgray-10: 85, 85, 92;
+  --o-mixedgray-10: 85 , 85, 92;
   /**
    * @name 
    * @type palette
@@ -1498,35 +1497,35 @@
    * @group control
    * @description 常规，常用于边框
    */
-  --o-color-control1: rgba(var(--o-mixedgray-10), 0.25);
+  --o-color-control1: rgba(var(--o-mixedgray-14), 0.25);
   /**
    * @name 
    * @type color
    * @group control
    * @description 悬浮，常用于边框
    */
-  --o-color-control2: rgba(var(--o-mixedgray-10), 0.6);
+  --o-color-control2: rgba(var(--o-mixedgray-14), 0.6);
   /**
    * @name 
    * @type color
    * @group control
    * @description 激活，常用于边框
    */
-  --o-color-control3: rgba(var(--o-mixedgray-10), 0.8);
+  --o-color-control3: rgba(var(--o-mixedgray-14), 0.8);
   /**
    * @name 
    * @type color
    * @group control
    * @description 禁用，常用于边框
    */
-  --o-color-control4: rgba(var(--o-mixedgray-10), 0.1);
+  --o-color-control4: rgba(var(--o-mixedgray-14), 0.1);
   /**
    * @name 
    * @type color
    * @group control
    * @description 常规-浅，常用于背景
    */
-  --o-color-control1-light: rgb(var(--o-mixedgray-5), 1);
+  --o-color-control1-light: rgb(var(--o-mixedgray-5), 1.0);
   /**
    * @name 
    * @type color
@@ -1554,14 +1553,14 @@
    * @group control
    * @description 很浅，常用于表格背景色
    */
-  --o-color-control-light: rgb(var(--o-mixedgray-1), 1);
+  --o-color-control-light: rgb(var(--o-mixedgray-1), 1.0);
   /**
    * @name 
    * @type color
    * @group info
    * @description 一级/强调/标题
    */
-  --o-color-info1: rgba(var(--o-mixedgray-14), 1);
+  --o-color-info1: rgba(var(--o-mixedgray-14), 1.0);
   /**
    * @name 
    * @type color
@@ -1589,7 +1588,7 @@
    * @group info
    * @description 一级/次强调/正文反色
    */
-  --o-color-info1-inverse: rgba(var(--o-mixedgray-1), 1);
+  --o-color-info1-inverse: rgba(var(--o-mixedgray-1), 1.0);
   /**
    * @name 
    * @type color

@@ -20,7 +20,6 @@ const { mkit } = useMarkdown();
 const { t } = useI18n();
 
 const basicInfo = ref<DetailItemT[]>([]);
-const version = ref();
 const installation = ref('');
 const tabValue = ref('oepkg');
 const downloadData = ref('');
@@ -32,6 +31,8 @@ const description = ref();
 const appData = ref<AppInfoT>({
   name: '',
   cover: '',
+  license: '',
+  version: '',
   repository: '',
   size: '',
   source_code: '',
@@ -113,7 +114,7 @@ const getDetailValue = (data: any) => {
     maintainerEmail: data?.maintainerEmail || maintainerDefaults.email,
     maintainerGiteeId: data?.maintainerGiteeId || maintainerDefaults.gitee_id,
   };
-  version.value = data?.version;
+  appData.value.version = data?.version;
   license.value = data.license;
   upStream.value = data?.upStream;
   security.value = data?.securityLevel;
@@ -152,7 +153,7 @@ const queryVer = () => {
         <div class="detail-row-main">
           <AppSection :title="`> ${t('detail.information')}`">
             <template #append>
-              <span v-if="version" class="ver">{{ t('detail.number') }}: {{ version }}</span>
+              <span v-if="appData.version" class="ver">{{ t('detail.number') }}: {{ appData.version }}</span>
             </template>
             <!-- 基本信息 -->
             <DetailBasicInfo :options="basicInfo" />
@@ -169,18 +170,10 @@ const queryVer = () => {
           </AppSection>
 
           <!-- 反馈 -->
-          <AppFeedback :name="appData.name" :version="version" type="OEPKG" :maintainer="maintainer" :srcRepo="srcRepo" />
+          <AppFeedback :name="appData.name" :version="appData.version" type="OEPKG" :maintainer="maintainer" :srcRepo="srcRepo" />
         </div>
         <div class="detail-row-side">
-          <DetailAside
-            :data="appData"
-            :basicInfo="basicInfo"
-            :maintainer="maintainer"
-            :ver-data="verData"
-            :license="license"
-            :tagVer="tagVer"
-            :type="'OEPKG'"
-          />
+          <DetailAside :data="appData" :ver-data="verData" :license="license" :tagVer="tagVer" :type="'OEPKG'" />
         </div></div
     ></template>
   </ContentWrapper>

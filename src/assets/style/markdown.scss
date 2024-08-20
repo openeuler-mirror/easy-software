@@ -1,6 +1,8 @@
 @use 'github-markdown-css/github-markdown-light.css' as *;
 
 .markdown-body {
+  background: var(--o-color-fill2);
+  color: var(--o-color-info1);
   details {
     display: block !important;
   }
@@ -45,12 +47,17 @@
   }
   code {
     border-radius: var(--layout-pkg-radius);
+    background-color: var(--o-color-control2-light);
+    margin: 0 4px;
+  }
+  p code:first-child {
+    margin-left: 0;
   }
 
   pre {
     position: relative;
     border-radius: var(--layout-pkg-radius);
-    background-color: var(--pkg-bg);
+    background-color: var(--o-color-control2-light);
     padding: 0;
     overflow: hidden;
 
@@ -58,6 +65,7 @@
       display: block;
       overflow-x: auto;
       padding: 16px 36px 16px 16px;
+      margin: 0;
       @include scrollbar;
     }
   }
@@ -84,7 +92,7 @@
     th {
       background-color: var(--o-color-control3-light);
       text-align: left;
-      border: 0 none !important;
+      border-color: var(--o-color-control3-light) !important;
       height: 40px;
     }
     th,
@@ -111,9 +119,8 @@
     position: absolute;
     top: 0;
     right: 0;
-    background-color: var(--o-color-fill1);
+    background-color: var(--o-color-control2-light);
     opacity: 1;
-    transition: all var(--o-duration-m1) var(--o-easing-standard-in);
     padding: 12px 12px 0 0;
     .icon-copy {
       display: block;
@@ -153,7 +160,7 @@
           content: counter(num);
           position: absolute;
           border-radius: 50%;
-          color: var(--o-color-info1-inverse);
+          color: var(--o-color-white);
           @include text1;
           text-align: center;
           top: 0;

@@ -4,15 +4,19 @@ import { OLink, OIcon } from '@opensig/opendesign';
 import { checkOriginLink, windowOpen } from '@/utils/common';
 import { scrollToTop } from '@/utils/common';
 import { useRoute } from 'vue-router';
+import { useTheme } from '@/composables/useTheme';
 import ExternalLink from '@/components/ExternalLink.vue';
 
 import type { MaintainerT } from '@/@types/app';
 import { GITEE } from '@/data/config';
 
-import Email from '@/assets/email.svg';
-import Gitee from '@/assets/gitee.svg';
+import IconEmail from '~icons/pkg/email.svg';
+import IconGitee from '~icons/pkg/gitee.svg';
 import IconOutlink from '~icons/pkg/icon-outlink.svg';
 import IconHelp from '~icons/pkg/icon-help.svg';
+
+import coverBg from '@/assets/default-logo-cover.png';
+import coverBgDark from '@/assets/default-logo-cover_dark.png';
 
 defineProps({
   data: {
@@ -34,6 +38,7 @@ defineProps({
   },
 });
 
+const { isDark } = useTheme();
 const route = useRoute();
 const showExternalDlg = ref(false);
 const externalLink = ref('');
@@ -60,7 +65,7 @@ const scrollToAnchor = (id: string) => {
 <template>
   <div class="domain-head">
     <div class="left">
-      <div class="cover"><img :src="data.cover" alt="" /></div>
+      <div class="cover" :style="{ 'background-image': `url(${isDark ? coverBgDark : coverBg})` }"><img :src="data.cover" alt="" /></div>
       <div class="box">
         <p class="title">
           {{ data.name }}
@@ -89,13 +94,13 @@ const scrollToAnchor = (id: string) => {
       <p v-if="maintainer.maintainerId" class="title">维护者：{{ maintainer.maintainerId }}</p>
       <p v-if="maintainer.maintainerEmail" class="text">
         <a class="email" :href="`mailto:${maintainer.maintainerEmail}`">
-          <img :src="Email" class="icon-img" alt="" />
+          <OIcon class="icon-img"><IconEmail /></OIcon>
           <span>{{ maintainer.maintainerEmail }}</span>
         </a>
       </p>
       <p v-if="maintainer.maintainerGiteeId" class="text">
         <a class="gitee" @click="onExternalDialog(`${GITEE}/${maintainer.maintainerGiteeId}`)">
-          <img :src="Gitee" class="icon-img" alt="" />
+          <OIcon class="icon-img"><IconGitee /></OIcon>
           <span>{{ `${GITEE}/${maintainer.maintainerGiteeId}` }}</span>
         </a>
       </p>
@@ -106,6 +111,12 @@ const scrollToAnchor = (id: string) => {
 </template>
 
 <style lang="scss" scoped>
+@include in-dark {
+  .cover {
+    @include img-in-dark;
+  }
+}
+
 .domain-head {
   margin-top: 24px;
   margin-bottom: 40px;
@@ -115,7 +126,7 @@ const scrollToAnchor = (id: string) => {
   .left {
     display: flex;
     width: 70%;
-    border-right: 1px solid rgba(0, 0, 0, 0.1);
+    border-right: 1px solid var(--o-color-control4);
     padding-right: 64px;
     .box {
       margin-left: 32px;
@@ -170,14 +181,14 @@ const scrollToAnchor = (id: string) => {
         align-items: center;
         .icon-img {
           margin-right: 8px;
+          color: var(--o-color-info1);
         }
       }
     }
 
     .title {
-      font-size: 16px;
-      color: rgba(0, 0, 0, 0.8);
-      line-height: 24px;
+      @include text1;
+      color: var(--o-color-info2);
       margin: 24px 0px 16px 0px;
     }
     .sp {
@@ -194,7 +205,7 @@ const scrollToAnchor = (id: string) => {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: url(@/assets/default-logo-cover.png) no-repeat center;
+    background: no-repeat center;
     padding: 12px;
     img {
       max-width: 100%;

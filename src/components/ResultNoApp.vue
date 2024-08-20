@@ -4,9 +4,11 @@ import { OLink, OResult, OFigure } from '@opensig/opendesign';
 import { useRoute } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { GITEE } from '@/data/config';
+import { useTheme } from '@/composables/useTheme';
 import ExternalLink from '@/components/ExternalLink.vue';
 
 import result404 from '@/assets/404.png';
+import result404Dark from '@/assets/404-dark.png';
 
 const props = defineProps({
   type: {
@@ -14,6 +16,8 @@ const props = defineProps({
     default: '',
   },
 });
+
+const { isDark } = useTheme();
 
 const route = useRoute();
 const { t } = useI18n();
@@ -47,11 +51,12 @@ const clickFeedback = () => {
 <template>
   <OResult class="result-tips">
     <template #image>
-      <OFigure :src="result404" fit="contain" />
+      <OFigure :src="isDark ? result404Dark : result404" fit="contain" />
     </template>
     <template #description>
-      {{ t('software.nofoundApp') }}
-      <OLink hover-underline color="primary" @click="clickFeedback">{{ t('software.feedbackPkg.btn') }}</OLink>
+      <p class="text">
+        {{ t('software.nofoundApp') }} <OLink hover-underline color="primary" @click="clickFeedback">{{ t('software.feedbackPkg.btn') }}</OLink>
+      </p>
     </template>
   </OResult>
 

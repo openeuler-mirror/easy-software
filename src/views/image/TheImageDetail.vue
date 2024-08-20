@@ -26,13 +26,14 @@ const route = useRoute();
 const { mkit } = useMarkdown();
 const activeName = ref(tagList[0].lable);
 const basicInfo = ref<DetailItemT[]>([]);
-const version = ref();
 const installation = ref('');
 const downloadData = ref('');
 const maintainer = ref<MaintainerT>({ maintainerId: '', maintainerEmail: '', maintainerGiteeId: '' });
 const security = ref();
 const appData = ref<AppInfoT>({
   name: '',
+  license: '',
+  version: '',
   cover: '',
   repository: '',
   size: '',
@@ -75,7 +76,6 @@ onMounted(() => {
 const imageUsage = ref();
 const summary = ref();
 const latestSupportOs = ref();
-const pkgLicense = ref();
 const tagVer = ref();
 const getDetailValue = (data: ImageDetailT) => {
   const {
@@ -113,8 +113,6 @@ const getDetailValue = (data: ImageDetailT) => {
   };
 
   summary.value = description;
-  pkgLicense.value = license;
-  version.value = appVer;
   latestSupportOs.value = latestOsSupport;
   security.value = securityLevel;
 
@@ -129,6 +127,8 @@ const getDetailValue = (data: ImageDetailT) => {
     cover: iconUrl || defaultImg,
     repository: srcRepo,
     size: appSize,
+    license: license,
+    version: appVer,
   };
 
   if (name) {
@@ -137,9 +137,12 @@ const getDetailValue = (data: ImageDetailT) => {
 };
 
 const tagsValue = ref([]);
+const isTagLoading = ref(false);
 const queryTags = () => {
+  isTagLoading.value = true;
   getTags(encodeURIComponent(appData.value.name)).then((res) => {
     tagsValue.value = res.data.list;
+    isTagLoading.value = false;
   });
 };
 
@@ -180,10 +183,10 @@ const onCodeSuccess = () => {
     ...(window as any)['sensorsCustomBuriedData'],
     profileType: 'download',
     origin: href,
-    name: appData.value.name,
-    os: tagVer.value[0],
-    arch: tagVer.value[1],
+    softwareName: appData.value.name,
+    version: appData.value.version,
     pkgId: route.query.pkgId as string,
+    type: 'IMAGE',
     downloadTime,
   });
 };
@@ -207,7 +210,7 @@ const onCodeSuccess = () => {
                   <!-- 基本信息 -->
                   <AppSection :title="`> ${t('detail.information')}`">
                     <template #append>
-                      <span v-if="version" class="ver">{{ t('detail.number') }}:{{ version }}</span>
+                      <span v-if="appData.version" class="ver">{{ t('detail.number') }}:{{ appData.version }}</span>
                     </template>
 
                     <DetailBasicInfo :options="basicInfo" />
@@ -222,23 +225,14 @@ const onCodeSuccess = () => {
                     <div v-if="imageUsage" v-dompurify-html="imageUsage" v-copy-code="true" class="markdown-body download"></div>
                   </DetailInstall>
                 </template>
-                <ImageTags v-else :data="tagsValue" :options="tagsOptions" />
+                <ImageTags v-else :data="tagsValue" :options="tagsOptions" :loading="isTagLoading" />
               </OTabPane>
             </OTab>
           </AppSection>
-          <AppFeedback v-if="!isTags" :name="appData.name" :version="version" type="应用镜像" :maintainer="maintainer" :srcRepo="srcRepo" />
+          <AppFeedback v-if="!isTags" :name="appData.name" :version="appData.version" type="应用镜像" :maintainer="maintainer" :srcRepo="srcRepo" />
         </div>
         <div v-if="!isTags" class="detail-row-side">
-          <DetailAside
-            :data="appData"
-            :basicInfo="basicInfo"
-            :maintainer="maintainer"
-            :type="'IMAGE'"
-            :downloadData="downloadData"
-            :ver-data="verData"
-            :license="pkgLicense"
-            :tagVer="tagVer"
-          />
+          <DetailAside :data="appData" :type="'IMAGE'" :downloadData="downloadData" :ver-data="verData" :tagVer="tagVer" />
         </div>
       </div>
     </template>

@@ -119,7 +119,7 @@ const issueUrl = ref();
 
 const getIssueUrl = () => {
   const desc = encodeURIComponent(getIssueTemplate());
-  issueUrl.value = `${GITEE}/openeuler/easy-software/issues/new?issue%5Bassignee_id%5D=0&issue%5Bmilestone_id%5D=0&title=【EasySoftware】【${props.type}】${pkgId.value}&description=${desc}`;
+  issueUrl.value = `${GITEE}/openeuler/easy-software/issues/new?issue%5Bassignee_id%5D=0&issue%5Bmilestone_id%5D=0&title=【EasySoftware】【${props.type}】${props.name}-${props.version}&description=${desc}`;
 };
 
 let clearDataAfterJump = false;
@@ -141,7 +141,6 @@ const onExternalDialog = () => {
   showExternalDlg.value = true;
   clearDataAfterJump = true;
 };
-
 
 const goToFeedbackDetailUrl = (url: string) => {
   externalLink.value = decodeURIComponent(url);
@@ -193,7 +192,7 @@ const jumpOut = () => {
         <div class="popover-content">历史反馈信息内容更新有延迟，请耐心等待</div>
       </OPopover>
     </h3>
-    <FeedbackHistory :fieldDetailTab="props.fieldDetailTab" @goToUrl="goToFeedbackDetailUrl" />
+    <FeedbackHistory :fieldDetailTab="props.fieldDetailTab" @goToUrl="goToFeedbackDetailUrl" :name="props.name" :version="props.version" />
   </AppSection>
   <ExternalLink v-if="showExternalDlg" :href="externalLink" @change="jumpOut" />
 </template>
@@ -241,8 +240,5 @@ const jumpOut = () => {
       margin-left: 16px;
     }
   }
-}
-:deep(.o-rate) {
-  --rate-size: 24px;
 }
 </style>

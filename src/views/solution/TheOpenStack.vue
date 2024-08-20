@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import { OCard, ODivider, OLink } from '@opensig/opendesign';
 import AppBanner from '@/components/AppBanner.vue';
 import ContentWrapper from '@/components/ContentWrapper.vue';
@@ -8,6 +8,15 @@ import bannerImg from '@/assets/banner/banner1.jpg';
 import OpenStack from '@/data/solution/openstack';
 import { GITEE, OPENEULER } from '@/data/config';
 import { checkOriginLink, windowOpen } from '@/utils/common';
+import { useTheme } from '@/composables/useTheme';
+
+import openstackLogo from '@/assets/solution/openstack/openstacklogo.png';
+import openstackLogoDark from '@/assets/solution/openstack/openstacklogo-dark.png';
+import Add from '@/assets/solution/openstack/add.png';
+import openeulerLogo from '@/assets/solution/openstack/openEulerlogo.png';
+import openeulerLogoDark from '@/assets/solution/openstack/openeuler-dark.png';
+
+const { isDark } = useTheme();
 
 const solutionInfo = {
   title: 'OpenStack',
@@ -39,6 +48,10 @@ const jumpTo = (href: string) => {
     showExternalDlg.value = true;
   }
 };
+
+const advImg = computed(() => {
+  return [isDark.value ? openstackLogoDark : openstackLogo, Add, isDark.value ? openeulerLogoDark : openeulerLogo];
+});
 </script>
 <template>
   <AppBanner :title="solutionInfo.title" :background-image="bannerImg" :subtitle="solutionInfo.desc" />
@@ -80,7 +93,7 @@ const jumpTo = (href: string) => {
       </div>
       <div class="solution-adv">
         <div class="adv-img-box">
-          <img v-for="(item, index) in OpenStack.advImg" :src="item" :key="item" :class="`img${index}`" />
+          <img v-for="(item, index) in advImg" :src="item" :key="item" :class="`img${index}`" />
         </div>
         <ODivider style="--o-divider-gap: 40px" />
         <div class="solution-adv-box">
@@ -124,13 +137,19 @@ const jumpTo = (href: string) => {
           v-for="item in OpenStack.caseList"
           :key="item.name"
           cursor="auto"
+          class="o-card-pkg"
           :title="item.name"
           :href="OPENEULER + item.href"
           target="_blank"
           rel="noopener noreferrer"
-          :detail="item.desc"
           :cover="item.img"
-        />
+        >
+          <template #default>
+            <div class="desc" :class="{ dark: isDark }">
+              {{ item.desc }}
+            </div>
+          </template>
+        </OCard>
       </div>
     </div>
     <!-- 跳转外部链接提示 -->
@@ -139,6 +158,12 @@ const jumpTo = (href: string) => {
 </template>
 
 <style lang="scss" scoped>
+@include in-dark {
+  .solution-overview .cover {
+    @include img-in-dark;
+  }
+}
+
 .solution-panel {
   padding: 72px 0 0;
   &:last-child {
@@ -185,6 +210,7 @@ const jumpTo = (href: string) => {
         svg {
           width: 48px;
           height: 48px;
+          fill: currentColor;
         }
       }
     }
