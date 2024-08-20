@@ -61,7 +61,7 @@ export async function tryLogin() {
   }
   try {
     loginStore.setLoginStatus(LOGIN_STATUS.DOING);
-    userInfoStore.$patch(await queryUserInfo());
+    // userInfoStore.$patch(await queryUserInfo());
     loginStore.setLoginStatus(LOGIN_STATUS.DONE);
   } catch (error) {
     loginStore.setLoginStatus(LOGIN_STATUS.FAILED);

@@ -209,10 +209,6 @@ const collectDownloadData = (pkgId: string, name: string, version: string) => {
 }
 
 :deep(.o-table) {
-  --table-edge-padding: 32px;
-  --table-cell-padding: 16px 20px;
-  --table-head-cell-padding: 12px 20px;
-  --table-cell-height: 80px;
   .label {
     display: flex;
     align-items: center;

@@ -148,7 +148,7 @@ const isFilterLoading = ref(false);
 const rpmColumn = {
   os,
   arch,
-  category: ['AI', 'HPC', '云服务', '分布式存储', '大数据', '其他'],
+  category: ['AI', 'HPC', '云服务', '分布式存储', '大数据', '数据库', '其他'],
 };
 
 const queryFilter = () => {

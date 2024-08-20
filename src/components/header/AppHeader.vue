@@ -1,10 +1,13 @@
 <script setup lang="ts">
-import { watch } from 'vue';
-import { ODivider } from '@opensig/opendesign';
-import { useRouter } from 'vue-router';
+import { computed, watch } from 'vue';
+import { ODivider, OLink } from '@opensig/opendesign';
+import { useRouter, useRoute } from 'vue-router';
 import { useLangStore } from '@/stores/common';
 import { OPENEULER } from '@/data/config';
 import { useI18n } from 'vue-i18n';
+import { navs, collaborationNav } from '@/data/nav';
+import { useLoginStore, useUserInfoStore } from '@/stores/user';
+
 import { useTheme } from '@/composables/useTheme';
 import HeaderNav from '@/components/header/HeaderNav.vue';
 import AppLogin from '@/components/header/AppLogin.vue';
@@ -15,8 +18,11 @@ import openeulerLogoDark from '@/assets/openeuler-logo-dark.svg';
 
 const { locale, t } = useI18n();
 const router = useRouter();
+const route = useRoute();
 const langStore = useLangStore();
 const { isDark } = useTheme();
+const loginStore = useLoginStore();
+const userInfoStore = useUserInfoStore();
 
 watch(
   () => {
@@ -32,6 +38,12 @@ const goHome = () => {
     path: `/${locale.value}`,
   });
 };
+
+// 判断是否是协作平台
+const collaborationRouteName = ['todo', 'collaboration', 'todo-detail'];
+const isCollaboration = computed(() => {
+  return collaborationRouteName.includes(route.name as string);
+});
 </script>
 
 <template>
@@ -43,12 +55,14 @@ const goHome = () => {
             <img :src="isDark ? openeulerLogoDark : openeulerLogo" />
           </a>
           <ODivider direction="v" :darker="true" />
-          <span @click="goHome" class="logo-text">{{ t('software.softwareHome') }}</span>
+          <span v-if="isCollaboration" class="logo-text">{{ t('software.softwareHome') }}协作平台</span>
+          <span v-else @click="goHome" class="logo-text">{{ t('software.softwareHome') }}</span>
         </div>
-
-        <HeaderNav />
+        <HeaderNav :options="isCollaboration ? collaborationNav : navs" />
       </div>
       <div class="header-right">
+        <OLink v-if="isCollaboration" class="collaboration" :href="`/${locale}/todo/application`">待办中心</OLink>
+        <OLink v-else class="collaboration" target="_blank" :href="`/${locale}/collaboration`">协作平台</OLink>
         <HeaderTheme />
         <AppLogin />
       </div>
@@ -87,6 +101,12 @@ const goHome = () => {
       height: 100%;
       display: flex;
       align-items: center;
+
+      .collaboration {
+        margin-right: 16px;
+        color: var(--o-color-info1);
+        @include tip1;
+      }
     }
   }
   .logo {
