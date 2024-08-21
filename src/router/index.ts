@@ -153,7 +153,7 @@ router.beforeEach(async (to) => {
     return { name: 'notFound' };
   }
 
-  if (userInfoStore.upstreamPermission === null && loginStore.isLogined) {
+  if (userInfoStore.upstreamPermission === null) {
     try {
       const upstreamPermission = await queryUpstreamPermission();
       userInfoStore.upstreamPermission = upstreamPermission.data.allow_access;
@@ -163,9 +163,8 @@ router.beforeEach(async (to) => {
     }
   }
 
-
   // 协作平台权限
-  if ((userInfoStore.platformMaintainerPermission === null || userInfoStore.platformAdminPermission === null) && loginStore.isLogined) {
+  if (userInfoStore.platformMaintainerPermission === null || userInfoStore.platformAdminPermission === null) {
     try {
       const { data } = await getCollaborationPermissions();
 
