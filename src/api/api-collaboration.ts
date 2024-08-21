@@ -1,13 +1,12 @@
 import { request } from '@/shared/axios';
 import type { AxiosResponse } from '@/shared/axios';
-import type { AdminAppryT, CollaborationRepoT } from '@/@types/collaboration'
+import type { AdminAppryT, CollaborationRepoT } from '@/@types/collaboration';
 
 // 权限
 export function getCollaborationPermissions() {
   const url = `/server/collaboration/maintainer/permissions`;
   return request.get(url).then((res: AxiosResponse) => res?.data);
 }
-
 
 // 软件维护详情 maintainer
 export function getMaintainerRepos(params: CollaborationRepoT) {
@@ -21,6 +20,21 @@ export function getAdminRepos(params: CollaborationRepoT) {
   return request.get(url, { params }).then((res: AxiosResponse) => res?.data);
 }
 
+/**
+ * 获取sig列表
+ */
+export function getSigList() {
+  const url = `/api-dsapi/query/sig/name?community=openeuler`;
+  return request.get<{ data: Record<'openeuler', string[]> }>(url).then((res) => res.data.data.openeuler);
+}
+
+/**
+ * 获取仓库列表
+ */
+export function getRepoList() {
+  const url = `/api-dsapi/query/repo/sig/list?community=openeuler`;
+  return request.get<{ data: Record<string, string>[] }>(url).then((res) => res.data.data.map((item) => Object.keys(item)[0]));
+}
 
 // 待我审批
 export function getAdminApply(params: AdminAppryT) {
@@ -33,8 +47,6 @@ export function getAdminRecords(id: number) {
   return request.get(url).then((res: AxiosResponse) => res?.data);
 }
 
-
-
 // 我的申请
 export function getMaintainerApply(params: AdminAppryT) {
   const url = `/server/collaboration/maintainer/query/apply`;
@@ -46,7 +58,6 @@ export function getMaintainerRevoke(id: number) {
   const url = `/server/collaboration/maintainer/revoke`;
   return request.post(url, { applyId: id }).then((res: AxiosResponse) => res?.data);
 }
-
 
 interface FeedbackT {
   repo: string;

@@ -27,3 +27,34 @@ export const arch = [
   "loongarch64",
   "sw_64",
 ]
+
+export const collaborationFilter: Record<string, string[]> = {
+  cveStatus: [
+    '有CVE且全部未修复',
+    '有CVE部分修复',
+    '有CVE且全部修复',
+    '没有CVE问题',
+  ],
+  issueStatus: [
+    '没有ISSUE修复',
+    '有部分ISSUE修复',
+    '全部ISSUE修复',
+  ],
+  prStatus: [
+    '没有PR提交',
+    '有PR提交未合入',
+    '有PR合入',
+  ],
+  versionStatus: [
+    '最新版本',
+    '落后版本',
+  ],
+  orgStatus: [
+    '贡献组织多',
+    '贡献组织少',
+  ],
+  contributorStatus: [
+    '贡献人员多',
+    '贡献人员少',
+  ],
+}

@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { ref, watch, computed } from 'vue';
-import { OTable, OTag, OLink, OIcon } from '@opensig/opendesign';
-import { getMaintainerRepos, getAdminRepos } from '@/api/api-collaboration';
+import { ref, watch, computed, onMounted, type ComponentPublicInstance, reactive, toRefs } from 'vue';
+import { OTable, OTag, OLink, OIcon, OPopup, OPopover } from '@opensig/opendesign';
+import { getMaintainerRepos, getAdminRepos, getSigList, getRepoList } from '@/api/api-collaboration';
 import { useUserInfoStore } from '@/stores/user';
 import ExternalLink from '@/components/ExternalLink.vue';
 import Indicators from '@/components/collaboration/Indicators.vue';
@@ -9,6 +9,10 @@ import StatusFeedback from '@/components/collaboration/StatusFeedback.vue';
 import Result404 from '@/components/Result404.vue';
 
 import IconOutlink from '~icons/pkg/icon-outlink.svg';
+import IconFilter from '~icons/app/icon-filter.svg';
+import FilterableCheckboxes from '@/components/FilterableCheckboxes.vue';
+import { collaborationFilter } from '@/data/filter';
+import { useDebounceFn } from '@vueuse/core';
 
 const columns = [
   { label: '软件仓库', key: 'repo', type: 'repo' },
@@ -24,6 +28,42 @@ const columns = [
   { label: '操作', key: 'operation', type: 'operation' },
 ];
 
+const { identities } = toRefs(useUserInfoStore());
+
+const hasGiteeAccount = computed(() => !!identities.value.find((id) => id.identity === 'gitee'));
+
+const allSigs = ref<string[]>();
+const allRepos = ref<string[]>();
+const displayRepos = ref<string[]>();
+
+// 筛选
+const filterPopupTargets = ref(new Array<ComponentPublicInstance>(columns.length));
+
+// 筛选组件是否显示的开关
+const filterSwitches = ref(columns.map(() => false));
+
+// 切换某个筛选组件显示开关
+const switchFilterVisible = (index: number) => {
+  filterSwitches.value[index] = !filterSwitches.value[index];
+};
+
+const onFilterChange = useDebounceFn((type: string, values: (string | number)[]) => {
+  filterParams[type] = values.join();
+}, 300);
+
+watch(
+  () => filterSwitches.value[0],
+  (val) => {
+    if (!val) {
+      displayRepos.value = allRepos.value?.slice(0, 30);
+    }
+  }
+);
+
+const onRepoFilterScrollBottom = () => {
+  displayRepos.value && (displayRepos.value = allRepos.value?.slice(0, displayRepos.value?.length + 30));
+};
+
 const SRCOPENEULER = 'https://gitee.com/src-openeuler/';
 
 const userInfoStore = useUserInfoStore();
@@ -35,10 +75,25 @@ const currentPage = ref(1);
 const pageSize = ref(10);
 const total = ref(0);
 
+// 筛选条件
+const filterParams = reactive<Record<string, string>>({
+  repo: '' as string,
+  kind: '' as string,
+  sigName: '' as string,
+  cveStatus: '' as string,
+  issueStatus: '' as string,
+  prStatus: '' as string,
+  versionStatus: '' as string,
+  orgStatus: '' as string,
+  contributorStatus: '' as string,
+  status: '' as string,
+});
+
 const searchParams = computed(() => {
   return {
     pageNum: currentPage.value,
     pageSize: pageSize.value,
+    ...filterParams
   };
 });
 
@@ -81,6 +136,14 @@ const queryAdminRepos = () => {
       isLoading.value = false;
     });
 };
+
+onMounted(() => {
+  getSigList().then((list) => (allSigs.value = list));
+  getRepoList().then((list) => {
+    allRepos.value = list;
+    displayRepos.value = allRepos.value.slice(0, 30);
+  });
+});
 
 const pageInit = () => {
   if (isAdminPer.value) {
@@ -142,7 +205,33 @@ watch(
     <div class="platform-main" :class="isMainPer ? 'maintainer' : 'admin'">
       <OTable :columns="columns" :data="reposData" :loading="loading" border="row">
         <template #head="{ columns }">
-          <th v-for="item in columns" :key="item.type" :class="item.type">{{ item.label }}</th>
+          <th v-for="(item, index) in columns" :key="item.type" :class="item.type" :ref="(el) => (filterPopupTargets[index] = el as ComponentPublicInstance)">
+            <div class="header-cell">
+              {{ item.label }}
+              <template v-if="item.key !== 'operation'">
+                <OPopover>
+                  <p class="bubble-content">
+                    <span class="title">{{ item.label }}:</span> {{ reposData.map((row) => row[item.key]).join('、') }}
+                  </p>
+                  <template #target>
+                    <OIcon class="filter-icon" @click="switchFilterVisible(index)"><IconFilter /></OIcon>
+                  </template>
+                </OPopover>
+                <OPopup trigger="none" :visible="filterSwitches[index]" :unmount-on-hide="false" position="bl" :target="filterPopupTargets[index]">
+                  <FilterableCheckboxes
+                    @scroll-bottom="onRepoFilterScrollBottom"
+                    :detect-scroll-bottom="true"
+                    @change="onFilterChange(item.key, $event)"
+                    v-if="item.key === 'repo'"
+                    :values="displayRepos"
+                  />
+                  <FilterableCheckboxes @change="onFilterChange(item.key, $event)" v-else-if="item.key === 'sigName'" :values="allSigs" />
+                  <FilterableCheckboxes @change="onFilterChange(item.key, $event)" v-else-if="item.key === 'kind'" />
+                  <FilterableCheckboxes :filterable="false" @change="onFilterChange(item.key, $event)" v-else :values="collaborationFilter[item.key]" />
+                </OPopup>
+              </template>
+            </div>
+          </th>
         </template>
         <template #td_repo="{ row }">
           <OLink color="primary" class="link-external" hover-underline @click="changeExternalDialog(`${SRCOPENEULER + row.repo}`)"
@@ -186,7 +275,7 @@ watch(
     </div>
 
     <!-- 暂无记录 -->
-    <template v-if="isError">
+    <template v-if="isError || !hasGiteeAccount">
       <Result404>
         <template #description>
           <p class="text404">暂无记录</p>
@@ -203,6 +292,30 @@ watch(
 </template>
 
 <style scoped lang="scss">
+.bubble-content {
+  color: var(--o-color-info1);
+  max-width: 300px;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  overflow: hidden;
+
+  .title {
+    font-weight: bold;
+  }
+}
+
+.header-cell {
+  position: relative;
+  display: flex;
+  align-items: center;
+
+  .filter-icon {
+    width: 16px;
+    cursor: pointer;
+  }
+}
 .platform-header {
   border-bottom: 1px solid var(--o-color-control4);
   padding: 48px 0 24px;
