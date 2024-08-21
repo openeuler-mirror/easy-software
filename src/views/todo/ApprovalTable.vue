@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { ref, type PropType } from 'vue';
-import { OTable, OLink, OTag } from '@opensig/opendesign';
+import { OTable, OLink, OTag, ODialog, OButton } from '@opensig/opendesign';
 import { useLocale } from '@/composables/useLocale';
 import { useI18n } from 'vue-i18n';
 import { formatDateTime } from '@/utils/common';
@@ -48,8 +48,16 @@ const emits = defineEmits<{
   (e: 'revoke', id: number): void;
 }>();
 
+const showDlg = ref(false);
+const applayId = ref();
 const revokeApplication = (id: number) => {
-  emits('revoke', id);
+  applayId.value = id;
+  showDlg.value = true;
+};
+
+const revoke = () => {
+  emits('revoke', applayId.value);
+  showDlg.value = false;
 };
 </script>
 
@@ -69,7 +77,7 @@ const revokeApplication = (id: number) => {
         <template v-if="type === 'application'">
           <div class="oper-box">
             <OLink color="primary" hover-underline @click="jumpTo(row.applyId)">申请详情</OLink>
-            <OLink color="danger" hover-underline @click="revokeApplication(row.applyId)">撤销申请</OLink>
+            <OLink color="danger" v-if="row.applyStatus === 'open'" hover-underline @click="revokeApplication(row.applyId)">撤销申请</OLink>
           </div>
         </template>
         <template v-if="type === 'approval'">
@@ -80,10 +88,35 @@ const revokeApplication = (id: number) => {
         </template>
       </template>
     </OTable>
+
+    <ODialog v-model:visible="showDlg" class="revoke-dlg" :unmount-on-hide="true" :mask="true" size="small">
+      <template #header>
+        <p class="title">确认撤销</p>
+      </template>
+      <p class="revoke-text">撤销后内容不可恢复，确认是否撤销？</p>
+      <template #footer>
+        <div class="dlg-action">
+          <OButton variant="solid" size="large" color="primary" class="upload" @click="revoke">确认</OButton>
+          <OButton variant="outline" size="large" color="primary" class="upload" @click="showDlg = false">取消</OButton>
+        </div>
+      </template>
+    </ODialog>
   </div>
 </template>
 
 <style lang="scss" scoped>
+.revoke-text {
+  color: var(--o-color-info1);
+  text-align: center;
+  @include text1;
+}
+.dlg-action {
+  display: flex;
+  justify-content: center;
+  .o-btn + .o-btn {
+    margin-left: 16px;
+  }
+}
 .oper-box {
   display: flex;
   align-items: center;
@@ -95,11 +128,11 @@ const revokeApplication = (id: number) => {
 .app-tag {
   min-width: 72px;
   color: var(--o-color-white);
-  &.pendding {
+  &.open {
     --tag-bg-color: var(--o-color-warning1);
     --tag-bd-color: var(--o-color-warning1);
   }
-  &.passed {
+  &.approved {
     --tag-bg-color: var(--o-color-success1);
     --tag-bd-color: var(--o-color-success1);
   }
@@ -108,7 +141,7 @@ const revokeApplication = (id: number) => {
     --tag-bd-color: transparent;
   }
 
-  &.dismissed {
+  &.rejected {
     --tag-bg-color: var(--o-color-danger1);
     --tag-bd-color: var(--o-color-danger1);
   }

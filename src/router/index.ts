@@ -5,7 +5,7 @@ import { useLangStore, useViewStore } from '@/stores/common';
 import { tryLogin } from '@/shared/login';
 import { useLoginStore, useUserInfoStore } from '@/stores/user';
 import { queryUpstreamPermission } from '@/api/api-user';
-import { getAdminPermission, getMaintainerPermission } from '@/api/api-collaboration';
+import { getCollaborationPermissions } from '@/api/api-collaboration';
 import { COLLABORATIONPERMISSION } from '@/data/query';
 
 const routes = [
@@ -164,21 +164,22 @@ router.beforeEach(async (to) => {
   }
 
 
-  // 协作平台Admin权限
-  if (userInfoStore.platformAdminPermission === null && loginStore.isLogined) {
+  // 协作平台权限
+  if ((userInfoStore.platformMaintainerPermission === null || userInfoStore.platformAdminPermission === null) && loginStore.isLogined) {
     try {
-      const queryAdminPermission = await getAdminPermission();
-      userInfoStore.platformAdminPermission = queryAdminPermission.data.allow_access;
-    } catch {
-      return isPlatform ? { name: 'notFound' } : true;
-    }
-  }
+      const { data } = await getCollaborationPermissions();
 
-  // 协作平台Maintainer权限
-  if (userInfoStore.platformMaintainerPermission === null && loginStore.isLogined) {
-    try {
-      const queryMaintainerPermission = await getMaintainerPermission();
-      userInfoStore.platformMaintainerPermission = queryMaintainerPermission.data.allow_access;
+      if (data.permissions.length > 0) {
+        if (data.permissions.includes('adminstrator')) {
+          userInfoStore.platformAdminPermission = true;
+        }
+        if (data.permissions.includes('maintainer')) {
+          userInfoStore.platformMaintainerPermission = true;
+        }
+      } else {
+        return isPlatform ? { name: 'notFound' } : true;
+      }
+
     } catch {
       return isPlatform ? { name: 'notFound' } : true;
     }

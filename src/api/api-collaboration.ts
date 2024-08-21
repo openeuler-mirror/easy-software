@@ -2,17 +2,12 @@ import { request } from '@/shared/axios';
 import type { AxiosResponse } from '@/shared/axios';
 import type { AdminAppryT, CollaborationRepoT } from '@/@types/collaboration'
 
-// maintainer权限
-export function getMaintainerPermission() {
-  const url = `/server/collaboration/maintainer/permission`;
+// 权限
+export function getCollaborationPermissions() {
+  const url = `/server/collaboration/maintainer/permissions`;
   return request.get(url).then((res: AxiosResponse) => res?.data);
 }
 
-// admin权限
-export function getAdminPermission() {
-  const url = `/server/collaboration/admin/permission`;
-  return request.get(url).then((res: AxiosResponse) => res?.data);
-}
 
 // 软件维护详情 maintainer
 export function getMaintainerRepos(params: CollaborationRepoT) {
