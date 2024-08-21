@@ -42,13 +42,14 @@ const total = ref(0);
 const todoName = ref('formPage');
 const applyId = ref();
 const isError = ref(false);
-
+const applyStatus = ref('');
 const todoParams = computed(() => {
   return {
     name: todoName.value,
     applyId: applyId.value,
     pageNum: currentPage.value,
     pageSize: pageSize.value,
+    applyStatus: applyStatus.value,
   };
 });
 
@@ -82,8 +83,12 @@ const queryMyApplication = () => {
   const newData = getParamsRules(todoParams.value);
   getMaintainerApply(newData)
     .then((res) => {
-      applicationData.value = res.data.list;
-      total.value = res.data.total;
+      if (res.data.list.length > 0) {
+        applicationData.value = res.data.list;
+        total.value = res.data.total;
+      } else {
+        isError.value = true;
+      }
       isLoading.value = false;
     })
     .catch(() => {
@@ -115,27 +120,37 @@ const queryApprovalApply = () => {
     const newData = getParamsRules(todoParams.value);
     getAdminApply(newData)
       .then((res) => {
-        approvalData.value = res.data.list;
-        total.value = res.data.total;
+        if (res.data.list.length > 0) {
+          approvalData.value = res.data.list;
+          total.value = res.data.total;
+        } else {
+          isError.value = true;
+        }
         isLoading.value = false;
       })
       .catch(() => {
         isError.value = true;
+        isLoading.value = false;
       });
   }
 };
 
-// 待我审批
+// 我审批过的
 const queryApprovedApply = () => {
   if (isAdminPermission.value) {
-    // { name: todoName.value, applyStatus: 'PASSED,DISMISSED' }
-    getAdminApply({ name: 'approved' })
+    const newData = getParamsRules(todoParams.value);
+    getAdminApply(newData)
       .then((res) => {
-        approvedData.value = res.data.list;
-        total.value = res.data.total;
+        if (res.data.list.length > 0) {
+          approvedData.value = res.data.list;
+          total.value = res.data.total;
+        } else {
+          isError.value = true;
+        }
         isLoading.value = false;
       })
       .catch(() => {
+        isLoading.value = false;
         isError.value = true;
       });
   }
@@ -144,10 +159,16 @@ const queryApprovedApply = () => {
 const pageInit = () => {
   isLoading.value = true;
   if (activeName.value === 'application') {
+    applyStatus.value = '';
+    todoName.value = 'formPage';
     queryMyApplication();
   } else if (activeName.value === 'approval') {
+    todoName.value = 'formPage';
+    applyStatus.value = 'OPEN';
     queryApprovalApply();
   } else if (activeName.value === 'approved') {
+    todoName.value = 'approved';
+    applyStatus.value = 'APPROVED,REJECTED';
     queryApprovedApply();
   }
 };
@@ -162,18 +183,20 @@ watch(
   (v: string) => {
     activeName.value = v || 'application';
     pageInit();
+    console.log(' watch activeName');
   }
 );
 
-watch(
-  () => todoParams.value,
-  () => {
-    pageInit();
-  },
-  {
-    immediate: true,
-  }
-);
+// watch(
+//   () => todoParams.value,
+//   () => {
+//     pageInit();
+//     console.log(' watch todoParams.value');
+//   },
+//   {
+//     immediate: true,
+//   }
+// );
 </script>
 
 <template>

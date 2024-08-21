@@ -20,7 +20,7 @@ const formData = reactive({
   metric: '',
   metricStatus: '',
   description: '',
-  applyStatus: 'PENDDING',
+  applyStatus: 'OPEN',
 });
 
 const statusRadios = [

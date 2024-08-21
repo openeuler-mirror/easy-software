@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import { ref, watch, computed, onMounted } from 'vue';
+import { ref, watch, computed } from 'vue';
 import { OTable, OTag, OLink, OIcon } from '@opensig/opendesign';
 import { getMaintainerRepos, getAdminRepos } from '@/api/api-collaboration';
-import { useLoginStore, useUserInfoStore } from '@/stores/user';
+import { useUserInfoStore } from '@/stores/user';
 import ExternalLink from '@/components/ExternalLink.vue';
 import Indicators from '@/components/collaboration/Indicators.vue';
 import StatusFeedback from '@/components/collaboration/StatusFeedback.vue';
+import Result404 from '@/components/Result404.vue';
 
 import IconOutlink from '~icons/pkg/icon-outlink.svg';
 
@@ -41,26 +42,44 @@ const searchParams = computed(() => {
   };
 });
 
-const data = ref([]);
+const reposData = ref([]);
 const isLoading = ref(false);
+const isError = ref(false);
+
+// Maintainer 数据
 const queryMaintainerRepos = () => {
   getMaintainerRepos(searchParams.value)
     .then((res) => {
-      data.value = res.data.list;
-      total.value = res.data.total;
+      if (res.data.list.length > 0) {
+        reposData.value = res.data.list;
+        total.value = res.data.total;
+      } else {
+        isError.value = true;
+      }
       isLoading.value = false;
     })
-    .catch(() => {});
+    .catch(() => {
+      isError.value = true;
+      isLoading.value = false;
+    });
 };
 
+// Admin 数据
 const queryAdminRepos = () => {
   getAdminRepos(searchParams.value)
     .then((res) => {
-      data.value = res.data.list;
-      total.value = res.data.total;
+      if (res.data.list.length > 0) {
+        reposData.value = res.data.list;
+        total.value = res.data.total;
+      } else {
+        isError.value = true;
+      }
       isLoading.value = false;
     })
-    .catch(() => {});
+    .catch(() => {
+      isError.value = true;
+      isLoading.value = false;
+    });
 };
 
 const pageInit = () => {
@@ -85,7 +104,7 @@ const handleCurrentChange = (val: number) => {
 // 外链确认
 const showExternalDlg = ref(false);
 const externalLink = ref('');
-const onExternalDialog = (href: string) => {
+const changeExternalDialog = (href: string) => {
   externalLink.value = href;
   showExternalDlg.value = true;
 };
@@ -98,10 +117,6 @@ const changeFeedback = (v: string) => {
   showFeedbackDlg.value = true;
   repoValue.value = v;
 };
-
-onMounted(() => {
-  pageInit();
-});
 
 watch(
   () => searchParams.value,
@@ -125,27 +140,32 @@ watch(
       <Indicators v-if="showDlg" @change="showDlg = false" />
     </div>
     <div class="platform-main" :class="isMainPer ? 'maintainer' : 'admin'">
-      <OTable :columns="columns" :data="data" :loading="loading" border="row">
+      <OTable :columns="columns" :data="reposData" :loading="loading" border="row">
         <template #head="{ columns }">
           <th v-for="item in columns" :key="item.type" :class="item.type">{{ item.label }}</th>
         </template>
         <template #td_repo="{ row }">
-          <OLink color="primary" class="link-external" hover-underline @click="onExternalDialog(`${SRCOPENEULER + row.repo}`)"
+          <OLink color="primary" class="link-external" hover-underline @click="changeExternalDialog(`${SRCOPENEULER + row.repo}`)"
             ><span class="text">{{ row.repo }} </span><OIcon><IconOutlink /></OIcon
           ></OLink>
         </template>
         <template #td_issueStatus="{ row }">
-          <OLink color="primary" class="link-external" hover-underline @click="onExternalDialog(`${SRCOPENEULER + row.repo}/issues`)"
+          <OLink color="primary" class="link-external" hover-underline @click="changeExternalDialog(`${SRCOPENEULER + row.repo}/issues`)"
             ><span class="text">{{ row.issueStatus }}</span> <OIcon><IconOutlink /></OIcon
           ></OLink>
         </template>
         <template #td_prStatus="{ row }">
-          <OLink color="primary" class="link-external" hover-underline @click="onExternalDialog(`${SRCOPENEULER + row.repo}/pulls`)"
+          <OLink color="primary" class="link-external" hover-underline @click="changeExternalDialog(`${SRCOPENEULER + row.repo}/pulls`)"
             ><span class="text">{{ row.prStatus }}</span> <OIcon><IconOutlink /></OIcon
           ></OLink>
         </template>
         <template #td_cveStatus="{ row }">
-          <OLink color="primary" class="link-external" hover-underline @click="onExternalDialog(`${SRCOPENEULER + row.repo}/issues?single_label_id=85497765`)">
+          <OLink
+            color="primary"
+            class="link-external"
+            hover-underline
+            @click="changeExternalDialog(`${SRCOPENEULER + row.repo}/issues?single_label_id=85497765`)"
+          >
             <span class="text">{{ row.cveStatus }}</span> <OIcon><IconOutlink /></OIcon
           ></OLink>
         </template>
@@ -164,6 +184,16 @@ watch(
         <AppPagination :current="currentPage" :pagesize="pageSize" :total="total" @size-change="handleSizeChange" @current-change="handleCurrentChange" />
       </div>
     </div>
+
+    <!-- 暂无记录 -->
+    <template v-if="isError">
+      <Result404>
+        <template #description>
+          <p class="text404">暂无记录</p>
+        </template>
+      </Result404>
+    </template>
+
     <!-- 跳转外部链接提示 -->
     <ExternalLink v-if="showExternalDlg" :href="externalLink" @change="showExternalDlg = false" />
     <!-- 状态反馈 -->

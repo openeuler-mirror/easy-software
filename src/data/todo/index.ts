@@ -37,8 +37,8 @@ export const approvalHistoryColumns = [
 
 
 export const applyStatus = {
-  PENDDING: '待审批',
-  DISMISSED: '已驳回',
-  PASSED: '已通过',
+  OPEN: '待审批',
+  REJECTED: '已驳回',
+  APPROVED: '已通过',
   REVOKED: '已撤销',
 };

@@ -41,10 +41,15 @@ const goHome = () => {
 };
 
 // 判断是否是协作平台
-
 const isCollaboration = computed(() => {
   return COLLABORATIONPERMISSION.includes(route.name as string);
 });
+
+const jump = (href: string) => {
+  router.push({
+    path: href,
+  });
+};
 </script>
 
 <template>
@@ -63,7 +68,7 @@ const isCollaboration = computed(() => {
       </div>
       <div class="header-right">
         <template v-if="loginStore.isLogined && (userInfoStore.platformAdminPermission || userInfoStore.platformMaintainerPermission)">
-          <OLink v-if="isCollaboration" class="collaboration" :href="`/${locale}/todo/application`">待办中心</OLink>
+          <OLink v-if="isCollaboration" class="collaboration" @click="jump(`/${locale}/todo/application`)">待办中心</OLink>
           <OLink v-else class="collaboration" target="_blank" :href="`/${locale}/collaboration`">协作平台</OLink>
         </template>
         <HeaderTheme />
