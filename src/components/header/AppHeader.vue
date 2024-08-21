@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, watch } from 'vue';
+import { computed, watch, ref } from 'vue';
 import { ODivider, OLink } from '@opensig/opendesign';
 import { useRouter, useRoute } from 'vue-router';
 import { useLangStore } from '@/stores/common';
@@ -8,11 +8,13 @@ import { useI18n } from 'vue-i18n';
 import { navs, collaborationNav } from '@/data/nav';
 import { useLoginStore, useUserInfoStore } from '@/stores/user';
 import { COLLABORATIONPERMISSION } from '@/data/query';
+import { windowOpen } from '@/utils/common';
 
 import { useTheme } from '@/composables/useTheme';
 import HeaderNav from '@/components/header/HeaderNav.vue';
 import AppLogin from '@/components/header/AppLogin.vue';
 import HeaderTheme from '@/components/header/HeaderTheme.vue';
+import GiteeAccountDialog from '@/components/collaboration/GiteeAccountDialog.vue';
 
 import openeulerLogo from '@/assets/openeuler-logo.svg';
 import openeulerLogoDark from '@/assets/openeuler-logo-dark.svg';
@@ -24,6 +26,8 @@ const langStore = useLangStore();
 const { isDark } = useTheme();
 const loginStore = useLoginStore();
 const userInfoStore = useUserInfoStore();
+const isMainPer = computed(() => userInfoStore.platformMaintainerAllPermission);
+const isAdminPer = computed(() => userInfoStore.platformAdminPermission);
 
 watch(
   () => {
@@ -45,10 +49,20 @@ const isCollaboration = computed(() => {
   return COLLABORATIONPERMISSION.includes(route.name as string);
 });
 
+const showGiteeDlg = ref(false);
 const jump = (href: string) => {
-  router.push({
-    path: href,
-  });
+  if (isAdminPer.value || isMainPer.value) {
+    if (href === 'collaboration') {
+      windowOpen(`/${locale.value}/${href}`, '_blank');
+    } else {
+      router.push({
+        path: `/${locale.value}/${href}`,
+      });
+    }
+  } else {
+    // 如果Maintainer没有绑定gitee，弹窗提醒
+    showGiteeDlg.value = true;
+  }
 };
 </script>
 
@@ -64,17 +78,18 @@ const jump = (href: string) => {
           <span v-if="isCollaboration" class="logo-text">{{ t('software.softwareHome') }}协作平台</span>
           <span v-else @click="goHome" class="logo-text">{{ t('software.softwareHome') }}</span>
         </div>
-        <HeaderNav :options="isCollaboration ? collaborationNav : navs" />
+        <HeaderNav v-if="route.name" :options="isCollaboration ? collaborationNav : navs" />
       </div>
       <div class="header-right">
-        <template v-if="loginStore.isLogined && (userInfoStore.platformAdminPermission || userInfoStore.platformMaintainerPermission)">
-          <OLink v-if="isCollaboration" class="collaboration" @click="jump(`/${locale}/todo/application`)">待办中心</OLink>
-          <OLink v-else class="collaboration" target="_blank" :href="`/${locale}/collaboration`">协作平台</OLink>
+        <template v-if="loginStore.isLogined">
+          <OLink v-if="isCollaboration" class="todo" @click="jump(`todo/application`)">待办中心</OLink>
+          <OLink v-else class="collaboration" @click="jump(`collaboration`)">协作平台</OLink>
         </template>
         <HeaderTheme />
         <AppLogin />
       </div>
     </div>
+    <GiteeAccountDialog v-if="showGiteeDlg" @close="showGiteeDlg = false" />
   </div>
 </template>
 
@@ -110,7 +125,8 @@ const jump = (href: string) => {
       display: flex;
       align-items: center;
 
-      .collaboration {
+      .collaboration,
+      .todo {
         margin-right: 16px;
         color: var(--o-color-info1);
         @include tip1;

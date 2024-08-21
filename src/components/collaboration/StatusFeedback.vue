@@ -1,8 +1,9 @@
 <script lang="ts" setup>
-import { ref, reactive } from 'vue';
+import { ref, reactive, computed } from 'vue';
 import { ODialog, OButton, OForm, OTextarea, OFormItem, ORadioGroup, ORadio, OSelect, OOption, type FieldResultT, useMessage } from '@opensig/opendesign';
 
 import { getApplyFeedback } from '@/api/api-collaboration';
+import { applicationType } from '@/data/todo/';
 
 const props = defineProps({
   repo: {
@@ -23,43 +24,17 @@ const formData = reactive({
   applyStatus: 'OPEN',
 });
 
-const statusRadios = [
-  {
-    id: 'cveStatus',
-    label: 'CVE状态',
-  },
-  {
-    id: 'issueStatus',
-    label: 'ISSUE状态',
-  },
-  {
-    id: 'prStatus',
-    label: '软件包更新状态',
-  },
-  {
-    id: 'versionStatus',
-    label: '软件包版本状态',
-  },
-  {
-    id: 'orgStatus',
-    label: '贡献组织状态',
-  },
-  {
-    id: 'contributorStatus',
-    label: '贡献人员状态',
-  },
-];
+const emits = defineEmits<{
+  (e: 'close'): void;
+}>();
 
-const optionLists = [
-  {
-    id: 'latest',
-    label: '最新版本',
-  },
-  {
-    id: 'outdated',
-    label: '落后版本',
-  },
-];
+const metricIndex = ref(-1);
+const onChangeRadio = (v: string) => {
+  formData.metricStatus = '';
+  metricIndex.value = applicationType.findIndex((item) => item.label === v);
+};
+// 根据状态获取
+const metricCategory = computed(() => (metricIndex.value === -1 ? [] : applicationType[metricIndex.value].children));
 
 // 重置表单数据
 const reset = () => {
@@ -103,9 +78,6 @@ const descriptionRules = [
     },
   },
 ];
-const emits = defineEmits<{
-  (e: 'close'): void;
-}>();
 
 const onSubmit = (results: FieldResultT[]) => {
   if (results.find((item) => item?.type === 'danger')) {
@@ -118,6 +90,7 @@ const onSubmit = (results: FieldResultT[]) => {
             content: '反馈成功',
           });
           showDlg.value = false;
+          emits('close');
         }
       })
       .catch(() => {
@@ -126,28 +99,27 @@ const onSubmit = (results: FieldResultT[]) => {
         });
         showDlg.value = false;
       });
-    emits('close');
   }
 };
 </script>
 
 <template>
-  <ODialog v-model:visible="showDlg" :unmount-on-hide="true" :mask="true" @change="onChange" size="large">
+  <ODialog v-model:visible="showDlg" :unmount-on-hide="true" @change="onChange" size="large">
     <template #header>
       <p class="title">状态反馈</p>
     </template>
     <div class="indicators">
       <OForm ref="formRef" has-required :model="formData" label-width="220px" label-align="top" @submit="onSubmit">
         <OFormItem label="请选择您要修改的状态类别" required field="metric" :rules="metricRules">
-          <ORadioGroup class="metric-options" v-model="formData.metric" direction="v">
-            <ORadio v-for="option in statusRadios" :key="option.id" :value="option.id">
+          <ORadioGroup class="metric-options" v-model="formData.metric" direction="v" @change="(v) => onChangeRadio(v)">
+            <ORadio v-for="option in applicationType" :key="option.label" :value="option.label">
               {{ option.label }}
             </ORadio>
           </ORadioGroup>
         </OFormItem>
         <OFormItem label="修改状态" required field="metricStatus" :rules="modifyRules">
           <OSelect v-model="formData.metricStatus" size="large" style="width: 100%">
-            <OOption v-for="item in optionLists" :key="item.id" :label="item.label" :value="item.id" />
+            <OOption v-for="item in metricCategory" :key="item" :label="item" :value="item" />
           </OSelect>
         </OFormItem>
         <OFormItem label="修改理由" required field="description" :rules="descriptionRules">

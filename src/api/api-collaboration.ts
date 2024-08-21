@@ -41,11 +41,7 @@ export function getAdminApply(params: AdminAppryT) {
   const url = `/server/collaboration/admin/query/apply`;
   return request.get(url, { params }).then((res: AxiosResponse) => res?.data);
 }
-// 审批
-export function getAdminRecords(id: number) {
-  const url = `/server/collaboration/admin/query/records?applyId=${id}`;
-  return request.get(url).then((res: AxiosResponse) => res?.data);
-}
+
 
 // 我的申请
 export function getMaintainerApply(params: AdminAppryT) {
@@ -68,7 +64,7 @@ interface FeedbackT {
 }
 
 export function getApplyFeedback(params: FeedbackT) {
-  const url = `/server/collaboration/maintainer/apply`;
+  const url = `/server/collaboration/maintainer/apply?repo=${params.repo}`;
   return request.post(url, { ...params }).then((res: AxiosResponse) => res?.data);
 }
 

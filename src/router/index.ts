@@ -140,7 +140,7 @@ router.beforeEach(async (to) => {
       return userInfoStore.upstreamPermission ? true : { name: 'notFound' };
     }
     if (isPlatform) {
-      return userInfoStore.platformAdminPermission ? true : { name: 'notFound' };
+      return userInfoStore.platformAdminPermission || userInfoStore.platformMaintainerPermission ? true : { name: 'notFound' };
     }
 
     return true;
@@ -153,7 +153,7 @@ router.beforeEach(async (to) => {
     return { name: 'notFound' };
   }
 
-  if (userInfoStore.upstreamPermission === null) {
+  if (userInfoStore.upstreamPermission === null && !isPlatform) {
     try {
       const upstreamPermission = await queryUpstreamPermission();
       userInfoStore.upstreamPermission = upstreamPermission.data.allow_access;
@@ -162,6 +162,7 @@ router.beforeEach(async (to) => {
       return isUpstream ? { name: 'notFound' } : true;
     }
   }
+
 
   // 协作平台权限
   if (userInfoStore.platformMaintainerPermission === null || userInfoStore.platformAdminPermission === null) {
@@ -174,6 +175,10 @@ router.beforeEach(async (to) => {
         }
         if (data.permissions.includes('maintainer')) {
           userInfoStore.platformMaintainerPermission = true;
+          // 判断是否绑定gitee
+          const hasGiteeAccount = () => !!userInfoStore.identities.find((id) => id.identity === 'gitee');
+
+          userInfoStore.platformMaintainerAllPermission = hasGiteeAccount() ? true : false;
         }
       } else {
         return isPlatform ? { name: 'notFound' } : true;

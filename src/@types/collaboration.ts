@@ -1,11 +1,12 @@
 export interface CollaborationT {
-  name: string;
+  name?: string;
   pageSize?: number;
   pageNum?: number;
 }
 
 export interface AdminAppryT extends CollaborationT {
-  applyId?: number;
+  applyId?: string | number;
+  applyIdString?: string;
   applyStatus?: string;
   repo?: string;
   metric?: string;
