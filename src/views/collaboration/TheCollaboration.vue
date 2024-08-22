@@ -11,8 +11,10 @@ import Result404 from '@/components/Result404.vue';
 import IconOutlink from '~icons/pkg/icon-outlink.svg';
 import IconFilter from '~icons/app/icon-filter.svg';
 import FilterableCheckboxes from '@/components/FilterableCheckboxes.vue';
+import GiteeAccountDialog from '@/components/collaboration/GiteeAccountDialog.vue';
 import { collaborationFilter } from '@/data/filter';
 import { useDebounceFn } from '@vueuse/core';
+import { repoStatusIndex } from '@/data/todo';
 
 const columns = [
   { label: '软件仓库', key: 'repo', type: 'repo' },
@@ -68,6 +70,7 @@ const SRCOPENEULER = 'https://gitee.com/src-openeuler/';
 
 const userInfoStore = useUserInfoStore();
 const isMainPer = computed(() => userInfoStore.platformMaintainerPermission);
+const isMainAllPer = computed(() => userInfoStore.platformMaintainerAllPermission);
 const isAdminPer = computed(() => userInfoStore.platformAdminPermission);
 
 // 分页
@@ -91,9 +94,10 @@ const filterParams = reactive<Record<string, string>>({
 
 const searchParams = computed(() => {
   return {
+    name: 'fromPage',
     pageNum: currentPage.value,
     pageSize: pageSize.value,
-    ...filterParams
+    ...filterParams,
   };
 });
 
@@ -103,17 +107,20 @@ const isError = ref(false);
 
 // Maintainer 数据
 const queryMaintainerRepos = () => {
+  isLoading.value = true;
   getMaintainerRepos(searchParams.value)
     .then((res) => {
       if (res.data.list.length > 0) {
         reposData.value = res.data.list;
         total.value = res.data.total;
       } else {
+        reposData.value = [];
         isError.value = true;
       }
       isLoading.value = false;
     })
     .catch(() => {
+      reposData.value = [];
       isError.value = true;
       isLoading.value = false;
     });
@@ -121,17 +128,20 @@ const queryMaintainerRepos = () => {
 
 // Admin 数据
 const queryAdminRepos = () => {
+  isLoading.value = true;
   getAdminRepos(searchParams.value)
     .then((res) => {
       if (res.data.list.length > 0) {
         reposData.value = res.data.list;
         total.value = res.data.total;
       } else {
+        reposData.value = [];
         isError.value = true;
       }
       isLoading.value = false;
     })
     .catch(() => {
+      reposData.value = [];
       isError.value = true;
       isLoading.value = false;
     });
@@ -148,7 +158,8 @@ onMounted(() => {
 const pageInit = () => {
   if (isAdminPer.value) {
     queryAdminRepos();
-  } else {
+  }
+  if (isMainPer.value) {
     queryMaintainerRepos();
   }
 };
@@ -176,9 +187,21 @@ const showDlg = ref(false);
 
 const showFeedbackDlg = ref(false);
 const repoValue = ref('');
+const showGiteeDlg = ref(false);
 const changeFeedback = (v: string) => {
-  showFeedbackDlg.value = true;
+  if (isMainAllPer.value) {
+    showFeedbackDlg.value = true;
+    repoValue.value = v;
+  } else {
+    showGiteeDlg.value = true;
+  }
+};
+
+// 反馈历史
+const showFeedbacHistroykDlg = ref(false);
+const changeFeedbackHistory = (v: string) => {
   repoValue.value = v;
+  showFeedbacHistroykDlg.value = true;
 };
 
 watch(
@@ -197,12 +220,13 @@ watch(
       <h1>软件维护详情</h1>
     </ContentWrapper>
   </div>
-  <ContentWrapper vertical-padding="24px" class="pkg-content-wrap">
+  <ContentWrapper vertical-padding="24px" class="collaboration-wrap">
+    <AppLoading :loading="isLoading" />
     <div class="indicators">
       <span @click="showDlg = true" class="text">状态指标说明</span>
       <Indicators v-if="showDlg" @change="showDlg = false" />
     </div>
-    <div class="platform-main" :class="isMainPer ? 'maintainer' : 'admin'">
+    <div class="platform-main maintainer">
       <OTable :columns="columns" :data="reposData" :loading="loading" border="row">
         <template #head="{ columns }">
           <th v-for="(item, index) in columns" :key="item.type" :class="item.type" :ref="(el) => (filterPopupTargets[index] = el as ComponentPublicInstance)">
@@ -259,12 +283,14 @@ watch(
           ></OLink>
         </template>
         <template #td_status="{ row }">
-          <OTag class="app-tag">{{ row.status }} </OTag>
+          <div class="repo-status">
+            <OTag :class="`type${repoStatusIndex(row.status)}`">{{ row.status }} </OTag>
+          </div>
         </template>
         <template #td_operation="{ row }">
           <div class="operation-box">
-            <OLink color="primary" hover-underline @click="changeFeedback(row.repo)">状态反馈</OLink>
-            <OLink color="primary" hover-underline> 反馈历史</OLink>
+            <OLink v-if="!isAdminPer" color="primary" hover-underline @click="changeFeedback(row.repo)">状态反馈</OLink>
+            <OLink color="primary" hover-underline @click="changeFeedbackHistory(row.repo)">反馈历史</OLink>
           </div>
         </template>
       </OTable>
@@ -273,6 +299,8 @@ watch(
         <AppPagination :current="currentPage" :pagesize="pageSize" :total="total" @size-change="handleSizeChange" @current-change="handleCurrentChange" />
       </div>
     </div>
+
+    <GiteeAccountDialog v-if="showGiteeDlg" @close="showGiteeDlg = false" />
 
     <!-- 暂无记录 -->
     <template v-if="isError || !hasGiteeAccount">
@@ -288,10 +316,20 @@ watch(
     <!-- 状态反馈 -->
 
     <StatusFeedback :repo="repoValue" v-if="showFeedbackDlg" @close="showFeedbackDlg = false" />
+
+    // 反馈历史
+    <FeedbackHistroy v-if="showFeedbacHistroykDlg" :repo="repoValue" @close="showFeedbacHistroykDlg = false" />
   </ContentWrapper>
 </template>
 
 <style scoped lang="scss">
+@import '@/assets/style/category/collaboration/index.scss';
+
+.collaboration-wrap {
+  position: relative;
+  min-height: calc(var(--layout-content-min-height) - 200px);
+}
+
 .bubble-content {
   color: var(--o-color-info1);
   max-width: 300px;
@@ -383,7 +421,7 @@ watch(
         width: 140px;
       }
       .kind {
-        width: 120px;
+        width: 180px;
       }
       .status {
         width: 125px;

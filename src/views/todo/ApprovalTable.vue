@@ -1,11 +1,14 @@
 <script lang="ts" setup>
-import { ref, type PropType } from 'vue';
+import { ref, type PropType, computed } from 'vue';
 import { OTable, OLink, OTag, ODialog, OButton } from '@opensig/opendesign';
 import { useLocale } from '@/composables/useLocale';
 import { useI18n } from 'vue-i18n';
 import { formatDateTime } from '@/utils/common';
 import { useRouter, useRoute } from 'vue-router';
 import { applyStatus } from '@/data/todo';
+import { useUserInfoStore } from '@/stores/user';
+
+import GiteeAccountDialog from '@/components/collaboration/GiteeAccountDialog.vue';
 
 interface ColumnsT {
   key: string;
@@ -37,6 +40,10 @@ const { t } = useI18n();
 const router = useRouter();
 const route = useRoute();
 const { locale } = useLocale();
+
+const userInfoStore = useUserInfoStore();
+const isMainAllPer = computed(() => userInfoStore.platformMaintainerAllPermission);
+
 const jumpTo = (id: number) => {
   const type = route.params?.type as string;
   router.push({
@@ -49,10 +56,15 @@ const emits = defineEmits<{
 }>();
 
 const showDlg = ref(false);
+const showGiteeDlg = ref(false);
 const applayId = ref();
 const revokeApplication = (id: number) => {
-  applayId.value = id;
-  showDlg.value = true;
+  if (isMainAllPer.value) {
+    applayId.value = id;
+    showDlg.value = true;
+  } else {
+    showGiteeDlg.value = true;
+  }
 };
 
 const revoke = () => {
@@ -70,25 +82,33 @@ const revoke = () => {
       <template #td_updateAt="{ row }">
         {{ formatDateTime(row.updateAt) }}
       </template>
+      <template #td_comment="{ row }">
+        <div class="line-clamp">{{ row.comment }}</div>
+      </template>
+      <template #td_description="{ row }">
+        <div class="line-clamp">{{ row.description }}</div>
+      </template>
       <template #td_applyStatus="{ row }">
-        <OTag v-if="row.applyStatus" class="app-tag" :class="row.applyStatus?.toLocaleLowerCase()">{{ applyStatus[row.applyStatus] }} </OTag>
+        <div class="apply-status">
+          <OTag v-if="row.applyStatus" :class="row.applyStatus?.toLocaleLowerCase()">{{ applyStatus[row.applyStatus] }} </OTag>
+        </div>
       </template>
       <template #td_operation="{ row }">
         <template v-if="type === 'application'">
           <div class="oper-box">
-            <OLink color="primary" hover-underline @click="jumpTo(row.applyId)">申请详情</OLink>
-            <OLink color="danger" v-if="row.applyStatus === 'open'" hover-underline @click="revokeApplication(row.applyId)">撤销申请</OLink>
+            <OLink color="primary" hover-underline @click="jumpTo(row.applyIdString)">申请详情</OLink>
+            <OLink color="danger" v-if="row.applyStatus === 'OPEN'" hover-underline @click="revokeApplication(row.applyIdString)">撤销申请</OLink>
           </div>
         </template>
         <template v-if="type === 'approval'">
-          <OLink color="primary" hover-underline @click="jumpTo(row.applyId)">审批</OLink>
+          <OLink color="primary" hover-underline @click="jumpTo(row.applyIdString)">审批</OLink>
         </template>
         <template v-if="type === 'approved'">
-          <OLink color="primary" hover-underline @click="jumpTo(row.applyId)">审批详情</OLink>
+          <OLink color="primary" hover-underline @click="jumpTo(row.applyIdString)">审批详情</OLink>
         </template>
       </template>
     </OTable>
-
+    <GiteeAccountDialog v-if="showGiteeDlg" @close="showGiteeDlg = false" />
     <ODialog v-model:visible="showDlg" class="revoke-dlg" :unmount-on-hide="true" :mask="true" size="small">
       <template #header>
         <p class="title">确认撤销</p>
@@ -105,6 +125,7 @@ const revoke = () => {
 </template>
 
 <style lang="scss" scoped>
+@import '@/assets/style/category/collaboration/index.scss';
 .revoke-text {
   color: var(--o-color-info1);
   text-align: center;
@@ -124,60 +145,16 @@ const revoke = () => {
     margin-left: 24px;
   }
 }
-
-.app-tag {
-  min-width: 72px;
-  color: var(--o-color-white);
-  &.open {
-    --tag-bg-color: var(--o-color-warning1);
-    --tag-bd-color: var(--o-color-warning1);
-  }
-  &.approved {
-    --tag-bg-color: var(--o-color-success1);
-    --tag-bd-color: var(--o-color-success1);
-  }
-  &.revoked {
-    --tag-bg-color: var(--o-color-control1);
-    --tag-bd-color: transparent;
-  }
-
-  &.rejected {
-    --tag-bg-color: var(--o-color-danger1);
-    --tag-bd-color: var(--o-color-danger1);
-  }
+.line-clamp {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  position: relative;
+  word-break: break-all;
 }
 
 :deep(.o-table) {
-  --table-edge-padding: 32px;
-  --table-cell-padding: 16px 20px;
-  --table-head-cell-padding: 12px 20px;
-  --table-cell-height: 80px;
-  .label {
-    display: flex;
-    align-items: center;
-    .icon-filter {
-      cursor: pointer;
-      svg {
-        fill: currentColor;
-        color: var(--o-color-info3);
-        width: 20px;
-        margin-left: 3px;
-      }
-    }
-    .icon-time-order {
-      margin-left: 4px;
-      cursor: pointer;
-      svg {
-        fill: currentColor;
-        color: var(--o-color-info3);
-        width: 24px;
-      }
-      &.on {
-        transform: rotate(180deg);
-      }
-    }
-  }
-
   .td-break {
     word-break: break-all;
   }
@@ -205,11 +182,15 @@ thead {
   }
   .applyStatus,
   .adminstrator,
-  .applyId {
+  .maintainer {
     width: 120px;
   }
 
-  .maintainer {
+  .applyId {
+    width: 150px;
+  }
+
+  .comment {
     width: 180px;
   }
   .updateAt {
@@ -247,7 +228,7 @@ thead {
           z-index: 2;
           background: var(--table-bg-color);
           &::before {
-            left: 0;
+            left: -9px;
             @include liner;
           }
         }
@@ -270,7 +251,7 @@ thead {
         z-index: 2;
         background: var(--table-head-bg);
         &::before {
-          left: 0;
+          left: -9px;
           @include liner;
         }
       }

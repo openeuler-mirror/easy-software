@@ -11,29 +11,47 @@ const route = useRoute();
 const message = useMessage();
 const userInfoStore = useUserInfoStore();
 const isAdminPer = computed(() => userInfoStore.platformAdminPermission);
+const isLoading = ref(true);
+const isError = ref(false);
 
 const type = ref();
-const applyId = ref(Number(route.params.id) || 0);
+const applyId = ref(route.params.id || '');
 const todoData = ref();
 const formRef = ref<InstanceType<typeof OForm>>();
 const formData = reactive({
-  applyId: applyId.value,
+  applyIdString: applyId.value,
   comment: '',
   applyStatus: '',
 });
 
 // 我的申请
 const queryApplicationApply = () => {
-  getMaintainerApply({ name: 'formContent', applyId: applyId.value }).then((res) => {
-    todoData.value = res.data.list[0];
-  });
+  getMaintainerApply({ name: 'formContent', applyId: applyId.value })
+    .then((res) => {
+      if (res.data.list.length > 0) {
+        todoData.value = res.data.list[0];
+      }
+      isLoading.value = false;
+    })
+    .catch(() => {
+      isError.value = true;
+      isLoading.value = false;
+    });
 };
 
 // 待我审批
 const queryApprovalApply = () => {
-  getAdminApply({ name: 'formContent', applyId: applyId.value }).then((res) => {
-    todoData.value = res.data.list[0];
-  });
+  getAdminApply({ name: 'formContent', applyIdString: applyId.value })
+    .then((res) => {
+      if (res.data.list.length > 0) {
+        todoData.value = res.data.list[0];
+      }
+      isLoading.value = false;
+    })
+    .catch(() => {
+      isError.value = true;
+      isLoading.value = false;
+    });
 };
 
 // --------------------审批开始------------------------
@@ -60,7 +78,7 @@ const onSubmit = (results: FieldResultT[]) => {
   if (results.find((item) => item?.type === 'danger')) {
     return;
   } else {
-    formData.applyStatus = 'approved';
+    formData.applyStatus = 'APPROVED';
     queryAdminProcess();
   }
 };
@@ -71,7 +89,7 @@ const rejected = async () => {
   if (items?.find((item) => item?.type === 'danger')) {
     return;
   }
-  formData.applyStatus = 'rejected';
+  formData.applyStatus = 'REJECTED';
   queryAdminProcess();
 };
 
@@ -83,6 +101,7 @@ const queryAdminProcess = () => {
           content: '审批成功',
         });
         formRef.value?.resetFields();
+        queryApprovalApply();
       }
     })
     .catch(() => {
@@ -107,17 +126,20 @@ onMounted(() => {
 
 <template>
   <ContentWrapper verticalPadding="32px">
+    <AppLoading :loading="isLoading" />
     <CBreadcrumb :type="type" :repo="todoData?.repo" />
     <div v-if="todoData" class="todo-detail">
       <div class="title">
         <h2>{{ todoData.repo }}</h2>
-        <OTag class="app-tag" :class="todoData.applyStatus.toLocaleLowerCase()">{{ applyStatus[todoData.applyStatus] }} </OTag>
+        <div class="apply-status">
+          <OTag :class="todoData.applyStatus.toLocaleLowerCase()">{{ applyStatus[todoData.applyStatus] }} </OTag>
+        </div>
       </div>
 
       <h3 class="caption">基本信息</h3>
       <OForm label-width="92px" label-align="top">
         <OFormItem label="申请单号：">
-          {{ todoData.applyId }}
+          {{ todoData.applyIdString }}
         </OFormItem>
         <OFormItem label="申请类型：">
           {{ todoData.metric }}
@@ -126,7 +148,7 @@ onMounted(() => {
         <OFormItem label="修改理由：">{{ todoData.description }} </OFormItem>
         <OFormItem label="申请时间："> {{ formatDateTime(todoData.updateAt) }} </OFormItem>
       </OForm>
-      <template v-if="todoData.applyStatus !== 'PENDDING'">
+      <template v-if="todoData.applyStatus !== 'OPEN'">
         <h3 class="caption">审批信息</h3>
         <OForm label-width="92px" label-align="top">
           <OFormItem label="审批人：">
@@ -138,7 +160,7 @@ onMounted(() => {
           <OFormItem label="审批时间："> - </OFormItem>
         </OForm>
       </template>
-      <template v-if="todoData.applyStatus === 'PENDDING' && type === 'approval'">
+      <template v-if="todoData.applyStatus === 'OPEN' && type === 'approval'">
         <h3 class="caption">审批</h3>
         <OForm ref="formRef" has-required :model="formData" label-width="92px" label-align="top" @submit="onSubmit">
           <OFormItem label="审批意见：" required field="comment" :rules="commentRules">
@@ -163,6 +185,7 @@ onMounted(() => {
 </template>
 
 <style lang="scss" scoped>
+@import '@/assets/style/category/collaboration/index.scss';
 .todo-detail {
   padding: 32px 40px;
   background: var(--o-color-fill2);
@@ -193,6 +216,7 @@ onMounted(() => {
     .o-form-item-main-wrap {
       min-height: 24px;
     }
+    color: var(--o-color-info1);
     @include text1;
   }
 
@@ -202,28 +226,6 @@ onMounted(() => {
     .o-btn + .o-btn {
       margin-left: 24px;
     }
-  }
-}
-
-.app-tag {
-  min-width: 72px;
-  color: var(--o-color-white);
-  &.pendding {
-    --tag-bg-color: var(--o-color-warning1);
-    --tag-bd-color: var(--o-color-warning1);
-  }
-  &.passed {
-    --tag-bg-color: var(--o-color-success1);
-    --tag-bd-color: var(--o-color-success1);
-  }
-  &.revoked {
-    --tag-bg-color: var(--o-color-control1);
-    --tag-bd-color: transparent;
-  }
-
-  &.dismissed {
-    --tag-bg-color: var(--o-color-danger1);
-    --tag-bd-color: var(--o-color-danger1);
   }
 }
 </style>

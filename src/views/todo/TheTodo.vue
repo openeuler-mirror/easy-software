@@ -33,6 +33,7 @@ const userInfoStore = useUserInfoStore();
 const message = useMessage();
 
 const isAdminPermission = computed(() => userInfoStore.platformAdminPermission);
+const isMaintainerPermission = computed(() => userInfoStore.platformMaintainerPermission);
 
 // 分页
 const currentPage = ref(1);
@@ -46,7 +47,7 @@ const applyStatus = ref('');
 const todoParams = computed(() => {
   return {
     name: todoName.value,
-    applyId: applyId.value,
+    applyIdString: applyId.value,
     pageNum: currentPage.value,
     pageSize: pageSize.value,
     applyStatus: applyStatus.value,
@@ -63,6 +64,7 @@ const isLoading = ref(false);
 
 const activeName = ref();
 const onChange = (type: string) => {
+  pageInit();
   // 切换url参数
   router.push({
     path: `/${locale.value}/todo/${type}`,
@@ -80,21 +82,29 @@ const handleCurrentChange = (val: number) => {
 
 // 我的申请
 const queryMyApplication = () => {
-  const newData = getParamsRules(todoParams.value);
-  getMaintainerApply(newData)
-    .then((res) => {
-      if (res.data.list.length > 0) {
-        applicationData.value = res.data.list;
-        total.value = res.data.total;
-      } else {
+  isLoading.value = true;
+  if (isMaintainerPermission.value) {
+    const newData = getParamsRules(todoParams.value);
+    getMaintainerApply(newData)
+      .then((res) => {
+        if (res.data.list.length > 0) {
+          applicationData.value = res.data.list;
+          total.value = res.data.total;
+        } else {
+          isError.value = true;
+          applicationData.value = [];
+        }
+        isLoading.value = false;
+      })
+      .catch(() => {
+        applicationData.value = [];
+        isLoading.value = false;
         isError.value = true;
-      }
-      isLoading.value = false;
-    })
-    .catch(() => {
-      isLoading.value = false;
-      isError.value = true;
-    });
+      });
+  } else {
+    isError.value = true;
+    isLoading.value = false;
+  }
 };
 
 // 撤销申请
@@ -116,27 +126,34 @@ const revokeApplication = (applyId: number) => {
 
 // 待我审批
 const queryApprovalApply = () => {
+  isLoading.value = true;
   if (isAdminPermission.value) {
     const newData = getParamsRules(todoParams.value);
-    getAdminApply(newData)
+    getAdminApply(todoParams.value)
       .then((res) => {
         if (res.data.list.length > 0) {
           approvalData.value = res.data.list;
           total.value = res.data.total;
         } else {
           isError.value = true;
+          approvalData.value = [];
         }
         isLoading.value = false;
       })
       .catch(() => {
+        approvalData.value = [];
         isError.value = true;
         isLoading.value = false;
       });
+  } else {
+    isError.value = true;
+    isLoading.value = false;
   }
 };
 
 // 我审批过的
 const queryApprovedApply = () => {
+  isLoading.value = true;
   if (isAdminPermission.value) {
     const newData = getParamsRules(todoParams.value);
     getAdminApply(newData)
@@ -146,28 +163,34 @@ const queryApprovedApply = () => {
           total.value = res.data.total;
         } else {
           isError.value = true;
+          approvedData.value = [];
         }
         isLoading.value = false;
       })
       .catch(() => {
+        approvedData.value = [];
         isLoading.value = false;
         isError.value = true;
       });
+  } else {
+    isError.value = true;
+    isLoading.value = false;
   }
 };
 
 const pageInit = () => {
-  isLoading.value = true;
+  isError.value = false;
   if (activeName.value === 'application') {
     applyStatus.value = '';
     todoName.value = 'formPage';
+    applyId.value = '';
     queryMyApplication();
   } else if (activeName.value === 'approval') {
     todoName.value = 'formPage';
     applyStatus.value = 'OPEN';
     queryApprovalApply();
   } else if (activeName.value === 'approved') {
-    todoName.value = 'approved';
+    todoName.value = 'APPROVED';
     applyStatus.value = 'APPROVED,REJECTED';
     queryApprovedApply();
   }
@@ -178,24 +201,12 @@ onMounted(() => {
   pageInit();
 });
 
-watch(
-  () => route.params.type as string,
-  (v: string) => {
-    activeName.value = v || 'application';
-    pageInit();
-    console.log(' watch activeName');
-  }
-);
-
 // watch(
 //   () => todoParams.value,
 //   () => {
 //     pageInit();
-//     console.log(' watch todoParams.value');
 //   },
-//   {
-//     immediate: true,
-//   }
+//   { deep: true }
 // );
 </script>
 
@@ -206,40 +217,42 @@ watch(
     </ContentWrapper>
   </div>
   <OTab variant="text" @change="onChange" v-model="activeName" size="large" :style="{ '--tab-nav-justify': 'flex-start' }">
-    <OTabPane class="tab-pane" v-for="item in tabList" :key="item.id" :value="item.id" :label="item.label">
-      <!-- 我的申请 -->
-      <template v-if="item.id === 'application' && applicationData.length > 0">
-        <ApprovalTable :columns="applicationColumns" :type="item.id" :data="applicationData" :loading="isLoading" @revoke="revokeApplication" />
+    <OTabPane v-for="item in tabList" :key="item.id" :value="item.id" :label="item.label"> </OTabPane>
+  </OTab>
+  <div class="todo-content">
+    <AppLoading :loading="isLoading" />
+    <!-- 我的申请 -->
+    <div v-if="activeName === 'application' && applicationData.length > 0" class="application">
+      <ApprovalTable :columns="applicationColumns" :type="activeName" :data="applicationData" :loading="isLoading" @revoke="revokeApplication" />
+      <div v-if="total > COUNT_PAGESIZE[0]" class="pagination-box">
+        <AppPagination :current="currentPage" :pagesize="pageSize" :total="total" @size-change="handleSizeChange" @current-change="handleCurrentChange" />
+      </div>
+    </div>
+    <!-- 判断admin权限 -->
+    <template v-if="isAdminPermission">
+      <div v-if="activeName === 'approval' && approvalData.length > 0" class="approval">
+        <ApprovalTable :columns="approvalColumns" :type="activeName" :data="approvalData" :loading="isLoading" />
         <div v-if="total > COUNT_PAGESIZE[0]" class="pagination-box">
           <AppPagination :current="currentPage" :pagesize="pageSize" :total="total" @size-change="handleSizeChange" @current-change="handleCurrentChange" />
         </div>
-      </template>
-      <!-- 判断admin权限 -->
-      <template v-if="isAdminPermission">
-        <template v-if="item.id === 'approval' && approvalData.length > 0">
-          <ApprovalTable :columns="approvalColumns" :type="item.id" :data="approvalData" :loading="isLoading" />
-          <div v-if="total > COUNT_PAGESIZE[0]" class="pagination-box">
-            <AppPagination :current="currentPage" :pagesize="pageSize" :total="total" @size-change="handleSizeChange" @current-change="handleCurrentChange" />
-          </div>
-        </template>
-        <template v-if="item.id === 'approved' && approvedData.length > 0">
-          <ApprovalTable :columns="approvalColumns" :type="item.id" :data="approvedData" :loading="isLoading" />
-          <div v-if="total > COUNT_PAGESIZE[0]" class="pagination-box">
-            <AppPagination :current="currentPage" :pagesize="pageSize" :total="total" @size-change="handleSizeChange" @current-change="handleCurrentChange" />
-          </div>
-        </template>
-      </template>
+      </div>
+      <div v-if="activeName === 'approved' && approvedData.length > 0" class="approved">
+        <ApprovalTable :columns="approvalColumns" :type="activeName" :data="approvedData" :loading="isLoading" />
+        <div v-if="total > COUNT_PAGESIZE[0]" class="pagination-box">
+          <AppPagination :current="currentPage" :pagesize="pageSize" :total="total" @size-change="handleSizeChange" @current-change="handleCurrentChange" />
+        </div>
+      </div>
+    </template>
 
-      <!-- 暂无记录 -->
-      <template v-if="(item.id === 'application' && isError) || (item.id === 'approval' && isError) || (item.id === 'approved' && isError)">
-        <Result404>
-          <template #description>
-            <p class="text404">暂无{{ item.id === 'application' ? '申请' : '审批' }}记录</p>
-          </template>
-        </Result404>
-      </template>
-    </OTabPane>
-  </OTab>
+    <!-- 暂无记录 -->
+    <template v-if="(activeName === 'application' && isError) || (activeName === 'approval' && isError) || (activeName === 'approved' && isError)">
+      <Result404>
+        <template #description>
+          <p class="text404">暂无{{ activeName === 'application' ? '申请' : '审批' }}记录</p>
+        </template>
+      </Result404>
+    </template>
+  </div>
 </template>
 
 <style lang="scss" scoped>
@@ -248,9 +261,7 @@ watch(
   display: flex;
   justify-content: end;
 }
-.loading-box {
-  position: relative;
-}
+
 .platform-header {
   padding: 48px 0 24px;
   h1 {
@@ -270,6 +281,21 @@ watch(
   max-width: var(--layout-content-max-width);
   padding-left: var(--layout-content-padding);
   padding-right: var(--layout-content-padding);
+  position: relative;
+}
+.todo-content {
+  position: relative;
+  min-height: calc(var(--layout-content-min-height) - 200px);
   margin: 24px auto;
+  max-width: var(--layout-content-max-width);
+  padding-left: var(--layout-content-padding);
+  padding-right: var(--layout-content-padding);
+}
+.approval {
+  :deep(thead) {
+    .operation {
+      width: 100px;
+    }
+  }
 }
 </style>
