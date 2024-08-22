@@ -45,3 +45,29 @@
     }
   }
 }
+
+.bubble-content {
+  color: var(--o-color-info1);
+  max-width: 300px;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  overflow: hidden;
+
+  .title {
+    font-weight: bold;
+  }
+}
+
+.header-cell {
+  position: relative;
+  display: flex;
+  align-items: center;
+
+  .filter-icon {
+    width: 16px;
+    cursor: pointer;
+    margin-left: 8px;
+  }
+}

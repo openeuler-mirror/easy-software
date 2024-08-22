@@ -1,6 +1,6 @@
-import { computed, ref, toValue, watch, type MaybeRef } from 'vue';
+import { computed, ref, toValue, watch, type MaybeRefOrGetter } from 'vue';
 
-export const useCheckbox = <T>(datasource: MaybeRef<T[]>, cbValueExtractor: (item: T) => string | number) => {
+export const useCheckbox = <T>(datasource: MaybeRefOrGetter<T[]>, cbValueExtractor: (item: T) => string | number) => {
   const checkboxes = ref<(string | number)[]>([]);
   const indeterminate = ref<boolean>(false);
   const parentCheckbox = ref<(string | number)[]>([]);

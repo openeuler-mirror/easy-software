@@ -6,6 +6,8 @@ import { OCheckbox, OCheckboxGroup, OInput, OScroller } from '@opensig/opendesig
 import IconSearch from '~icons/app/icon-search.svg';
 import { useCheckbox } from '@/composables/useCheckbox';
 
+type ValueT = string | { label: string; value: string };
+
 const props = defineProps({
   /** 是否显示筛选输入 */
   filterable: {
@@ -14,62 +16,75 @@ const props = defineProps({
   },
   /** 多选值 */
   values: {
-    type: Array as PropType<string[]>,
+    type: Array as PropType<ValueT[]>,
     default: () => [],
   },
-  /** 是否开启检测滚动到底部 */
-  detectScrollBottom: {
-    type: Boolean,
-    default: false,
+  filterDebounceTimeout: {
+    type: Number,
+    default: 300,
   },
 });
 
 const emit = defineEmits<{
-  (event: 'change', values: (string | number)[]): void
-  (event: 'scrollBottom'): void
+  (event: 'change', val: { values: (string | number)[]; isCheckAll: boolean }): void;
 }>();
+
+const rawValues = computed(() =>
+  props.values.map((val) => {
+    if (typeof val === 'string') {
+      return { label: val, value: val };
+    }
+    return val;
+  })
+);
+
+const searchVal = ref<string>();
+
+const filteredValues = computed(() => {
+  const search = searchVal.value;
+  if (search) {
+    return rawValues.value.filter((val) => val.label.includes(search));
+  } else {
+    return rawValues.value;
+  }
+});
+
+const displayCount = ref(30);
+const displayValues = computed(() => {
+  return filteredValues.value.slice(0, Math.min(filteredValues.value.length, displayCount.value));
+});
 
 const wrapDiv = ref<HTMLDivElement>();
 
 const onScroll = (event: Event) => {
   const el = event.target as HTMLDivElement;
   if (el.scrollHeight - Math.round(el.scrollTop) <= el.clientHeight) {
-    emit('scrollBottom');
+    displayCount.value += 30;
   }
 };
 
 onMounted(() => {
-  if (props.detectScrollBottom) {
-    const container = wrapDiv.value?.querySelector('.o-scroller-container') as HTMLDivElement;
-    container && container.addEventListener('scroll', onScroll);
-  }
+  const container = wrapDiv.value?.querySelector('.o-scroller-container') as HTMLDivElement;
+  container && container.addEventListener('scroll', onScroll);
 });
 
 onUnmounted(() => {
-  if (props.detectScrollBottom) {
-    const container = wrapDiv.value?.querySelector('.o-scroller-container') as HTMLDivElement;
-    container && container.removeEventListener('scroll', onScroll);
-  }
-})
-
-const searchVal = ref<string>();
-
-const actualValues = computed(() => {
-  const search = searchVal.value;
-  if (search) {
-    return props.values.filter((val) => val.includes(search));
-  } else {
-    return props.values;
-  }
+  const container = wrapDiv.value?.querySelector('.o-scroller-container') as HTMLDivElement;
+  container && container.removeEventListener('scroll', onScroll);
 });
 
 const onFilterInput = useDebounceFn((search?: string) => {
+  // 重置显示个数
+  displayCount.value = 30;
   searchVal.value = search;
-}, 200);
+}, props.filterDebounceTimeout);
 
-const { checkboxes, parentCheckbox, indeterminate } = useCheckbox(actualValues, (item) => item);
+const { checkboxes, parentCheckbox, indeterminate, isCheckedAll } = useCheckbox(
+  () => rawValues.value,
+  (item) => item.value
+);
 
-watch(checkboxes, (values) => emit('change', values));
+watch(checkboxes, (values) => emit('change', { values, isCheckAll: isCheckedAll.value }));
 </script>
 
 <template>
@@ -79,12 +94,12 @@ watch(checkboxes, (values) => emit('change', values));
         <IconSearch />
       </template>
     </OInput>
-    <OScroller class="content">
+    <OScroller class="content" showType="always">
       <div class="check-all-wrap">
         <OCheckbox v-model="parentCheckbox" :indeterminate="indeterminate" :value="1">全选</OCheckbox>
       </div>
       <OCheckboxGroup v-model="checkboxes" direction="v">
-        <OCheckbox v-for="item in actualValues" :key="item" :value="item">{{ item }}</OCheckbox>
+        <OCheckbox v-for="item in displayValues" :key="item.value" :value="item.value">{{ item.label }}</OCheckbox>
       </OCheckboxGroup>
     </OScroller>
   </div>
