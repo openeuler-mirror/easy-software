@@ -36,35 +36,43 @@ const hasGiteeAccount = computed(() => !!identities.value.find((id) => id.identi
 
 const allSigs = ref<string[]>();
 const allRepos = ref<string[]>();
-const displayRepos = ref<string[]>();
 
 // 筛选
-const filterPopupTargets = ref(new Array<ComponentPublicInstance>(columns.length));
+const filterIconRefs = ref(new Array<ComponentPublicInstance>(columns.length));
 
-// 筛选组件是否显示的开关
+/** 筛选组件是否显示的开关 */
 const filterSwitches = ref(columns.map(() => false));
 
-// 切换某个筛选组件显示开关
+/** 切换某个筛选组件显示开关 */
 const switchFilterVisible = (index: number) => {
-  filterSwitches.value[index] = !filterSwitches.value[index];
-};
-
-const onFilterChange = useDebounceFn((type: string, values: (string | number)[]) => {
-  filterParams[type] = values.join();
-}, 300);
-
-watch(
-  () => filterSwitches.value[0],
-  (val) => {
-    if (!val) {
-      displayRepos.value = allRepos.value?.slice(0, 30);
+  filterSwitches.value = columns.map((_, idx) => {
+    if (idx === index) {
+      return !filterSwitches.value[idx];
     }
-  }
-);
-
-const onRepoFilterScrollBottom = () => {
-  displayRepos.value && (displayRepos.value = allRepos.value?.slice(0, displayRepos.value?.length + 30));
+    return false;
+  });
 };
+
+/** 各表格列对应的已选中的筛选项 */
+const activeFilterValues = ref(new Array<string[]>(columns.length));
+
+/** 当前有选中筛选项的表格列的数组下标 */
+const currentActiveFilterIndices = ref(new Set<number>());
+
+const onFilterChange = useDebounceFn((type: string, index: number, val: { values: (string | number)[], isCheckAll: boolean }) => {
+  // 关掉筛选组件
+  filterSwitches.value = columns.map(() => false);
+  currentPage.value = 1;
+  if (val.isCheckAll) {
+    filterParams[type] = '';
+    currentActiveFilterIndices.value.add(index);
+    activeFilterValues.value[index] = [];
+  } else {
+    filterParams[type] = val.values.join();
+    activeFilterValues.value[index] = val.values as string[];
+    currentActiveFilterIndices.value.delete(index);
+  }
+}, 300);
 
 const SRCOPENEULER = 'https://gitee.com/src-openeuler/';
 
@@ -80,16 +88,16 @@ const total = ref(0);
 
 // 筛选条件
 const filterParams = reactive<Record<string, string>>({
-  repo: '' as string,
-  kind: '' as string,
-  sigName: '' as string,
-  cveStatus: '' as string,
-  issueStatus: '' as string,
-  prStatus: '' as string,
-  versionStatus: '' as string,
-  orgStatus: '' as string,
-  contributorStatus: '' as string,
-  status: '' as string,
+  repo: '',
+  kind: '',
+  sigName: '',
+  cveStatus: '',
+  issueStatus: '',
+  prStatus: '',
+  versionStatus: '',
+  orgStatus: '',
+  contributorStatus: '',
+  status: '',
 });
 
 const searchParams = computed(() => {
@@ -149,10 +157,7 @@ const queryAdminRepos = () => {
 
 onMounted(() => {
   getSigList().then((list) => (allSigs.value = list));
-  getRepoList().then((list) => {
-    allRepos.value = list;
-    displayRepos.value = allRepos.value.slice(0, 30);
-  });
+  getRepoList().then((list) => (allRepos.value = list));
 });
 
 const pageInit = () => {
@@ -229,33 +234,42 @@ watch(
     <div class="platform-main maintainer">
       <OTable :columns="columns" :data="reposData" :loading="loading" border="row">
         <template #head="{ columns }">
-          <th v-for="(item, index) in columns" :key="item.type" :class="item.type" :ref="(el) => (filterPopupTargets[index] = el as ComponentPublicInstance)">
-            <div class="header-cell">
-              {{ item.label }}
-              <template v-if="item.key !== 'operation'">
-                <OPopover>
-                  <p class="bubble-content">
-                    <span class="title">{{ item.label }}:</span> {{ reposData.map((row) => row[item.key]).join('、') }}
-                  </p>
-                  <template #target>
-                    <OIcon class="filter-icon" @click="switchFilterVisible(index)"><IconFilter /></OIcon>
+          <OPopup
+            trigger="none"
+            style="--popup-radius: 4px"
+            v-for="(item, index) in columns"
+            :key="item.type"
+            :visible="filterSwitches[index]"
+            :unmount-on-hide="false"
+            position="bl"
+          >
+            <template #target>
+              <th :class="item.type">
+                <div class="header-cell">
+                  {{ item.label }}
+                  <template v-if="item.key !== 'operation'">
+                    <OIcon
+                      :ref="(el) => (filterIconRefs[index] = el as ComponentPublicInstance)"
+                      class="filter-icon"
+                      :style="currentActiveFilterIndices.has(index) ? { color: 'var(--o-color-primary1)' } : {}"
+                      @click="switchFilterVisible(index)"
+                      ><IconFilter
+                    /></OIcon>
+                    <OPopover :target="filterIconRefs[index]" trigger="hover">
+                      <p class="bubble-content">
+                        <span class="title">{{ item.label }}:</span>
+                        {{ activeFilterValues[index]?.join('、') }}
+                      </p>
+                    </OPopover>
                   </template>
-                </OPopover>
-                <OPopup trigger="none" :visible="filterSwitches[index]" :unmount-on-hide="false" position="bl" :target="filterPopupTargets[index]">
-                  <FilterableCheckboxes
-                    @scroll-bottom="onRepoFilterScrollBottom"
-                    :detect-scroll-bottom="true"
-                    @change="onFilterChange(item.key, $event)"
-                    v-if="item.key === 'repo'"
-                    :values="displayRepos"
-                  />
-                  <FilterableCheckboxes @change="onFilterChange(item.key, $event)" v-else-if="item.key === 'sigName'" :values="allSigs" />
-                  <FilterableCheckboxes @change="onFilterChange(item.key, $event)" v-else-if="item.key === 'kind'" />
-                  <FilterableCheckboxes :filterable="false" @change="onFilterChange(item.key, $event)" v-else :values="collaborationFilter[item.key]" />
-                </OPopup>
-              </template>
-            </div>
-          </th>
+                </div>
+              </th>
+            </template>
+            <FilterableCheckboxes @change="onFilterChange(item.key, index, $event)" v-if="item.key === 'repo'" :values="allRepos" />
+            <FilterableCheckboxes @change="onFilterChange(item.key, index, $event)" v-else-if="item.key === 'sigName'" :values="allSigs" />
+            <FilterableCheckboxes @change="onFilterChange(item.key, index, $event)" v-else-if="item.key === 'kind'" />
+            <FilterableCheckboxes :filterable="false" @change="onFilterChange(item.key, index, $event)" v-else :values="collaborationFilter[item.key]" />
+          </OPopup>
         </template>
         <template #td_repo="{ row }">
           <OLink color="primary" class="link-external" hover-underline @click="changeExternalDialog(`${SRCOPENEULER + row.repo}`)"
@@ -325,25 +339,6 @@ watch(
 <style scoped lang="scss">
 @import '@/assets/style/category/collaboration/index.scss';
 
-.collaboration-wrap {
-  position: relative;
-  min-height: calc(var(--layout-content-min-height) - 200px);
-}
-
-.bubble-content {
-  color: var(--o-color-info1);
-  max-width: 300px;
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 3;
-  line-clamp: 3;
-  overflow: hidden;
-
-  .title {
-    font-weight: bold;
-  }
-}
-
 .header-cell {
   position: relative;
   display: flex;
@@ -352,6 +347,7 @@ watch(
   .filter-icon {
     width: 16px;
     cursor: pointer;
+    margin-left: 8px;
   }
 }
 .platform-header {

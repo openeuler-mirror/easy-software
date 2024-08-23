@@ -1,14 +1,18 @@
 <script lang="ts" setup>
-import { ref, type PropType, computed } from 'vue';
-import { OTable, OLink, OTag, ODialog, OButton } from '@opensig/opendesign';
+import { ref, type PropType, computed, type ComponentPublicInstance, reactive, watch, onMounted } from 'vue';
+import { OTable, OLink, OTag, ODialog, OButton, OPopup, OIcon, OPopover } from '@opensig/opendesign';
 import { useLocale } from '@/composables/useLocale';
-import { useI18n } from 'vue-i18n';
 import { formatDateTime } from '@/utils/common';
 import { useRouter, useRoute } from 'vue-router';
-import { applyStatus } from '@/data/todo';
+import { applicationType, applyStatus } from '@/data/todo';
 import { useUserInfoStore } from '@/stores/user';
 
+import IconFilter from '~icons/app/icon-filter.svg';
+
 import GiteeAccountDialog from '@/components/collaboration/GiteeAccountDialog.vue';
+import FilterableCheckboxes from '@/components/FilterableCheckboxes.vue';
+import { useDebounceFn } from '@vueuse/core';
+import { getAdminApplyRepos, getMaintainerApplyRepos } from '@/api/api-collaboration';
 
 interface ColumnsT {
   key: string;
@@ -18,6 +22,10 @@ interface ColumnsT {
 }
 
 const props = defineProps({
+  filterableColumns: {
+    type: Array as PropType<string[]>,
+    default: () => [],
+  },
   data: {
     type: Array,
     default: () => [],
@@ -36,10 +44,71 @@ const props = defineProps({
   },
 });
 
-const { t } = useI18n();
 const router = useRouter();
 const route = useRoute();
 const { locale } = useLocale();
+
+const repoList = ref<string[]>([]);
+
+onMounted(() => {
+  if (props.type === 'approval' || props.type === 'approved') {
+    getAdminApplyRepos().then((data) => {
+      repoList.value = data.list;
+    });
+  } else {
+    getMaintainerApplyRepos().then((data) => {
+      repoList.value = data.list;
+    });
+  }
+})
+
+const filterParams = reactive(
+  props.filterableColumns.reduce(
+    (obj, col) => {
+      obj[col] = '';
+      return obj;
+    },
+    {} as Record<string, string>
+  )
+);
+
+watch(filterParams, (params) => emits('queryData', params));
+
+const filterableColSet = computed(() => new Set(props.filterableColumns));
+const applyTypes = applicationType.map((item) => ({ label: item.label, value: item.id }));
+const filterIconRefs = ref(new Array<ComponentPublicInstance>(props.columns.length));
+
+/** 筛选组件是否显示的开关 */
+const filterSwitches = ref(props.columns.map(() => false));
+
+/** 当前有选中筛选项的表格列的数组下标 */
+const currentActiveFilterIndices = ref(new Set<number>());
+
+/** 切换某个筛选组件显示开关 */
+const switchFilterVisible = (index: number) => {
+  filterSwitches.value = props.columns.map((_, idx) => {
+    if (idx === index) {
+      return !filterSwitches.value[idx];
+    }
+    return false;
+  });
+};
+
+/** 各表格列对应的已选中的筛选项 */
+const activeFilterValues = ref(new Array<string[]>(props.columns.length));
+
+const onFilterChange = useDebounceFn((type: string, index: number, val: { values: (string | number)[]; isCheckAll: boolean }) => {
+  filterSwitches.value = props.columns.map(() => false);
+  if (val.isCheckAll) {
+    filterParams[type] = '';
+    currentActiveFilterIndices.value.add(index);
+    activeFilterValues.value[index] = [];
+  } else {
+    filterParams[type] = val.values.join();
+    activeFilterValues.value[index] = val.values as string[];
+    currentActiveFilterIndices.value.delete(index);
+  }
+}, 300);
 
 const userInfoStore = useUserInfoStore();
 const isMainAllPer = computed(() => userInfoStore.platformMaintainerAllPermission);
@@ -53,6 +122,7 @@ const jumpTo = (id: number) => {
 
 const emits = defineEmits<{
   (e: 'revoke', id: number): void;
+  (e: 'queryData', params: Record<string, string>): void;
 }>();
 
 const showDlg = ref(false);
@@ -77,7 +147,38 @@ const revoke = () => {
   <div class="table-main" :class="type">
     <OTable :columns="columns" :data="data" :loading="loading" border="all">
       <template #head="{ columns }">
-        <th v-for="item in columns" :key="item.type" :class="item.type">{{ item.label }}</th>
+        <template v-for="(item, index) in columns" :key="item.type">
+          <th v-if="!filterableColSet.size || !filterableColSet.has(item.key)" :class="item.type">
+            {{ item.label }}
+          </th>
+          <OPopup v-else trigger="none" style="--popup-radius: 4px" :visible="filterSwitches[index]" :unmount-on-hide="false" position="bl">
+            <template #target>
+              <th :class="item.type">
+                <div class="header-cell">
+                  {{ item.label }}
+                  <template v-if="item.key !== 'operation'">
+                    <OIcon
+                      :ref="(el) => (filterIconRefs[index] = el as ComponentPublicInstance)"
+                      class="filter-icon"
+                      :style="currentActiveFilterIndices.has(index) ? { color: 'var(--o-color-primary1)' } : {}"
+                      @click="switchFilterVisible(index)"
+                      ><IconFilter
+                    /></OIcon>
+                    <OPopover :target="filterIconRefs[index]" trigger="hover">
+                      <p class="bubble-content">
+                        <span class="title">{{ item.label }}:</span>
+                        {{ activeFilterValues[index]?.join('、') }}
+                      </p>
+                    </OPopover>
+                  </template>
+                </div>
+              </th>
+            </template>
+            <FilterableCheckboxes v-if="item.key === 'metric'" @change="onFilterChange(item.key, index, $event)" :values="applyTypes" />
+            <FilterableCheckboxes v-else-if="item.key === 'repo'" @change="onFilterChange(item.key, index, $event)" :values="repoList" />
+            <FilterableCheckboxes v-else-if="item.key === 'applyStatus'" @change="onFilterChange(item.key, index, $event)" :values="Object.keys(applyStatus)" />
+          </OPopup>
+        </template>
       </template>
       <template #td_updateAt="{ row }">
         {{ formatDateTime(row.updateAt) }}
@@ -126,6 +227,7 @@ const revoke = () => {
 
 <style lang="scss" scoped>
 @import '@/assets/style/category/collaboration/index.scss';
+
 .revoke-text {
   color: var(--o-color-info1);
   text-align: center;

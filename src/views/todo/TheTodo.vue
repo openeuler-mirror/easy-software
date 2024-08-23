@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref, onMounted, computed, watch } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { OTab, OTabPane, useMessage } from '@opensig/opendesign';
 import { useRoute, useRouter } from 'vue-router';
 import { useLocale } from '@/composables/useLocale';
@@ -75,17 +75,22 @@ const onChange = (type: string) => {
 const handleSizeChange = (val: number) => {
   pageSize.value = val;
   currentPage.value = 1;
+  pageInit();
 };
 const handleCurrentChange = (val: number) => {
   currentPage.value = val;
+  pageInit();
 };
 
 // 我的申请
-const queryMyApplication = () => {
+const queryMyApplication = (params = {}) => {
   isLoading.value = true;
   if (isMaintainerPermission.value) {
+    if (Object.keys(params).length) {
+      currentPage.value = 1;
+    }
     const newData = getParamsRules(todoParams.value);
-    getMaintainerApply(newData)
+    getMaintainerApply({ ...newData, ...params })
       .then((res) => {
         if (res.data.list.length > 0) {
           applicationData.value = res.data.list;
@@ -125,11 +130,14 @@ const revokeApplication = (applyId: number) => {
 };
 
 // 待我审批
-const queryApprovalApply = () => {
+const queryApprovalApply = (params = {}) => {
   isLoading.value = true;
   if (isAdminPermission.value) {
+    if (Object.keys(params).length) {
+      currentPage.value = 1;
+    }
     const newData = getParamsRules(todoParams.value);
-    getAdminApply(todoParams.value)
+    getAdminApply({ ...newData, ...params })
       .then((res) => {
         if (res.data.list.length > 0) {
           approvalData.value = res.data.list;
@@ -152,11 +160,14 @@ const queryApprovalApply = () => {
 };
 
 // 我审批过的
-const queryApprovedApply = () => {
+const queryApprovedApply = (params = {}) => {
   isLoading.value = true;
   if (isAdminPermission.value) {
+    if (Object.keys(params).length) {
+      currentPage.value = 1;
+    }
     const newData = getParamsRules(todoParams.value);
-    getAdminApply(newData)
+    getAdminApply({ ...newData, ...params })
       .then((res) => {
         if (res.data.list.length > 0) {
           approvedData.value = res.data.list;
@@ -223,7 +234,7 @@ onMounted(() => {
     <AppLoading :loading="isLoading" />
     <!-- 我的申请 -->
     <div v-if="activeName === 'application' && applicationData.length > 0" class="application">
-      <ApprovalTable :columns="applicationColumns" :type="activeName" :data="applicationData" :loading="isLoading" @revoke="revokeApplication" />
+      <ApprovalTable :columns="applicationColumns" @queryData="queryMyApplication" :filterable-columns="['repo', 'metric', 'applyStatus']" :type="activeName" :data="applicationData" :loading="isLoading" @revoke="revokeApplication" />
       <div v-if="total > COUNT_PAGESIZE[0]" class="pagination-box">
         <AppPagination :current="currentPage" :pagesize="pageSize" :total="total" @size-change="handleSizeChange" @current-change="handleCurrentChange" />
       </div>
@@ -231,13 +242,13 @@ onMounted(() => {
     <!-- 判断admin权限 -->
     <template v-if="isAdminPermission">
       <div v-if="activeName === 'approval' && approvalData.length > 0" class="approval">
-        <ApprovalTable :columns="approvalColumns" :type="activeName" :data="approvalData" :loading="isLoading" />
+        <ApprovalTable :columns="approvalColumns" @queryData="queryApprovalApply" :filterable-columns="['repo', 'metric']" :type="activeName" :data="approvalData" :loading="isLoading" />
         <div v-if="total > COUNT_PAGESIZE[0]" class="pagination-box">
           <AppPagination :current="currentPage" :pagesize="pageSize" :total="total" @size-change="handleSizeChange" @current-change="handleCurrentChange" />
         </div>
       </div>
       <div v-if="activeName === 'approved' && approvedData.length > 0" class="approved">
-        <ApprovalTable :columns="approvalColumns" :type="activeName" :data="approvedData" :loading="isLoading" />
+        <ApprovalTable :columns="approvalColumns" @queryData="queryApprovedApply" :filterable-columns="['repo', 'metric']" :type="activeName" :data="approvedData" :loading="isLoading" />
         <div v-if="total > COUNT_PAGESIZE[0]" class="pagination-box">
           <AppPagination :current="currentPage" :pagesize="pageSize" :total="total" @size-change="handleSizeChange" @current-change="handleCurrentChange" />
         </div>

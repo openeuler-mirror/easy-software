@@ -55,6 +55,18 @@ export function getMaintainerRevoke(id: number) {
   return request.post(url, { applyId: id }).then((res: AxiosResponse) => res?.data);
 }
 
+/** 待办中心获取我的申请所有仓库 */
+export function getMaintainerApplyRepos() {
+  const url = `/server/collaboration/maintainer/apply/repos`;
+  return request.get<{ data: { total: number, list: string[] } }>(url).then((res) => res?.data.data);
+}
+
+/** 待办中心获取待我审批/我审批过所有仓库 */
+export function getAdminApplyRepos() {
+  const url = `/server/collaboration/admin/apply/repos`;
+  return request.get<{ data: { total: number, list: string[] } }>(url).then((res) => res?.data.data);
+}
+
 interface FeedbackT {
   repo: string;
   metric: string;
