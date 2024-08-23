@@ -3,7 +3,7 @@ import { ref, onMounted, computed, reactive } from 'vue';
 import { OButton, OTag, OForm, OTextarea, OFormItem, useMessage, type FieldResultT } from '@opensig/opendesign';
 import { useRoute } from 'vue-router';
 import { getAdminApply, getMaintainerApply, getAdminProcess } from '@/api/api-collaboration';
-import { applicationTypeConvert, applyStatusConvert } from '@/utils/collaboration';
+import { applicationTypeConvert, applyStatusConvert, versionLatestStatusConvert } from '@/utils/collaboration';
 import { formatDateTime } from '@/utils/common';
 import { useUserInfoStore } from '@/stores/user';
 
@@ -11,6 +11,7 @@ const route = useRoute();
 const message = useMessage();
 const userInfoStore = useUserInfoStore();
 const isAdminPer = computed(() => userInfoStore.platformAdminPermission);
+const isMaintainerPer = computed(() => userInfoStore.platformMaintainerPermission);
 const isLoading = ref(true);
 const isError = ref(false);
 
@@ -28,9 +29,7 @@ const formData = reactive({
 const queryApplicationApply = () => {
   getMaintainerApply({ name: 'formContent', applyIdString: applyId.value })
     .then((res) => {
-      if (res.data.list.length > 0) {
-        todoData.value = res.data.list[0];
-      }
+      todoData.value = res.data.list[0];
       isLoading.value = false;
     })
     .catch(() => {
@@ -43,9 +42,8 @@ const queryApplicationApply = () => {
 const queryApprovalApply = () => {
   getAdminApply({ name: 'formContent', applyIdString: applyId.value })
     .then((res) => {
-      if (res.data.list.length > 0) {
-        todoData.value = res.data.list[0];
-      }
+      todoData.value = res.data.list[0];
+
       isLoading.value = false;
     })
     .catch(() => {
@@ -144,20 +142,21 @@ onMounted(() => {
         <OFormItem label="申请类型：">
           {{ applicationTypeConvert(todoData.metric) }}
         </OFormItem>
-        <OFormItem label="修改状态："> {{ todoData.metricStatus }} </OFormItem>
+        <OFormItem label="修改状态："> {{ versionLatestStatusConvert(todoData.metricStatus) }} </OFormItem>
         <OFormItem label="修改理由：">{{ todoData.description }} </OFormItem>
-        <OFormItem label="申请时间："> {{ formatDateTime(todoData.updateAt) }} </OFormItem>
+        <OFormItem label="申请时间："> {{ formatDateTime(todoData.createdAt, true) }} </OFormItem>
       </OForm>
-      <template v-if="todoData.applyStatus === 'REJECTED' || todoData.applyStatus === 'APPROVED'">
+
+      <template v-if="isMaintainerPer || todoData.applyStatus === 'REJECTED' || todoData.applyStatus === 'APPROVED'">
         <h3 class="caption">审批信息</h3>
         <OForm label-width="92px" label-align="top">
-          <OFormItem v-if="todoData.adminstrator" label="审批人：">
-            {{ todoData.adminstrator }}
+          <OFormItem label="审批人：">
+            {{ todoData.administrator ?? ' -' }}
           </OFormItem>
           <OFormItem label="审批意见：">
-            {{ todoData.comment }}
+            {{ todoData.comment ?? ' -' }}
           </OFormItem>
-          <OFormItem label="审批时间："> {{ formatDateTime(todoData.approvalTime) }} </OFormItem>
+          <OFormItem label="审批时间："> {{ formatDateTime(todoData.approvalTime, true) ?? ' -' }} </OFormItem>
         </OForm>
       </template>
       <template v-if="isAdminPer && todoData.applyStatus === 'OPEN'">

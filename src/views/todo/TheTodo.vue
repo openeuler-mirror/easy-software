@@ -51,6 +51,7 @@ const todoParams = computed(() => {
     pageNum: currentPage.value,
     pageSize: pageSize.value,
     applyStatus: applyStatus.value,
+    timeOrder: 'desc',
   };
 });
 
@@ -65,6 +66,7 @@ const isLoading = ref(false);
 const activeName = ref();
 const onChange = (type: string) => {
   currentPage.value = 1;
+  pageSize.value = 10;
   pageInit();
   // 切换url参数
   router.push({
@@ -87,19 +89,12 @@ const handleCurrentChange = (val: number) => {
 const queryMyApplication = (params = {}) => {
   isLoading.value = true;
   if (isMaintainerPermission.value) {
-    if (Object.keys(params).length) {
-      currentPage.value = 1;
-    }
     const newData = getParamsRules(todoParams.value);
     getMaintainerApply({ ...newData, ...params })
       .then((res) => {
-        if (res.data.list.length > 0) {
-          applicationData.value = res.data.list;
-          total.value = res.data.total;
-        } else {
-          isError.value = true;
-          applicationData.value = [];
-        }
+        applicationData.value = res.data.list;
+        total.value = res.data.total;
+
         isLoading.value = false;
       })
       .catch(() => {
@@ -114,8 +109,12 @@ const queryMyApplication = (params = {}) => {
 };
 
 // 撤销申请
-const revokeApplication = (applyId: number) => {
-  getMaintainerRevoke(applyId)
+const revokeApplication = (id: string) => {
+  const params = {
+    applyIdString: id,
+    applyStatus: 'OPEN',
+  };
+  getMaintainerRevoke(params)
     .then((res) => {
       if (res.code === 200) {
         message.success({
@@ -135,19 +134,12 @@ const revokeApplication = (applyId: number) => {
 const queryApprovalApply = (params = {}) => {
   isLoading.value = true;
   if (isAdminPermission.value) {
-    if (Object.keys(params).length) {
-      currentPage.value = 1;
-    }
     const newData = getParamsRules(todoParams.value);
     getAdminApply({ ...newData, ...params })
       .then((res) => {
-        if (res.data.list.length > 0) {
-          approvalData.value = res.data.list;
-          total.value = res.data.total;
-        } else {
-          isError.value = true;
-          approvalData.value = [];
-        }
+        approvalData.value = res.data.list;
+        total.value = res.data.total;
+
         isLoading.value = false;
       })
       .catch(() => {
@@ -165,19 +157,11 @@ const queryApprovalApply = (params = {}) => {
 const queryApprovedApply = (params = {}) => {
   isLoading.value = true;
   if (isAdminPermission.value) {
-    if (Object.keys(params).length) {
-      currentPage.value = 1;
-    }
     const newData = getParamsRules(todoParams.value);
     getAdminApply({ ...newData, ...params })
       .then((res) => {
-        if (res.data.list.length > 0) {
-          approvedData.value = res.data.list;
-          total.value = res.data.total;
-        } else {
-          isError.value = true;
-          approvedData.value = [];
-        }
+        approvedData.value = res.data.list;
+        total.value = res.data.total;
         isLoading.value = false;
       })
       .catch(() => {
@@ -213,14 +197,6 @@ onMounted(() => {
   activeName.value = (route.params?.type as string) || 'application';
   pageInit();
 });
-
-// watch(
-//   () => todoParams.value,
-//   () => {
-//     pageInit();
-//   },
-//   { deep: true }
-// );
 </script>
 
 <template>
@@ -235,7 +211,7 @@ onMounted(() => {
   <div class="todo-content">
     <AppLoading :loading="isLoading" />
     <!-- 我的申请 -->
-    <div v-if="activeName === 'application' && applicationData.length > 0" class="application">
+    <div v-if="activeName === 'application' && !isError" class="application">
       <ApprovalTable
         :columns="applicationColumns"
         @queryData="queryMyApplication"
@@ -251,7 +227,7 @@ onMounted(() => {
     </div>
     <!-- 判断admin权限 -->
     <template v-if="isAdminPermission">
-      <div v-if="activeName === 'approval' && approvalData.length > 0" class="approval">
+      <div v-if="activeName === 'approval' && !isError" class="approval">
         <ApprovalTable
           :columns="approvalColumns"
           @queryData="queryApprovalApply"
@@ -264,7 +240,7 @@ onMounted(() => {
           <AppPagination :current="currentPage" :pagesize="pageSize" :total="total" @size-change="handleSizeChange" @current-change="handleCurrentChange" />
         </div>
       </div>
-      <div v-if="activeName === 'approved' && approvedData.length > 0" class="approved">
+      <div v-if="activeName === 'approved' && !isError" class="approved">
         <ApprovalTable
           :columns="approvalHistoryColumns"
           @queryData="queryApprovedApply"

@@ -29,7 +29,7 @@ const onChange = () => {
 </script>
 
 <template>
-  <ODialog v-model:visible="showDlg" :unmount-on-hide="true" :mask="true" size="large" @change="onChange">
+  <ODialog v-model:visible="showDlg" :unmount-on-hide="true" :mask="true" @change="onChange">
     <template #header>
       <p class="external-title">{{ t('software.external.title') }}</p>
     </template>

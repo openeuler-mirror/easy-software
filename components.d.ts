@@ -19,7 +19,6 @@ declare module 'vue' {
     AppTableToggle: typeof import('./src/components/AppTableToggle.vue')['default']
     CBreadcrumb: typeof import('./src/components/collaboration/CBreadcrumb.vue')['default']
     ContentWrapper: typeof import('./src/components/ContentWrapper.vue')['default']
-    copy: typeof import('./src/components/collaboration/StatusFeedback copy.vue')['default']
     DetailAside: typeof import('./src/components/detail/DetailAside.vue')['default']
     DetailBasicInfo: typeof import('./src/components/detail/DetailBasicInfo.vue')['default']
     DetailHeader: typeof import('./src/components/detail/DetailHeader.vue')['default']
@@ -38,8 +37,6 @@ declare module 'vue' {
     FilterItemSkeleton: typeof import('./src/components/skeleton/FilterItemSkeleton.vue')['default']
     FilterOrder: typeof import('./src/components/filter/FilterOrder.vue')['default']
     FilterRadio: typeof import('./src/components/filter/FilterRadio.vue')['default']
-    GiteeAccountDialog: typeof import('./src/components/collaboration/GiteeAccountDialog.vue')['default']
-    GiteeDialog: typeof import('./src/components/collaboration/GiteeDialog.vue')['default']
     HeaderNav: typeof import('./src/components/header/HeaderNav.vue')['default']
     HeaderTheme: typeof import('./src/components/header/HeaderTheme.vue')['default']
     HomeSkeleton: typeof import('./src/components/skeleton/HomeSkeleton.vue')['default']
@@ -58,5 +55,8 @@ declare module 'vue' {
     SearchRecommend: typeof import('./src/components/search/SearchRecommend.vue')['default']
     SearchTab: typeof import('./src/components/search/SearchTab.vue')['default']
     StatusFeedback: typeof import('./src/components/collaboration/StatusFeedback.vue')['default']
+  }
+  export interface ComponentCustomProperties {
+    vLoading: typeof import('element-plus/es')['ElLoadingDirective']
   }
 }

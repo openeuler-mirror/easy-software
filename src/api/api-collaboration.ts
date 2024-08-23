@@ -50,9 +50,13 @@ export function getMaintainerApply(params: AdminAppryT) {
 }
 
 // 申请撤销
-export function getMaintainerRevoke(id: number) {
+interface RevokeT {
+  applyIdString: string;
+  applyStatus: string;
+}
+export function getMaintainerRevoke(params: RevokeT) {
   const url = `/server/collaboration/maintainer/revoke`;
-  return request.post(url, { applyIdString: id }).then((res: AxiosResponse) => res?.data);
+  return request.post(url, { params }).then((res: AxiosResponse) => res?.data);
 }
 
 /** 待办中心获取我的申请所有仓库 */
@@ -81,7 +85,7 @@ export function getApplyFeedback(params: FeedbackT) {
 }
 
 interface ProcessT {
-  applyId: string;
+  applyIdString: string;
   comment: string;
   applyStatus: string;
 }

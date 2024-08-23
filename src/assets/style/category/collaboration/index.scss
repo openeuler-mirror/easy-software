@@ -21,6 +21,14 @@
     }
   }
 }
+.indicators {
+  .repo-status {
+    :deep(.o-tag) {
+      min-width: 56px;
+      border-radius: 2px;
+    }
+  }
+}
 
 .apply-status {
   :deep(.o-tag) {
