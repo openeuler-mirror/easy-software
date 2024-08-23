@@ -61,7 +61,9 @@ export async function tryLogin() {
   if (!csrfToken) {
     userInfoStore.$reset();
     loginStore.setLoginStatus(LOGIN_STATUS.NOT);
+    return;
   }
+
   try {
     loginStore.setLoginStatus(LOGIN_STATUS.DOING);
     userInfoStore.$patch(await queryUserInfo());

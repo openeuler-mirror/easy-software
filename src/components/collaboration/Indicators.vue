@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { ref } from 'vue';
 import { OTable, OTag, ODialog } from '@opensig/opendesign';
-import { repoStatusIndex } from '@/data/todo';
+import { repoStatusIndex } from '@/utils/collaboration';
 
 const columns = [
   { label: 'CVE分类', key: 'cve', type: 'cve' },

@@ -4,12 +4,11 @@ import { OTable, OLink, OTag, ODialog, OButton, OPopup, OIcon, OPopover } from '
 import { useLocale } from '@/composables/useLocale';
 import { formatDateTime } from '@/utils/common';
 import { useRouter, useRoute } from 'vue-router';
-import { applicationType, applyStatus } from '@/data/todo';
+import { applicationType, applyStatusType } from '@/data/todo';
+import { applicationTypeConvert, applyStatusConvert } from '@/utils/collaboration';
 import { useUserInfoStore } from '@/stores/user';
 
 import IconFilter from '~icons/app/icon-filter.svg';
-
-import GiteeAccountDialog from '@/components/collaboration/GiteeAccountDialog.vue';
 import FilterableCheckboxes from '@/components/FilterableCheckboxes.vue';
 import { useDebounceFn } from '@vueuse/core';
 import { getAdminApplyRepos, getMaintainerApplyRepos } from '@/api/api-collaboration';
@@ -60,7 +59,7 @@ onMounted(() => {
       repoList.value = data.list;
     });
   }
-})
+});
 
 const filterParams = reactive(
   props.filterableColumns.reduce(
@@ -76,7 +75,10 @@ watch(filterParams, (params) => emits('queryData', params));
 
 const filterableColSet = computed(() => new Set(props.filterableColumns));
 const applyTypes = applicationType.map((item) => ({ label: item.label, value: item.id }));
+
 const filterIconRefs = ref(new Array<ComponentPublicInstance>(props.columns.length));
+
+const applyStatusList = computed(() => {});
 
 /** 筛选组件是否显示的开关 */
 const filterSwitches = ref(props.columns.map(() => false));
@@ -111,7 +113,7 @@ const onFilterChange = useDebounceFn((type: string, index: number, val: { values
 }, 300);
 
 const userInfoStore = useUserInfoStore();
-const isMainAllPer = computed(() => userInfoStore.platformMaintainerAllPermission);
+const isMainPer = computed(() => userInfoStore.platformMaintainerPermission);
 
 const jumpTo = (id: number) => {
   const type = route.params?.type as string;
@@ -126,15 +128,10 @@ const emits = defineEmits<{
 }>();
 
 const showDlg = ref(false);
-const showGiteeDlg = ref(false);
 const applayId = ref();
 const revokeApplication = (id: number) => {
-  if (isMainAllPer.value) {
-    applayId.value = id;
-    showDlg.value = true;
-  } else {
-    showGiteeDlg.value = true;
-  }
+  applayId.value = id;
+  showDlg.value = true;
 };
 
 const revoke = () => {
@@ -176,12 +173,15 @@ const revoke = () => {
             </template>
             <FilterableCheckboxes v-if="item.key === 'metric'" @change="onFilterChange(item.key, index, $event)" :values="applyTypes" />
             <FilterableCheckboxes v-else-if="item.key === 'repo'" @change="onFilterChange(item.key, index, $event)" :values="repoList" />
-            <FilterableCheckboxes v-else-if="item.key === 'applyStatus'" @change="onFilterChange(item.key, index, $event)" :values="Object.keys(applyStatus)" />
+            <FilterableCheckboxes v-else-if="item.key === 'applyStatus'" @change="onFilterChange(item.key, index, $event)" :values="applyStatusType" />
           </OPopup>
         </template>
       </template>
       <template #td_updateAt="{ row }">
         {{ formatDateTime(row.updateAt) }}
+      </template>
+      <template #td_metric="{ row }">
+        {{ applicationTypeConvert(row.metric) }}
       </template>
       <template #td_comment="{ row }">
         <div class="line-clamp">{{ row.comment }}</div>
@@ -191,14 +191,14 @@ const revoke = () => {
       </template>
       <template #td_applyStatus="{ row }">
         <div class="apply-status">
-          <OTag v-if="row.applyStatus" :class="row.applyStatus?.toLocaleLowerCase()">{{ applyStatus[row.applyStatus] }} </OTag>
+          <OTag v-if="row.applyStatus" :class="row.applyStatus?.toLocaleLowerCase()">{{ applyStatusConvert(row.applyStatus) }} </OTag>
         </div>
       </template>
       <template #td_operation="{ row }">
         <template v-if="type === 'application'">
           <div class="oper-box">
             <OLink color="primary" hover-underline @click="jumpTo(row.applyIdString)">申请详情</OLink>
-            <OLink color="danger" v-if="row.applyStatus === 'OPEN'" hover-underline @click="revokeApplication(row.applyIdString)">撤销申请</OLink>
+            <OLink color="danger" v-if="row.applyStatus === 'OPEN' && isMainPer" hover-underline @click="revokeApplication(row.applyIdString)">撤销申请</OLink>
           </div>
         </template>
         <template v-if="type === 'approval'">
@@ -209,7 +209,6 @@ const revoke = () => {
         </template>
       </template>
     </OTable>
-    <GiteeAccountDialog v-if="showGiteeDlg" @close="showGiteeDlg = false" />
     <ODialog v-model:visible="showDlg" class="revoke-dlg" :unmount-on-hide="true" :mask="true" size="small">
       <template #header>
         <p class="title">确认撤销</p>
@@ -282,7 +281,9 @@ thead {
   .description {
     width: 150px;
   }
-  .applyStatus,
+  .applyStatus {
+    width: 135px;
+  }
   .adminstrator,
   .maintainer {
     width: 120px;

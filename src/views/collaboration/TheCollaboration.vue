@@ -11,10 +11,9 @@ import Result404 from '@/components/Result404.vue';
 import IconOutlink from '~icons/pkg/icon-outlink.svg';
 import IconFilter from '~icons/app/icon-filter.svg';
 import FilterableCheckboxes from '@/components/FilterableCheckboxes.vue';
-import GiteeAccountDialog from '@/components/collaboration/GiteeAccountDialog.vue';
-import { collaborationFilter } from '@/data/filter';
+import { kindTypes, applicationType } from '@/data/todo';
 import { useDebounceFn } from '@vueuse/core';
-import { repoStatusIndex } from '@/data/todo';
+import { repoStatusIndex, repoStatusArr } from '@/utils/collaboration';
 
 const columns = [
   { label: '软件仓库', key: 'repo', type: 'repo' },
@@ -59,7 +58,7 @@ const activeFilterValues = ref(new Array<string[]>(columns.length));
 /** 当前有选中筛选项的表格列的数组下标 */
 const currentActiveFilterIndices = ref(new Set<number>());
 
-const onFilterChange = useDebounceFn((type: string, index: number, val: { values: (string | number)[], isCheckAll: boolean }) => {
+const onFilterChange = useDebounceFn((type: string, index: number, val: { values: (string | number)[]; isCheckAll: boolean }) => {
   // 关掉筛选组件
   filterSwitches.value = columns.map(() => false);
   currentPage.value = 1;
@@ -78,7 +77,6 @@ const SRCOPENEULER = 'https://gitee.com/src-openeuler/';
 
 const userInfoStore = useUserInfoStore();
 const isMainPer = computed(() => userInfoStore.platformMaintainerPermission);
-const isMainAllPer = computed(() => userInfoStore.platformMaintainerAllPermission);
 const isAdminPer = computed(() => userInfoStore.platformAdminPermission);
 
 // 分页
@@ -192,14 +190,9 @@ const showDlg = ref(false);
 
 const showFeedbackDlg = ref(false);
 const repoValue = ref('');
-const showGiteeDlg = ref(false);
 const changeFeedback = (v: string) => {
-  if (isMainAllPer.value) {
-    showFeedbackDlg.value = true;
-    repoValue.value = v;
-  } else {
-    showGiteeDlg.value = true;
-  }
+  showFeedbackDlg.value = true;
+  repoValue.value = v;
 };
 
 // 反馈历史
@@ -207,6 +200,15 @@ const showFeedbacHistroykDlg = ref(false);
 const changeFeedbackHistory = (v: string) => {
   repoValue.value = v;
   showFeedbacHistroykDlg.value = true;
+};
+
+// 类型数据
+const metricTypes = (v: string) => {
+  const index = applicationType.findIndex((item) => item.id === v);
+  if (index === -1) {
+    return [];
+  }
+  return applicationType[index].children;
 };
 
 watch(
@@ -267,8 +269,9 @@ watch(
             </template>
             <FilterableCheckboxes @change="onFilterChange(item.key, index, $event)" v-if="item.key === 'repo'" :values="allRepos" />
             <FilterableCheckboxes @change="onFilterChange(item.key, index, $event)" v-else-if="item.key === 'sigName'" :values="allSigs" />
-            <FilterableCheckboxes @change="onFilterChange(item.key, index, $event)" v-else-if="item.key === 'kind'" />
-            <FilterableCheckboxes :filterable="false" @change="onFilterChange(item.key, index, $event)" v-else :values="collaborationFilter[item.key]" />
+            <FilterableCheckboxes @change="onFilterChange(item.key, index, $event)" v-else-if="item.key === 'kind'" :values="kindTypes" />
+            <FilterableCheckboxes @change="onFilterChange(item.key, index, $event)" v-else-if="item.key === 'status'" :values="repoStatusArr" />
+            <FilterableCheckboxes :filterable="false" @change="onFilterChange(item.key, index, $event)" v-else :values="metricTypes(item.key)" />
           </OPopup>
         </template>
         <template #td_repo="{ row }">
@@ -303,7 +306,7 @@ watch(
         </template>
         <template #td_operation="{ row }">
           <div class="operation-box">
-            <OLink v-if="!isAdminPer" color="primary" hover-underline @click="changeFeedback(row.repo)">状态反馈</OLink>
+            <OLink v-if="isMainPer" color="primary" hover-underline @click="changeFeedback(row.repo)">状态反馈</OLink>
             <OLink color="primary" hover-underline @click="changeFeedbackHistory(row.repo)">反馈历史</OLink>
           </div>
         </template>
@@ -313,8 +316,6 @@ watch(
         <AppPagination :current="currentPage" :pagesize="pageSize" :total="total" @size-change="handleSizeChange" @current-change="handleCurrentChange" />
       </div>
     </div>
-
-    <GiteeAccountDialog v-if="showGiteeDlg" @close="showGiteeDlg = false" />
 
     <!-- 暂无记录 -->
     <template v-if="isError || !hasGiteeAccount">
@@ -331,7 +332,7 @@ watch(
 
     <StatusFeedback :repo="repoValue" v-if="showFeedbackDlg" @close="showFeedbackDlg = false" />
 
-    // 反馈历史
+    <!-- 反馈历史 -->
     <FeedbackHistroy v-if="showFeedbacHistroykDlg" :repo="repoValue" @close="showFeedbacHistroykDlg = false" />
   </ContentWrapper>
 </template>
@@ -410,11 +411,11 @@ watch(
       .issue,
       .pr,
       .version {
-        width: 180px;
+        width: 188px;
       }
       .org,
       .personnel {
-        width: 140px;
+        width: 160px;
       }
       .kind {
         width: 180px;

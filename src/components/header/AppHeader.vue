@@ -14,7 +14,6 @@ import { useTheme } from '@/composables/useTheme';
 import HeaderNav from '@/components/header/HeaderNav.vue';
 import AppLogin from '@/components/header/AppLogin.vue';
 import HeaderTheme from '@/components/header/HeaderTheme.vue';
-import GiteeAccountDialog from '@/components/collaboration/GiteeAccountDialog.vue';
 
 import openeulerLogo from '@/assets/openeuler-logo.svg';
 import openeulerLogoDark from '@/assets/openeuler-logo-dark.svg';
@@ -26,7 +25,7 @@ const langStore = useLangStore();
 const { isDark } = useTheme();
 const loginStore = useLoginStore();
 const userInfoStore = useUserInfoStore();
-const isMainPer = computed(() => userInfoStore.platformMaintainerAllPermission);
+const isMainPer = computed(() => userInfoStore.platformMaintainerPermission);
 const isAdminPer = computed(() => userInfoStore.platformAdminPermission);
 
 watch(
@@ -49,19 +48,13 @@ const isCollaboration = computed(() => {
   return COLLABORATIONPERMISSION.includes(route.name as string);
 });
 
-const showGiteeDlg = ref(false);
 const jump = (href: string) => {
-  if (isAdminPer.value || isMainPer.value) {
-    if (href === 'collaboration') {
-      windowOpen(`/${locale.value}/${href}`, '_blank');
-    } else {
-      router.push({
-        path: `/${locale.value}/${href}`,
-      });
-    }
+  if (href === 'collaboration') {
+    windowOpen(`/${locale.value}/${href}`, '_blank');
   } else {
-    // 如果Maintainer没有绑定gitee，弹窗提醒
-    showGiteeDlg.value = true;
+    router.push({
+      path: `/${locale.value}/${href}`,
+    });
   }
 };
 </script>
@@ -81,7 +74,7 @@ const jump = (href: string) => {
         <HeaderNav v-if="route.name" :options="isCollaboration ? collaborationNav : navs" />
       </div>
       <div class="header-right">
-        <template v-if="loginStore.isLogined">
+        <template v-if="loginStore.isLogined && (isAdminPer || isMainPer)">
           <OLink v-if="isCollaboration" class="todo" @click="jump(`todo/application`)">待办中心</OLink>
           <OLink v-else class="collaboration" @click="jump(`collaboration`)">协作平台</OLink>
         </template>
@@ -89,7 +82,6 @@ const jump = (href: string) => {
         <AppLogin />
       </div>
     </div>
-    <GiteeAccountDialog v-if="showGiteeDlg" @close="showGiteeDlg = false" />
   </div>
 </template>
 

@@ -31,7 +31,7 @@ const emits = defineEmits<{
 const metricIndex = ref(-1);
 const onChangeRadio = (v: string) => {
   formData.metricStatus = '';
-  metricIndex.value = applicationType.findIndex((item) => item.label === v);
+  metricIndex.value = applicationType.findIndex((item) => item.id === v);
 };
 // 根据状态获取
 const metricCategory = computed(() => (metricIndex.value === -1 ? [] : applicationType[metricIndex.value].children));
@@ -112,7 +112,7 @@ const onSubmit = (results: FieldResultT[]) => {
       <OForm ref="formRef" has-required :model="formData" label-width="220px" label-align="top" @submit="onSubmit">
         <OFormItem label="请选择您要修改的状态类别" required field="metric" :rules="metricRules">
           <ORadioGroup class="metric-options" v-model="formData.metric" direction="v" @change="(v) => onChangeRadio(v)">
-            <ORadio v-for="option in applicationType" :key="option.label" :value="option.label">
+            <ORadio v-for="option in applicationType" :key="option.label" :value="option.id">
               {{ option.label }}
             </ORadio>
           </ORadioGroup>
@@ -153,5 +153,9 @@ const onSubmit = (results: FieldResultT[]) => {
   .o-btn + .o-btn {
     margin-left: 16px;
   }
+}
+
+:deep(.o-form) {
+  color: var(--o-color-info1);
 }
 </style>

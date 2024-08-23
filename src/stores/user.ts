@@ -16,8 +16,6 @@ export const useUserInfoStore = defineStore('userInfo', {
       platformAdminPermission: null as boolean | null,
       // 协作平台maintainer权限
       platformMaintainerPermission: null as boolean | null,
-      // 协作平台maintainer权限并绑定gitee
-      platformMaintainerAllPermission: null as boolean | null,
     }
   },
 });
