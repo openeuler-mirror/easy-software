@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref, watch, type PropType } from 'vue';
 import { useDebounceFn } from '@vueuse/core';
-import { OCheckbox, OCheckboxGroup, OInput, OScroller } from '@opensig/opendesign';
+import { OCheckbox, OCheckboxGroup, OIcon, OInput, OScroller } from '@opensig/opendesign';
 
 import IconSearch from '~icons/app/icon-search.svg';
 import { useCheckbox } from '@/composables/useCheckbox';
@@ -91,7 +91,9 @@ watch(checkboxes, (values) => emit('change', { values, isCheckAll: isCheckedAll.
   <div class="filterable-checkboxes-wrap" :style="filterable ? {} : { paddingTop: '0' }" ref="wrapDiv">
     <OInput v-if="filterable" clearable @clear="onFilterInput()" @input="onFilterInput" class="filter-input" placeholder="搜索">
       <template #prefix>
-        <IconSearch />
+        <OIcon class="search-icon">
+          <IconSearch />
+        </OIcon>
       </template>
     </OInput>
     <OScroller class="content" showType="always">
@@ -106,6 +108,10 @@ watch(checkboxes, (values) => emit('change', { values, isCheckAll: isCheckedAll.
 </template>
 
 <style lang="scss" scoped>
+.search-icon {
+  color: var(--o-color-info1);
+}
+
 .filterable-checkboxes-wrap {
   background-color: var(--o-color-fill2);
   padding: 8px;
