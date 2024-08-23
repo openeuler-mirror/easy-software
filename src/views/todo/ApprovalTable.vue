@@ -107,7 +107,11 @@ const onFilterChange = useDebounceFn((type: string, index: number, val: { values
     activeFilterValues.value[index] = [];
   } else {
     filterParams[type] = val.values.join();
-    activeFilterValues.value[index] = val.values as string[];
+    if (type === 'metric') {
+      activeFilterValues.value[index] = val.values.map(item => applyStatusConvert(item as string));
+    } else {
+      activeFilterValues.value[index] = val.values as string[];
+    }
     currentActiveFilterIndices.value.delete(index);
   }
 }, 300);
