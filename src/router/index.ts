@@ -89,7 +89,6 @@ const routes = [
     name: 'collaboration',
     component: () => import('@/views/collaboration/TheCollaboration.vue'),
   },
-
   {
     path: '/zh/todo/:type',
     name: 'todo',
@@ -153,7 +152,7 @@ router.beforeEach(async (to) => {
     return { name: 'notFound' };
   }
 
-  if (userInfoStore.upstreamPermission === null && !isPlatform) {
+  if (userInfoStore.upstreamPermission === null && loginStore.isLogined && !isPlatform) {
     try {
       const upstreamPermission = await queryUpstreamPermission();
       userInfoStore.upstreamPermission = upstreamPermission.data.allow_access;
@@ -165,7 +164,7 @@ router.beforeEach(async (to) => {
 
 
   // 协作平台权限
-  if (userInfoStore.platformMaintainerPermission === null || userInfoStore.platformAdminPermission === null) {
+  if ((userInfoStore.platformMaintainerPermission === null || userInfoStore.platformAdminPermission === null) && loginStore.isLogined) {
     try {
       const { data } = await getCollaborationPermissions();
 
@@ -175,10 +174,6 @@ router.beforeEach(async (to) => {
         }
         if (data.permissions.includes('maintainer')) {
           userInfoStore.platformMaintainerPermission = true;
-          // 判断是否绑定gitee
-          const hasGiteeAccount = () => !!userInfoStore.identities.find((id) => id.identity === 'gitee');
-
-          userInfoStore.platformMaintainerAllPermission = hasGiteeAccount() ? true : false;
         }
       } else {
         return isPlatform ? { name: 'notFound' } : true;

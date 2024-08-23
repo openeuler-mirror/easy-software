@@ -21,7 +21,7 @@ const { t } = useI18n();
 
 <template>
   <OBreadcrumb class="app-breadcrumb">
-    <OBreadcrumbItem :to="`/${locale}/collaboration`">待办中心</OBreadcrumbItem>
+    <OBreadcrumbItem :to="`/${locale}/todo/application`">待办中心</OBreadcrumbItem>
     <OBreadcrumbItem :to="`/${locale}/todo/${type}`">{{ t(`collaboration.${type}`) }}</OBreadcrumbItem>
     <OBreadcrumbItem>{{ repo }} </OBreadcrumbItem>
   </OBreadcrumb>

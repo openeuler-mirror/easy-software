@@ -24,31 +24,24 @@ export const approvalColumns = [
 ]
 
 export const approvalHistoryColumns = [
-  { label: '软件仓库', key: 'name', type: 'name' },
-  { label: '申请类型', key: 'type', type: 'type' },
-  { label: '修改状态', key: 'sig', type: 'sig' },
-  { label: '审批意见', key: 'cve', type: 'cve' },
-  { label: '申请人', key: 'issue', type: 'issue' },
-  { label: '申请单号', key: 'pkg', type: 'pkg' },
-  { label: '审批时间', key: 'version', type: 'version' },
-  { label: '审批状态', key: 'member', type: 'member' },
+  { label: '软件仓库', key: 'repo', type: 'repo' },
+  { label: '申请类型', key: 'metric', type: 'metric' },
+  { label: '修改状态', key: 'metricStatus', type: 'metricStatus' },
+  { label: '审批意见', key: 'comment', type: 'comment' },
+  { label: '申请人', key: 'maintainer', type: 'maintainer' },
+  { label: '申请单号', key: 'applyIdString', type: 'applyId' },
+  { label: '审批时间', key: 'updateAt', type: 'updateAt' },
+  { label: '审批状态', key: 'applyStatus', type: 'applyStatus' },
   { label: '操作', key: 'operation', type: 'operation' },
 ]
 
-
-export const applyStatus = {
-  OPEN: '待审批',
-  REJECTED: '已驳回',
-  APPROVED: '已通过',
-  REVOKED: '已撤销',
-};
-
-
-const repoStatusArr = ['健康', '活跃', '静止', '缺人维护', '没有人维护'];
-export const repoStatusIndex = (v: string) => {
-  return repoStatusArr.findIndex((item) => item === v);
-};
-
+// 申请状态
+export const applyStatusType = [
+  { label: '待审批', value: 'OPEN' },
+  { label: '已驳回', value: 'REJECTED' },
+  { label: '已通过', value: 'APPROVED' },
+  { label: '已撤销', value: 'REVOKED' },
+]
 
 // 申请类型
 export const applicationType = [
@@ -83,3 +76,6 @@ export const applicationType = [
     children: ['贡献人员多', '贡献人员少'],
   },
 ];
+
+export const kindTypes = ['everything-exclude-baseos', 'epol', 'baseos']
+

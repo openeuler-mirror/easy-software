@@ -52,7 +52,7 @@ export function getMaintainerApply(params: AdminAppryT) {
 // 申请撤销
 export function getMaintainerRevoke(id: number) {
   const url = `/server/collaboration/maintainer/revoke`;
-  return request.post(url, { applyId: id }).then((res: AxiosResponse) => res?.data);
+  return request.post(url, { applyIdString: id }).then((res: AxiosResponse) => res?.data);
 }
 
 /** 待办中心获取我的申请所有仓库 */

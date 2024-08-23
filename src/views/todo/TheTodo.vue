@@ -3,7 +3,7 @@ import { ref, onMounted, computed } from 'vue';
 import { OTab, OTabPane, useMessage } from '@opensig/opendesign';
 import { useRoute, useRouter } from 'vue-router';
 import { useLocale } from '@/composables/useLocale';
-import { approvalColumns, applicationColumns } from '@/data/todo';
+import { approvalColumns, applicationColumns, approvalHistoryColumns } from '@/data/todo';
 import { getAdminApply, getMaintainerApply, getMaintainerRevoke } from '@/api/api-collaboration';
 import { useUserInfoStore } from '@/stores/user';
 import Result404 from '@/components/Result404.vue';
@@ -64,6 +64,7 @@ const isLoading = ref(false);
 
 const activeName = ref();
 const onChange = (type: string) => {
+  currentPage.value = 1;
   pageInit();
   // 切换url参数
   router.push({
@@ -120,6 +121,7 @@ const revokeApplication = (applyId: number) => {
         message.success({
           content: '撤销成功',
         });
+        pageInit();
       }
     })
     .catch(() => {
@@ -201,7 +203,7 @@ const pageInit = () => {
     applyStatus.value = 'OPEN';
     queryApprovalApply();
   } else if (activeName.value === 'approved') {
-    todoName.value = 'APPROVED';
+    todoName.value = 'formPage';
     applyStatus.value = 'APPROVED,REJECTED';
     queryApprovedApply();
   }
@@ -234,7 +236,15 @@ onMounted(() => {
     <AppLoading :loading="isLoading" />
     <!-- 我的申请 -->
     <div v-if="activeName === 'application' && applicationData.length > 0" class="application">
-      <ApprovalTable :columns="applicationColumns" @queryData="queryMyApplication" :filterable-columns="['repo', 'metric', 'applyStatus']" :type="activeName" :data="applicationData" :loading="isLoading" @revoke="revokeApplication" />
+      <ApprovalTable
+        :columns="applicationColumns"
+        @queryData="queryMyApplication"
+        :filterable-columns="['repo', 'metric', 'applyStatus']"
+        :type="activeName"
+        :data="applicationData"
+        :loading="isLoading"
+        @revoke="revokeApplication"
+      />
       <div v-if="total > COUNT_PAGESIZE[0]" class="pagination-box">
         <AppPagination :current="currentPage" :pagesize="pageSize" :total="total" @size-change="handleSizeChange" @current-change="handleCurrentChange" />
       </div>
@@ -242,13 +252,27 @@ onMounted(() => {
     <!-- 判断admin权限 -->
     <template v-if="isAdminPermission">
       <div v-if="activeName === 'approval' && approvalData.length > 0" class="approval">
-        <ApprovalTable :columns="approvalColumns" @queryData="queryApprovalApply" :filterable-columns="['repo', 'metric']" :type="activeName" :data="approvalData" :loading="isLoading" />
+        <ApprovalTable
+          :columns="approvalColumns"
+          @queryData="queryApprovalApply"
+          :filterable-columns="['repo', 'metric']"
+          :type="activeName"
+          :data="approvalData"
+          :loading="isLoading"
+        />
         <div v-if="total > COUNT_PAGESIZE[0]" class="pagination-box">
           <AppPagination :current="currentPage" :pagesize="pageSize" :total="total" @size-change="handleSizeChange" @current-change="handleCurrentChange" />
         </div>
       </div>
       <div v-if="activeName === 'approved' && approvedData.length > 0" class="approved">
-        <ApprovalTable :columns="approvalColumns" @queryData="queryApprovedApply" :filterable-columns="['repo', 'metric']" :type="activeName" :data="approvedData" :loading="isLoading" />
+        <ApprovalTable
+          :columns="approvalHistoryColumns"
+          @queryData="queryApprovedApply"
+          :filterable-columns="['repo', 'metric']"
+          :type="activeName"
+          :data="approvedData"
+          :loading="isLoading"
+        />
         <div v-if="total > COUNT_PAGESIZE[0]" class="pagination-box">
           <AppPagination :current="currentPage" :pagesize="pageSize" :total="total" @size-change="handleSizeChange" @current-change="handleCurrentChange" />
         </div>
@@ -302,10 +326,11 @@ onMounted(() => {
   padding-left: var(--layout-content-padding);
   padding-right: var(--layout-content-padding);
 }
-.approval {
+.approval,
+.approved {
   :deep(thead) {
     .operation {
-      width: 100px;
+      width: 112px;
     }
   }
 }

@@ -4,7 +4,7 @@ import { ODialog, OTable, OTag } from '@opensig/opendesign';
 
 import { getMaintainerApply } from '@/api/api-collaboration';
 import { formatDateTime } from '@/utils/common';
-import { applyStatus } from '@/data/todo';
+import { applicationTypeConvert, applyStatusConvert } from '@/utils/collaboration';
 
 import { COUNT_PAGESIZE } from '@/data/query';
 
@@ -107,9 +107,12 @@ watch(
         <template #td_updateAt="{ row }">
           {{ formatDateTime(row.updateAt) }}
         </template>
+        <template #td_metric="{ row }">
+          {{ applicationTypeConvert(row.metric) }}
+        </template>
         <template #td_applyStatus="{ row }">
           <div class="apply-status">
-            <OTag v-if="row.applyStatus" :class="row.applyStatus?.toLocaleLowerCase()">{{ applyStatus[row.applyStatus] }} </OTag>
+            <OTag v-if="row.applyStatus" :class="row.applyStatus?.toLocaleLowerCase()">{{ applyStatusConvert(row.applyStatus) }} </OTag>
           </div>
         </template>
       </OTable>
