@@ -5,7 +5,7 @@ import { useLocale } from '@/composables/useLocale';
 import { formatDateTime } from '@/utils/common';
 import { useRouter, useRoute } from 'vue-router';
 import { applicationType, applyStatusType } from '@/data/todo';
-import { applicationTypeConvert, applyStatusConvert } from '@/utils/collaboration';
+import { applicationTypeConvert, applyStatusConvert, versionLatestStatusConvert } from '@/utils/collaboration';
 import { useUserInfoStore } from '@/stores/user';
 
 import IconFilter from '~icons/app/icon-filter.svg';
@@ -78,8 +78,6 @@ const applyTypes = applicationType.map((item) => ({ label: item.label, value: it
 
 const filterIconRefs = ref(new Array<ComponentPublicInstance>(props.columns.length));
 
-const applyStatusList = computed(() => {});
-
 /** 筛选组件是否显示的开关 */
 const filterSwitches = ref(props.columns.map(() => false));
 
@@ -108,7 +106,7 @@ const onFilterChange = useDebounceFn((type: string, index: number, val: { values
   } else {
     filterParams[type] = val.values.join();
     if (type === 'metric') {
-      activeFilterValues.value[index] = val.values.map(item => applyStatusConvert(item as string));
+      activeFilterValues.value[index] = val.values.map((item) => applyStatusConvert(item as string));
     } else {
       activeFilterValues.value[index] = val.values as string[];
     }
@@ -186,6 +184,9 @@ const revoke = () => {
       </template>
       <template #td_metric="{ row }">
         {{ applicationTypeConvert(row.metric) }}
+      </template>
+      <template #td_metricStatus="{ row }">
+        {{ versionLatestStatusConvert(row.metricStatus) }}
       </template>
       <template #td_comment="{ row }">
         <div class="line-clamp">{{ row.comment }}</div>
@@ -288,7 +289,7 @@ thead {
   .applyStatus {
     width: 135px;
   }
-  .adminstrator,
+  .administrator,
   .maintainer {
     width: 120px;
   }

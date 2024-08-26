@@ -20,16 +20,27 @@ export const xssAllTag = (str: string) => {
 /**
  * 日期转 xxxx/xx/xx 格式时间
  * @param {v}  待转换时间
+ * @param {isTime:boolean} 返回格式 2024/01/01 01:00
  * @returns {string} 返回格式化时间，如 2024/01/01
  */
-export const formatDateTime = (v: string) => {
-  const date = new Date(v);
+export const formatDateTime = (v: string, isTime?: boolean) => {
+  if (v) {
+    const date = new Date(v);
 
-  const year = date.getFullYear();
-  const month = ('0' + (date.getMonth() + 1)).slice(-2);
-  const day = ('0' + date.getDate()).slice(-2);
+    const year = date.getFullYear();
+    const month = ('0' + (date.getMonth() + 1)).slice(-2);
+    const day = ('0' + date.getDate()).slice(-2);
 
-  return `${year}/${month}/${day}`;
+    if (isTime) {
+      const hh = ('0' + date.getHours()).slice(-2);
+      const mm = ('0' + date.getMinutes()).slice(-2);
+
+      return `${year}/${month}/${day} ${hh}:${mm}`;
+    }
+
+    return `${year}/${month}/${day}`;
+  }
+  return ''
 };
 
 /**

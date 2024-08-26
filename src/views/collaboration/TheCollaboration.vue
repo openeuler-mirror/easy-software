@@ -9,18 +9,19 @@ import StatusFeedback from '@/components/collaboration/StatusFeedback.vue';
 import Result404 from '@/components/Result404.vue';
 
 import IconOutlink from '~icons/pkg/icon-outlink.svg';
+import IconState from '~icons/pkg/icon-state.svg';
 import IconFilter from '~icons/app/icon-filter.svg';
 import FilterableCheckboxes from '@/components/FilterableCheckboxes.vue';
 import { kindTypes, applicationType } from '@/data/todo';
 import { useDebounceFn } from '@vueuse/core';
-import { repoStatusIndex, repoStatusArr } from '@/utils/collaboration';
+import { repoStatusIndex, repoStatusArr, versionLatestStatusConvert } from '@/utils/collaboration';
 
 const columns = [
   { label: '软件仓库', key: 'repo', type: 'repo' },
   { label: '类别', key: 'kind', type: 'kind' },
   { label: 'SIG名称', key: 'sigName', type: 'sig' },
   { label: 'CVE状态', key: 'cveStatus', type: 'cve' },
-  { label: 'ISSUE状态', key: 'issueStatus', type: 'issue' },
+  { label: 'Issue状态', key: 'issueStatus', type: 'issue' },
   { label: '软件包更新状态', key: 'prStatus', type: 'pr' },
   { label: '软件包版本状态', key: 'versionStatus', type: 'version' },
   { label: '贡献组织状态', key: 'orgStatus', type: 'org' },
@@ -28,10 +29,6 @@ const columns = [
   { label: '状态', key: 'status', type: 'status' },
   { label: '操作', key: 'operation', type: 'operation' },
 ];
-
-const { identities } = toRefs(useUserInfoStore());
-
-const hasGiteeAccount = computed(() => !!identities.value.find((id) => id.identity === 'gitee'));
 
 const allSigs = ref<string[]>();
 const allRepos = ref<string[]>();
@@ -71,6 +68,9 @@ const onFilterChange = useDebounceFn((type: string, index: number, val: { values
     activeFilterValues.value[index] = val.values as string[];
     currentActiveFilterIndices.value.delete(index);
   }
+  if (filterParams.versionStatus === '版本正常') {
+    filterParams.versionStatus = '最新版本';
+  }
 }, 300);
 
 const SRCOPENEULER = 'https://gitee.com/src-openeuler/';
@@ -100,7 +100,6 @@ const filterParams = reactive<Record<string, string>>({
 
 const searchParams = computed(() => {
   return {
-    name: 'fromPage',
     pageNum: currentPage.value,
     pageSize: pageSize.value,
     ...filterParams,
@@ -114,15 +113,11 @@ const isError = ref(false);
 // Maintainer 数据
 const queryMaintainerRepos = () => {
   isLoading.value = true;
+
   getMaintainerRepos(searchParams.value)
     .then((res) => {
-      if (res.data.list.length > 0) {
-        reposData.value = res.data.list;
-        total.value = res.data.total;
-      } else {
-        reposData.value = [];
-        isError.value = true;
-      }
+      reposData.value = res.data.list;
+      total.value = res.data.total;
       isLoading.value = false;
     })
     .catch(() => {
@@ -135,15 +130,11 @@ const queryMaintainerRepos = () => {
 // Admin 数据
 const queryAdminRepos = () => {
   isLoading.value = true;
+
   getAdminRepos(searchParams.value)
     .then((res) => {
-      if (res.data.list.length > 0) {
-        reposData.value = res.data.list;
-        total.value = res.data.total;
-      } else {
-        reposData.value = [];
-        isError.value = true;
-      }
+      reposData.value = res.data.list;
+      total.value = res.data.total;
       isLoading.value = false;
     })
     .catch(() => {
@@ -229,12 +220,15 @@ watch(
   </div>
   <ContentWrapper vertical-padding="24px" class="collaboration-wrap">
     <AppLoading :loading="isLoading" />
+
     <div class="indicators">
-      <span @click="showDlg = true" class="text">状态指标说明</span>
+      <span @click="showDlg = true" class="text"
+        ><OIcon><IconState /></OIcon>状态指标说明</span
+      >
       <Indicators v-if="showDlg" @change="showDlg = false" />
     </div>
-    <div class="platform-main maintainer">
-      <OTable :columns="columns" :data="reposData" :loading="loading" border="row">
+    <div class="platform-main">
+      <OTable :columns="columns" :data="reposData" :loading="loading" border="row" :class="{ admin: isAdminPer }">
         <template #head="{ columns }">
           <OPopup
             trigger="none"
@@ -304,6 +298,10 @@ watch(
             <OTag :class="`type${repoStatusIndex(row.status)}`">{{ row.status }} </OTag>
           </div>
         </template>
+        <template #td_versionStatus="{ row }">
+          {{ versionLatestStatusConvert(row.versionStatus) }}
+        </template>
+
         <template #td_operation="{ row }">
           <div class="operation-box">
             <OLink v-if="isMainPer" color="primary" hover-underline @click="changeFeedback(row.repo)">状态反馈</OLink>
@@ -316,9 +314,8 @@ watch(
         <AppPagination :current="currentPage" :pagesize="pageSize" :total="total" @size-change="handleSizeChange" @current-change="handleCurrentChange" />
       </div>
     </div>
-
     <!-- 暂无记录 -->
-    <template v-if="isError || !hasGiteeAccount">
+    <template v-if="isError">
       <Result404>
         <template #description>
           <p class="text404">暂无记录</p>
@@ -367,7 +364,14 @@ watch(
   .text {
     color: var(--o-color-info1);
     cursor: pointer;
+    display: flex;
+    align-items: center;
     @include text1;
+    svg {
+      width: 16px;
+      height: 16px;
+      margin-right: 8px;
+    }
   }
 }
 .operation-box {
@@ -402,6 +406,85 @@ watch(
     width: 8px;
   }
   :deep(.o-table) {
+    --oper-width: 215px;
+    &.admin {
+      --oper-width: 125px;
+    }
+
+    .o-table-wrap {
+      overflow-x: auto;
+      overflow-y: hidden;
+      @include scrollbar;
+    }
+    table {
+      table-layout: fixed;
+    }
+
+    tr {
+      td {
+        &:first-child,
+        &:nth-of-type(10),
+        &:nth-of-type(11) {
+          position: sticky;
+          z-index: 2;
+          background: var(--table-bg-color);
+        }
+        &:first-child {
+          left: 0;
+          &::before {
+            right: 0;
+            transform: scaleX(-1);
+            @include liner;
+          }
+        }
+        &:nth-of-type(11) {
+          right: 0;
+        }
+        &:nth-of-type(10) {
+          right: var(--oper-width);
+          &::before {
+            left: -9px;
+            @include liner;
+          }
+        }
+      }
+      &.last {
+        td {
+          border-bottom: 0 none;
+        }
+      }
+      &:hover td {
+        background: var(--table-row-hover);
+      }
+    }
+    th {
+      &:first-child,
+      &:nth-of-type(10),
+      &:nth-of-type(11) {
+        position: sticky;
+        z-index: 2;
+        background: var(--table-head-bg);
+      }
+      &:first-child {
+        left: 0;
+        &::before {
+          right: 0;
+          transform: scaleX(-1);
+          @include liner;
+        }
+      }
+      &:nth-of-type(10) {
+        right: var(--oper-width);
+        &::before {
+          left: -9px;
+          @include liner;
+        }
+      }
+      &:nth-of-type(11) {
+        right: 0;
+      }
+    }
+
     thead {
       .repo {
         width: 200px;
@@ -425,85 +508,6 @@ watch(
       }
       .operation {
         width: var(--oper-width);
-      }
-    }
-  }
-  &.maintainer {
-    :deep(.o-table) {
-      --oper-width: 215px;
-
-      .o-table-wrap {
-        overflow-x: auto;
-        overflow-y: hidden;
-        @include scrollbar;
-      }
-      table {
-        table-layout: fixed;
-      }
-
-      tr {
-        td {
-          &:first-child,
-          &:nth-of-type(10),
-          &:nth-of-type(11) {
-            position: sticky;
-            z-index: 2;
-            background: var(--table-bg-color);
-          }
-          &:first-child {
-            left: 0;
-            &::before {
-              right: 0;
-              transform: scaleX(-1);
-              @include liner;
-            }
-          }
-          &:nth-of-type(11) {
-            right: 0px;
-          }
-          &:nth-of-type(10) {
-            right: var(--oper-width);
-            &::before {
-              left: 0;
-              @include liner;
-            }
-          }
-        }
-        &.last {
-          td {
-            border-bottom: 0 none;
-          }
-        }
-        &:hover td {
-          background: var(--table-row-hover);
-        }
-      }
-      th {
-        &:first-child,
-        &:nth-of-type(10),
-        &:nth-of-type(11) {
-          position: sticky;
-          z-index: 2;
-          background: var(--table-head-bg);
-        }
-        &:first-child {
-          left: 0;
-          &::before {
-            right: 0;
-            transform: scaleX(-1);
-            @include liner;
-          }
-        }
-        &:nth-of-type(10) {
-          right: var(--oper-width);
-          &::before {
-            left: 0;
-            @include liner;
-          }
-        }
-        &:nth-of-type(11) {
-          right: 0;
-        }
       }
     }
   }

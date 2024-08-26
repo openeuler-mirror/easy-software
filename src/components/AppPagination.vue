@@ -46,7 +46,7 @@ onMounted(() => {
       :current-page="current"
       :page-size="pagesize"
       background
-      layout="sizes, prev, pager, next, jumper"
+      layout="total ,sizes, prev, pager, next, jumper"
       :total="total"
       :page-sizes="isFieldPage ? COUNT_PAGESIZE_FIELD : COUNT_PAGESIZE"
       @size-change="handleSizeChange"

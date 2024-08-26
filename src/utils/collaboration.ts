@@ -25,3 +25,8 @@ export const applyStatusConvert = (v: string) => {
   }
   return applyStatusType[index].label;
 };
+
+// 最新版本修改为版本正常
+export const versionLatestStatusConvert = (v: string) => {
+  return v === '最新版本' ? '版本正常' : v
+}

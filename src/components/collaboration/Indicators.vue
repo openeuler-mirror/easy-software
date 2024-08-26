@@ -1,7 +1,8 @@
 <script lang="ts" setup>
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import { OTable, OTag, ODialog } from '@opensig/opendesign';
 import { repoStatusIndex } from '@/utils/collaboration';
+import { applicationType } from '@/data/todo/';
 
 const columns = [
   { label: 'CVE分类', key: 'cve', type: 'cve' },
@@ -57,7 +58,7 @@ const data = [
     cve: '没有CVE',
     cveType: '没有CVE问题',
     contribution: '没有PR提交',
-    details: '最新版本',
+    details: '版本正常',
     maintenance: '健康',
     description: '没有CVE问题，且也没有PR提交，且软件包是最新版本',
   },
@@ -86,6 +87,23 @@ const data = [
     description: '没有CVE问题，有PR提交但是没有PR被合入',
   },
 ];
+
+const applicationTypeDesc: Record<string, string[]> = {
+  cveStatus: [],
+  issueStatus: ['所有Issue都没有被修复', '一部分Issue被修复了，一部分Issue没有修复', '所有Issue都被修复了'],
+  prStatus: ['-', '有PR提交，且都没有被合入代码仓', '有PR提及，且有PR被合入到代码仓'],
+  versionStatus: ['软件包版本与上游版本一致', '软件包版本比上游版本低'],
+  orgStatus: ['参与贡献组织数 > 5人', '参与贡献组织数 <= 5人'],
+  contributorStatus: ['参与贡献人数 > 10人', '参与贡献人数 <= 10人'],
+};
+
+const indicatorsInfo = computed(() => {
+  return applicationType.map((item) => {
+    return { ...item, desc: applicationTypeDesc[item.id] || [] };
+  });
+});
+
+console.log('indicatorsInfo', indicatorsInfo.value);
 
 // 单元格合并
 const cellSpanFn = (rowIdx: number, colIdx: number) => {
@@ -143,7 +161,7 @@ const onChange = () => {
     </template>
     <div class="indicators">
       <p class="title">软件包维护状态指标</p>
-      <OTable class="main-table" :columns="columns" :data="data" :cell-span="cellSpanFn" border="all">
+      <OTable class="main-table" :columns="columns" :data="data" :cell-span="cellSpanFn" border="all" :small="true">
         <template #td_maintenance="{ row }">
           <div class="repo-status">
             <OTag :class="`type${repoStatusIndex(row.maintenance)}`" size="small">{{ row.maintenance }} </OTag>
@@ -151,6 +169,14 @@ const onChange = () => {
         </template>
       </OTable>
       <p class="title">详细指标</p>
+      <div v-for="item in indicatorsInfo" :key="item.id" class="indicators-info">
+        <div class="title">{{ item.label }}</div>
+        <div class="box">
+          <div v-for="(child, index) in item.children" :key="child" class="rows">
+            <span class="child"> {{ child }}</span> <span v-if="item.desc[index]" class="desc">{{ item.desc[index] }}</span>
+          </div>
+        </div>
+      </div>
     </div>
   </ODialog>
 </template>
@@ -158,11 +184,65 @@ const onChange = () => {
 <style lang="scss" scoped>
 @import '@/assets/style/category/collaboration/index.scss';
 
-.o-table {
+:deep(.o-table) {
   margin: 16px 0;
+  tbody {
+    tr {
+      &:hover {
+        background: none !important;
+      }
+    }
+  }
+  td[rowspan='4'] {
+    border-bottom: 0 none;
+  }
 }
 .indicators {
   color: var(--o-color-info1);
   @include text1;
+}
+
+.indicators-info {
+  --indicators-border: 1px solid var(--o-color-control4);
+  border: var(--indicators-border);
+  display: flex;
+  margin-top: 16px;
+  border-radius: 4px;
+  @include tip1;
+  .title {
+    background: var(--o-color-control3-light);
+    display: flex;
+    align-items: center;
+    width: 195px;
+    font-weight: 500;
+    justify-content: center;
+  }
+  .box {
+    flex: 1;
+    border-left: var(--indicators-border);
+    .rows {
+      &:not(:last-child) {
+        border-bottom: var(--indicators-border);
+      }
+      color: var(--o-color-info1);
+
+      display: flex;
+      align-items: center;
+      span {
+        padding: 12px 16px;
+        display: block;
+      }
+      .child {
+        padding-left: 78px;
+      }
+      .desc {
+        flex: 1;
+      }
+      .child:has(+ span) {
+        width: 40%;
+        border-right: var(--indicators-border);
+      }
+    }
+  }
 }
 </style>

@@ -4,7 +4,7 @@ export const applicationColumns = [
   { label: '修改状态', key: 'metricStatus', type: 'metricStatus' },
   { label: '修改理由', key: 'description', type: 'description' },
   { label: '申请状态', key: 'applyStatus', type: 'applyStatus' },
-  { label: '审批人', key: 'adminstrator', type: 'adminstrator' },
+  { label: '审批人', key: 'administrator', type: 'administrator' },
   { label: '审批意见', key: 'comment', type: 'comment' },
   { label: '申请单号', key: 'applyIdString', type: 'applyId' },
   { label: '申请时间', key: 'updateAt', type: 'updateAt' },
@@ -52,8 +52,8 @@ export const applicationType = [
   },
   {
     id: 'issueStatus',
-    label: 'ISSUE状态',
-    children: ['没有ISSUE修复', '有部分ISSUE修复', '全部ISSUE修复'],
+    label: 'Issue状态',
+    children: ['没有Issue修复', '有部分Issue修复', '全部Issue修复'],
   },
   {
     id: 'prStatus',
@@ -63,7 +63,7 @@ export const applicationType = [
   {
     id: 'versionStatus',
     label: '软件包版本状态',
-    children: ['最新版本', '落后版本'],
+    children: ['版本正常', '落后版本'],
   },
   {
     id: 'orgStatus',

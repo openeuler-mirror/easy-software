@@ -3,6 +3,9 @@
   --el-pagination-button-bg-color: var(--o-color-fill2);
   --el-disabled-bg-color: var(--o-color-fill2);
   --el-pagination-button-color: var(--o-color-info1);
+  .el-pagination__total {
+    color: var(--o-color-info2);
+  }
   .el-pager {
     li {
       --el-pagination-button-color: var(--o-color-info1);

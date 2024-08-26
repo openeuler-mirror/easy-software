@@ -90,6 +90,11 @@ const routes = [
     component: () => import('@/views/collaboration/TheCollaboration.vue'),
   },
   {
+    path: '/zh/collaboration-permission',
+    name: 'collaboration-permission',
+    component: () => import('@/views/collaboration/CollaborationPermission.vue'),
+  },
+  {
     path: '/zh/todo/:type',
     name: 'todo',
     component: () => import('@/views/todo/TheTodo.vue'),
@@ -169,18 +174,18 @@ router.beforeEach(async (to) => {
       const { data } = await getCollaborationPermissions();
 
       if (data.permissions.length > 0) {
-        if (data.permissions.includes('adminstrator')) {
+        if (data.permissions.includes('administrator')) {
           userInfoStore.platformAdminPermission = true;
         }
         if (data.permissions.includes('maintainer')) {
           userInfoStore.platformMaintainerPermission = true;
         }
       } else {
-        return isPlatform ? { name: 'notFound' } : true;
+        return isPlatform ? { name: 'collaboration-permission' } : true;
       }
 
     } catch {
-      return isPlatform ? { name: 'notFound' } : true;
+      return isPlatform ? { name: 'collaboration-permission' } : true;
     }
   }
 

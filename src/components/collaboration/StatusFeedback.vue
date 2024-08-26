@@ -3,7 +3,6 @@ import { ref, reactive, computed } from 'vue';
 import { ODialog, OButton, OForm, OTextarea, OFormItem, ORadioGroup, ORadio, OSelect, OOption, type FieldResultT, useMessage } from '@opensig/opendesign';
 
 import { getApplyFeedback } from '@/api/api-collaboration';
-import { applicationType } from '@/data/todo/';
 
 const props = defineProps({
   repo: {
@@ -14,6 +13,19 @@ const props = defineProps({
 
 const showDlg = ref(true);
 const message = useMessage();
+
+const applicationType = [
+  {
+    id: 'cveStatus',
+    label: 'CVE状态',
+    children: ['有CVE且全部未修复', '有CVE部分修复', '有CVE且全部修复', '没有CVE问题'],
+  },
+  {
+    id: 'versionStatus',
+    label: '软件包版本状态',
+    children: ['版本正常', '落后版本'],
+  },
+];
 
 const formRef = ref<InstanceType<typeof OForm>>();
 const formData = reactive({
@@ -83,6 +95,9 @@ const onSubmit = (results: FieldResultT[]) => {
   if (results.find((item) => item?.type === 'danger')) {
     return;
   } else {
+    if (formData.metricStatus === '版本正常') {
+      formData.metricStatus = '最新版本';
+    }
     getApplyFeedback(formData)
       .then((res) => {
         if (res.code === 200) {

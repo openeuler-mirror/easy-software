@@ -1,8 +1,8 @@
+@use '../mixin/font.scss' as *;
 .o-table {
   --table-edge-padding: 32px;
   --table-cell-padding: 16px 20px;
   --table-head-cell-padding: 12px 20px;
-  --table-cell-height: 80px;
   --table-head-bg: var(--o-color-control3-light);
   --table-color: var(--o-color-info1);
   th {
@@ -17,5 +17,15 @@
   }
   td {
     word-break: break-word;
+  }
+  &.o-table-small {
+    --table-cell-height: auto;
+    --table-cell-padding: 12px 16px;
+    --table-head-cell-padding: 9px 16px;
+    --table-edge-padding: 16px;
+    td,
+    th {
+      @include tip1;
+    }
   }
 }
