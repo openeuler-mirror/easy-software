@@ -10,7 +10,7 @@ import { useUserInfoStore } from '@/stores/user';
 
 import IconFilter from '~icons/app/icon-filter.svg';
 import FilterableCheckboxes from '@/components/FilterableCheckboxes.vue';
-import { useDebounceFn } from '@vueuse/core';
+import { onClickOutside, useDebounceFn } from '@vueuse/core';
 import { getAdminApplyRepos, getMaintainerApplyRepos } from '@/api/api-collaboration';
 
 interface ColumnsT {
@@ -49,17 +49,16 @@ const { locale } = useLocale();
 
 const repoList = ref<string[]>([]);
 
-onMounted(() => {
+const getRepoList = () => {
   if (props.type === 'approval' || props.type === 'approved') {
-    getAdminApplyRepos().then((data) => {
-      repoList.value = data.list;
-    });
+    getAdminApplyRepos()
+      .then((data) => repoList.value = data.list)
+      .finally(() => repoFilterLoading.value = false);
   } else {
-    getMaintainerApplyRepos().then((data) => {
-      repoList.value = data.list;
-    });
+      getMaintainerApplyRepos().then((data) => repoList.value = data.list)
+      .finally(() => repoFilterLoading.value = false);
   }
-});
+};
 
 const filterParams = reactive(
   props.filterableColumns.reduce(
@@ -81,8 +80,16 @@ const filterIconRefs = ref(new Array<ComponentPublicInstance>(props.columns.leng
 /** 筛选组件是否显示的开关 */
 const filterSwitches = ref(props.columns.map(() => false));
 
+const setPopupClickoutSideFn = (el: any, index: number) => {
+  onClickOutside(el, () => {
+    filterSwitches.value[index] = false;
+  });
+};
+
 /** 当前有选中筛选项的表格列的数组下标 */
 const currentActiveFilterIndices = ref(new Set<number>());
+
+const repoFilterLoading = ref(false);
 
 /** 切换某个筛选组件显示开关 */
 const switchFilterVisible = (index: number) => {
@@ -92,6 +99,10 @@ const switchFilterVisible = (index: number) => {
     }
     return false;
   });
+  if (index === 0) {
+    repoFilterLoading.value = true;
+    getRepoList();
+  }
 };
 
 /** 各表格列对应的已选中的筛选项 */
@@ -99,10 +110,15 @@ const activeFilterValues = ref(new Array<string[]>(props.columns.length));
 
 const onFilterChange = useDebounceFn((type: string, index: number, val: { values: (string | number)[]; isCheckAll: boolean }) => {
   filterSwitches.value = props.columns.map(() => false);
+  if (val.values.length > 0) {
+    currentActiveFilterIndices.value.add(index);
+  } else {
+    currentActiveFilterIndices.value.delete(index);
+  }
   if (val.isCheckAll) {
     filterParams[type] = '';
-    currentActiveFilterIndices.value.add(index);
     activeFilterValues.value[index] = [];
+    currentActiveFilterIndices.value.delete(index);
   } else {
     filterParams[type] = val.values.join();
     if (type === 'metric') {
@@ -110,7 +126,6 @@ const onFilterChange = useDebounceFn((type: string, index: number, val: { values
     } else {
       activeFilterValues.value[index] = val.values as string[];
     }
-    currentActiveFilterIndices.value.delete(index);
   }
 }, 300);
 
@@ -150,7 +165,7 @@ const revoke = () => {
           <th v-if="!filterableColSet.size || !filterableColSet.has(item.key)" :class="item.type">
             {{ item.label }}
           </th>
-          <OPopup v-else trigger="none" style="--popup-radius: 4px" :visible="filterSwitches[index]" :unmount-on-hide="false" position="bl">
+          <OPopup :ref="(el) => setPopupClickoutSideFn(el, index)" v-else trigger="none" style="--popup-radius: 4px" :visible="filterSwitches[index]" :unmount-on-hide="false" position="bl">
             <template #target>
               <th :class="item.type">
                 <div class="header-cell">
@@ -173,9 +188,9 @@ const revoke = () => {
                 </div>
               </th>
             </template>
-            <FilterableCheckboxes v-if="item.key === 'metric'" @change="onFilterChange(item.key, index, $event)" :values="applyTypes" />
-            <FilterableCheckboxes v-else-if="item.key === 'repo'" @change="onFilterChange(item.key, index, $event)" :values="repoList" />
-            <FilterableCheckboxes v-else-if="item.key === 'applyStatus'" @change="onFilterChange(item.key, index, $event)" :values="applyStatusType" />
+            <FilterableCheckboxes v-if="item.key === 'metric'" :filterable="false" @change="onFilterChange(item.key, index, $event)" :values="applyTypes" />
+            <FilterableCheckboxes v-else-if="item.key === 'repo'" :loading="repoFilterLoading" @change="onFilterChange(item.key, index, $event)" :values="repoList" />
+            <FilterableCheckboxes v-else-if="item.key === 'applyStatus'" :filterable="false" @change="onFilterChange(item.key, index, $event)" :values="applyStatusType" />
           </OPopup>
         </template>
       </template>

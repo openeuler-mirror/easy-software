@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch, computed, onMounted, type ComponentPublicInstance, reactive, toRefs } from 'vue';
+import { ref, watch, computed, type ComponentPublicInstance, reactive, toRefs } from 'vue';
 import { OTable, OTag, OLink, OIcon, OPopup, OPopover } from '@opensig/opendesign';
 import { getMaintainerRepos, getAdminRepos, getSigList, getRepoList } from '@/api/api-collaboration';
 import { useUserInfoStore } from '@/stores/user';
@@ -13,7 +13,7 @@ import IconState from '~icons/pkg/icon-state.svg';
 import IconFilter from '~icons/app/icon-filter.svg';
 import FilterableCheckboxes from '@/components/FilterableCheckboxes.vue';
 import { kindTypes, applicationType } from '@/data/todo';
-import { useDebounceFn } from '@vueuse/core';
+import { onClickOutside, useDebounceFn } from '@vueuse/core';
 import { repoStatusIndex, repoStatusArr, versionLatestStatusConvert } from '@/utils/collaboration';
 
 const columns = [
@@ -39,6 +39,15 @@ const filterIconRefs = ref(new Array<ComponentPublicInstance>(columns.length));
 /** 筛选组件是否显示的开关 */
 const filterSwitches = ref(columns.map(() => false));
 
+const setPopupClickoutSideFn = (el: any, index: number) => {
+  onClickOutside(el, () => {
+    filterSwitches.value[index] = false;
+  });
+};
+
+const repoFilterLoading = ref(false);
+const sigFilterLoading = ref(false);
+
 /** 切换某个筛选组件显示开关 */
 const switchFilterVisible = (index: number) => {
   filterSwitches.value = columns.map((_, idx) => {
@@ -47,6 +56,20 @@ const switchFilterVisible = (index: number) => {
     }
     return false;
   });
+  if (index === 0) {
+    // 筛选仓库
+    repoFilterLoading.value = true;
+    getRepoList()
+      .then((list) => (allRepos.value = list))
+      .finally(() => (repoFilterLoading.value = false));
+  }
+  if (index === 2) {
+    // 筛选sig
+    sigFilterLoading.value = true;
+    getSigList()
+      .then((list) => (allSigs.value = list))
+      .finally(() => (sigFilterLoading.value = false));
+  }
 };
 
 /** 各表格列对应的已选中的筛选项 */
@@ -59,14 +82,18 @@ const onFilterChange = useDebounceFn((type: string, index: number, val: { values
   // 关掉筛选组件
   filterSwitches.value = columns.map(() => false);
   currentPage.value = 1;
+  if (val.values.length > 0) {
+    currentActiveFilterIndices.value.add(index);
+  } else {
+    currentActiveFilterIndices.value.delete(index);
+  }
   if (val.isCheckAll) {
     filterParams[type] = '';
-    currentActiveFilterIndices.value.add(index);
     activeFilterValues.value[index] = [];
+    currentActiveFilterIndices.value.delete(index);
   } else {
     filterParams[type] = val.values.join();
     activeFilterValues.value[index] = val.values as string[];
-    currentActiveFilterIndices.value.delete(index);
   }
   if (filterParams.versionStatus === '版本正常') {
     filterParams.versionStatus = '最新版本';
@@ -143,11 +170,6 @@ const queryAdminRepos = () => {
       isLoading.value = false;
     });
 };
-
-onMounted(() => {
-  getSigList().then((list) => (allSigs.value = list));
-  getRepoList().then((list) => (allRepos.value = list));
-});
 
 const pageInit = () => {
   if (isAdminPer.value) {
@@ -234,9 +256,11 @@ watch(
             trigger="none"
             style="--popup-radius: 4px"
             v-for="(item, index) in columns"
+            :ref="(el) => setPopupClickoutSideFn(el, index)"
             :key="item.type"
             :visible="filterSwitches[index]"
             :unmount-on-hide="false"
+            :offset="-8"
             position="bl"
           >
             <template #target>
@@ -251,7 +275,11 @@ watch(
                       @click="switchFilterVisible(index)"
                       ><IconFilter
                     /></OIcon>
-                    <OPopover :target="filterIconRefs[index]" trigger="hover">
+                    <OPopover
+                      v-if="currentActiveFilterIndices.has(index) && activeFilterValues[index].length > 0"
+                      :target="filterIconRefs[index]"
+                      trigger="hover"
+                    >
                       <p class="bubble-content">
                         <span class="title">{{ item.label }}:</span>
                         {{ activeFilterValues[index]?.join('、') }}
@@ -261,11 +289,21 @@ watch(
                 </div>
               </th>
             </template>
-            <FilterableCheckboxes @change="onFilterChange(item.key, index, $event)" v-if="item.key === 'repo'" :values="allRepos" />
-            <FilterableCheckboxes @change="onFilterChange(item.key, index, $event)" v-else-if="item.key === 'sigName'" :values="allSigs" />
-            <FilterableCheckboxes @change="onFilterChange(item.key, index, $event)" v-else-if="item.key === 'kind'" :values="kindTypes" />
-            <FilterableCheckboxes @change="onFilterChange(item.key, index, $event)" v-else-if="item.key === 'status'" :values="repoStatusArr" />
-            <FilterableCheckboxes :filterable="false" @change="onFilterChange(item.key, index, $event)" v-else :values="metricTypes(item.key)" />
+            <FilterableCheckboxes
+              v-if="item.key === 'repo'"
+              :loading="repoFilterLoading"
+              @change="onFilterChange(item.key, index, $event)"
+              :values="allRepos"
+            />
+            <FilterableCheckboxes
+              v-else-if="item.key === 'sigName'"
+              :loading="sigFilterLoading"
+              @change="onFilterChange(item.key, index, $event)"
+              :values="allSigs"
+            />
+            <FilterableCheckboxes v-else-if="item.key === 'kind'" @change="onFilterChange(item.key, index, $event)" :filterable="false" :values="kindTypes" />
+            <FilterableCheckboxes v-else-if="item.key === 'status'" @change="onFilterChange(item.key, index, $event)" :values="repoStatusArr" />
+            <FilterableCheckboxes v-else :filterable="false" @change="onFilterChange(item.key, index, $event)" :values="metricTypes(item.key)" />
           </OPopup>
         </template>
         <template #td_repo="{ row }">
