@@ -7,11 +7,12 @@ import { useRouter, useRoute } from 'vue-router';
 import { applicationType, applyStatusType } from '@/data/todo';
 import { applicationTypeConvert, applyStatusConvert, versionLatestStatusConvert } from '@/utils/collaboration';
 import { useUserInfoStore } from '@/stores/user';
-
-import IconFilter from '~icons/app/icon-filter.svg';
-import FilterableCheckboxes from '@/components/FilterableCheckboxes.vue';
 import { onClickOutside, useDebounceFn } from '@vueuse/core';
 import { getAdminApplyRepos, getMaintainerApplyRepos } from '@/api/api-collaboration';
+import FilterableCheckboxes from '@/components/FilterableCheckboxes.vue';
+
+import IconFilter from '~icons/app/icon-filter.svg';
+import IconHelp from '~icons/app/icon-help.svg';
 
 interface ColumnsT {
   key: string;
@@ -52,11 +53,12 @@ const repoList = ref<string[]>([]);
 const getRepoList = () => {
   if (props.type === 'approval' || props.type === 'approved') {
     getAdminApplyRepos()
-      .then((data) => repoList.value = data.list)
-      .finally(() => repoFilterLoading.value = false);
+      .then((data) => (repoList.value = data.list))
+      .finally(() => (repoFilterLoading.value = false));
   } else {
-      getMaintainerApplyRepos().then((data) => repoList.value = data.list)
-      .finally(() => repoFilterLoading.value = false);
+    getMaintainerApplyRepos()
+      .then((data) => (repoList.value = data.list))
+      .finally(() => (repoFilterLoading.value = false));
   }
 };
 
@@ -140,13 +142,13 @@ const jumpTo = (id: number) => {
 };
 
 const emits = defineEmits<{
-  (e: 'revoke', id: number): void;
+  (e: 'revoke', id: string): void;
   (e: 'queryData', params: Record<string, string>): void;
 }>();
 
 const showDlg = ref(false);
 const applayId = ref();
-const revokeApplication = (id: number) => {
+const revokeApplication = (id: string) => {
   applayId.value = id;
   showDlg.value = true;
 };
@@ -163,9 +165,28 @@ const revoke = () => {
       <template #head="{ columns }">
         <template v-for="(item, index) in columns" :key="item.type">
           <th v-if="!filterableColSet.size || !filterableColSet.has(item.key)" :class="item.type">
-            {{ item.label }}
+            <template v-if="item.label === '申请人'">
+              <div class="th-maintainer">
+                申请人
+                <OPopover position="top" trigger="hover">
+                  <template #target>
+                    <OIcon class="maintainer-icon"><IconHelp /></OIcon>
+                  </template>
+                  <div class="box">展示Gitee ID 不是openEuler用户名</div>
+                </OPopover>
+              </div>
+            </template>
+            <template v-else> {{ item.label }}</template>
           </th>
-          <OPopup :ref="(el) => setPopupClickoutSideFn(el, index)" v-else trigger="none" style="--popup-radius: 4px" :visible="filterSwitches[index]" :unmount-on-hide="false" position="bl">
+          <OPopup
+            v-else
+            trigger="none"
+            style="--popup-radius: 4px"
+            :visible="filterSwitches[index]"
+            :unmount-on-hide="false"
+            position="bl"
+            :ref="(el) => setPopupClickoutSideFn(el, index)"
+          >
             <template #target>
               <th :class="item.type">
                 <div class="header-cell">
@@ -189,8 +210,18 @@ const revoke = () => {
               </th>
             </template>
             <FilterableCheckboxes v-if="item.key === 'metric'" :filterable="false" @change="onFilterChange(item.key, index, $event)" :values="applyTypes" />
-            <FilterableCheckboxes v-else-if="item.key === 'repo'" :loading="repoFilterLoading" @change="onFilterChange(item.key, index, $event)" :values="repoList" />
-            <FilterableCheckboxes v-else-if="item.key === 'applyStatus'" :filterable="false" @change="onFilterChange(item.key, index, $event)" :values="applyStatusType" />
+            <FilterableCheckboxes
+              v-else-if="item.key === 'repo'"
+              :loading="repoFilterLoading"
+              @change="onFilterChange(item.key, index, $event)"
+              :values="repoList"
+            />
+            <FilterableCheckboxes
+              v-else-if="item.key === 'applyStatus'"
+              :filterable="false"
+              @change="onFilterChange(item.key, index, $event)"
+              :values="applyStatusType"
+            />
           </OPopup>
         </template>
       </template>
@@ -209,6 +240,7 @@ const revoke = () => {
       <template #td_description="{ row }">
         <div class="line-clamp">{{ row.description }}</div>
       </template>
+
       <template #td_applyStatus="{ row }">
         <div class="apply-status">
           <OTag v-if="row.applyStatus" :class="row.applyStatus?.toLocaleLowerCase()">{{ applyStatusConvert(row.applyStatus) }} </OTag>
@@ -246,7 +278,15 @@ const revoke = () => {
 
 <style lang="scss" scoped>
 @import '@/assets/style/category/collaboration/index.scss';
-
+.th-maintainer {
+  display: flex;
+  align-items: center;
+  .maintainer-icon {
+    width: 16px;
+    margin-left: 8px;
+    color: var(--o-color-info1);
+  }
+}
 .revoke-text {
   color: var(--o-color-info1);
   text-align: center;
@@ -302,15 +342,15 @@ thead {
     width: 150px;
   }
   .applyStatus {
-    width: 135px;
+    width: 130px;
   }
   .administrator,
   .maintainer {
-    width: 120px;
+    width: 130px;
   }
 
   .applyId {
-    width: 150px;
+    width: 140px;
   }
 
   .comment {

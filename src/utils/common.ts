@@ -40,7 +40,7 @@ export const formatDateTime = (v: string, isTime?: boolean) => {
 
     return `${year}/${month}/${day}`;
   }
-  return ''
+  return '-'
 };
 
 /**

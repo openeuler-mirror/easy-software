@@ -137,13 +137,19 @@ const advImg = computed(() => {
           v-for="item in OpenStack.caseList"
           :key="item.name"
           cursor="auto"
+          class="o-card-pkg"
           :title="item.name"
           :href="OPENEULER + item.href"
           target="_blank"
           rel="noopener noreferrer"
-          :detail="item.desc"
           :cover="item.img"
-        />
+        >
+          <template #default>
+            <div class="desc" :class="{ dark: isDark }">
+              {{ item.desc }}
+            </div>
+          </template>
+        </OCard>
       </div>
     </div>
     <!-- 跳转外部链接提示 -->

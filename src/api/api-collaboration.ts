@@ -56,7 +56,7 @@ interface RevokeT {
 }
 export function getMaintainerRevoke(params: RevokeT) {
   const url = `/server/collaboration/maintainer/revoke`;
-  return request.post(url, { params }).then((res: AxiosResponse) => res?.data);
+  return request.post(url, { ...params }).then((res: AxiosResponse) => res?.data);
 }
 
 /** 待办中心获取我的申请所有仓库 */

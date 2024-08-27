@@ -172,11 +172,11 @@ const responseInterceptorId = request.interceptors.response.use(
       });
     }
 
-    // if (err.response?.status === 401) {
-    //   clearUserAuth();
-    //   useLoginStore().setLoginStatus(LOGIN_STATUS.FAILED);
-    //   router.push('/');
-    // }
+    if (err.response?.status === 401) {
+      clearUserAuth();
+      useLoginStore().setLoginStatus(LOGIN_STATUS.FAILED);
+      router.push('/');
+    }
 
     return Promise.reject(err);
   }
