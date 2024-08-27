@@ -80,11 +80,13 @@ const descriptionRules = [
     required: true,
     triggers: ['blur'],
     message: '请输入您的理由',
+  },
+  {
     validator: (value: string) => {
-      if (value.length > 1000) {
+      if (value.trim().length < 1 || value.length > 1000) {
         return {
           type: 'danger',
-          message: '最多不能超过1000字',
+          message: '长度为1-1000个字符',
         };
       }
     },

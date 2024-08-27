@@ -60,7 +60,7 @@ const data = [
     contribution: '没有PR提交',
     details: '版本正常',
     maintenance: '健康',
-    description: '没有CVE问题，且也没有PR提交，且软件包是最新版本',
+    description: '没有CVE问题，且也没有PR提交，且软件包是正常稳定的',
   },
   {
     cve: '没有CVE',

@@ -54,7 +54,7 @@ const jump = (href: string) => {
       windowOpen(`/${locale.value}/${href}`, '_blank');
     } else {
       router.push({
-        path: `/${locale.value}/${href}`,
+        path: `/${locale.value}/${href}${isMainPer.value ? '/application' : '/approval'}`,
       });
     }
   } else {
@@ -81,7 +81,7 @@ const jump = (href: string) => {
       </div>
       <div class="header-right">
         <template v-if="loginStore.isLogined">
-          <OLink v-if="isCollaboration" class="todo" @click="jump(`todo/application`)">待办中心</OLink>
+          <OLink v-if="isCollaboration" class="todo" @click="jump(`todo`)">待办中心</OLink>
           <OLink v-else class="collaboration" @click="jump(`collaboration`)">协作平台</OLink>
         </template>
         <HeaderTheme />
