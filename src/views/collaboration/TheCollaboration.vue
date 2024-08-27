@@ -256,7 +256,6 @@ watch(
             trigger="none"
             style="--popup-radius: 4px"
             v-for="(item, index) in columns"
-            :ref="(el) => setPopupClickoutSideFn(el, index)"
             :key="item.type"
             :visible="filterSwitches[index]"
             :unmount-on-hide="false"
@@ -289,21 +288,23 @@ watch(
                 </div>
               </th>
             </template>
-            <FilterableCheckboxes
-              v-if="item.key === 'repo'"
-              :loading="repoFilterLoading"
-              @change="onFilterChange(item.key, index, $event)"
-              :values="allRepos"
-            />
-            <FilterableCheckboxes
-              v-else-if="item.key === 'sigName'"
-              :loading="sigFilterLoading"
-              @change="onFilterChange(item.key, index, $event)"
-              :values="allSigs"
-            />
-            <FilterableCheckboxes v-else-if="item.key === 'kind'" @change="onFilterChange(item.key, index, $event)" :filterable="false" :values="kindTypes" />
-            <FilterableCheckboxes v-else-if="item.key === 'status'" @change="onFilterChange(item.key, index, $event)" :values="repoStatusArr" />
-            <FilterableCheckboxes v-else :filterable="false" @change="onFilterChange(item.key, index, $event)" :values="metricTypes(item.key)" />
+            <div :ref="(el) => setPopupClickoutSideFn(el, index)">
+              <FilterableCheckboxes
+                v-if="item.key === 'repo'"
+                :loading="repoFilterLoading"
+                @change="onFilterChange(item.key, index, $event)"
+                :values="allRepos"
+              />
+              <FilterableCheckboxes
+                v-else-if="item.key === 'sigName'"
+                :loading="sigFilterLoading"
+                @change="onFilterChange(item.key, index, $event)"
+                :values="allSigs"
+              />
+              <FilterableCheckboxes v-else-if="item.key === 'kind'" @change="onFilterChange(item.key, index, $event)" :filterable="false" :values="kindTypes" />
+              <FilterableCheckboxes v-else-if="item.key === 'status'" @change="onFilterChange(item.key, index, $event)" :values="repoStatusArr" />
+              <FilterableCheckboxes v-else :filterable="false" @change="onFilterChange(item.key, index, $event)" :values="metricTypes(item.key)" />
+            </div>
           </OPopup>
         </template>
         <template #td_repo="{ row }">

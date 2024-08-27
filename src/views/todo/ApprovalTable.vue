@@ -178,15 +178,7 @@ const revoke = () => {
             </template>
             <template v-else> {{ item.label }}</template>
           </th>
-          <OPopup
-            v-else
-            trigger="none"
-            style="--popup-radius: 4px"
-            :visible="filterSwitches[index]"
-            :unmount-on-hide="false"
-            position="bl"
-            :ref="(el) => setPopupClickoutSideFn(el, index)"
-          >
+          <OPopup v-else trigger="none" style="--popup-radius: 4px" :visible="filterSwitches[index]" :unmount-on-hide="false" position="bl">
             <template #target>
               <th :class="item.type">
                 <div class="header-cell">
@@ -209,19 +201,21 @@ const revoke = () => {
                 </div>
               </th>
             </template>
-            <FilterableCheckboxes v-if="item.key === 'metric'" :filterable="false" @change="onFilterChange(item.key, index, $event)" :values="applyTypes" />
-            <FilterableCheckboxes
-              v-else-if="item.key === 'repo'"
-              :loading="repoFilterLoading"
-              @change="onFilterChange(item.key, index, $event)"
-              :values="repoList"
-            />
-            <FilterableCheckboxes
-              v-else-if="item.key === 'applyStatus'"
-              :filterable="false"
-              @change="onFilterChange(item.key, index, $event)"
-              :values="applyStatusType"
-            />
+            <div :ref="(el) => setPopupClickoutSideFn(el, index)">
+              <FilterableCheckboxes v-if="item.key === 'metric'" :filterable="false" @change="onFilterChange(item.key, index, $event)" :values="applyTypes" />
+              <FilterableCheckboxes
+                v-else-if="item.key === 'repo'"
+                :loading="repoFilterLoading"
+                @change="onFilterChange(item.key, index, $event)"
+                :values="repoList"
+              />
+              <FilterableCheckboxes
+                v-else-if="item.key === 'applyStatus'"
+                :filterable="false"
+                @change="onFilterChange(item.key, index, $event)"
+                :values="applyStatusType"
+              />
+            </div>
           </OPopup>
         </template>
       </template>
