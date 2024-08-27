@@ -5,6 +5,7 @@ import { OCheckbox, OCheckboxGroup, OIcon, OInput, OScroller } from '@opensig/op
 
 import IconSearch from '~icons/app/icon-search.svg';
 import { useCheckbox } from '@/composables/useCheckbox';
+import IconLoading from '~icons/app/icon-loading.svg';
 
 type ValueT = string | { label: string; value: string };
 
@@ -13,6 +14,10 @@ const props = defineProps({
   filterable: {
     type: Boolean,
     default: true,
+  },
+  loading: {
+    type: Boolean,
+    default: false,
   },
   /** 多选值 */
   values: {
@@ -97,6 +102,9 @@ watch(checkboxes, (values) => emit('change', { values, isCheckAll: isCheckedAll.
       </template>
     </OInput>
     <OScroller class="content" showType="always">
+      <div class="loading-mask" v-show="loading">
+        <OIcon><IconLoading class="o-rotating" /></OIcon>
+      </div>
       <div class="check-all-wrap">
         <OCheckbox v-model="parentCheckbox" :indeterminate="indeterminate" :value="1">全选</OCheckbox>
       </div>
@@ -108,6 +116,19 @@ watch(checkboxes, (values) => emit('change', { values, isCheckAll: isCheckedAll.
 </template>
 
 <style lang="scss" scoped>
+.loading-mask {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-color: var(--o-color-fill2);
+  z-index: 2;
+  left: 0;
+  top: 0;
+}
+
 .search-icon {
   color: var(--o-color-info1);
 }
