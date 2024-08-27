@@ -46,12 +46,11 @@ const rawValues = computed(() =>
 const searchVal = ref<string>();
 
 const filteredValues = computed(() => {
-  const search = searchVal.value;
-  if (search) {
-    return rawValues.value.filter((val) => val.label.includes(search));
-  } else {
+  if (!searchVal.value) {
     return rawValues.value;
   }
+  const search = searchVal.value.toLowerCase();
+  return rawValues.value.filter((val) => val.label.toLowerCase().includes(search));
 });
 
 const displayCount = ref(30);
