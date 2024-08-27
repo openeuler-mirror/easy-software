@@ -162,12 +162,9 @@ router.beforeEach(async (to) => {
       const { data } = await queryUpstreamPermission();
       if (data.allow_access) {
         userInfoStore.upstreamPermission = data.allow_access;
-      } else {
-        return isUpstream ? { name: 'notFound' } : true;
       }
     } catch {
-      // 如果queryUpstreamPermission不是401
-      return isUpstream ? { name: 'notFound' } : true;
+      userInfoStore.upstreamPermission = false;
     }
   }
 
