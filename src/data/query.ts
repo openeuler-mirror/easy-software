@@ -44,3 +44,7 @@ export const maintainerDefaults = {
   gitee_id: 'georgecao',
 }
 
+
+
+// 协作平台权限 route name
+export const COLLABORATIONPERMISSION = ['todo', 'collaboration', 'todo-detail'];

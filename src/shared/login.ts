@@ -43,7 +43,11 @@ export function clearUserAuth() {
   // 清除内存中用户信息
   useUserInfoStore().$reset();
   // 清除cookie
-  Cookies.remove(LOGIN_KEYS.CSRF_TOKEN, { domain: import.meta.env.VITE_COOKIE_DOMAIN, path: '/', secure: true });
+  if (import.meta.env.DEV) {
+    Cookies.remove(LOGIN_KEYS.CSRF_TOKEN);
+  } else {
+    Cookies.remove(LOGIN_KEYS.CSRF_TOKEN, { domain: import.meta.env.VITE_COOKIE_DOMAIN, path: '/', secure: true });
+  }
 }
 
 /**
@@ -59,11 +63,14 @@ export async function tryLogin() {
     loginStore.setLoginStatus(LOGIN_STATUS.NOT);
     return;
   }
+
   try {
     loginStore.setLoginStatus(LOGIN_STATUS.DOING);
     userInfoStore.$patch(await queryUserInfo());
     loginStore.setLoginStatus(LOGIN_STATUS.DONE);
   } catch (error) {
     loginStore.setLoginStatus(LOGIN_STATUS.FAILED);
+
+
   }
 }

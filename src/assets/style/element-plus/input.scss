@@ -1,4 +1,5 @@
 .el-input {
+  --el-input-text-color: var(--o-color-info2);
   .el-input__wrapper {
     box-shadow: none !important;
     border: 1px solid var(--o-color-control1);

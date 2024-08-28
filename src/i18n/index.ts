@@ -4,6 +4,7 @@ import common from './common';
 import software from './software';
 import upstream from './upstream';
 import detail from '@/i18n/detail';
+import collaboration from '@/i18n/collaboration';
 
 const messages = {
   zh: {
@@ -11,12 +12,14 @@ const messages = {
     software: software.zh,
     upstream: upstream.zh,
     detail: detail.zh,
+    collaboration: collaboration.zh,
   },
   en: {
     common: common.en,
     software: software.en,
     upstream: upstream.en,
     detail: detail.en,
+    collaboration: collaboration.en,
   },
 };
 

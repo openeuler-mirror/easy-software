@@ -1,14 +1,11 @@
 <script lang="ts" setup>
 import { ref } from 'vue';
-import { OLink, OResult, OFigure } from '@opensig/opendesign';
+import { OLink } from '@opensig/opendesign';
 import { useRoute } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { GITEE } from '@/data/config';
-import { useTheme } from '@/composables/useTheme';
 import ExternalLink from '@/components/ExternalLink.vue';
-
-import result404 from '@/assets/404.png';
-import result404Dark from '@/assets/404-dark.png';
+import Result404 from '@/components/Result404.vue';
 
 const props = defineProps({
   type: {
@@ -16,8 +13,6 @@ const props = defineProps({
     default: '',
   },
 });
-
-const { isDark } = useTheme();
 
 const route = useRoute();
 const { t } = useI18n();
@@ -49,16 +44,13 @@ const clickFeedback = () => {
 </script>
 
 <template>
-  <OResult class="result-tips">
-    <template #image>
-      <OFigure :src="isDark ? result404Dark : result404" fit="contain" />
-    </template>
+  <Result404 class="result-tips">
     <template #description>
       <p class="text">
         {{ t('software.nofoundApp') }} <OLink hover-underline color="primary" @click="clickFeedback">{{ t('software.feedbackPkg.btn') }}</OLink>
       </p>
     </template>
-  </OResult>
+  </Result404>
 
   <ExternalLink v-if="showExternalDlg" :href="externalLink" @change="showExternalDlg = false" />
 </template>

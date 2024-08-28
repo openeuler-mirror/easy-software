@@ -318,12 +318,6 @@ const onCodeSuccess = () => {
   }
 }
 :deep(.o-table) {
-  th,
-  td {
-    padding: 2px 12px;
-    font-size: 14px !important;
-  }
-
   tbody tr:hover {
     background: none;
   }

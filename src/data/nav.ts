@@ -24,7 +24,7 @@ export const navs = [
     href: '/rpm',
   },
   {
-    id: 'apppkg',
+    id: 'image',
     label: {
       zh: '应用镜像',
       en: 'Image',
@@ -56,3 +56,15 @@ export const navs = [
     href: '/upstream',
   },
 ];
+
+
+export const collaborationNav = [
+  {
+    id: 'collaboration',
+    label: {
+      zh: '软件维护详情',
+      en: 'Collaboration',
+    },
+    href: '/collaboration',
+  },
+]

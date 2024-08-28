@@ -1,10 +1,26 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, type PropType } from 'vue';
 import { navs } from '@/data/nav';
 import { useRoute, useRouter } from 'vue-router';
 import { computed } from 'vue';
 import { useLocale } from '@/composables/useLocale';
 import { useLoginStore, useUserInfoStore } from '@/stores/user';
+
+interface NavsT {
+  id: string;
+  label: {
+    zh: string;
+    en: string;
+  };
+  href: string;
+}
+
+const props = defineProps({
+  options: {
+    type: Array as PropType<NavsT[]>,
+    default: () => [],
+  },
+});
 
 const route = useRoute();
 const router = useRouter();
@@ -26,43 +42,7 @@ const onMouseLeave = () => {
 
 // -------------------- 选中事件 --------------------
 const selectedIndex = computed(() => {
-  let idx = -1;
-
-  if (route.path === `/${locale.value}` || route.path === `/${locale.value}/`) {
-    idx = 0;
-    return idx;
-  }
-
-  if (route.path.includes('/field')) {
-    idx = 1;
-    return idx;
-  }
-
-  if (route.path.includes('/rpm')) {
-    idx = 2;
-    return idx;
-  }
-
-  if (route.path.includes('/image')) {
-    idx = 3;
-    return idx;
-  }
-
-  // if (route.path.includes('/epkg')) {
-  //   idx = 4;
-  //   return idx;
-  // }
-  if (route.path.includes('/oepkg')) {
-    idx = 4;
-    return idx;
-  }
-
-  if (route.path.includes('/upstream')) {
-    idx = 5;
-    return idx;
-  }
-
-  return idx;
+  return props.options.findIndex((item) => route.name?.toString().includes(item.id));
 });
 
 // 导航跳转
@@ -74,7 +54,7 @@ const jumpTo = (href: string) => {
 <template>
   <nav class="header-nav">
     <ul class="nav-list">
-      <template v-for="(item, idx) in navs" :key="item.id">
+      <template v-for="(item, idx) in options" :key="item.id">
         <li
           v-if="item.id !== 'upstream' || upstreamPermission"
           :id="'e2e_headerNav_' + item.id"
