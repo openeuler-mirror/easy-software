@@ -7,7 +7,7 @@ import { useRouter, useRoute } from 'vue-router';
 import { applicationType, applyStatusType } from '@/data/todo';
 import { applicationTypeConvert, applyStatusConvert, versionLatestStatusConvert } from '@/utils/collaboration';
 import { useUserInfoStore } from '@/stores/user';
-import { onClickOutside, useDebounceFn } from '@vueuse/core';
+import { onClickOutside } from '@vueuse/core';
 import { getAdminApplyRepos, getMaintainerApplyRepos } from '@/api/api-collaboration';
 import FilterableCheckboxes from '@/components/FilterableCheckboxes.vue';
 
@@ -95,12 +95,7 @@ const repoFilterLoading = ref(false);
 
 /** 切换某个筛选组件显示开关 */
 const switchFilterVisible = (index: number) => {
-  filterSwitches.value = props.columns.map((_, idx) => {
-    if (idx === index) {
-      return !filterSwitches.value[idx];
-    }
-    return false;
-  });
+  filterSwitches.value[index] = true;
   if (index === 0) {
     repoFilterLoading.value = true;
     getRepoList();
@@ -108,28 +103,24 @@ const switchFilterVisible = (index: number) => {
 };
 
 /** 各表格列对应的已选中的筛选项 */
-const activeFilterValues = ref(new Array<string[]>(props.columns.length));
+const activeFilterValues = ref(new Array<string>(props.columns.length));
 
-const onFilterChange = useDebounceFn((type: string, index: number, val: { values: (string | number)[]; isCheckAll: boolean }) => {
+const onFilterChange = (type: string, index: number, val: string) => {
   filterSwitches.value = props.columns.map(() => false);
-  if (val.values.length > 0) {
+  if (val) {
+    filterParams[type] = val;
+    if (type === 'metric') {
+      activeFilterValues.value[index] = applyStatusConvert(val);
+    } else {
+      activeFilterValues.value[index] = val;
+    }
     currentActiveFilterIndices.value.add(index);
   } else {
-    currentActiveFilterIndices.value.delete(index);
-  }
-  if (val.isCheckAll) {
     filterParams[type] = '';
-    activeFilterValues.value[index] = [];
+    activeFilterValues.value[index] = '';
     currentActiveFilterIndices.value.delete(index);
-  } else {
-    filterParams[type] = val.values.join();
-    if (type === 'metric') {
-      activeFilterValues.value[index] = val.values.map((item) => applyStatusConvert(item as string));
-    } else {
-      activeFilterValues.value[index] = val.values as string[];
-    }
   }
-}, 300);
+};
 
 const userInfoStore = useUserInfoStore();
 const isMainPer = computed(() => userInfoStore.platformMaintainerPermission);
@@ -178,7 +169,7 @@ const revoke = () => {
             </template>
             <template v-else> {{ item.label }}</template>
           </th>
-          <OPopup v-else trigger="none" style="--popup-radius: 4px" :visible="filterSwitches[index]" :unmount-on-hide="false" position="bl">
+          <OPopup v-else trigger="none" style="--popup-radius: 4px" :offset="-8" :visible="filterSwitches[index]" :unmount-on-hide="false" position="bl">
             <template #target>
               <th :class="item.type">
                 <div class="header-cell">
@@ -191,10 +182,10 @@ const revoke = () => {
                       @click="switchFilterVisible(index)"
                       ><IconFilter
                     /></OIcon>
-                    <OPopover :target="filterIconRefs[index]" trigger="hover">
+                    <OPopover v-if="currentActiveFilterIndices.has(index) && activeFilterValues[index]" :target="filterIconRefs[index]" trigger="hover">
                       <p class="bubble-content">
                         <span class="title">{{ item.label }}:</span>
-                        {{ activeFilterValues[index]?.join('、') }}
+                        {{ activeFilterValues[index] }}
                       </p>
                     </OPopover>
                   </template>
