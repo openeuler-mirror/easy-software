@@ -5,6 +5,8 @@ import { useLangStore, useViewStore } from '@/stores/common';
 import { tryLogin } from '@/shared/login';
 import { useLoginStore, useUserInfoStore } from '@/stores/user';
 import { queryUpstreamPermission } from '@/api/api-user';
+import { getCollaborationPermissions } from '@/api/api-collaboration';
+import { COLLABORATIONPERMISSION } from '@/data/query';
 
 const routes = [
   {
@@ -82,6 +84,26 @@ const routes = [
     name: 'openstack',
     component: () => import('@/views/solution/TheOpenStack.vue'),
   },
+  {
+    path: '/zh/collaboration',
+    name: 'collaboration',
+    component: () => import('@/views/collaboration/TheCollaboration.vue'),
+  },
+  {
+    path: '/zh/collaboration-permission',
+    name: 'collaboration-permission',
+    component: () => import('@/views/collaboration/CollaborationPermission.vue'),
+  },
+  {
+    path: '/zh/todo/:type',
+    name: 'todo',
+    component: () => import('@/views/todo/TheTodo.vue'),
+  },
+  {
+    path: '/zh/todo/:type/:id',
+    name: 'todo-detail',
+    component: () => import('@/views/todo/TheTodoDetail.vue'),
+  },
   // 默认路由
   {
     path: '/:path(.*)*',
@@ -114,27 +136,58 @@ router.beforeEach(async (to) => {
 
   const userInfoStore = useUserInfoStore();
   const isUpstream = to.name === 'upstream';
+  const isPlatform = COLLABORATIONPERMISSION.includes(to.name as string);
   const loginStore = useLoginStore();
+
   if (loginStore.isLogined) {
     if (isUpstream) {
       return userInfoStore.upstreamPermission ? true : { name: 'notFound' };
     }
+    if (isPlatform) {
+      return userInfoStore.platformAdminPermission || userInfoStore.platformMaintainerPermission ? true : { name: 'notFound' };
+    }
+
     return true;
   }
 
   await tryLogin();
-  if (userInfoStore.upstreamPermission === null && loginStore.isLogined) {
+
+  // 没登陆、没权限 直接404
+  if (!loginStore.isLogined && (isUpstream || isPlatform)) {
+    return { name: 'notFound' };
+  }
+
+  if (userInfoStore.upstreamPermission === null && loginStore.isLogined && !isPlatform) {
     try {
-      const upstreamPermission = await queryUpstreamPermission();
-      userInfoStore.upstreamPermission = upstreamPermission.data.allow_access;
+      const { data } = await queryUpstreamPermission();
+      if (data.allow_access) {
+        userInfoStore.upstreamPermission = data.allow_access;
+      }
     } catch {
-      // 如果queryUpstreamPermission不是401
-      return isUpstream ? { name: 'notFound' } : true;
+      userInfoStore.upstreamPermission = false;
     }
   }
 
-  if (isUpstream) {
-    return loginStore.isLogined && userInfoStore.upstreamPermission ? true : { name: 'notFound' };
+
+  // 协作平台权限
+  if ((userInfoStore.platformMaintainerPermission === null || userInfoStore.platformAdminPermission === null) && loginStore.isLogined) {
+    try {
+      const { data } = await getCollaborationPermissions();
+
+      if (data.permissions.length > 0) {
+        if (data.permissions.includes('administrator')) {
+          userInfoStore.platformAdminPermission = true;
+        }
+        if (data.permissions.includes('maintainer')) {
+          userInfoStore.platformMaintainerPermission = true;
+        }
+      } else {
+        return isPlatform ? { name: 'collaboration-permission' } : true;
+      }
+
+    } catch {
+      return isPlatform ? { name: 'collaboration-permission' } : true;
+    }
   }
 
   return true;

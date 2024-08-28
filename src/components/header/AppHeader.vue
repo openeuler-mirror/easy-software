@@ -1,10 +1,15 @@
 <script setup lang="ts">
-import { watch } from 'vue';
-import { ODivider } from '@opensig/opendesign';
-import { useRouter } from 'vue-router';
+import { computed, watch, ref } from 'vue';
+import { ODivider, OLink } from '@opensig/opendesign';
+import { useRouter, useRoute } from 'vue-router';
 import { useLangStore } from '@/stores/common';
 import { OPENEULER } from '@/data/config';
 import { useI18n } from 'vue-i18n';
+import { navs, collaborationNav } from '@/data/nav';
+import { useLoginStore, useUserInfoStore } from '@/stores/user';
+import { COLLABORATIONPERMISSION } from '@/data/query';
+import { windowOpen } from '@/utils/common';
+
 import { useTheme } from '@/composables/useTheme';
 import HeaderNav from '@/components/header/HeaderNav.vue';
 import AppLogin from '@/components/header/AppLogin.vue';
@@ -15,8 +20,13 @@ import openeulerLogoDark from '@/assets/openeuler-logo-dark.svg';
 
 const { locale, t } = useI18n();
 const router = useRouter();
+const route = useRoute();
 const langStore = useLangStore();
 const { isDark } = useTheme();
+const loginStore = useLoginStore();
+const userInfoStore = useUserInfoStore();
+const isMainPer = computed(() => userInfoStore.platformMaintainerPermission);
+const isAdminPer = computed(() => userInfoStore.platformAdminPermission);
 
 watch(
   () => {
@@ -32,6 +42,27 @@ const goHome = () => {
     path: `/${locale.value}`,
   });
 };
+
+// 判断是否是协作平台
+const isCollaboration = computed(() => {
+  return COLLABORATIONPERMISSION.includes(route.name as string);
+});
+
+const jump = (href: string) => {
+  if (isAdminPer.value || isMainPer.value) {
+    if (href === 'collaboration') {
+      windowOpen(`/${locale.value}/${href}`, '_blank');
+    } else {
+      router.push({
+        path: `/${locale.value}/${href}${isMainPer.value ? '/application' : '/approval'}`,
+      });
+    }
+  } else {
+    router.push({
+      path: `/${locale.value}/collaboration-permission`,
+    });
+  }
+};
 </script>
 
 <template>
@@ -44,11 +75,15 @@ const goHome = () => {
           </a>
           <ODivider direction="v" :darker="true" />
           <span @click="goHome" class="logo-text">{{ t('software.softwareHome') }}</span>
+          <span v-if="isCollaboration" class="collaboration-text">协作平台</span>
         </div>
-
-        <HeaderNav />
+        <HeaderNav v-if="route.name" :options="isCollaboration ? collaborationNav : navs" />
       </div>
       <div class="header-right">
+        <template v-if="loginStore.isLogined">
+          <OLink v-if="isCollaboration" class="todo" @click="jump(`todo`)">待办中心</OLink>
+          <OLink v-else class="collaboration" @click="jump(`collaboration`)">协作平台</OLink>
+        </template>
         <HeaderTheme />
         <AppLogin />
       </div>
@@ -82,11 +117,25 @@ const goHome = () => {
       cursor: pointer;
       @include h4;
     }
+    .collaboration-text {
+      color: var(--o-color-info1);
+      font-weight: bold;
+      margin-left: 48px;
+      cursor: default;
+      @include h4;
+    }
     .header-left,
     .header-right {
       height: 100%;
       display: flex;
       align-items: center;
+
+      .collaboration,
+      .todo {
+        margin-right: 16px;
+        color: var(--o-color-info1);
+        @include tip1;
+      }
     }
   }
   .logo {
