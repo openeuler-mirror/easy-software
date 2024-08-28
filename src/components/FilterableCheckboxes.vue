@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, ref, watch, type PropType } from 'vue';
-import { useDebounceFn } from '@vueuse/core';
+import { computed, onMounted, onUnmounted, ref, type PropType } from 'vue';
+import { useDebounceFn, useVModel } from '@vueuse/core';
 import { OIcon, OInput, ORadio, ORadioGroup, OScroller } from '@opensig/opendesign';
 
 import IconSearch from '~icons/app/icon-search.svg';
@@ -9,6 +9,10 @@ import IconLoading from '~icons/app/icon-loading.svg';
 type ValueT = string | { label: string; value: string };
 
 const props = defineProps({
+  modelValue: {
+    type: [String, Number],
+    default: '',
+  },
   /** 是否显示搜索 */
   filterable: {
     type: Boolean,
@@ -82,9 +86,7 @@ const onFilterInput = useDebounceFn((search?: string) => {
   searchVal.value = search;
 }, props.filterDebounceTimeout);
 
-const radioVal = ref('');
-
-watch(radioVal, (val) => emit('change', val));
+const radioVal = useVModel(props, 'modelValue', emit);
 </script>
 
 <template>
@@ -101,9 +103,9 @@ watch(radioVal, (val) => emit('change', val));
         <OIcon><IconLoading class="o-rotating" /></OIcon>
       </div>
       <div class="check-all-wrap">
-        <ORadio v-model="radioVal" :value="''">全选</ORadio>
+        <ORadio @change="$emit('change', $event as string)" v-model="radioVal" :value="''">全选</ORadio>
       </div>
-      <ORadioGroup v-model="radioVal" direction="v">
+      <ORadioGroup v-model="radioVal" direction="v" @change="$emit('change', $event as string)">
         <ORadio v-for="item in displayValues" :key="item.value" :value="item.value">{{ item.label }}</ORadio>
       </ORadioGroup>
     </OScroller>

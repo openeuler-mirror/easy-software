@@ -108,7 +108,6 @@ const activeFilterValues = ref(new Array<string>(props.columns.length));
 const onFilterChange = (type: string, index: number, val: string) => {
   filterSwitches.value = props.columns.map(() => false);
   if (val) {
-    filterParams[type] = val;
     if (type === 'metric') {
       activeFilterValues.value[index] = applyStatusConvert(val);
     } else {
@@ -116,7 +115,6 @@ const onFilterChange = (type: string, index: number, val: string) => {
     }
     currentActiveFilterIndices.value.add(index);
   } else {
-    filterParams[type] = '';
     activeFilterValues.value[index] = '';
     currentActiveFilterIndices.value.delete(index);
   }
@@ -193,14 +191,22 @@ const revoke = () => {
               </th>
             </template>
             <div :ref="(el) => setPopupClickoutSideFn(el, index)">
-              <FilterableCheckboxes v-if="item.key === 'metric'" :filterable="false" @change="onFilterChange(item.key, index, $event)" :values="applyTypes" />
               <FilterableCheckboxes
+                v-model="filterParams[item.key]"
+                v-if="item.key === 'metric'"
+                :filterable="false"
+                @change="onFilterChange(item.key, index, $event)"
+                :values="applyTypes"
+              />
+              <FilterableCheckboxes
+                v-model="filterParams[item.key]"
                 v-else-if="item.key === 'repo'"
                 :loading="repoFilterLoading"
                 @change="onFilterChange(item.key, index, $event)"
                 :values="repoList"
               />
               <FilterableCheckboxes
+                v-model="filterParams[item.key]"
                 v-else-if="item.key === 'applyStatus'"
                 :filterable="false"
                 @change="onFilterChange(item.key, index, $event)"
