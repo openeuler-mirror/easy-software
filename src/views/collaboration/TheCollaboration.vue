@@ -53,17 +53,21 @@ const switchFilterVisible = (index: number) => {
   filterSwitches.value[index] = true;
   if (index === 0) {
     // 筛选仓库
-    repoFilterLoading.value = true;
-    getRepoList()
-      .then((list) => (allRepos.value = list))
-      .finally(() => (repoFilterLoading.value = false));
+    if (!allRepos.value?.length) {
+      repoFilterLoading.value = true;
+      getRepoList()
+        .then((list) => (allRepos.value = list))
+        .finally(() => (repoFilterLoading.value = false));
+    }
   }
   if (index === 2) {
     // 筛选sig
-    sigFilterLoading.value = true;
-    getSigList()
-      .then((list) => (allSigs.value = list))
-      .finally(() => (sigFilterLoading.value = false));
+    if (!allSigs.value?.length) {
+      sigFilterLoading.value = true;
+      getSigList()
+        .then((list) => (allSigs.value = list))
+        .finally(() => (sigFilterLoading.value = false));
+    }
   }
 };
 
