@@ -22,10 +22,10 @@ interface ColumnsT {
 }
 
 const props = defineProps({
-  filterableColumns: {
+  /* filterableColumns: {
     type: Array as PropType<string[]>,
     default: () => [],
-  },
+  }, */
   data: {
     type: Array,
     default: () => [],
@@ -41,6 +41,10 @@ const props = defineProps({
   loading: {
     type: Boolean,
     default: () => false,
+  },
+  filterParams: {
+    type: Object,
+    default: () => ({}),
   },
 });
 
@@ -62,19 +66,9 @@ const getRepoList = () => {
   }
 };
 
-const filterParams = reactive(
-  props.filterableColumns.reduce(
-    (obj, col) => {
-      obj[col] = '';
-      return obj;
-    },
-    {} as Record<string, string>
-  )
-);
+const innerFilterParams = ref(props.filterParams);
+const filterableColumns = ref(Object.keys(props.filterParams));
 
-watch(filterParams, (params) => emits('queryData', params));
-
-const filterableColSet = computed(() => new Set(props.filterableColumns));
 const applyTypes = applicationTypeCurrent.map((item) => ({ label: item.label, value: item.id }));
 
 const filterIconRefs = ref(new Array<ComponentPublicInstance>(props.columns.length));
@@ -87,6 +81,15 @@ const setPopupClickoutSideFn = (el: any, index: number) => {
     filterSwitches.value[index] = false;
   });
 };
+
+onMounted(() => {
+  Object.entries(props.filterParams).forEach((entry, index) => {
+    if (entry[1]) {
+      currentActiveFilterIndices.value.add(index);
+      activeFilterValues.value[props.columns.findIndex((item) => item.key === entry[0])] = entry[1];
+    }
+  });
+});
 
 /** 当前有选中筛选项的表格列的数组下标 */
 const currentActiveFilterIndices = ref(new Set<number>());
@@ -118,6 +121,7 @@ const onFilterChange = (type: string, index: number, val: string) => {
     activeFilterValues.value[index] = '';
     currentActiveFilterIndices.value.delete(index);
   }
+  emits('queryData', innerFilterParams.value);
 };
 
 const userInfoStore = useUserInfoStore();
@@ -153,7 +157,7 @@ const revoke = () => {
     <OTable :columns="columns" :data="data" :loading="loading" border="all">
       <template #head="{ columns }">
         <template v-for="(item, index) in columns" :key="item.type">
-          <th v-if="!filterableColSet.size || !filterableColSet.has(item.key)" :class="item.type">
+          <th v-if="!filterableColumns.includes(item.key)" :class="item.type">
             <template v-if="item.label === '申请人'">
               <div class="th-maintainer">
                 申请人
@@ -192,21 +196,21 @@ const revoke = () => {
             </template>
             <div :ref="(el) => setPopupClickoutSideFn(el, index)">
               <FilterableCheckboxes
-                v-model="filterParams[item.key]"
+                v-model="innerFilterParams[item.key]"
                 v-if="item.key === 'metric'"
                 :filterable="false"
                 @change="onFilterChange(item.key, index, $event)"
                 :values="applyTypes"
               />
               <FilterableCheckboxes
-                v-model="filterParams[item.key]"
+                v-model="innerFilterParams[item.key]"
                 v-else-if="item.key === 'repo'"
                 :loading="repoFilterLoading"
                 @change="onFilterChange(item.key, index, $event)"
                 :values="repoList"
               />
               <FilterableCheckboxes
-                v-model="filterParams[item.key]"
+                v-model="innerFilterParams[item.key]"
                 v-else-if="item.key === 'applyStatus'"
                 :filterable="false"
                 @change="onFilterChange(item.key, index, $event)"
