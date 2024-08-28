@@ -39,6 +39,6 @@ const bannerInfo = {
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  margin: 40px 0;
+  margin: 32px 0;
 }
 </style>

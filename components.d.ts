@@ -55,8 +55,6 @@ declare module 'vue' {
     SearchRecommend: typeof import('./src/components/search/SearchRecommend.vue')['default']
     SearchTab: typeof import('./src/components/search/SearchTab.vue')['default']
     StatusFeedback: typeof import('./src/components/collaboration/StatusFeedback.vue')['default']
-  }
-  export interface ComponentCustomProperties {
-    vLoading: typeof import('element-plus/es')['ElLoadingDirective']
+    TableShowOverflowTips: typeof import('./src/components/collaboration/TableShowOverflowTips.vue')['default']
   }
 }

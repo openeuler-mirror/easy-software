@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { ref, reactive, computed } from 'vue';
 import { ODialog, OButton, OForm, OTextarea, OFormItem, ORadioGroup, ORadio, OSelect, OOption, type FieldResultT, useMessage } from '@opensig/opendesign';
-
+import { applicationTypeCurrent } from '@/data/todo';
 import { getApplyFeedback } from '@/api/api-collaboration';
 
 const props = defineProps({
@@ -13,19 +13,6 @@ const props = defineProps({
 
 const showDlg = ref(true);
 const message = useMessage();
-
-const applicationType = [
-  {
-    id: 'cveStatus',
-    label: 'CVE状态',
-    children: ['有CVE且全部未修复', '有CVE部分修复', '有CVE且全部修复', '没有CVE问题'],
-  },
-  {
-    id: 'versionStatus',
-    label: '软件包版本状态',
-    children: ['版本正常', '落后版本'],
-  },
-];
 
 const formRef = ref<InstanceType<typeof OForm>>();
 const formData = reactive({
@@ -43,10 +30,10 @@ const emits = defineEmits<{
 const metricIndex = ref(-1);
 const onChangeRadio = (v: string) => {
   formData.metricStatus = '';
-  metricIndex.value = applicationType.findIndex((item) => item.id === v);
+  metricIndex.value = applicationTypeCurrent.findIndex((item) => item.id === v);
 };
 // 根据状态获取
-const metricCategory = computed(() => (metricIndex.value === -1 ? [] : applicationType[metricIndex.value].children));
+const metricCategory = computed(() => (metricIndex.value === -1 ? [] : applicationTypeCurrent[metricIndex.value].children));
 
 // 重置表单数据
 const reset = () => {
@@ -129,7 +116,7 @@ const onSubmit = (results: FieldResultT[]) => {
       <OForm ref="formRef" has-required :model="formData" label-width="220px" label-align="top" @submit="onSubmit">
         <OFormItem label="请选择您要修改的状态类别" required field="metric" :rules="metricRules">
           <ORadioGroup class="metric-options" v-model="formData.metric" direction="v" @change="(v) => onChangeRadio(v)">
-            <ORadio v-for="option in applicationType" :key="option.label" :value="option.id">
+            <ORadio v-for="option in applicationTypeCurrent" :key="option.label" :value="option.id">
               {{ option.label }}
             </ORadio>
           </ORadioGroup>
@@ -146,6 +133,7 @@ const onSubmit = (results: FieldResultT[]) => {
             placeholder="请输入您的理由"
             resize="none"
             :rows="4"
+            :clearable="false"
             :input-on-outlimit="false"
             style="width: 100%"
           >

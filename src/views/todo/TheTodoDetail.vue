@@ -1,17 +1,24 @@
 <script lang="ts" setup>
 import { ref, onMounted, computed, reactive } from 'vue';
-import { OButton, OTag, OForm, OTextarea, OFormItem, useMessage, type FieldResultT } from '@opensig/opendesign';
-import { useRoute } from 'vue-router';
+import { OButton, OTag, OForm, OTextarea, OFormItem, useMessage, type FieldResultT, ODialog, OBreadcrumb, OBreadcrumbItem } from '@opensig/opendesign';
+import { useRoute, useRouter } from 'vue-router';
 import { getAdminApply, getMaintainerApply, getAdminProcess } from '@/api/api-collaboration';
 import { applicationTypeConvert, applyStatusConvert, versionLatestStatusConvert } from '@/utils/collaboration';
 import { formatDateTime } from '@/utils/common';
 import { useUserInfoStore } from '@/stores/user';
+import { useLocale } from '@/composables/useLocale';
+import { useI18n } from 'vue-i18n';
 
 const route = useRoute();
+const router = useRouter();
 const message = useMessage();
+const { locale } = useLocale();
+const { t } = useI18n();
+
 const userInfoStore = useUserInfoStore();
 const isAdminPer = computed(() => userInfoStore.platformAdminPermission);
 const isMaintainerPer = computed(() => userInfoStore.platformMaintainerPermission);
+
 const isLoading = ref(true);
 const isError = ref(false);
 
@@ -92,7 +99,7 @@ const rejected = async () => {
   formData.applyStatus = 'REJECTED';
   queryAdminProcess();
 };
-
+// 审批
 const queryAdminProcess = () => {
   getAdminProcess(formData)
     .then((res) => {
@@ -113,6 +120,21 @@ const queryAdminProcess = () => {
 };
 
 // --------------------审批结束------------------------
+const showDlg = ref(false);
+const showHref = ref('');
+const jump = (path: string) => {
+  if (formData.comment.trim().length > 0) {
+    showDlg.value = true;
+    showHref.value = path;
+  } else {
+    router.push(path);
+  }
+};
+
+const confirmExit = () => {
+  showDlg.value = false;
+  router.push(showHref.value);
+};
 
 onMounted(() => {
   type.value = route.params.type;
@@ -125,9 +147,13 @@ onMounted(() => {
 </script>
 
 <template>
-  <ContentWrapper verticalPadding="32px">
+  <ContentWrapper :verticalPadding="['32px', '72px']">
     <AppLoading :loading="isLoading" />
-    <CBreadcrumb :type="type" :repo="todoData?.repo" />
+    <OBreadcrumb class="app-breadcrumb">
+      <OBreadcrumbItem @click="jump(`/${locale}/todo/application`)">待办中心</OBreadcrumbItem>
+      <OBreadcrumbItem @click="jump(`/${locale}/todo/${type}`)">{{ t(`collaboration.${type}`) }}</OBreadcrumbItem>
+      <OBreadcrumbItem>{{ todoData?.repo }} </OBreadcrumbItem>
+    </OBreadcrumb>
     <div v-if="todoData" class="todo-detail">
       <div class="title">
         <h2>{{ todoData.repo }}</h2>
@@ -135,7 +161,6 @@ onMounted(() => {
           <OTag :class="todoData.applyStatus.toLocaleLowerCase()">{{ applyStatusConvert(todoData.applyStatus) }} </OTag>
         </div>
       </div>
-
       <h3 class="caption">基本信息</h3>
       <OForm label-width="92px" label-align="top">
         <OFormItem label="申请单号：">
@@ -170,6 +195,7 @@ onMounted(() => {
               :max-length="1000"
               placeholder="请输入审批意见"
               resize="none"
+              :clearable="false"
               :rows="4"
               :input-on-outlimit="false"
               style="width: 480px"
@@ -182,17 +208,42 @@ onMounted(() => {
         </OForm>
       </template>
     </div>
+
+    <!--退出弹窗 -->
+    <ODialog v-model:visible="showDlg" :unmount-on-hide="true" :mask="true" size="small">
+      <template #header>
+        <p class="title">确认退出</p>
+      </template>
+      <p class="revoke-text">退出后输入内容将会丢失，确认是否退出？</p>
+      <template #footer>
+        <div class="dlg-action">
+          <OButton variant="solid" size="large" color="primary" class="upload" @click="confirmExit">确认</OButton>
+          <OButton variant="outline" size="large" color="primary" class="upload" @click="showDlg = false">取消</OButton>
+        </div>
+      </template>
+    </ODialog>
   </ContentWrapper>
 </template>
 
 <style lang="scss" scoped>
 @import '@/assets/style/category/collaboration/index.scss';
+.revoke-text {
+  text-align: center;
+}
+.dlg-action {
+  display: flex;
+  justify-content: center;
+  .o-btn + .o-btn {
+    margin-left: 16px;
+  }
+}
+
 .todo-detail {
   padding: 32px 40px;
   background: var(--o-color-fill2);
   box-shadow: var(--o-shadow-1);
   margin: 24px 0 0;
-  min-height: calc(var(--layout-content-min-height) - 24px);
+  min-height: calc(var(--layout-content-min-height) - 154px);
   .title {
     display: flex;
     align-items: center;

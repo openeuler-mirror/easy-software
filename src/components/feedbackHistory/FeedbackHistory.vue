@@ -159,7 +159,7 @@ const handleCurrentChange = (page: number) => {
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  margin: 40px 0;
+  margin: 24px 0;
   :deep(.el-input) {
     --el-input-text-color: var(--o-color-info1);
   }

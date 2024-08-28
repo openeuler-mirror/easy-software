@@ -76,6 +76,20 @@ export const applicationType = [
     children: ['贡献人员多', '贡献人员少'],
   },
 ];
+// 能申请的类型
+export const applicationTypeCurrent = [
+  {
+    id: 'cveStatus',
+    label: 'CVE状态',
+    children: ['有CVE且全部未修复', '有CVE部分修复', '有CVE且全部修复', '没有CVE问题'],
+  },
+  {
+    id: 'versionStatus',
+    label: '软件包版本状态',
+    children: ['版本正常', '落后版本'],
+  },
+];
+
 
 export const kindTypes = ['everything-exclude-baseos', 'epol', 'baseos']
 

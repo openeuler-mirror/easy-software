@@ -1,10 +1,15 @@
 <script lang="ts" setup>
 import { ref, onMounted, computed, watch } from 'vue';
 import { ODialog, OTable, OTag } from '@opensig/opendesign';
+import { useLocale } from '@/composables/useLocale';
 import { useUserInfoStore } from '@/stores/user';
 import { getMaintainerApply, getAdminApply } from '@/api/api-collaboration';
 import { formatDateTime } from '@/utils/common';
 import { applicationTypeConvert, applyStatusConvert, versionLatestStatusConvert } from '@/utils/collaboration';
+
+import { ElPagination, ElConfigProvider } from 'element-plus';
+import zhCn from 'element-plus/es/locale/lang/zh-cn';
+import English from 'element-plus/es/locale/lang/en';
 
 import { COUNT_PAGESIZE } from '@/data/query';
 
@@ -15,6 +20,7 @@ const props = defineProps({
   },
 });
 
+const { isZh } = useLocale();
 const showDlg = ref(true);
 const userInfoStore = useUserInfoStore();
 const isMainPer = computed(() => userInfoStore.platformMaintainerPermission);
@@ -56,17 +62,14 @@ const queryMaintainerApply = () => {
   isLoading.value = true;
   getMaintainerApply(searchParams.value)
     .then((res) => {
-      if (res.data.list.length > 0) {
-        reposData.value = res.data.list;
-        total.value = res.data.total;
-      } else {
-        reposData.value = [];
-      }
+      reposData.value = res.data.list;
+      total.value = res.data.total;
 
       isLoading.value = false;
     })
     .catch(() => {
       reposData.value = [];
+      total.value = 0;
       isLoading.value = false;
     });
 };
@@ -75,17 +78,14 @@ const queryAdminApply = () => {
   isLoading.value = true;
   getAdminApply(searchParams.value)
     .then((res) => {
-      if (res.data.list.length > 0) {
-        reposData.value = res.data.list;
-        total.value = res.data.total;
-      } else {
-        reposData.value = [];
-      }
+      reposData.value = res.data.list;
+      total.value = res.data.total;
 
       isLoading.value = false;
     })
     .catch(() => {
       reposData.value = [];
+      total.value = 0;
       isLoading.value = false;
     });
 };
@@ -131,36 +131,54 @@ watch(
       <p class="title">反馈历史</p>
     </template>
     <div class="feedback-histroy">
-      <OTable :columns="columns" :data="reposData" :loading="isLoading" border="row" :small="true">
-        <template #head="{ columns }">
-          <th v-for="item in columns" :key="item.type" :class="item.type">{{ item.label }}</th>
-        </template>
-        <template #td_updateAt="{ row }">
-          {{ formatDateTime(row.updateAt) }}
-        </template>
-        <template #td_metric="{ row }">
-          {{ applicationTypeConvert(row.metric) }}
-        </template>
-        <template #td_metricStatus="{ row }">
-          {{ versionLatestStatusConvert(row.metricStatus) }}
-        </template>
-        <template #td_description="{ row }">
-          <div :title="row.description" class="td-nowrap">{{ row.description }}</div>
-        </template>
-        <template #td_applyIdString="{ row }">
-          <div :title="row.applyIdString" class="td-nowrap">{{ row.applyIdString }}</div>
-        </template>
-        <template #td_comment="{ row }">
-          <div :title="row.comment" class="td-nowrap">{{ row.comment }}</div>
-        </template>
-        <template #td_applyStatus="{ row }">
-          <div class="apply-status">
-            <OTag v-if="row.applyStatus" :class="row.applyStatus?.toLocaleLowerCase()">{{ applyStatusConvert(row.applyStatus) }} </OTag>
-          </div>
-        </template>
-      </OTable>
+      <div class="histroy-table">
+        <OTable :columns="columns" :data="reposData" :loading="isLoading" border="row" :small="true">
+          <template #head="{ columns }">
+            <th v-for="item in columns" :key="item.type" :class="item.type">{{ item.label }}</th>
+          </template>
+          <template #td_updateAt="{ row }">
+            {{ formatDateTime(row.updateAt, true) }}
+          </template>
+          <template #td_metric="{ row }">
+            {{ applicationTypeConvert(row.metric) }}
+          </template>
+          <template #td_metricStatus="{ row }">
+            {{ versionLatestStatusConvert(row.metricStatus) }}
+          </template>
+          <template #td_administrator="{ row }">
+            {{ row.administrator ?? '-' }}
+          </template>
+          <template #td_description="{ row }">
+            <TableShowOverflowTips v-if="row.description" :content="row.description" :line="1" />
+            <template v-else>-</template>
+          </template>
+          <template #td_applyIdString="{ row }">
+            <TableShowOverflowTips v-if="row.applyIdString" :content="row.applyIdString" :line="1" />
+            <template v-else>-</template>
+          </template>
+          <template #td_comment="{ row }">
+            <TableShowOverflowTips v-if="row.comment" :content="row.comment" :line="1" />
+            <template v-else>-</template>
+          </template>
+          <template #td_applyStatus="{ row }">
+            <div class="apply-status">
+              <OTag v-if="row.applyStatus" :class="row.applyStatus?.toLocaleLowerCase()">{{ applyStatusConvert(row.applyStatus) }} </OTag>
+            </div>
+          </template>
+        </OTable>
+      </div>
       <div v-if="total > COUNT_PAGESIZE[0]" class="pagination-box">
-        <AppPagination :current="currentPage" :pagesize="pageSize" :total="total" @size-change="handleSizeChange" @current-change="handleCurrentChange" />
+        <el-config-provider :locale="isZh ? zhCn : English">
+          <el-pagination
+            :current-page="currentPage"
+            background
+            layout="total , prev, pager, next, jumper"
+            :total="total"
+            :page-sizes="COUNT_PAGESIZE"
+            @size-change="handleSizeChange"
+            @current-change="handleCurrentChange"
+          />
+        </el-config-provider>
       </div>
     </div>
   </ODialog>
@@ -168,9 +186,16 @@ watch(
 
 <style lang="scss" scoped>
 @import '@/assets/style/category/collaboration/index.scss';
+.pagination-box {
+  margin-top: 24px;
+  display: flex;
+  justify-content: end;
+}
 .feedback-histroy {
-  border: 1px solid var(--o-color-control4);
-  border-radius: 4px;
+  .histroy-table {
+    border: 1px solid var(--o-color-control4);
+    border-radius: 4px;
+  }
   :deep(.o-table) {
     .o-table-wrap {
       overflow-x: auto;

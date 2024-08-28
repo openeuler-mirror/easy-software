@@ -212,46 +212,52 @@ onMounted(() => {
     <AppLoading :loading="isLoading" />
     <!-- 我的申请 -->
     <div v-if="activeName === 'application' && !isError" class="application">
-      <ApprovalTable
-        :columns="applicationColumns"
-        @queryData="queryMyApplication"
-        :filterable-columns="['repo', 'metric', 'applyStatus']"
-        :type="activeName"
-        :data="applicationData"
-        :loading="isLoading"
-        @revoke="revokeApplication"
-      />
-      <div v-if="total > COUNT_PAGESIZE[0]" class="pagination-box">
-        <AppPagination :current="currentPage" :pagesize="pageSize" :total="total" @size-change="handleSizeChange" @current-change="handleCurrentChange" />
-      </div>
+      <template v-if="!isLoading">
+        <ApprovalTable
+          :columns="applicationColumns"
+          @queryData="queryMyApplication"
+          :filterable-columns="['repo', 'metric', 'applyStatus']"
+          :type="activeName"
+          :data="applicationData"
+          :loading="isLoading"
+          @revoke="revokeApplication"
+        />
+        <div v-if="total > COUNT_PAGESIZE[0]" class="pagination-box">
+          <AppPagination :current="currentPage" :pagesize="pageSize" :total="total" @size-change="handleSizeChange" @current-change="handleCurrentChange" />
+        </div>
+      </template>
     </div>
     <!-- 判断admin权限 -->
     <template v-if="isAdminPermission">
       <div v-if="activeName === 'approval' && !isError" class="approval">
-        <ApprovalTable
-          :columns="approvalColumns"
-          @queryData="queryApprovalApply"
-          :filterable-columns="['repo', 'metric']"
-          :type="activeName"
-          :data="approvalData"
-          :loading="isLoading"
-        />
-        <div v-if="total > COUNT_PAGESIZE[0]" class="pagination-box">
-          <AppPagination :current="currentPage" :pagesize="pageSize" :total="total" @size-change="handleSizeChange" @current-change="handleCurrentChange" />
-        </div>
+        <template v-if="!isLoading">
+          <ApprovalTable
+            :columns="approvalColumns"
+            @queryData="queryApprovalApply"
+            :filterable-columns="['repo', 'metric']"
+            :type="activeName"
+            :data="approvalData"
+            :loading="isLoading"
+          />
+          <div v-if="total > COUNT_PAGESIZE[0]" class="pagination-box">
+            <AppPagination :current="currentPage" :pagesize="pageSize" :total="total" @size-change="handleSizeChange" @current-change="handleCurrentChange" />
+          </div>
+        </template>
       </div>
       <div v-if="activeName === 'approved' && !isError" class="approved">
-        <ApprovalTable
-          :columns="approvalHistoryColumns"
-          @queryData="queryApprovedApply"
-          :filterable-columns="['repo', 'metric']"
-          :type="activeName"
-          :data="approvedData"
-          :loading="isLoading"
-        />
-        <div v-if="total > COUNT_PAGESIZE[0]" class="pagination-box">
-          <AppPagination :current="currentPage" :pagesize="pageSize" :total="total" @size-change="handleSizeChange" @current-change="handleCurrentChange" />
-        </div>
+        <template v-if="!isLoading">
+          <ApprovalTable
+            :columns="approvalHistoryColumns"
+            @queryData="queryApprovedApply"
+            :filterable-columns="['repo', 'metric']"
+            :type="activeName"
+            :data="approvedData"
+            :loading="isLoading"
+          />
+          <div v-if="total > COUNT_PAGESIZE[0]" class="pagination-box">
+            <AppPagination :current="currentPage" :pagesize="pageSize" :total="total" @size-change="handleSizeChange" @current-change="handleCurrentChange" />
+          </div>
+        </template>
       </div>
     </template>
 
@@ -268,7 +274,7 @@ onMounted(() => {
 
 <style lang="scss" scoped>
 .pagination-box {
-  margin-top: 24px;
+  margin-top: 32px;
   display: flex;
   justify-content: end;
 }
@@ -297,16 +303,15 @@ onMounted(() => {
 .todo-content {
   position: relative;
   min-height: calc(var(--layout-content-min-height) - 200px);
-  margin: 24px auto;
+  margin: 0 auto;
   max-width: var(--layout-content-max-width);
-  padding-left: var(--layout-content-padding);
-  padding-right: var(--layout-content-padding);
+  padding: 24px var(--layout-content-padding) 72px;
 }
 .approval,
 .approved {
   :deep(thead) {
     .operation {
-      width: 112px;
+      width: 115px;
     }
   }
 }

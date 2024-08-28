@@ -4,7 +4,7 @@ import { OTable, OLink, OTag, ODialog, OButton, OPopup, OIcon, OPopover } from '
 import { useLocale } from '@/composables/useLocale';
 import { formatDateTime } from '@/utils/common';
 import { useRouter, useRoute } from 'vue-router';
-import { applicationType, applyStatusType } from '@/data/todo';
+import { applicationTypeCurrent, applyStatusType } from '@/data/todo';
 import { applicationTypeConvert, applyStatusConvert, versionLatestStatusConvert } from '@/utils/collaboration';
 import { useUserInfoStore } from '@/stores/user';
 import { onClickOutside } from '@vueuse/core';
@@ -75,7 +75,7 @@ const filterParams = reactive(
 watch(filterParams, (params) => emits('queryData', params));
 
 const filterableColSet = computed(() => new Set(props.filterableColumns));
-const applyTypes = applicationType.map((item) => ({ label: item.label, value: item.id }));
+const applyTypes = applicationTypeCurrent.map((item) => ({ label: item.label, value: item.id }));
 
 const filterIconRefs = ref(new Array<ComponentPublicInstance>(props.columns.length));
 
@@ -217,7 +217,7 @@ const revoke = () => {
         </template>
       </template>
       <template #td_updateAt="{ row }">
-        {{ formatDateTime(row.updateAt) }}
+        {{ formatDateTime(row.updateAt, true) }}
       </template>
       <template #td_metric="{ row }">
         {{ applicationTypeConvert(row.metric) }}
@@ -226,10 +226,14 @@ const revoke = () => {
         {{ versionLatestStatusConvert(row.metricStatus) }}
       </template>
       <template #td_comment="{ row }">
-        <div class="line-clamp">{{ row.comment }}</div>
+        <TableShowOverflowTips v-if="row.comment" :content="row.comment" />
+        <template v-else>-</template>
+      </template>
+      <template #td_administrator="{ row }">
+        {{ row.administrator ?? '-' }}
       </template>
       <template #td_description="{ row }">
-        <div class="line-clamp">{{ row.description }}</div>
+        <TableShowOverflowTips v-if="row.description" :content="row.description" />
       </template>
 
       <template #td_applyStatus="{ row }">
@@ -297,14 +301,6 @@ const revoke = () => {
     margin-left: 24px;
   }
 }
-.line-clamp {
-  display: -webkit-box;
-  overflow: hidden;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  position: relative;
-  word-break: break-all;
-}
 
 :deep(.o-table) {
   .td-break {
@@ -330,7 +326,7 @@ thead {
   .metric,
   .metricStatus,
   .description {
-    width: 150px;
+    width: 140px;
   }
   .applyStatus {
     width: 130px;
@@ -348,7 +344,7 @@ thead {
     width: 180px;
   }
   .updateAt {
-    width: 130px;
+    width: 178px;
   }
   .operation {
     width: 220px;

@@ -74,7 +74,7 @@ initSensor();
 
   --layout-screen-height: 100vh;
 
-  --layout-content-min-height: calc(var(--layout-screen-height) - var(--layout-header-height));
+  --layout-content-min-height: calc(var(--layout-screen-height) - var(--layout-header-height) - var(--layout-footer-height));
 
   @include respond-to('<=laptop') {
     --layout-header-max-width: 100%;
