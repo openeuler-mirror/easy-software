@@ -7,6 +7,7 @@ import ExternalLink from '@/components/ExternalLink.vue';
 import Indicators from '@/components/collaboration/Indicators.vue';
 import StatusFeedback from '@/components/collaboration/StatusFeedback.vue';
 import Result404 from '@/components/Result404.vue';
+import { COUNT_PAGESIZE } from '@/data/query';
 
 import IconOutlink from '~icons/pkg/icon-outlink.svg';
 import IconState from '~icons/pkg/icon-state.svg';
@@ -233,158 +234,162 @@ watch(
       <h1>软件维护详情</h1>
     </ContentWrapper>
   </div>
-  <ContentWrapper vertical-padding="24px" class="collaboration-wrap">
+  <ContentWrapper :vertical-padding="['24px', '72px']" class="collaboration-wrap">
     <AppLoading :loading="isLoading" />
-
-    <div class="indicators">
-      <span @click="showDlg = true" class="text"
-        ><OIcon><IconState /></OIcon>状态指标说明</span
-      >
-      <Indicators v-if="showDlg" @change="showDlg = false" />
-    </div>
-    <div class="platform-main">
-      <OTable :columns="columns" :data="reposData" :loading="loading" border="row" :class="{ admin: isAdminPer }">
-        <template #head="{ columns }">
-          <OPopup
-            trigger="none"
-            style="--popup-radius: 4px"
-            v-for="(item, index) in columns"
-            :key="item.type"
-            :visible="filterSwitches[index]"
-            :unmount-on-hide="false"
-            :offset="-8"
-            position="bl"
-          >
-            <template #target>
-              <th :class="item.type">
-                <div class="header-cell">
-                  {{ item.label }}
-                  <template v-if="item.key !== 'operation'">
-                    <OIcon
-                      :ref="(el) => (filterIconRefs[index] = el as ComponentPublicInstance)"
-                      class="filter-icon"
-                      :style="currentActiveFilterIndices.has(index) ? { color: 'var(--o-color-primary1)' } : {}"
-                      @click="switchFilterVisible(index)"
-                      ><IconFilter
-                    /></OIcon>
-                    <OPopover v-if="currentActiveFilterIndices.has(index) && activeFilterValues[index]" :target="filterIconRefs[index]" trigger="hover">
-                      <p class="bubble-content">
-                        <span class="title">{{ item.label }}:</span>
-                        {{ activeFilterValues[index] }}
-                      </p>
-                    </OPopover>
-                  </template>
-                </div>
-              </th>
-            </template>
-            <div :ref="(el) => setPopupClickoutSideFn(el, index)">
-              <FilterableCheckboxes
-                v-if="item.key === 'repo'"
-                v-model="filterParams[item.key]"
-                :loading="repoFilterLoading"
-                @change="onFilterChange(item.key, index, $event)"
-                :values="allRepos"
-              />
-              <FilterableCheckboxes
-                v-else-if="item.key === 'sigName'"
-                v-model="filterParams[item.key]"
-                :loading="sigFilterLoading"
-                @change="onFilterChange(item.key, index, $event)"
-                :values="allSigs"
-              />
-              <FilterableCheckboxes
-                v-else-if="item.key === 'kind'"
-                v-model="filterParams[item.key]"
-                @change="onFilterChange(item.key, index, $event)"
-                :filterable="false"
-                :values="kindTypes"
-              />
-              <FilterableCheckboxes
-                v-else-if="item.key === 'status'"
-                :filterable="false"
-                v-model="filterParams[item.key]"
-                @change="onFilterChange(item.key, index, $event)"
-                :values="repoStatusArr"
-              />
-              <FilterableCheckboxes
-                v-else
-                v-model="filterParams[item.key]"
-                :filterable="false"
-                @change="onFilterChange(item.key, index, $event)"
-                :values="metricTypes(item.key)"
-              />
-            </div>
-          </OPopup>
-        </template>
-        <template #td_repo="{ row }">
-          <OLink color="primary" class="link-external" hover-underline @click="changeExternalDialog(`${SRCOPENEULER + row.repo}`)"
-            ><span class="text">{{ row.repo }} </span><OIcon><IconOutlink /></OIcon
-          ></OLink>
-        </template>
-        <template #td_issueStatus="{ row }">
-          <OLink color="primary" class="link-external" hover-underline @click="changeExternalDialog(`${SRCOPENEULER + row.repo}/issues`)"
-            ><span class="text">{{ row.issueStatus }}</span> <OIcon><IconOutlink /></OIcon
-          ></OLink>
-        </template>
-        <template #td_prStatus="{ row }">
-          <OLink color="primary" class="link-external" hover-underline @click="changeExternalDialog(`${SRCOPENEULER + row.repo}/pulls`)"
-            ><span class="text">{{ row.prStatus }}</span> <OIcon><IconOutlink /></OIcon
-          ></OLink>
-        </template>
-        <template #td_cveStatus="{ row }">
-          <OLink
-            color="primary"
-            class="link-external"
-            hover-underline
-            @click="changeExternalDialog(`${SRCOPENEULER + row.repo}/issues?single_label_id=85497765`)"
-          >
-            <span class="text">{{ row.cveStatus }}</span> <OIcon><IconOutlink /></OIcon
-          ></OLink>
-        </template>
-        <template #td_status="{ row }">
-          <div class="repo-status">
-            <OTag :class="`type${repoStatusIndex(row.status)}`">{{ row.status }} </OTag>
-          </div>
-        </template>
-        <template #td_versionStatus="{ row }">
-          {{ versionLatestStatusConvert(row.versionStatus) }}
-        </template>
-
-        <template #td_operation="{ row }">
-          <div class="operation-box">
-            <OLink v-if="isMainPer" color="primary" hover-underline @click="changeFeedback(row.repo)">状态反馈</OLink>
-            <OLink color="primary" hover-underline @click="changeFeedbackHistory(row.repo)">反馈历史</OLink>
-          </div>
-        </template>
-      </OTable>
-
-      <div class="pagination-box">
-        <AppPagination :current="currentPage" :pagesize="pageSize" :total="total" @size-change="handleSizeChange" @current-change="handleCurrentChange" />
+    <template v-if="!isLoading">
+      <div class="indicators">
+        <span @click="showDlg = true" class="text"
+          ><OIcon><IconState /></OIcon>状态指标说明</span
+        >
+        <Indicators v-if="showDlg" @change="showDlg = false" />
       </div>
-    </div>
-    <!-- 暂无记录 -->
-    <template v-if="isError">
-      <Result404>
-        <template #description>
-          <p class="text404">暂无记录</p>
-        </template>
-      </Result404>
+      <div class="platform-main">
+        <OTable :columns="columns" :data="reposData" :loading="loading" border="row" :class="{ admin: isAdminPer }">
+          <template #head="{ columns }">
+            <OPopup
+              trigger="none"
+              style="--popup-radius: 4px"
+              v-for="(item, index) in columns"
+              :key="item.type"
+              :visible="filterSwitches[index]"
+              :unmount-on-hide="false"
+              :offset="-8"
+              position="bl"
+            >
+              <template #target>
+                <th :class="item.type">
+                  <div class="header-cell">
+                    {{ item.label }}
+                    <template v-if="item.key !== 'operation'">
+                      <OIcon
+                        :ref="(el) => (filterIconRefs[index] = el as ComponentPublicInstance)"
+                        class="filter-icon"
+                        :style="currentActiveFilterIndices.has(index) ? { color: 'var(--o-color-primary1)' } : {}"
+                        @click="switchFilterVisible(index)"
+                        ><IconFilter
+                      /></OIcon>
+                      <OPopover v-if="currentActiveFilterIndices.has(index) && activeFilterValues[index]" :target="filterIconRefs[index]" trigger="hover">
+                        <p class="bubble-content">
+                          <span class="title">{{ item.label }}:</span>
+                          {{ activeFilterValues[index] }}
+                        </p>
+                      </OPopover>
+                    </template>
+                  </div>
+                </th>
+              </template>
+              <div :ref="(el) => setPopupClickoutSideFn(el, index)">
+                <FilterableCheckboxes
+                  v-if="item.key === 'repo'"
+                  v-model="filterParams[item.key]"
+                  :loading="repoFilterLoading"
+                  @change="onFilterChange(item.key, index, $event)"
+                  :values="allRepos"
+                />
+                <FilterableCheckboxes
+                  v-else-if="item.key === 'sigName'"
+                  v-model="filterParams[item.key]"
+                  :loading="sigFilterLoading"
+                  @change="onFilterChange(item.key, index, $event)"
+                  :values="allSigs"
+                />
+                <FilterableCheckboxes
+                  v-else-if="item.key === 'kind'"
+                  v-model="filterParams[item.key]"
+                  @change="onFilterChange(item.key, index, $event)"
+                  :filterable="false"
+                  :values="kindTypes"
+                />
+                <FilterableCheckboxes
+                  v-else-if="item.key === 'status'"
+                  :filterable="false"
+                  v-model="filterParams[item.key]"
+                  @change="onFilterChange(item.key, index, $event)"
+                  :values="repoStatusArr"
+                />
+                <FilterableCheckboxes
+                  v-else
+                  v-model="filterParams[item.key]"
+                  :filterable="false"
+                  @change="onFilterChange(item.key, index, $event)"
+                  :values="metricTypes(item.key)"
+                />
+              </div>
+            </OPopup>
+          </template>
+          <template #td_repo="{ row }">
+            <OLink color="primary" class="link-external" hover-underline @click="changeExternalDialog(`${SRCOPENEULER + row.repo}`)"
+              ><span class="text">{{ row.repo }} </span><OIcon><IconOutlink /></OIcon
+            ></OLink>
+          </template>
+          <template #td_issueStatus="{ row }">
+            <OLink color="primary" class="link-external" hover-underline @click="changeExternalDialog(`${SRCOPENEULER + row.repo}/issues`)"
+              ><span class="text">{{ row.issueStatus }}</span> <OIcon><IconOutlink /></OIcon
+            ></OLink>
+          </template>
+          <template #td_prStatus="{ row }">
+            <OLink color="primary" class="link-external" hover-underline @click="changeExternalDialog(`${SRCOPENEULER + row.repo}/pulls`)"
+              ><span class="text">{{ row.prStatus }}</span> <OIcon><IconOutlink /></OIcon
+            ></OLink>
+          </template>
+          <template #td_cveStatus="{ row }">
+            <OLink
+              color="primary"
+              class="link-external"
+              hover-underline
+              @click="changeExternalDialog(`${SRCOPENEULER + row.repo}/issues?single_label_id=85497765`)"
+            >
+              <span class="text">{{ row.cveStatus }}</span> <OIcon><IconOutlink /></OIcon
+            ></OLink>
+          </template>
+          <template #td_status="{ row }">
+            <div class="repo-status">
+              <OTag :class="`type${repoStatusIndex(row.status)}`">{{ row.status }} </OTag>
+            </div>
+          </template>
+          <template #td_versionStatus="{ row }">
+            {{ versionLatestStatusConvert(row.versionStatus) }}
+          </template>
+
+          <template #td_operation="{ row }">
+            <div class="operation-box">
+              <OLink v-if="isMainPer" color="primary" hover-underline @click="changeFeedback(row.repo)">状态反馈</OLink>
+              <OLink color="primary" hover-underline @click="changeFeedbackHistory(row.repo)">反馈历史</OLink>
+            </div>
+          </template>
+        </OTable>
+
+        <div v-if="total > COUNT_PAGESIZE[0]" class="pagination-box">
+          <AppPagination :current="currentPage" :pagesize="pageSize" :total="total" @size-change="handleSizeChange" @current-change="handleCurrentChange" />
+        </div>
+      </div>
+      <!-- 暂无记录 -->
+      <template v-if="isError">
+        <Result404>
+          <template #description>
+            <p class="text404">暂无记录</p>
+          </template>
+        </Result404>
+      </template>
+
+      <!-- 跳转外部链接提示 -->
+      <ExternalLink v-if="showExternalDlg" :href="externalLink" @change="showExternalDlg = false" />
+      <!-- 状态反馈 -->
+
+      <StatusFeedback :repo="repoValue" v-if="showFeedbackDlg" @close="showFeedbackDlg = false" />
+
+      <!-- 反馈历史 -->
+      <FeedbackHistroy v-if="showFeedbacHistroykDlg" :repo="repoValue" @close="showFeedbacHistroykDlg = false" />
     </template>
-
-    <!-- 跳转外部链接提示 -->
-    <ExternalLink v-if="showExternalDlg" :href="externalLink" @change="showExternalDlg = false" />
-    <!-- 状态反馈 -->
-
-    <StatusFeedback :repo="repoValue" v-if="showFeedbackDlg" @close="showFeedbackDlg = false" />
-
-    <!-- 反馈历史 -->
-    <FeedbackHistroy v-if="showFeedbacHistroykDlg" :repo="repoValue" @close="showFeedbacHistroykDlg = false" />
   </ContentWrapper>
 </template>
 
 <style scoped lang="scss">
 @import '@/assets/style/category/collaboration/index.scss';
-
+.collaboration-wrap {
+  position: relative;
+  min-height: calc(var(--layout-content-min-height) - 154px);
+}
 .header-cell {
   position: relative;
   display: flex;
@@ -480,7 +485,7 @@ watch(
         &:first-child {
           left: 0;
           &::before {
-            right: 0;
+            right: -9px;
             transform: scaleX(-1);
             @include liner;
           }
@@ -516,7 +521,7 @@ watch(
       &:first-child {
         left: 0;
         &::before {
-          right: 0;
+          right: -7px;
           transform: scaleX(-1);
           @include liner;
         }
@@ -562,7 +567,7 @@ watch(
 }
 
 .pagination-box {
-  margin-top: 24px;
+  margin-top: 32px;
   display: flex;
   justify-content: end;
 }

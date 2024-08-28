@@ -74,8 +74,8 @@ const jump = (href: string) => {
             <img :src="isDark ? openeulerLogoDark : openeulerLogo" />
           </a>
           <ODivider direction="v" :darker="true" />
-          <span v-if="isCollaboration" class="logo-text">{{ t('software.softwareHome') }}协作平台</span>
-          <span v-else @click="goHome" class="logo-text">{{ t('software.softwareHome') }}</span>
+          <span @click="goHome" class="logo-text">{{ t('software.softwareHome') }}</span>
+          <span v-if="isCollaboration" class="collaboration-text">协作平台</span>
         </div>
         <HeaderNav v-if="route.name" :options="isCollaboration ? collaborationNav : navs" />
       </div>
@@ -115,6 +115,13 @@ const jump = (href: string) => {
       color: var(--o-color-info1);
       font-weight: bold;
       cursor: pointer;
+      @include h4;
+    }
+    .collaboration-text {
+      color: var(--o-color-info1);
+      font-weight: bold;
+      margin-left: 48px;
+      cursor: default;
       @include h4;
     }
     .header-left,

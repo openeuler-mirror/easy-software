@@ -23,12 +23,11 @@ const jumpAccount = () => {
     <Result404>
       <template #description>
         <template v-if="isGiteeAccount && (!isAdminPer || !isMaintainerPer)">
-          <div class="content">无权限访问协作平台</div>
+          <div class="content">您无权限访问协作平台</div>
         </template>
         <template v-else>
           <div class="content">
-            <p>如果您是Maintainer</p>
-            <p>想要获取相关信息，请先前往个人中心-账号绑定 绑定您的Gitee账号</p>
+            <p>如果您是Maintainer,请先前往个人中心-账号绑定 绑定您的Gitee账号, 以获取软件包维护详情信息</p>
           </div>
           <OButton variant="solid" size="large" color="primary" @click="jumpAccount">前往绑定</OButton>
         </template>

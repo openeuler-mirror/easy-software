@@ -91,7 +91,7 @@ const data = [
 const applicationTypeDesc: Record<string, string[]> = {
   cveStatus: [],
   issueStatus: ['所有Issue都没有被修复', '一部分Issue被修复了，一部分Issue没有修复', '所有Issue都被修复了'],
-  prStatus: ['-', '有PR提交，且都没有被合入代码仓', '有PR提及，且有PR被合入到代码仓'],
+  prStatus: ['-', '有PR提交，且都没有被合入代码仓', '有PR提交，且有PR被合入到代码仓'],
   versionStatus: ['软件包版本与上游版本一致', '软件包版本比上游版本低'],
   orgStatus: ['参与贡献组织数 > 5人', '参与贡献组织数 <= 5人'],
   contributorStatus: ['参与贡献人数 > 10人', '参与贡献人数 <= 10人'],
@@ -102,8 +102,6 @@ const indicatorsInfo = computed(() => {
     return { ...item, desc: applicationTypeDesc[item.id] || [] };
   });
 });
-
-console.log('indicatorsInfo', indicatorsInfo.value);
 
 // 单元格合并
 const cellSpanFn = (rowIdx: number, colIdx: number) => {
