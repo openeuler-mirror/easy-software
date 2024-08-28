@@ -14,7 +14,7 @@ import IconState from '~icons/pkg/icon-state.svg';
 import IconFilter from '~icons/app/icon-filter.svg';
 import FilterableCheckboxes from '@/components/FilterableCheckboxes.vue';
 import { kindTypes, applicationType } from '@/data/todo';
-import { onClickOutside, useDebounceFn } from '@vueuse/core';
+import { onClickOutside } from '@vueuse/core';
 import { repoStatusIndex, repoStatusArr, versionLatestStatusConvert } from '@/utils/collaboration';
 
 const columns = [
@@ -81,7 +81,6 @@ const currentActiveFilterIndices = ref(new Set<number>());
 const onFilterChange = (type: string, index: number, val: string) => {
   // 关掉筛选组件
   filterSwitches.value = columns.map(() => false);
-  currentPage.value = 1;
   if (val) {
     activeFilterValues.value[index] = val;
     currentActiveFilterIndices.value.add(index);
@@ -91,6 +90,11 @@ const onFilterChange = (type: string, index: number, val: string) => {
   }
   if (filterParams.versionStatus === '版本正常') {
     filterParams.versionStatus = '最新版本';
+  }
+  if (currentPage.value !== 1) {
+    currentPage.value = 1;
+  } else {
+    pageInit();
   }
 };
 
@@ -123,7 +127,6 @@ const searchParams = computed(() => {
   return {
     pageNum: currentPage.value,
     pageSize: pageSize.value,
-    ...filterParams,
   };
 });
 
@@ -135,7 +138,7 @@ const isError = ref(false);
 const queryMaintainerRepos = () => {
   isLoading.value = true;
 
-  getMaintainerRepos(searchParams.value)
+  getMaintainerRepos({ ...searchParams.value, ...filterParams })
     .then((res) => {
       reposData.value = res.data.list;
       total.value = res.data.total;
@@ -152,7 +155,7 @@ const queryMaintainerRepos = () => {
 const queryAdminRepos = () => {
   isLoading.value = true;
 
-  getAdminRepos(searchParams.value)
+  getAdminRepos({ ...searchParams.value, ...filterParams })
     .then((res) => {
       reposData.value = res.data.list;
       total.value = res.data.total;
@@ -236,7 +239,6 @@ watch(
   </div>
   <ContentWrapper :vertical-padding="['24px', '72px']" class="collaboration-wrap">
     <AppLoading :loading="isLoading" />
-
     <div class="indicators">
       <span @click="showDlg = true" class="text"
         ><OIcon><IconState /></OIcon>状态指标说明</span

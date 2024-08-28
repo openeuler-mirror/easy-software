@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, ref, type PropType } from 'vue';
+import { computed, onMounted, onUnmounted, ref, watch, type PropType } from 'vue';
 import { useDebounceFn, useVModel } from '@vueuse/core';
 import { OIcon, OInput, ORadio, ORadioGroup, OScroller } from '@opensig/opendesign';
 
@@ -34,8 +34,11 @@ const props = defineProps({
 });
 
 const emit = defineEmits<{
+  (e: 'update:modelValue', val: string): void;
   (event: 'change', val: string): void;
 }>();
+
+const empty = ref(false);
 
 const rawValues = computed(() =>
   props.values.map((val) => {
@@ -55,6 +58,8 @@ const filteredValues = computed(() => {
   const search = searchVal.value.toLowerCase();
   return rawValues.value.filter((val) => val.label.toLowerCase().includes(search));
 });
+
+watch(() => filteredValues.value.length, (len) => empty.value = len <= 0)
 
 const displayCount = ref(30);
 const displayValues = computed(() => {
@@ -99,8 +104,11 @@ const radioVal = useVModel(props, 'modelValue', emit);
       </template>
     </OInput>
     <OScroller class="content" showType="always">
-      <div class="loading-mask" v-show="loading">
+      <div class="mask" v-if="loading">
         <OIcon><IconLoading class="o-rotating" /></OIcon>
+      </div>
+      <div class="mask" v-else-if="empty">
+        <p class="info">没有匹配的数据</p>
       </div>
       <div class="check-all-wrap">
         <ORadio @change="$emit('change', $event as string)" v-model="radioVal" :value="''">全选</ORadio>
@@ -113,7 +121,7 @@ const radioVal = useVModel(props, 'modelValue', emit);
 </template>
 
 <style lang="scss" scoped>
-.loading-mask {
+.mask {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -124,6 +132,11 @@ const radioVal = useVModel(props, 'modelValue', emit);
   z-index: 2;
   left: 0;
   top: 0;
+
+  .info {
+    @include tip1;
+    color: var(--o-color-info1);
+  }
 }
 
 .search-icon {
