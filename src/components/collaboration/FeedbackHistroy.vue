@@ -201,6 +201,9 @@ watch(
       overflow-x: auto;
       overflow-y: hidden;
       @include scrollbar;
+      &::-webkit-scrollbar {
+        height: 6px;
+      }
     }
     table {
       table-layout: fixed;

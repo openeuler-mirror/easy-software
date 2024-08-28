@@ -364,6 +364,9 @@ thead {
       overflow-x: auto;
       overflow-y: hidden;
       @include scrollbar;
+      &::-webkit-scrollbar {
+        height: 6px;
+      }
     }
     table {
       table-layout: fixed;
@@ -371,6 +374,17 @@ thead {
 
     tr {
       td {
+        &:first-child {
+          position: sticky;
+          z-index: 2;
+          background: var(--table-bg-color);
+          left: 0;
+          &::before {
+            right: -9px;
+            transform: scaleX(-1);
+            @include liner;
+          }
+        }
         &:last-child {
           width: 220px;
           position: sticky;
@@ -394,6 +408,17 @@ thead {
     }
 
     th {
+      &:first-child {
+        position: sticky;
+        z-index: 2;
+        background: var(--table-head-bg);
+        left: 0;
+        &::before {
+          right: -7px;
+          transform: scaleX(-1);
+          @include liner;
+        }
+      }
       &:last-child {
         width: 220px;
         position: sticky;

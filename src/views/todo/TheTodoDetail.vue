@@ -150,7 +150,7 @@ onMounted(() => {
   <ContentWrapper :verticalPadding="['32px', '72px']">
     <AppLoading :loading="isLoading" />
     <OBreadcrumb class="app-breadcrumb">
-      <OBreadcrumbItem @click="jump(`/${locale}/todo/application`)">待办中心</OBreadcrumbItem>
+      <OBreadcrumbItem @click="jump(`/${locale}/todo/${isMaintainerPer ? 'application' : 'approval'}`)">待办中心</OBreadcrumbItem>
       <OBreadcrumbItem @click="jump(`/${locale}/todo/${type}`)">{{ t(`collaboration.${type}`) }}</OBreadcrumbItem>
       <OBreadcrumbItem>{{ todoData?.repo }} </OBreadcrumbItem>
     </OBreadcrumb>
@@ -217,8 +217,8 @@ onMounted(() => {
       <p class="revoke-text">退出后输入内容将会丢失，确认是否退出？</p>
       <template #footer>
         <div class="dlg-action">
-          <OButton variant="solid" size="large" color="primary" class="upload" @click="confirmExit">确认</OButton>
-          <OButton variant="outline" size="large" color="primary" class="upload" @click="showDlg = false">取消</OButton>
+          <OButton variant="outline" size="large" color="primary" class="upload" @click="confirmExit">确认</OButton>
+          <OButton variant="solid" size="large" color="primary" class="upload" @click="showDlg = false">取消</OButton>
         </div>
       </template>
     </ODialog>
