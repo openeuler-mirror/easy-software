@@ -82,11 +82,9 @@ const onFilterChange = (type: string, index: number, val: string) => {
   filterSwitches.value = columns.map(() => false);
   currentPage.value = 1;
   if (val) {
-    filterParams[type] = val;
     activeFilterValues.value[index] = val;
     currentActiveFilterIndices.value.add(index);
   } else {
-    filterParams[type] = '';
     activeFilterValues.value[index] = '';
     currentActiveFilterIndices.value.delete(index);
   }
@@ -269,11 +267,7 @@ watch(
                       @click="switchFilterVisible(index)"
                       ><IconFilter
                     /></OIcon>
-                    <OPopover
-                      v-if="currentActiveFilterIndices.has(index) && activeFilterValues[index]"
-                      :target="filterIconRefs[index]"
-                      trigger="hover"
-                    >
+                    <OPopover v-if="currentActiveFilterIndices.has(index) && activeFilterValues[index]" :target="filterIconRefs[index]" trigger="hover">
                       <p class="bubble-content">
                         <span class="title">{{ item.label }}:</span>
                         {{ activeFilterValues[index] }}
@@ -286,19 +280,39 @@ watch(
             <div :ref="(el) => setPopupClickoutSideFn(el, index)">
               <FilterableCheckboxes
                 v-if="item.key === 'repo'"
+                v-model="filterParams[item.key]"
                 :loading="repoFilterLoading"
                 @change="onFilterChange(item.key, index, $event)"
                 :values="allRepos"
               />
               <FilterableCheckboxes
                 v-else-if="item.key === 'sigName'"
+                v-model="filterParams[item.key]"
                 :loading="sigFilterLoading"
                 @change="onFilterChange(item.key, index, $event)"
                 :values="allSigs"
               />
-              <FilterableCheckboxes v-else-if="item.key === 'kind'" @change="onFilterChange(item.key, index, $event)" :filterable="false" :values="kindTypes" />
-              <FilterableCheckboxes v-else-if="item.key === 'status'" @change="onFilterChange(item.key, index, $event)" :values="repoStatusArr" />
-              <FilterableCheckboxes v-else :filterable="false" @change="onFilterChange(item.key, index, $event)" :values="metricTypes(item.key)" />
+              <FilterableCheckboxes
+                v-else-if="item.key === 'kind'"
+                v-model="filterParams[item.key]"
+                @change="onFilterChange(item.key, index, $event)"
+                :filterable="false"
+                :values="kindTypes"
+              />
+              <FilterableCheckboxes
+                v-else-if="item.key === 'status'"
+                :filterable="false"
+                v-model="filterParams[item.key]"
+                @change="onFilterChange(item.key, index, $event)"
+                :values="repoStatusArr"
+              />
+              <FilterableCheckboxes
+                v-else
+                v-model="filterParams[item.key]"
+                :filterable="false"
+                @change="onFilterChange(item.key, index, $event)"
+                :values="metricTypes(item.key)"
+              />
             </div>
           </OPopup>
         </template>
