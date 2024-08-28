@@ -1,16 +1,15 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref, watch, type PropType } from 'vue';
 import { useDebounceFn } from '@vueuse/core';
-import { OCheckbox, OCheckboxGroup, OIcon, OInput, OScroller } from '@opensig/opendesign';
+import { OIcon, OInput, ORadio, ORadioGroup, OScroller } from '@opensig/opendesign';
 
 import IconSearch from '~icons/app/icon-search.svg';
-import { useCheckbox } from '@/composables/useCheckbox';
 import IconLoading from '~icons/app/icon-loading.svg';
 
 type ValueT = string | { label: string; value: string };
 
 const props = defineProps({
-  /** 是否显示筛选输入 */
+  /** 是否显示搜索 */
   filterable: {
     type: Boolean,
     default: true,
@@ -31,7 +30,7 @@ const props = defineProps({
 });
 
 const emit = defineEmits<{
-  (event: 'change', val: { values: (string | number)[]; isCheckAll: boolean }): void;
+  (event: 'change', val: string): void;
 }>();
 
 const rawValues = computed(() =>
@@ -83,12 +82,9 @@ const onFilterInput = useDebounceFn((search?: string) => {
   searchVal.value = search;
 }, props.filterDebounceTimeout);
 
-const { checkboxes, parentCheckbox, indeterminate, isCheckedAll } = useCheckbox(
-  () => rawValues.value,
-  (item) => item.value
-);
+const radioVal = ref('');
 
-watch(checkboxes, (values) => emit('change', { values, isCheckAll: isCheckedAll.value }));
+watch(radioVal, (val) => emit('change', val));
 </script>
 
 <template>
@@ -105,11 +101,11 @@ watch(checkboxes, (values) => emit('change', { values, isCheckAll: isCheckedAll.
         <OIcon><IconLoading class="o-rotating" /></OIcon>
       </div>
       <div class="check-all-wrap">
-        <OCheckbox v-model="parentCheckbox" :indeterminate="indeterminate" :value="1">全选</OCheckbox>
+        <ORadio v-model="radioVal" :value="''">全选</ORadio>
       </div>
-      <OCheckboxGroup v-model="checkboxes" direction="v">
-        <OCheckbox v-for="item in displayValues" :key="item.value" :value="item.value">{{ item.label }}</OCheckbox>
-      </OCheckboxGroup>
+      <ORadioGroup v-model="radioVal" direction="v">
+        <ORadio v-for="item in displayValues" :key="item.value" :value="item.value">{{ item.label }}</ORadio>
+      </ORadioGroup>
     </OScroller>
   </div>
 </template>

@@ -50,12 +50,7 @@ const sigFilterLoading = ref(false);
 
 /** 切换某个筛选组件显示开关 */
 const switchFilterVisible = (index: number) => {
-  filterSwitches.value = columns.map((_, idx) => {
-    if (idx === index) {
-      return !filterSwitches.value[idx];
-    }
-    return false;
-  });
+  filterSwitches.value[index] = true;
   if (index === 0) {
     // 筛选仓库
     repoFilterLoading.value = true;
@@ -73,32 +68,28 @@ const switchFilterVisible = (index: number) => {
 };
 
 /** 各表格列对应的已选中的筛选项 */
-const activeFilterValues = ref(new Array<string[]>(columns.length));
+const activeFilterValues = ref(new Array<string>(columns.length));
 
 /** 当前有选中筛选项的表格列的数组下标 */
 const currentActiveFilterIndices = ref(new Set<number>());
 
-const onFilterChange = useDebounceFn((type: string, index: number, val: { values: (string | number)[]; isCheckAll: boolean }) => {
+const onFilterChange = (type: string, index: number, val: string) => {
   // 关掉筛选组件
   filterSwitches.value = columns.map(() => false);
   currentPage.value = 1;
-  if (val.values.length > 0) {
+  if (val) {
+    filterParams[type] = val;
+    activeFilterValues.value[index] = val;
     currentActiveFilterIndices.value.add(index);
   } else {
-    currentActiveFilterIndices.value.delete(index);
-  }
-  if (val.isCheckAll) {
     filterParams[type] = '';
-    activeFilterValues.value[index] = [];
+    activeFilterValues.value[index] = '';
     currentActiveFilterIndices.value.delete(index);
-  } else {
-    filterParams[type] = val.values.join();
-    activeFilterValues.value[index] = val.values as string[];
   }
   if (filterParams.versionStatus === '版本正常') {
     filterParams.versionStatus = '最新版本';
   }
-}, 300);
+};
 
 const SRCOPENEULER = 'https://gitee.com/src-openeuler/';
 
@@ -112,7 +103,7 @@ const pageSize = ref(10);
 const total = ref(0);
 
 // 筛选条件
-const filterParams = reactive<Record<string, string>>({
+const filterParams = reactive<Record<string, string | number>>({
   repo: '',
   kind: '',
   sigName: '',
@@ -275,13 +266,13 @@ watch(
                       ><IconFilter
                     /></OIcon>
                     <OPopover
-                      v-if="currentActiveFilterIndices.has(index) && activeFilterValues[index].length > 0"
+                      v-if="currentActiveFilterIndices.has(index) && activeFilterValues[index]"
                       :target="filterIconRefs[index]"
                       trigger="hover"
                     >
                       <p class="bubble-content">
                         <span class="title">{{ item.label }}:</span>
-                        {{ activeFilterValues[index]?.join('、') }}
+                        {{ activeFilterValues[index] }}
                       </p>
                     </OPopover>
                   </template>
