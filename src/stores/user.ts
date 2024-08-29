@@ -18,6 +18,12 @@ export const useUserInfoStore = defineStore('userInfo', {
       platformMaintainerPermission: null as boolean | null,
     }
   },
+  getters: {
+    // 判断是否有绑定gitee
+    isGiteeAccount(): boolean {
+      return !!this.identities.find((id) => id.identity === 'gitee');
+    },
+  },
 });
 
 /**

@@ -39,7 +39,7 @@ const columns = [
   { label: '审批人', key: 'administrator', type: 'administrator' },
   { label: '审批意见', key: 'comment', type: 'comment' },
   { label: '申请单号', key: 'applyIdString', type: 'applyId' },
-  { label: '申请时间', key: 'updateAt', type: 'time' },
+  { label: '申请时间', key: 'createdAt', type: 'time' },
 ];
 
 const emits = defineEmits<{
@@ -135,8 +135,8 @@ watch(
           <template #head="{ columns }">
             <th v-for="item in columns" :key="item.type" :class="item.type">{{ item.label }}</th>
           </template>
-          <template #td_updateAt="{ row }">
-            {{ formatDateTime(row.updateAt, true) }}
+          <template #td_createdAt="{ row }">
+            {{ formatDateTime(row.createdAt, true) }}
           </template>
           <template #td_metric="{ row }">
             {{ applicationTypeConvert(row.metric) }}
