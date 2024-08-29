@@ -59,7 +59,7 @@ const filteredValues = computed(() => {
   return rawValues.value.filter((val) => val.label.toLowerCase().includes(search));
 });
 
-watch(() => filteredValues.value.length, (len) => empty.value = len <= 0)
+watch(() => filteredValues.value.length, (len) => empty.value = len <= 0, { immediate: true });
 
 const displayCount = ref(30);
 const displayValues = computed(() => {

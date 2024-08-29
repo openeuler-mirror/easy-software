@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted, computed, reactive } from 'vue';
 import { OTab, OTabPane, useMessage } from '@opensig/opendesign';
 import { useRoute, useRouter } from 'vue-router';
 import { useLocale } from '@/composables/useLocale';
@@ -85,11 +85,20 @@ const handleCurrentChange = (val: number) => {
   pageInit();
 };
 
+const applicationFilterParams = reactive({
+  repo: '',
+  metric: '',
+  applyStatus: '',
+});
+
 // 我的申请
 const queryMyApplication = (params = {}) => {
   isLoading.value = true;
   if (isMaintainerPermission.value) {
     const newData = getParamsRules(todoParams.value);
+    for (const key of Object.keys(params)) {
+      applicationFilterParams[key] = params[key];
+    }
     getMaintainerApply({ ...newData, ...params })
       .then((res) => {
         applicationData.value = res.data.list;
@@ -130,11 +139,19 @@ const revokeApplication = (id: string) => {
     });
 };
 
+const approvalFilterParams = reactive({
+  repo: '',
+  metric: '',
+});
+
 // 待我审批
 const queryApprovalApply = (params = {}) => {
   isLoading.value = true;
   if (isAdminPermission.value) {
     const newData = getParamsRules(todoParams.value);
+    for (const key of Object.keys(params)) {
+      approvalFilterParams[key] = params[key];
+    }
     getAdminApply({ ...newData, ...params })
       .then((res) => {
         approvalData.value = res.data.list;
@@ -153,11 +170,19 @@ const queryApprovalApply = (params = {}) => {
   }
 };
 
+const approvedFilterParams = reactive({
+  repo: '',
+  metric: '',
+});
+
 // 我审批过的
 const queryApprovedApply = (params = {}) => {
   isLoading.value = true;
   if (isAdminPermission.value) {
     const newData = getParamsRules(todoParams.value);
+    for (const key of Object.keys(params)) {
+      approvedFilterParams[key] = params[key];
+    }
     getAdminApply({ ...newData, ...params })
       .then((res) => {
         approvedData.value = res.data.list;
@@ -217,6 +242,7 @@ onMounted(() => {
           :columns="applicationColumns"
           @queryData="queryMyApplication"
           :filterable-columns="['repo', 'metric', 'applyStatus']"
+          :filterParams="applicationFilterParams"
           :type="activeName"
           :data="applicationData"
           :loading="isLoading"
@@ -234,7 +260,7 @@ onMounted(() => {
           <ApprovalTable
             :columns="approvalColumns"
             @queryData="queryApprovalApply"
-            :filterable-columns="['repo', 'metric']"
+            :filterParams="approvalFilterParams"
             :type="activeName"
             :data="approvalData"
             :loading="isLoading"
@@ -249,7 +275,7 @@ onMounted(() => {
           <ApprovalTable
             :columns="approvalHistoryColumns"
             @queryData="queryApprovedApply"
-            :filterable-columns="['repo', 'metric']"
+            :filterParams="approvedFilterParams"
             :type="activeName"
             :data="approvedData"
             :loading="isLoading"
