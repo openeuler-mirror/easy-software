@@ -27,3 +27,5 @@ export interface RevokeT {
   applyIdString: string;
   applyStatus: string;
 }
+
+export type PlatformPermission = ('maintainer' | 'admin')[]

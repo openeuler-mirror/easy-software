@@ -1,3 +1,4 @@
+import type { PlatformPermission } from '@/@types/collaboration';
 import type { Identity } from '@/@types/type-user';
 import { LOGIN_STATUS, type LoginStatusT } from '@/shared/login';
 import { defineStore } from 'pinia';
@@ -12,10 +13,7 @@ export const useUserInfoStore = defineStore('userInfo', {
       photo: '' as string,
       username: '' as string,
       upstreamPermission: null as boolean | null,
-      // 协作平台admin权限
-      platformAdminPermission: null as boolean | null,
-      // 协作平台maintainer权限
-      platformMaintainerPermission: null as boolean | null,
+      platformPermissions: null as PlatformPermission | null,
     }
   },
   getters: {
@@ -23,7 +21,11 @@ export const useUserInfoStore = defineStore('userInfo', {
     isGiteeAccount(): boolean {
       return !!this.identities.find((id) => id.identity === 'gitee');
     },
-  },
+    /** 协作平台admin权限 */
+    platformAdminPermission: (state) => state.platformPermissions?.includes('admin'),
+    /** 协作平台maintainer权限 */
+    platformMaintainerPermission: (state) => state.platformPermissions?.includes('maintainer'),
+  }
 });
 
 /**
