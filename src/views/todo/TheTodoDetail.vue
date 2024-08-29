@@ -34,16 +34,21 @@ const formData = reactive({
 });
 
 // 我的申请
-const queryApplicationApply = () => {
-  getMaintainerApply({ name: 'formContent', applyIdString: applyId.value })
-    .then((res) => {
-      todoData.value = res.data.list[0];
-      isLoading.value = false;
-    })
-    .catch(() => {
-      isError.value = true;
-      isLoading.value = false;
-    });
+const queryApplicationApply = async () => {
+  try {
+    if (isAdminPer.value) {
+      const { data } = await getAdminApply({ name: 'formContent', applyIdString: applyId.value });
+      todoData.value = data.list[0];
+    } else if (isMaintainerPer.value) {
+      const { data } = await getMaintainerApply({ name: 'formContent', applyIdString: applyId.value });
+      todoData.value = data.list[0];
+    }
+
+    isLoading.value = false;
+  } catch {
+    isError.value = true;
+    isLoading.value = false;
+  }
 };
 
 // 待我审批
@@ -104,7 +109,7 @@ const rejected = async () => {
 const queryAdminProcess = () => {
   //不能审批自己提的反馈
   if (adminName.value === todoData.value.maintainer) {
-    return message.danger({
+    return message.warning({
       content: '不能审批自己提的反馈!',
     });
   }

@@ -228,8 +228,8 @@ const revoke = () => {
           </OPopup>
         </template>
       </template>
-      <template #td_updateAt="{ row }">
-        {{ formatDateTime(row.updateAt, true) }}
+      <template #td_createdAt="{ row }">
+        {{ formatDateTime(row.createdAt, true) }}
       </template>
       <template #td_metric="{ row }">
         {{ applicationTypeConvert(row.metric) }}

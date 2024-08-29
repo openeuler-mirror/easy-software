@@ -7,7 +7,6 @@ import { useUserInfoStore } from '@/stores/user';
 const userInfoStore = useUserInfoStore();
 
 // 判断是否绑定gitee
-const isGiteeAccount = computed(() => !!userInfoStore.identities.find((id) => id.identity === 'gitee'));
 const isAdminPer = computed(() => userInfoStore.platformAdminPermission);
 const isMaintainerPer = computed(() => userInfoStore.platformMaintainerPermission);
 
@@ -22,7 +21,7 @@ const jumpAccount = () => {
   <ContentWrapper verticalPadding="40px">
     <Result404>
       <template #description>
-        <template v-if="isGiteeAccount && (!isAdminPer || !isMaintainerPer)">
+        <template v-if="userInfoStore.isGiteeAccount && (!isAdminPer || !isMaintainerPer)">
           <div class="content">您无权限访问协作平台</div>
         </template>
         <template v-else>

@@ -54,7 +54,6 @@ const todoParams = computed(() => {
     pageNum: currentPage.value,
     pageSize: pageSize.value,
     applyStatus: applyStatus.value,
-    timeOrder: 'desc',
   };
 });
 
@@ -123,8 +122,7 @@ const queryMyApplication = async (params: Record<string, string> = {}) => {
       const { data } = await getAdminApply({ ...newData, ...applicationFilterParams });
       applicationData.value = data.list;
       total.value = data.total;
-    }
-    if (isMaintainerPermission.value) {
+    } else if (isMaintainerPermission.value) {
       const { data } = await getMaintainerApply({ ...newData, ...applicationFilterParams });
       applicationData.value = data.list;
       total.value = data.total;
@@ -152,8 +150,7 @@ const revokeApplication = async (id: string) => {
         });
         pageInit();
       }
-    }
-    if (isMaintainerPermission.value) {
+    } else if (isMaintainerPermission.value) {
       const res = await getMaintainerRevoke(params);
       if (res.code === 200) {
         message.success({
@@ -187,6 +184,7 @@ const queryApprovalApply = (params: Record<string, string> = {}) => {
       approvalFilterParams[key as keyof typeof approvalFilterParams] = params[key];
     }
     const newData = getParamsRules(todoParams.value);
+
     getAdminApply({ ...newData, ...approvalFilterParams })
       .then((res) => {
         approvalData.value = res.data.list;
@@ -242,7 +240,7 @@ const queryApprovedApply = (params: Record<string, string> = {}) => {
 const pageInit = () => {
   isError.value = false;
   if (activeName.value === 'application') {
-    applyStatus.value = '';
+    applyStatus.value = isAdminPermission.value ? 'OPEN,REVOKED' : '';
     todoName.value = 'formPage';
     applyId.value = '';
     queryMyApplication();

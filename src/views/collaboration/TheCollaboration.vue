@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, watch, computed, type ComponentPublicInstance, reactive, toRefs } from 'vue';
-import { OTable, OTag, OLink, OIcon, OPopup, OPopover } from '@opensig/opendesign';
+import { OTable, OTag, OLink, OIcon, OPopup, OPopover, useMessage } from '@opensig/opendesign';
 import { getMaintainerRepos, getAdminRepos, getSigList, getRepoList } from '@/api/api-collaboration';
 import { useUserInfoStore } from '@/stores/user';
 import ExternalLink from '@/components/ExternalLink.vue';
@@ -30,6 +30,8 @@ const columns = [
   { label: '状态', key: 'status', type: 'status' },
   { label: '操作', key: 'operation', type: 'operation' },
 ];
+
+const message = useMessage();
 
 const allSigs = ref<string[]>();
 const allRepos = ref<string[]>();
@@ -206,8 +208,14 @@ const showDlg = ref(false);
 const showFeedbackDlg = ref(false);
 const repoValue = ref('');
 const changeFeedback = (v: string) => {
-  showFeedbackDlg.value = true;
-  repoValue.value = v;
+  if (userInfoStore.isGiteeAccount) {
+    showFeedbackDlg.value = true;
+    repoValue.value = v;
+  } else {
+    message.warning({
+      content: '请绑定您的Gitee ID',
+    });
+  }
 };
 
 // 反馈历史
