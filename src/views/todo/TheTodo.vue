@@ -99,7 +99,7 @@ const queryMyApplication = (params = {}) => {
     for (const key of Object.keys(params)) {
       applicationFilterParams[key] = params[key];
     }
-    getMaintainerApply({ ...newData, ...params })
+    getMaintainerApply({ ...newData, ...applicationFilterParams })
       .then((res) => {
         applicationData.value = res.data.list;
         total.value = res.data.total;
@@ -152,7 +152,7 @@ const queryApprovalApply = (params = {}) => {
     for (const key of Object.keys(params)) {
       approvalFilterParams[key] = params[key];
     }
-    getAdminApply({ ...newData, ...params })
+    getAdminApply({ ...newData, ...approvalFilterParams })
       .then((res) => {
         approvalData.value = res.data.list;
         total.value = res.data.total;
@@ -183,7 +183,7 @@ const queryApprovedApply = (params = {}) => {
     for (const key of Object.keys(params)) {
       approvedFilterParams[key] = params[key];
     }
-    getAdminApply({ ...newData, ...params })
+    getAdminApply({ ...newData, ...approvedFilterParams })
       .then((res) => {
         approvedData.value = res.data.list;
         total.value = res.data.total;
@@ -241,7 +241,6 @@ onMounted(() => {
         <ApprovalTable
           :columns="applicationColumns"
           @queryData="queryMyApplication"
-          :filterable-columns="['repo', 'metric', 'applyStatus']"
           :filterParams="applicationFilterParams"
           :type="activeName"
           :data="applicationData"

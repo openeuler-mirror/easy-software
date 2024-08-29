@@ -22,10 +22,6 @@ interface ColumnsT {
 }
 
 const props = defineProps({
-  /* filterableColumns: {
-    type: Array as PropType<string[]>,
-    default: () => [],
-  }, */
   data: {
     type: Array,
     default: () => [],
@@ -83,10 +79,11 @@ const setPopupClickoutSideFn = (el: any, index: number) => {
 };
 
 onMounted(() => {
-  Object.entries(props.filterParams).forEach((entry, index) => {
-    if (entry[1]) {
+  Object.entries(props.filterParams).forEach(([key, value]) => {
+    if (value) {
+      const index = props.columns.findIndex((item) => item.key === key);
       currentActiveFilterIndices.value.add(index);
-      activeFilterValues.value[props.columns.findIndex((item) => item.key === entry[0])] = entry[1];
+      activeFilterValues.value[index] = value;
     }
   });
 });
