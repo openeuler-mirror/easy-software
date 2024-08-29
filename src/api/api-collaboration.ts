@@ -68,9 +68,12 @@ export function getMaintainerApplyRepos() {
 }
 
 /** 待办中心获取待我审批/我审批过所有仓库 */
-export function getAdminApplyRepos(applyStatus: string) {
-  const url = `/server/collaboration/admin/apply/repos?apply_status=${applyStatus}`;
-  return request.get<{ data: { total: number, list: string[] } }>(url).then((res) => res?.data.data);
+interface ReposT {
+  apply_status: string
+}
+export function getAdminApplyRepos(params: ReposT) {
+  const url = `/server/collaboration/admin/apply/repos`;
+  return request.get(url, { params }).then((res) => res?.data.data);
 }
 
 interface FeedbackT {

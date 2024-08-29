@@ -1,14 +1,14 @@
 <script lang="ts" setup>
-import { ref, type PropType, computed, type ComponentPublicInstance, reactive, watch, onMounted } from 'vue';
+import { ref, type PropType, type ComponentPublicInstance, onMounted, computed } from 'vue';
 import { OTable, OLink, OTag, ODialog, OButton, OPopup, OIcon, OPopover } from '@opensig/opendesign';
 import { useLocale } from '@/composables/useLocale';
 import { formatDateTime } from '@/utils/common';
 import { useRouter, useRoute } from 'vue-router';
 import { applicationTypeCurrent, applyStatusType } from '@/data/todo';
 import { applicationTypeConvert, applyStatusConvert, versionLatestStatusConvert } from '@/utils/collaboration';
-import { useUserInfoStore } from '@/stores/user';
 import { onClickOutside } from '@vueuse/core';
 import { getAdminApplyRepos, getMaintainerApplyRepos } from '@/api/api-collaboration';
+import { useUserInfoStore } from '@/stores/user';
 import FilterableCheckboxes from '@/components/FilterableCheckboxes.vue';
 
 import IconFilter from '~icons/app/icon-filter.svg';
@@ -44,6 +44,10 @@ const props = defineProps({
   },
 });
 
+const userInfoStore = useUserInfoStore();
+const isMainPer = computed(() => userInfoStore.platformMaintainerPermission);
+const isAdminPer = computed(() => userInfoStore.platformAdminPermission);
+
 const router = useRouter();
 const route = useRoute();
 const { locale } = useLocale();
@@ -51,9 +55,18 @@ const { locale } = useLocale();
 const repoList = ref<string[]>([]);
 
 const getRepoList = () => {
-  if (props.type === 'approval' || props.type === 'approved') {
-    const applyStatus = props.type === 'approval' ? 'OPEN,REJECTED' : 'APPROVED,REJECTED';
-    getAdminApplyRepos(applyStatus)
+  let applyStatus = '';
+  if (isAdminPer.value) {
+    if (props.type === 'approval' || props.type === 'approved') {
+      applyStatus = props.type === 'approval' ? 'OPEN,REJECTED' : 'APPROVED,REJECTED';
+    } else if (props.type === 'application') {
+      applyStatus = 'OPEN,REJECTED,APPROVED,REJECTED';
+    }
+    const params = {
+      apply_status: applyStatus,
+    };
+
+    getAdminApplyRepos(params)
       .then((data) => (repoList.value = data.list))
       .finally(() => (repoFilterLoading.value = false));
   } else {
@@ -121,9 +134,6 @@ const onFilterChange = (type: string, index: number, val: string) => {
   }
   emits('queryData', innerFilterParams.value);
 };
-
-const userInfoStore = useUserInfoStore();
-const isMainPer = computed(() => userInfoStore.platformMaintainerPermission);
 
 const jumpTo = (id: number) => {
   const type = route.params?.type as string;
@@ -247,7 +257,7 @@ const revoke = () => {
         <template v-if="type === 'application'">
           <div class="oper-box">
             <OLink color="primary" hover-underline @click="jumpTo(row.applyIdString)">申请详情</OLink>
-            <OLink color="danger" v-if="row.applyStatus === 'OPEN' && isMainPer" hover-underline @click="revokeApplication(row.applyIdString)">撤销申请</OLink>
+            <OLink color="danger" v-if="row.applyStatus === 'OPEN'" hover-underline @click="revokeApplication(row.applyIdString)">撤销申请</OLink>
           </div>
         </template>
         <template v-if="type === 'approval'">
