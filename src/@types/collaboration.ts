@@ -21,3 +21,9 @@ export interface CollaborationRepoT {
   sigName?: string;
   status?: string;
 }
+
+
+export interface RevokeT {
+  applyIdString: string;
+  applyStatus: string;
+}

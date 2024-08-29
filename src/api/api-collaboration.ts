@@ -1,6 +1,6 @@
 import { request } from '@/shared/axios';
 import type { AxiosResponse } from '@/shared/axios';
-import type { AdminAppryT, CollaborationRepoT } from '@/@types/collaboration';
+import type { AdminAppryT, CollaborationRepoT, RevokeT } from '@/@types/collaboration';
 
 // 权限
 export function getCollaborationPermissions() {
@@ -50,12 +50,14 @@ export function getMaintainerApply(params: AdminAppryT) {
 }
 
 // 申请撤销
-interface RevokeT {
-  applyIdString: string;
-  applyStatus: string;
-}
+
 export function getMaintainerRevoke(params: RevokeT) {
   const url = `/server/collaboration/maintainer/revoke`;
+  return request.post(url, { ...params }).then((res: AxiosResponse) => res?.data);
+}
+
+export function getAdminRevoke(params: RevokeT) {
+  const url = `/server/collaboration/admin/revoke`;
   return request.post(url, { ...params }).then((res: AxiosResponse) => res?.data);
 }
 
@@ -66,8 +68,8 @@ export function getMaintainerApplyRepos() {
 }
 
 /** 待办中心获取待我审批/我审批过所有仓库 */
-export function getAdminApplyRepos() {
-  const url = `/server/collaboration/admin/apply/repos`;
+export function getAdminApplyRepos(applyStatus: string) {
+  const url = `/server/collaboration/admin/apply/repos?apply_status=${applyStatus}`;
   return request.get<{ data: { total: number, list: string[] } }>(url).then((res) => res?.data.data);
 }
 
@@ -83,6 +85,12 @@ export function getApplyFeedback(params: FeedbackT) {
   const url = `/server/collaboration/maintainer/apply?repo=${params.repo}`;
   return request.post(url, { ...params }).then((res: AxiosResponse) => res?.data);
 }
+
+export function getAdminApplyFeedback(params: FeedbackT) {
+  const url = `/server/collaboration/admin/apply?repo=${params.repo}`;
+  return request.post(url, { ...params }).then((res: AxiosResponse) => res?.data);
+}
+
 
 interface ProcessT {
   applyIdString: string;

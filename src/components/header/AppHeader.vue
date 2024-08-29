@@ -48,6 +48,11 @@ const isCollaboration = computed(() => {
   return COLLABORATIONPERMISSION.includes(route.name as string);
 });
 
+// 是否是待办中心
+const isTodo = computed(() => {
+  return ['todo', 'todo-detail'].includes(route.name as string);
+});
+
 const jump = (href: string) => {
   if (isAdminPer.value || isMainPer.value) {
     if (href === 'collaboration') {
@@ -81,7 +86,7 @@ const jump = (href: string) => {
       </div>
       <div class="header-right">
         <template v-if="loginStore.isLogined">
-          <OLink v-if="isCollaboration" class="todo" @click="jump(`todo`)">待办中心</OLink>
+          <OLink v-if="isCollaboration" class="todo" @click="jump(`todo`)" :class="{ active: isTodo }">待办中心</OLink>
           <OLink v-else class="collaboration" @click="jump(`collaboration`)">协作平台</OLink>
         </template>
         <HeaderTheme />
@@ -135,6 +140,9 @@ const jump = (href: string) => {
         margin-right: 16px;
         color: var(--o-color-info1);
         @include tip1;
+        &.active {
+          color: var(--o-color-primary1);
+        }
       }
     }
   }

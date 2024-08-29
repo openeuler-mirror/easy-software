@@ -18,6 +18,7 @@ const { t } = useI18n();
 const userInfoStore = useUserInfoStore();
 const isAdminPer = computed(() => userInfoStore.platformAdminPermission);
 const isMaintainerPer = computed(() => userInfoStore.platformMaintainerPermission);
+const adminName = computed(() => userInfoStore.username);
 
 const isLoading = ref(true);
 const isError = ref(false);
@@ -101,6 +102,13 @@ const rejected = async () => {
 };
 // 审批
 const queryAdminProcess = () => {
+  //不能审批自己提的反馈
+  if (adminName.value === todoData.value.maintainer) {
+    return message.danger({
+      content: '不能审批自己提的反馈!',
+    });
+  }
+
   getAdminProcess(formData)
     .then((res) => {
       if (res.code === 200) {
