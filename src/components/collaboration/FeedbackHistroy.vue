@@ -104,11 +104,10 @@ const onChange = () => {
 };
 
 const pageInit = () => {
-  if (isMainPer.value) {
-    queryMaintainerApply();
-  }
   if (isAdminPer.value) {
     queryAdminApply();
+  } else if (isMainPer.value) {
+    queryMaintainerApply();
   }
 };
 
@@ -131,7 +130,7 @@ watch(
       <p class="title">反馈历史</p>
     </template>
     <div class="feedback-histroy">
-      <div class="histroy-table">
+      <div class="histroy-table" :class="{ total: total > COUNT_PAGESIZE[0] }">
         <OTable :columns="columns" :data="reposData" :loading="isLoading" border="row" :small="true">
           <template #head="{ columns }">
             <th v-for="item in columns" :key="item.type" :class="item.type">{{ item.label }}</th>
@@ -195,6 +194,11 @@ watch(
   .histroy-table {
     border: 1px solid var(--o-color-control4);
     border-radius: 4px;
+    &.total {
+      :deep(.o-table-wrap) {
+        height: 538px;
+      }
+    }
   }
   :deep(.o-table) {
     .o-table-wrap {

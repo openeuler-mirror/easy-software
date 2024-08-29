@@ -56,7 +56,8 @@ const repoList = ref<string[]>([]);
 
 const getRepoList = () => {
   if (props.type === 'approval' || props.type === 'approved') {
-    getAdminApplyRepos()
+    const applyStatus = props.type === 'approval' ? 'OPEN,REJECTED' : 'APPROVED,REJECTED';
+    getAdminApplyRepos(applyStatus)
       .then((data) => (repoList.value = data.list))
       .finally(() => (repoFilterLoading.value = false));
   } else {
@@ -348,7 +349,7 @@ thead {
     width: 180px;
   }
   .updateAt {
-    width: 178px;
+    width: 180px;
   }
   .operation {
     width: 220px;

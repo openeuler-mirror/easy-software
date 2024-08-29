@@ -2,7 +2,8 @@
 import { ref, reactive, computed } from 'vue';
 import { ODialog, OButton, OForm, OTextarea, OFormItem, ORadioGroup, ORadio, OSelect, OOption, type FieldResultT, useMessage } from '@opensig/opendesign';
 import { applicationTypeCurrent } from '@/data/todo';
-import { getApplyFeedback } from '@/api/api-collaboration';
+import { getApplyFeedback, getAdminApplyFeedback } from '@/api/api-collaboration';
+import { useUserInfoStore } from '@/stores/user';
 
 const props = defineProps({
   repo: {
@@ -10,6 +11,10 @@ const props = defineProps({
     default: () => '',
   },
 });
+
+const userInfoStore = useUserInfoStore();
+const isMainPer = computed(() => userInfoStore.platformMaintainerPermission);
+const isAdminPer = computed(() => userInfoStore.platformAdminPermission);
 
 const showDlg = ref(true);
 const message = useMessage();
@@ -80,6 +85,46 @@ const descriptionRules = [
   },
 ];
 
+// Maintainer 反馈
+const queryMaintainerFeedback = () => {
+  getApplyFeedback(formData)
+    .then((res) => {
+      if (res.code === 200) {
+        message.success({
+          content: '反馈成功',
+        });
+        showDlg.value = false;
+        emits('close');
+      }
+    })
+    .catch(() => {
+      message.danger({
+        content: '操作失败',
+      });
+      showDlg.value = false;
+    });
+};
+
+// Admin 反馈
+const queryAdminFeedback = () => {
+  getAdminApplyFeedback(formData)
+    .then((res) => {
+      if (res.code === 200) {
+        message.success({
+          content: '反馈成功',
+        });
+        showDlg.value = false;
+        emits('close');
+      }
+    })
+    .catch(() => {
+      message.danger({
+        content: '操作失败',
+      });
+      showDlg.value = false;
+    });
+};
+
 const onSubmit = (results: FieldResultT[]) => {
   if (results.find((item) => item?.type === 'danger')) {
     return;
@@ -87,22 +132,11 @@ const onSubmit = (results: FieldResultT[]) => {
     if (formData.metricStatus === '版本正常') {
       formData.metricStatus = '最新版本';
     }
-    getApplyFeedback(formData)
-      .then((res) => {
-        if (res.code === 200) {
-          message.success({
-            content: '反馈成功',
-          });
-          showDlg.value = false;
-          emits('close');
-        }
-      })
-      .catch(() => {
-        message.danger({
-          content: '操作失败',
-        });
-        showDlg.value = false;
-      });
+    if (isAdminPer.value) {
+      queryAdminFeedback();
+    } else if (isMainPer.value) {
+      queryMaintainerFeedback();
+    }
   }
 };
 </script>

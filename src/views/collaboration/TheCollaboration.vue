@@ -47,9 +47,11 @@ const setPopupClickoutSideFn = (el: any, index: number) => {
     clickOutsideStopFns.forEach((fn) => fn());
     clickOutsideStopFns = [];
   }
-  clickOutsideStopFns.push(onClickOutside(el, () => {
-    filterSwitches.value[index] = false;
-  }) as (() => void));
+  clickOutsideStopFns.push(
+    onClickOutside(el, () => {
+      filterSwitches.value[index] = false;
+    }) as () => void
+  );
 };
 
 const repoFilterLoading = ref(false);
@@ -143,7 +145,6 @@ const isError = ref(false);
 // Maintainer 数据
 const queryMaintainerRepos = () => {
   isLoading.value = true;
-
   getMaintainerRepos({ ...searchParams.value, ...filterParams })
     .then((res) => {
       reposData.value = res.data.list;
@@ -160,7 +161,6 @@ const queryMaintainerRepos = () => {
 // Admin 数据
 const queryAdminRepos = () => {
   isLoading.value = true;
-
   getAdminRepos({ ...searchParams.value, ...filterParams })
     .then((res) => {
       reposData.value = res.data.list;
@@ -177,8 +177,7 @@ const queryAdminRepos = () => {
 const pageInit = () => {
   if (isAdminPer.value) {
     queryAdminRepos();
-  }
-  if (isMainPer.value) {
+  } else if (isMainPer.value) {
     queryMaintainerRepos();
   }
 };
@@ -253,7 +252,7 @@ watch(
         <Indicators v-if="showDlg" @change="showDlg = false" />
       </div>
       <div class="platform-main">
-        <OTable :columns="columns" :data="reposData" :loading="loading" border="row" :class="{ admin: isAdminPer }">
+        <OTable :columns="columns" :data="reposData" :loading="loading" border="row">
           <template #head="{ columns }">
             <OPopup
               trigger="none"
@@ -359,15 +358,15 @@ watch(
           <template #td_versionStatus="{ row }">
             {{ versionLatestStatusConvert(row.versionStatus) }}
           </template>
-  
+
           <template #td_operation="{ row }">
             <div class="operation-box">
-              <OLink v-if="isMainPer" color="primary" hover-underline @click="changeFeedback(row.repo)">状态反馈</OLink>
+              <OLink color="primary" hover-underline @click="changeFeedback(row.repo)">状态反馈</OLink>
               <OLink color="primary" hover-underline @click="changeFeedbackHistory(row.repo)">反馈历史</OLink>
             </div>
           </template>
         </OTable>
-  
+
         <div v-if="total > COUNT_PAGESIZE[0]" class="pagination-box">
           <AppPagination :current="currentPage" :pagesize="pageSize" :total="total" @size-change="handleSizeChange" @current-change="handleCurrentChange" />
         </div>
@@ -380,13 +379,13 @@ watch(
           </template>
         </Result404>
       </template>
-  
+
       <!-- 跳转外部链接提示 -->
       <ExternalLink v-if="showExternalDlg" :href="externalLink" @change="showExternalDlg = false" />
       <!-- 状态反馈 -->
-  
+
       <StatusFeedback :repo="repoValue" v-if="showFeedbackDlg" @close="showFeedbackDlg = false" />
-  
+
       <!-- 反馈历史 -->
       <FeedbackHistroy v-if="showFeedbacHistroykDlg" :repo="repoValue" @close="showFeedbacHistroykDlg = false" />
     </template>
