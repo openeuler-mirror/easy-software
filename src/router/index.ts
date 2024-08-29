@@ -144,7 +144,7 @@ router.beforeEach(async (to) => {
       return userInfoStore.upstreamPermission ? true : { name: 'notFound' };
     }
     if (isPlatform) {
-      return userInfoStore.platformAdminPermission || userInfoStore.platformMaintainerPermission ? true : { name: 'notFound' };
+      return userInfoStore.platformPermissions?.length ? true : { name: 'notFound' };
     }
 
     return true;
@@ -170,17 +170,12 @@ router.beforeEach(async (to) => {
 
 
   // 协作平台权限
-  if ((userInfoStore.platformMaintainerPermission === null || userInfoStore.platformAdminPermission === null) && loginStore.isLogined) {
+  if ((userInfoStore.platformPermissions === null) && loginStore.isLogined) {
     try {
       const { data } = await getCollaborationPermissions();
 
       if (data.permissions.length > 0) {
-        if (data.permissions.includes('administrator')) {
-          userInfoStore.platformAdminPermission = true;
-        }
-        if (data.permissions.includes('maintainer')) {
-          userInfoStore.platformMaintainerPermission = true;
-        }
+        userInfoStore.platformPermissions = data.permissions;
       } else {
         return isPlatform ? { name: 'collaboration-permission' } : true;
       }

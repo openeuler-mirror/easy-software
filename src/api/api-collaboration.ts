@@ -1,6 +1,6 @@
 import { request } from '@/shared/axios';
 import type { AxiosResponse } from '@/shared/axios';
-import type { AdminAppryT, CollaborationRepoT, RevokeT } from '@/@types/collaboration';
+import type { AdminAppryT, CollaborationRepoT, PlatformPermission, RevokeT } from '@/@types/collaboration';
 
 // 权限
 export function getCollaborationPermissions() {
@@ -21,19 +21,12 @@ export function getAdminRepos(params: CollaborationRepoT) {
 }
 
 /**
- * 获取sig列表
+ * 获取仓库/sig列表
  */
-export function getSigList() {
-  const url = `/api-dsapi/query/sig/name?community=openeuler`;
-  return request.get<{ data: Record<'openeuler', string[]> }>(url).then((res) => res.data.data.openeuler);
-}
-
-/**
- * 获取仓库列表
- */
-export function getRepoList() {
-  const url = `/api-dsapi/query/repo/sig/list?community=openeuler`;
-  return request.get<{ data: Record<string, string>[] }>(url).then((res) => res.data.data.map((item) => Object.keys(item)[0]));
+export function getRepoSigList(permissions: PlatformPermission): Promise<{ sigs: string[]; repos: string[] }> {
+  const type = permissions.length === 2 ? 'admin' : permissions[0];
+  const url = `/server/collaboration/${type}/query/apply`;
+  return request.get<{ data: Record<string, string> }>(url).then((res) => ({ sigs: Object.values(res.data.data), repos: Object.keys(res.data.data) }));
 }
 
 // 待我审批

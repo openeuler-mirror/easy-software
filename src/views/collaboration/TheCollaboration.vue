@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { ref, watch, computed, type ComponentPublicInstance, reactive, toRefs } from 'vue';
+import { ref, watch, computed, type ComponentPublicInstance, reactive } from 'vue';
 import { OTable, OTag, OLink, OIcon, OPopup, OPopover, useMessage } from '@opensig/opendesign';
-import { getMaintainerRepos, getAdminRepos, getSigList, getRepoList } from '@/api/api-collaboration';
+import { getMaintainerRepos, getAdminRepos, getRepoSigList } from '@/api/api-collaboration';
 import { useUserInfoStore } from '@/stores/user';
 import ExternalLink from '@/components/ExternalLink.vue';
 import Indicators from '@/components/collaboration/Indicators.vue';
@@ -16,6 +16,7 @@ import FilterableCheckboxes from '@/components/FilterableCheckboxes.vue';
 import { kindTypes, applicationType } from '@/data/todo';
 import { onClickOutside } from '@vueuse/core';
 import { repoStatusIndex, repoStatusArr, versionLatestStatusConvert } from '@/utils/collaboration';
+import { storeToRefs } from 'pinia';
 
 const columns = [
   { label: '软件仓库', key: 'repo', type: 'repo' },
@@ -32,6 +33,7 @@ const columns = [
 ];
 
 const message = useMessage();
+const { platformPermissions } = storeToRefs(useUserInfoStore());
 
 const allSigs = ref<string[]>();
 const allRepos = ref<string[]>();
@@ -62,23 +64,14 @@ const sigFilterLoading = ref(false);
 /** 切换某个筛选组件显示开关 */
 const switchFilterVisible = (index: number) => {
   filterSwitches.value[index] = true;
-  if (index === 0) {
-    // 筛选仓库
-    if (!allRepos.value?.length) {
-      repoFilterLoading.value = true;
-      getRepoList()
-        .then((list) => (allRepos.value = list))
-        .finally(() => (repoFilterLoading.value = false));
-    }
-  }
-  if (index === 2) {
-    // 筛选sig
-    if (!allSigs.value?.length) {
-      sigFilterLoading.value = true;
-      getSigList()
-        .then((list) => (allSigs.value = list))
-        .finally(() => (sigFilterLoading.value = false));
-    }
+  if (platformPermissions.value && (index === 0 || index === 2) && (!allSigs.value?.length || !allRepos.value?.length)) {
+    repoFilterLoading.value = true;
+    getRepoSigList(platformPermissions.value)
+      .then(data => {
+        allSigs.value = data.sigs;
+        allRepos.value = data.repos;
+      })
+      .finally(() => (repoFilterLoading.value = false));
   }
 };
 
@@ -88,7 +81,7 @@ const activeFilterValues = ref(new Array<string>(columns.length));
 /** 当前有选中筛选项的表格列的数组下标 */
 const currentActiveFilterIndices = ref(new Set<number>());
 
-const onFilterChange = (type: string, index: number, val: string) => {
+const onFilterChange = (index: number, val: string) => {
   // 关掉筛选组件
   filterSwitches.value = columns.map(() => false);
   if (val) {
@@ -299,20 +292,20 @@ watch(
                   v-if="item.key === 'repo'"
                   v-model="filterParams[item.key]"
                   :loading="repoFilterLoading"
-                  @change="onFilterChange(item.key, index, $event)"
+                  @change="onFilterChange(index, $event)"
                   :values="allRepos"
                 />
                 <FilterableCheckboxes
                   v-else-if="item.key === 'sigName'"
                   v-model="filterParams[item.key]"
                   :loading="sigFilterLoading"
-                  @change="onFilterChange(item.key, index, $event)"
+                  @change="onFilterChange(index, $event)"
                   :values="allSigs"
                 />
                 <FilterableCheckboxes
                   v-else-if="item.key === 'kind'"
                   v-model="filterParams[item.key]"
-                  @change="onFilterChange(item.key, index, $event)"
+                  @change="onFilterChange(index, $event)"
                   :filterable="false"
                   :values="kindTypes"
                 />
@@ -320,14 +313,14 @@ watch(
                   v-else-if="item.key === 'status'"
                   :filterable="false"
                   v-model="filterParams[item.key]"
-                  @change="onFilterChange(item.key, index, $event)"
+                  @change="onFilterChange(index, $event)"
                   :values="repoStatusArr"
                 />
                 <FilterableCheckboxes
                   v-else
                   v-model="filterParams[item.key]"
                   :filterable="false"
-                  @change="onFilterChange(item.key, index, $event)"
+                  @change="onFilterChange(index, $event)"
                   :values="metricTypes(item.key)"
                 />
               </div>
