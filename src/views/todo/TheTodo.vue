@@ -36,8 +36,6 @@ const message = useMessage();
 const isAdminPermission = computed(() => userInfoStore.platformAdminPermission);
 const isMaintainerPermission = computed(() => userInfoStore.platformMaintainerPermission);
 
-// 页面数据为空
-const isPageData = ref(false);
 // 报错提示
 const isError = ref(false);
 
@@ -72,10 +70,22 @@ const activeName = ref();
 const onChange = (type: string) => {
   currentPage.value = 1;
   pageSize.value = 10;
+
+  clearFilterParams(applicationFilterParams);
+  clearFilterParams(approvalFilterParams);
+  clearFilterParams(approvedFilterParams);
+
   pageInit();
   // 切换url参数
   router.push({
     path: `/${locale.value}/todo/${type}`,
+  });
+};
+
+// 清楚筛选数据
+const clearFilterParams = (data: any) => {
+  Object.keys(data).forEach((key) => {
+    data[key] = '';
   });
 };
 
@@ -97,83 +107,66 @@ const applicationFilterParams = reactive({
 });
 
 // 我的申请
-const queryMyApplication = (params: Record<string, string> = {}) => {
+const queryMyApplication = async (params: Record<string, string> = {}) => {
   isLoading.value = true;
-  if (isMaintainerPermission.value || isAdminPermission.value) {
-    const filterParamKeys = Object.keys(params);
-    if (filterParamKeys.length && currentPage.value !== 1) {
-      currentPage.value = 1;
-    }
-    for (const key of filterParamKeys) {
-      applicationFilterParams[key as keyof typeof applicationFilterParams] = params[key];
-    }
-    const newData = getParamsRules(todoParams.value);
-    getMaintainerApply({ ...newData, ...applicationFilterParams })
-      .then((res) => {
-        applicationData.value = res.data.list;
-        total.value = res.data.total;
-        if (applicationData.value.length === 0) {
-          isPageData.value = true;
-        }
+  const filterParamKeys = Object.keys(params);
+  if (filterParamKeys.length && currentPage.value !== 1) {
+    currentPage.value = 1;
+  }
+  for (const key of filterParamKeys) {
+    applicationFilterParams[key as keyof typeof applicationFilterParams] = params[key];
+  }
+  const newData = getParamsRules(todoParams.value);
 
-        isLoading.value = false;
-      })
-      .catch(() => {
-        applicationData.value = [];
-        isLoading.value = false;
-        isError.value = true;
-        isPageData.value = true;
-      });
-  } else {
+  try {
+    if (isAdminPermission.value) {
+      const { data } = await getAdminApply({ ...newData, ...applicationFilterParams });
+      applicationData.value = data.list;
+      total.value = data.total;
+    }
+    if (isMaintainerPermission.value) {
+      const { data } = await getMaintainerApply({ ...newData, ...applicationFilterParams });
+      applicationData.value = data.list;
+      total.value = data.total;
+    }
+    isLoading.value = false;
+  } catch {
+    applicationData.value = [];
     isError.value = true;
     isLoading.value = false;
   }
 };
 
-const queryMaintainerRevoke = (params: RevokeT) => {
-  getMaintainerRevoke(params)
-    .then((res) => {
-      if (res.code === 200) {
-        message.success({
-          content: '撤销成功',
-        });
-        pageInit();
-      }
-    })
-    .catch(() => {
-      message.danger({
-        content: '操作失败',
-      });
-    });
-};
-
-const queryAdminRevoke = (params: RevokeT) => {
-  getAdminRevoke(params)
-    .then((res) => {
-      if (res.code === 200) {
-        message.success({
-          content: '撤销成功',
-        });
-        pageInit();
-      }
-    })
-    .catch(() => {
-      message.danger({
-        content: '操作失败',
-      });
-    });
-};
-
 // 撤销申请
-const revokeApplication = (id: string) => {
+const revokeApplication = async (id: string) => {
   const params: RevokeT = {
     applyIdString: id,
     applyStatus: 'OPEN',
   };
-  if (isAdminPermission.value) {
-    queryAdminRevoke(params);
-  } else if (isMaintainerPermission.value) {
-    queryMaintainerRevoke(params);
+  try {
+    if (isAdminPermission.value) {
+      const res = await getAdminRevoke(params);
+      if (res.code === 200) {
+        message.success({
+          content: '撤销成功',
+        });
+        pageInit();
+      }
+    }
+    if (isMaintainerPermission.value) {
+      const res = await getMaintainerRevoke(params);
+      if (res.code === 200) {
+        message.success({
+          content: '撤销成功',
+        });
+        pageInit();
+      }
+    }
+    isLoading.value = false;
+  } catch {
+    message.danger({
+      content: '操作失败',
+    });
   }
 };
 
@@ -198,9 +191,6 @@ const queryApprovalApply = (params: Record<string, string> = {}) => {
       .then((res) => {
         approvalData.value = res.data.list;
         total.value = res.data.total;
-        if (approvalData.value.length === 0) {
-          isPageData.value = true;
-        }
 
         isLoading.value = false;
       })
@@ -208,12 +198,10 @@ const queryApprovalApply = (params: Record<string, string> = {}) => {
         approvalData.value = [];
         isError.value = true;
         isLoading.value = false;
-        isPageData.value = true;
       });
   } else {
     isError.value = true;
     isLoading.value = false;
-    isPageData.value = true;
   }
 };
 
@@ -239,26 +227,20 @@ const queryApprovedApply = (params: Record<string, string> = {}) => {
         approvedData.value = res.data.list;
         total.value = res.data.total;
         isLoading.value = false;
-        if (approvedData.value.length === 0) {
-          isPageData.value = true;
-        }
       })
       .catch(() => {
         approvedData.value = [];
         isLoading.value = false;
         isError.value = true;
-        isPageData.value = true;
       });
   } else {
     isError.value = true;
-    isPageData.value = true;
     isLoading.value = false;
   }
 };
 
 const pageInit = () => {
   isError.value = false;
-  isPageData.value = false;
   if (activeName.value === 'application') {
     applyStatus.value = '';
     todoName.value = 'formPage';
@@ -293,7 +275,7 @@ onMounted(() => {
   <div class="todo-content">
     <AppLoading :loading="isLoading" />
     <!-- 我的申请 -->
-    <div v-if="activeName === 'application' && !isError && !isPageData" class="application">
+    <div v-if="activeName === 'application' && !isError" class="application">
       <template v-if="!isLoading">
         <ApprovalTable
           :columns="applicationColumns"
@@ -311,7 +293,7 @@ onMounted(() => {
     </div>
     <!-- 判断admin权限 -->
     <template v-if="isAdminPermission">
-      <div v-if="activeName === 'approval' && !isError && !isPageData" class="approval">
+      <div v-if="activeName === 'approval' && !isError" class="approval">
         <template v-if="!isLoading">
           <ApprovalTable
             :columns="approvalColumns"
@@ -326,7 +308,7 @@ onMounted(() => {
           </div>
         </template>
       </div>
-      <div v-if="activeName === 'approved' && !isError && !isPageData" class="approved">
+      <div v-if="activeName === 'approved' && !isError" class="approved">
         <template v-if="!isLoading">
           <ApprovalTable
             :columns="approvalHistoryColumns"
@@ -344,9 +326,7 @@ onMounted(() => {
     </template>
 
     <!-- 暂无记录 -->
-    <template
-      v-if="isPageData || (activeName === 'application' && isError) || (activeName === 'approval' && isError) || (activeName === 'approved' && isError)"
-    >
+    <template v-if="(activeName === 'application' && isError) || (activeName === 'approval' && isError) || (activeName === 'approved' && isError)">
       <Result404>
         <template #description>
           <p class="text404">暂无{{ activeName === 'application' ? '申请' : '审批' }}记录</p>
