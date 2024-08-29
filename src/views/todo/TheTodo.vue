@@ -97,13 +97,17 @@ const applicationFilterParams = reactive({
 });
 
 // 我的申请
-const queryMyApplication = (params = {}) => {
+const queryMyApplication = (params: Record<string, string> = {}) => {
   isLoading.value = true;
   if (isMaintainerPermission.value || isAdminPermission.value) {
-    const newData = getParamsRules(todoParams.value);
-    for (const key of Object.keys(params)) {
-      applicationFilterParams[key] = params[key];
+    const filterParamKeys = Object.keys(params);
+    if (filterParamKeys.length && currentPage.value !== 1) {
+      currentPage.value = 1;
     }
+    for (const key of filterParamKeys) {
+      applicationFilterParams[key as keyof typeof applicationFilterParams] = params[key];
+    }
+    const newData = getParamsRules(todoParams.value);
     getMaintainerApply({ ...newData, ...applicationFilterParams })
       .then((res) => {
         applicationData.value = res.data.list;
@@ -179,13 +183,17 @@ const approvalFilterParams = reactive({
 });
 
 // 待我审批
-const queryApprovalApply = (params = {}) => {
+const queryApprovalApply = (params: Record<string, string> = {}) => {
   isLoading.value = true;
   if (isAdminPermission.value) {
-    const newData = getParamsRules(todoParams.value);
-    for (const key of Object.keys(params)) {
-      approvalFilterParams[key] = params[key];
+    const filterParamKeys = Object.keys(params);
+    if (filterParamKeys.length && currentPage.value !== 1) {
+      currentPage.value = 1;
     }
+    for (const key of filterParamKeys) {
+      approvalFilterParams[key as keyof typeof approvalFilterParams] = params[key];
+    }
+    const newData = getParamsRules(todoParams.value);
     getAdminApply({ ...newData, ...approvalFilterParams })
       .then((res) => {
         approvalData.value = res.data.list;
@@ -215,13 +223,17 @@ const approvedFilterParams = reactive({
 });
 
 // 我审批过的
-const queryApprovedApply = (params = {}) => {
+const queryApprovedApply = (params: Record<string, string> = {}) => {
   isLoading.value = true;
   if (isAdminPermission.value) {
-    const newData = getParamsRules(todoParams.value);
-    for (const key of Object.keys(params)) {
-      approvedFilterParams[key] = params[key];
+    const filterParamKeys = Object.keys(params);
+    if (filterParamKeys.length && currentPage.value !== 1) {
+      currentPage.value = 1;
     }
+    for (const key of filterParamKeys) {
+      approvedFilterParams[key as keyof typeof approvedFilterParams] = params[key];
+    }
+    const newData = getParamsRules(todoParams.value);
     getAdminApply({ ...newData, ...approvedFilterParams })
       .then((res) => {
         approvedData.value = res.data.list;
