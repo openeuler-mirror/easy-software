@@ -33,7 +33,6 @@ const columns = [
 ];
 
 const message = useMessage();
-const { platformPermissions } = storeToRefs(useUserInfoStore());
 
 const allSigs = ref<string[]>();
 const allRepos = ref<string[]>();
@@ -62,16 +61,25 @@ const repoFilterLoading = ref(false);
 const sigFilterLoading = ref(false);
 
 /** 切换某个筛选组件显示开关 */
-const switchFilterVisible = (index: number) => {
+const switchFilterVisible = async (index: number) => {
   filterSwitches.value[index] = true;
-  if (platformPermissions.value && (index === 0 || index === 2) && (!allSigs.value?.length || !allRepos.value?.length)) {
+  if ((index === 0 || index === 2) && (!allSigs.value?.length || !allRepos.value?.length)) {
     repoFilterLoading.value = true;
-    getRepoSigList(platformPermissions.value)
-      .then(data => {
-        allSigs.value = data.sigs;
-        allRepos.value = data.repos;
-      })
-      .finally(() => (repoFilterLoading.value = false));
+    let data: { sigs: string[]; repos: string[]; } | null = null;
+    try {
+      if (isAdminPer.value) {
+        data = await getRepoSigList('admin');
+      } else if (isMainPer.value) {
+        data = await getRepoSigList('maintainer');
+      }
+      if (!data) {
+        return;
+      }
+      allSigs.value = data.sigs;
+      allRepos.value = data.repos;
+    } finally {
+      repoFilterLoading.value = false;
+    }
   }
 };
 

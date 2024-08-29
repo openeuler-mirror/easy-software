@@ -175,7 +175,12 @@ router.beforeEach(async (to) => {
       const { data } = await getCollaborationPermissions();
 
       if (data.permissions.length > 0) {
-        userInfoStore.platformPermissions = data.permissions;
+        if (data.permissions.includes('administrator')) {
+          userInfoStore.platformAdminPermission = true;
+        }
+        if (data.permissions.includes('maintainer')) {
+          userInfoStore.platformMaintainerPermission = true;
+        }
       } else {
         return isPlatform ? { name: 'collaboration-permission' } : true;
       }
