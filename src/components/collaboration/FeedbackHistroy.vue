@@ -114,7 +114,7 @@ const onFilterChange = (type: string, index: number, val: string) => {
 
 const queryMaintainerApply = () => {
   isLoading.value = true;
-  getMaintainerApply(searchParams.value)
+  getMaintainerApply({ ...searchParams.value, ...filterParams })
     .then((res) => {
       reposData.value = res.data.list;
       total.value = res.data.total;
@@ -130,7 +130,7 @@ const queryMaintainerApply = () => {
 
 const queryAdminApply = () => {
   isLoading.value = true;
-  getAdminApply(searchParams.value)
+  getAdminApply({ ...searchParams.value, ...filterParams })
     .then((res) => {
       reposData.value = res.data.list;
       total.value = res.data.total;
