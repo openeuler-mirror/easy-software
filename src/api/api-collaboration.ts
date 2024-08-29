@@ -1,6 +1,6 @@
 import { request } from '@/shared/axios';
 import type { AxiosResponse } from '@/shared/axios';
-import type { AdminAppryT, CollaborationRepoT, PlatformPermission, RevokeT } from '@/@types/collaboration';
+import type { AdminAppryT, CollaborationRepoT, RevokeT } from '@/@types/collaboration';
 
 // 权限
 export function getCollaborationPermissions() {
@@ -23,9 +23,8 @@ export function getAdminRepos(params: CollaborationRepoT) {
 /**
  * 获取仓库/sig列表
  */
-export function getRepoSigList(permissions: PlatformPermission): Promise<{ sigs: string[]; repos: string[] }> {
-  const type = permissions.length === 2 ? 'admin' : permissions[0];
-  const url = `/server/collaboration/${type}/query/apply`;
+export function getRepoSigList(permission: string): Promise<{ sigs: string[]; repos: string[] }> {
+  const url = `/server/collaboration/${permission}/query/apply`;
   return request.get<{ data: Record<string, string> }>(url).then((res) => ({ sigs: Object.values(res.data.data), repos: Object.keys(res.data.data) }));
 }
 
