@@ -23,9 +23,9 @@ export function getAdminRepos(params: CollaborationRepoT) {
 /**
  * 获取仓库/sig列表
  */
-export function getRepoSigList(permission: string): Promise<{ sigs: string[]; repos: string[] }> {
+export function getRepoSigList(permission: string) {
   const url = `/server/collaboration/${permission}/query/repos`;
-  return request.get<{ data: Record<string, string> }>(url).then((res) => ({ sigs: Object.values(res.data.data), repos: Object.keys(res.data.data) }));
+  return request.get<{ data: Record<string, string> }>(url).then((res) => res.data.data);
 }
 
 // 待我审批
