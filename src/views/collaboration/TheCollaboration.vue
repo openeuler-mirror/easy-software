@@ -34,8 +34,28 @@ const columns = [
 
 const message = useMessage();
 
-const allSigs = ref<string[]>();
-const allRepos = ref<string[]>();
+// 筛选条件
+const filterParams = reactive<Record<string, string | number>>({
+  repo: '',
+  kind: '',
+  sigName: '',
+  cveStatus: '',
+  issueStatus: '',
+  prStatus: '',
+  versionStatus: '',
+  orgStatus: '',
+  contributorStatus: '',
+  status: '',
+});
+
+const sigRepoMap = ref(new Map<string, string[]>());
+const allSigs = computed(() => Array.from(sigRepoMap.value.keys()));
+const allRepos = computed(() => {
+  if (filterParams.sigName) {
+    return sigRepoMap.value.get(filterParams.sigName as string) ?? []
+  }
+  return Array.from(sigRepoMap.value.values()).flat();
+});
 
 // 筛选
 const filterIconRefs = ref(new Array<ComponentPublicInstance>(columns.length));
@@ -57,15 +77,14 @@ const setPopupClickoutSideFn = (el: any, index: number) => {
   );
 };
 
-const repoFilterLoading = ref(false);
-const sigFilterLoading = ref(false);
+const filterLoading = ref(false);
 
 /** 切换某个筛选组件显示开关 */
 const switchFilterVisible = async (index: number) => {
   filterSwitches.value[index] = true;
-  if ((index === 0 || index === 2) && (!allSigs.value?.length || !allRepos.value?.length)) {
-    repoFilterLoading.value = true;
-    let data: { sigs: string[]; repos: string[]; } | null = null;
+  if ((index === 0 || index === 2) && !sigRepoMap.value.size) {
+    filterLoading.value = true;
+    let data: Record<string, string> | null = null;
     try {
       if (isAdminPer.value) {
         data = await getRepoSigList('admin');
@@ -75,10 +94,16 @@ const switchFilterVisible = async (index: number) => {
       if (!data) {
         return;
       }
-      allSigs.value = data.sigs;
-      allRepos.value = data.repos;
+      Object.entries(data).forEach(([repo, sig]) => {
+        let repoList = sigRepoMap.value.get(sig);
+        if (!repoList) {
+          repoList = [repo];
+          return sigRepoMap.value.set(sig, repoList);
+        }
+        repoList.push(repo);
+      });
     } finally {
-      repoFilterLoading.value = false;
+      filterLoading.value = false;
     }
   }
 };
@@ -102,6 +127,7 @@ const onFilterChange = (index: number, val: string) => {
   if (filterParams.versionStatus === '版本正常') {
     filterParams.versionStatus = '最新版本';
   }
+  
   if (currentPage.value !== 1) {
     currentPage.value = 1;
   } else {
@@ -119,20 +145,6 @@ const isAdminPer = computed(() => userInfoStore.platformAdminPermission);
 const currentPage = ref(1);
 const pageSize = ref(10);
 const total = ref(0);
-
-// 筛选条件
-const filterParams = reactive<Record<string, string | number>>({
-  repo: '',
-  kind: '',
-  sigName: '',
-  cveStatus: '',
-  issueStatus: '',
-  prStatus: '',
-  versionStatus: '',
-  orgStatus: '',
-  contributorStatus: '',
-  status: '',
-});
 
 const searchParams = computed(() => {
   return {
@@ -299,14 +311,14 @@ watch(
                 <FilterableCheckboxes
                   v-if="item.key === 'repo'"
                   v-model="filterParams[item.key]"
-                  :loading="repoFilterLoading"
+                  :loading="filterLoading"
                   @change="onFilterChange(index, $event)"
                   :values="allRepos"
                 />
                 <FilterableCheckboxes
                   v-else-if="item.key === 'sigName'"
                   v-model="filterParams[item.key]"
-                  :loading="sigFilterLoading"
+                  :loading="filterLoading"
                   @change="onFilterChange(index, $event)"
                   :values="allSigs"
                 />
