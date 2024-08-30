@@ -143,31 +143,15 @@ router.beforeEach(async (to) => {
     if (isUpstream) {
       return userInfoStore.upstreamPermission ? true : { name: 'notFound' };
     }
+
     if (isPlatform) {
-      return userInfoStore.platformAdminPermission || userInfoStore.platformMaintainerPermission ? true : { name: 'notFound' };
+      return userInfoStore.platformAdminPermission || userInfoStore.platformMaintainerPermission ? true : { name: 'collaboration-permission' };
     }
 
     return true;
   }
 
   await tryLogin();
-
-  // 没登陆、没权限 直接404
-  if (!loginStore.isLogined && (isUpstream || isPlatform)) {
-    return { name: 'notFound' };
-  }
-
-  if (userInfoStore.upstreamPermission === null && loginStore.isLogined && !isPlatform) {
-    try {
-      const { data } = await queryUpstreamPermission();
-      if (data.allow_access) {
-        userInfoStore.upstreamPermission = data.allow_access;
-      }
-    } catch {
-      userInfoStore.upstreamPermission = false;
-    }
-  }
-
 
   // 协作平台权限
   if ((userInfoStore.platformMaintainerPermission === null || userInfoStore.platformAdminPermission === null) && loginStore.isLogined) {
@@ -187,6 +171,22 @@ router.beforeEach(async (to) => {
 
     } catch {
       return isPlatform ? { name: 'collaboration-permission' } : true;
+    }
+  }
+
+  // 没登陆、没权限 直接404
+  if (!loginStore.isLogined && (isUpstream || isPlatform)) {
+    return { name: 'notFound' };
+  }
+
+  if (userInfoStore.upstreamPermission === null && loginStore.isLogined && !isPlatform) {
+    try {
+      const { data } = await queryUpstreamPermission();
+      if (data.allow_access) {
+        userInfoStore.upstreamPermission = data.allow_access;
+      }
+    } catch {
+      userInfoStore.upstreamPermission = false;
     }
   }
 
