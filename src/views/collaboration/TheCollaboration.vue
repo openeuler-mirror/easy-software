@@ -52,7 +52,7 @@ const sigRepoMap = ref(new Map<string, string[]>());
 const allSigs = computed(() => Array.from(sigRepoMap.value.keys()));
 const allRepos = computed(() => {
   if (filterParams.sigName) {
-    return sigRepoMap.value.get(filterParams.sigName as string) ?? []
+    return sigRepoMap.value.get(filterParams.sigName as string) ?? [];
   }
   return Array.from(sigRepoMap.value.values()).flat();
 });
@@ -127,7 +127,7 @@ const onFilterChange = (index: number, val: string) => {
   if (filterParams.versionStatus === '版本正常') {
     filterParams.versionStatus = '最新版本';
   }
-  
+
   if (currentPage.value !== 1) {
     currentPage.value = 1;
   } else {
@@ -221,7 +221,7 @@ const showDlg = ref(false);
 const showFeedbackDlg = ref(false);
 const repoValue = ref('');
 const changeFeedback = (v: string) => {
-  if (userInfoStore.isGiteeAccount) {
+  if (userInfoStore.getGiteeId) {
     showFeedbackDlg.value = true;
     repoValue.value = v;
   } else {

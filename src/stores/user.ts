@@ -19,9 +19,10 @@ export const useUserInfoStore = defineStore('userInfo', {
     }
   },
   getters: {
-    // 判断是否有绑定gitee
-    isGiteeAccount(): boolean {
-      return !!this.identities.find((id) => id.identity === 'gitee');
+    // 获取giteeID
+    getGiteeId(status): string {
+      const id = status.identities.find((id) => id.identity === 'gitee');
+      return id ? id.login_name : '';
     },
   }
 });

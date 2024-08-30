@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, watch, ref } from 'vue';
+import { computed, watch, nextTick } from 'vue';
 import { ODivider, OLink } from '@opensig/opendesign';
 import { useRouter, useRoute } from 'vue-router';
 import { useLangStore } from '@/stores/common';
@@ -54,19 +54,21 @@ const isTodo = computed(() => {
 });
 
 const jump = (href: string) => {
-  if (isAdminPer.value || isMainPer.value) {
-    if (href === 'collaboration') {
-      windowOpen(`/${locale.value}/${href}`, '_blank');
+  nextTick(() => {
+    if (isAdminPer.value || isMainPer.value) {
+      if (href === 'collaboration') {
+        windowOpen(`/${locale.value}/${href}`, '_blank');
+      } else {
+        router.push({
+          path: `/${locale.value}/${href}${isMainPer.value ? '/application' : '/approval'}`,
+        });
+      }
     } else {
       router.push({
-        path: `/${locale.value}/${href}${isMainPer.value ? '/application' : '/approval'}`,
+        path: `/${locale.value}/collaboration-permission`,
       });
     }
-  } else {
-    router.push({
-      path: `/${locale.value}/collaboration-permission`,
-    });
-  }
+  });
 };
 </script>
 
@@ -85,7 +87,7 @@ const jump = (href: string) => {
         <HeaderNav v-if="route.name" :options="isCollaboration ? collaborationNav : navs" />
       </div>
       <div class="header-right">
-        <template v-if="loginStore.isLogined">
+        <template v-if="loginStore.isLogined && route.name">
           <OLink v-if="isCollaboration" class="todo" @click="jump(`todo`)" :class="{ active: isTodo }">待办中心</OLink>
           <OLink v-else class="collaboration" @click="jump(`collaboration`)">协作平台</OLink>
         </template>
