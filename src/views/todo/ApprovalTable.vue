@@ -1,14 +1,14 @@
 <script lang="ts" setup>
-import { ref, type PropType, computed, type ComponentPublicInstance, reactive, watch, onMounted } from 'vue';
+import { ref, type PropType, type ComponentPublicInstance, onMounted, computed } from 'vue';
 import { OTable, OLink, OTag, ODialog, OButton, OPopup, OIcon, OPopover } from '@opensig/opendesign';
 import { useLocale } from '@/composables/useLocale';
 import { formatDateTime } from '@/utils/common';
 import { useRouter, useRoute } from 'vue-router';
 import { applicationTypeCurrent, applyStatusType } from '@/data/todo';
 import { applicationTypeConvert, applyStatusConvert, versionLatestStatusConvert } from '@/utils/collaboration';
-import { useUserInfoStore } from '@/stores/user';
 import { onClickOutside } from '@vueuse/core';
 import { getAdminApplyRepos, getMaintainerApplyRepos } from '@/api/api-collaboration';
+import { useUserInfoStore } from '@/stores/user';
 import FilterableCheckboxes from '@/components/FilterableCheckboxes.vue';
 
 import IconFilter from '~icons/app/icon-filter.svg';
@@ -22,10 +22,6 @@ interface ColumnsT {
 }
 
 const props = defineProps({
-  filterableColumns: {
-    type: Array as PropType<string[]>,
-    default: () => [],
-  },
   data: {
     type: Array,
     default: () => [],
@@ -42,7 +38,15 @@ const props = defineProps({
     type: Boolean,
     default: () => false,
   },
+  filterParams: {
+    type: Object,
+    default: () => ({}),
+  },
 });
+
+const userInfoStore = useUserInfoStore();
+const isMainPer = computed(() => userInfoStore.platformMaintainerPermission);
+const isAdminPer = computed(() => userInfoStore.platformAdminPermission);
 
 const router = useRouter();
 const route = useRoute();
@@ -51,8 +55,18 @@ const { locale } = useLocale();
 const repoList = ref<string[]>([]);
 
 const getRepoList = () => {
-  if (props.type === 'approval' || props.type === 'approved') {
-    getAdminApplyRepos()
+  let applyStatus = '';
+  if (isAdminPer.value) {
+    if (props.type === 'approval' || props.type === 'approved') {
+      applyStatus = props.type === 'approval' ? 'OPEN,REJECTED' : 'APPROVED,REJECTED';
+    } else if (props.type === 'application') {
+      applyStatus = 'OPEN,REJECTED,APPROVED,REJECTED';
+    }
+    const params = {
+      apply_status: applyStatus,
+    };
+
+    getAdminApplyRepos(params)
       .then((data) => (repoList.value = data.list))
       .finally(() => (repoFilterLoading.value = false));
   } else {
@@ -62,19 +76,9 @@ const getRepoList = () => {
   }
 };
 
-const filterParams = reactive(
-  props.filterableColumns.reduce(
-    (obj, col) => {
-      obj[col] = '';
-      return obj;
-    },
-    {} as Record<string, string>
-  )
-);
+const innerFilterParams = ref(props.filterParams);
+const filterableColumns = ref(Object.keys(props.filterParams));
 
-watch(filterParams, (params) => emits('queryData', params));
-
-const filterableColSet = computed(() => new Set(props.filterableColumns));
 const applyTypes = applicationTypeCurrent.map((item) => ({ label: item.label, value: item.id }));
 
 const filterIconRefs = ref(new Array<ComponentPublicInstance>(props.columns.length));
@@ -87,6 +91,16 @@ const setPopupClickoutSideFn = (el: any, index: number) => {
     filterSwitches.value[index] = false;
   });
 };
+
+onMounted(() => {
+  Object.entries(props.filterParams).forEach(([key, value]) => {
+    if (value) {
+      const index = props.columns.findIndex((item) => item.key === key);
+      currentActiveFilterIndices.value.add(index);
+      activeFilterValues.value[index] = value;
+    }
+  });
+});
 
 /** 当前有选中筛选项的表格列的数组下标 */
 const currentActiveFilterIndices = ref(new Set<number>());
@@ -118,10 +132,8 @@ const onFilterChange = (type: string, index: number, val: string) => {
     activeFilterValues.value[index] = '';
     currentActiveFilterIndices.value.delete(index);
   }
+  emits('queryData', innerFilterParams.value);
 };
-
-const userInfoStore = useUserInfoStore();
-const isMainPer = computed(() => userInfoStore.platformMaintainerPermission);
 
 const jumpTo = (id: number) => {
   const type = route.params?.type as string;
@@ -153,7 +165,7 @@ const revoke = () => {
     <OTable :columns="columns" :data="data" :loading="loading" border="all">
       <template #head="{ columns }">
         <template v-for="(item, index) in columns" :key="item.type">
-          <th v-if="!filterableColSet.size || !filterableColSet.has(item.key)" :class="item.type">
+          <th v-if="!filterableColumns.includes(item.key)" :class="item.type">
             <template v-if="item.label === '申请人'">
               <div class="th-maintainer">
                 申请人
@@ -192,21 +204,21 @@ const revoke = () => {
             </template>
             <div :ref="(el) => setPopupClickoutSideFn(el, index)">
               <FilterableCheckboxes
-                v-model="filterParams[item.key]"
+                v-model="innerFilterParams[item.key]"
                 v-if="item.key === 'metric'"
                 :filterable="false"
                 @change="onFilterChange(item.key, index, $event)"
                 :values="applyTypes"
               />
               <FilterableCheckboxes
-                v-model="filterParams[item.key]"
+                v-model="innerFilterParams[item.key]"
                 v-else-if="item.key === 'repo'"
                 :loading="repoFilterLoading"
                 @change="onFilterChange(item.key, index, $event)"
                 :values="repoList"
               />
               <FilterableCheckboxes
-                v-model="filterParams[item.key]"
+                v-model="innerFilterParams[item.key]"
                 v-else-if="item.key === 'applyStatus'"
                 :filterable="false"
                 @change="onFilterChange(item.key, index, $event)"
@@ -216,8 +228,8 @@ const revoke = () => {
           </OPopup>
         </template>
       </template>
-      <template #td_updateAt="{ row }">
-        {{ formatDateTime(row.updateAt, true) }}
+      <template #td_createdAt="{ row }">
+        {{ formatDateTime(row.createdAt, true) }}
       </template>
       <template #td_metric="{ row }">
         {{ applicationTypeConvert(row.metric) }}
@@ -245,7 +257,7 @@ const revoke = () => {
         <template v-if="type === 'application'">
           <div class="oper-box">
             <OLink color="primary" hover-underline @click="jumpTo(row.applyIdString)">申请详情</OLink>
-            <OLink color="danger" v-if="row.applyStatus === 'OPEN' && isMainPer" hover-underline @click="revokeApplication(row.applyIdString)">撤销申请</OLink>
+            <OLink color="danger" v-if="row.applyStatus === 'OPEN'" hover-underline @click="revokeApplication(row.applyIdString)">撤销申请</OLink>
           </div>
         </template>
         <template v-if="type === 'approval'">
@@ -344,7 +356,7 @@ thead {
     width: 180px;
   }
   .updateAt {
-    width: 178px;
+    width: 180px;
   }
   .operation {
     width: 220px;

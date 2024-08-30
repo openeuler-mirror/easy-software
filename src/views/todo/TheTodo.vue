@@ -1,15 +1,16 @@
 <script lang="ts" setup>
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted, computed, reactive } from 'vue';
 import { OTab, OTabPane, useMessage } from '@opensig/opendesign';
 import { useRoute, useRouter } from 'vue-router';
 import { useLocale } from '@/composables/useLocale';
 import { approvalColumns, applicationColumns, approvalHistoryColumns } from '@/data/todo';
-import { getAdminApply, getMaintainerApply, getMaintainerRevoke } from '@/api/api-collaboration';
+import { getAdminApply, getMaintainerApply, getMaintainerRevoke, getAdminRevoke } from '@/api/api-collaboration';
 import { useUserInfoStore } from '@/stores/user';
 import Result404 from '@/components/Result404.vue';
 import ApprovalTable from './ApprovalTable.vue';
 import { COUNT_PAGESIZE } from '@/data/query';
 import { getParamsRules } from '@/utils/common';
+import type { RevokeT } from '@/@types/collaboration';
 
 const tabList = [
   {
@@ -35,6 +36,9 @@ const message = useMessage();
 const isAdminPermission = computed(() => userInfoStore.platformAdminPermission);
 const isMaintainerPermission = computed(() => userInfoStore.platformMaintainerPermission);
 
+// 报错提示
+const isError = ref(false);
+
 // 分页
 const currentPage = ref(1);
 const pageSize = ref(10);
@@ -42,7 +46,6 @@ const total = ref(0);
 
 const todoName = ref('formPage');
 const applyId = ref();
-const isError = ref(false);
 const applyStatus = ref('');
 const todoParams = computed(() => {
   return {
@@ -51,7 +54,6 @@ const todoParams = computed(() => {
     pageNum: currentPage.value,
     pageSize: pageSize.value,
     applyStatus: applyStatus.value,
-    timeOrder: 'desc',
   };
 });
 
@@ -67,10 +69,22 @@ const activeName = ref();
 const onChange = (type: string) => {
   currentPage.value = 1;
   pageSize.value = 10;
+
+  clearFilterParams(applicationFilterParams);
+  clearFilterParams(approvalFilterParams);
+  clearFilterParams(approvedFilterParams);
+
   pageInit();
   // 切换url参数
   router.push({
     path: `/${locale.value}/todo/${type}`,
+  });
+};
+
+// 清楚筛选数据
+const clearFilterParams = (data: any) => {
+  Object.keys(data).forEach((key) => {
+    data[key] = '';
   });
 };
 
@@ -85,57 +99,93 @@ const handleCurrentChange = (val: number) => {
   pageInit();
 };
 
-// 我的申请
-const queryMyApplication = (params = {}) => {
-  isLoading.value = true;
-  if (isMaintainerPermission.value) {
-    const newData = getParamsRules(todoParams.value);
-    getMaintainerApply({ ...newData, ...params })
-      .then((res) => {
-        applicationData.value = res.data.list;
-        total.value = res.data.total;
+const applicationFilterParams = reactive({
+  repo: '',
+  metric: '',
+  applyStatus: '',
+});
 
-        isLoading.value = false;
-      })
-      .catch(() => {
-        applicationData.value = [];
-        isLoading.value = false;
-        isError.value = true;
-      });
-  } else {
+// 我的申请
+const queryMyApplication = async (params: Record<string, string> = {}) => {
+  isLoading.value = true;
+  const filterParamKeys = Object.keys(params);
+  if (filterParamKeys.length && currentPage.value !== 1) {
+    currentPage.value = 1;
+  }
+  for (const key of filterParamKeys) {
+    applicationFilterParams[key as keyof typeof applicationFilterParams] = params[key];
+  }
+  const newData = getParamsRules(todoParams.value);
+
+  try {
+    if (isAdminPermission.value) {
+      const { data } = await getAdminApply({ ...newData, ...applicationFilterParams });
+      applicationData.value = data.list;
+      total.value = data.total;
+    } else if (isMaintainerPermission.value) {
+      const { data } = await getMaintainerApply({ ...newData, ...applicationFilterParams });
+      applicationData.value = data.list;
+      total.value = data.total;
+    }
+    isLoading.value = false;
+  } catch {
+    applicationData.value = [];
     isError.value = true;
     isLoading.value = false;
   }
 };
 
 // 撤销申请
-const revokeApplication = (id: string) => {
-  const params = {
+const revokeApplication = async (id: string) => {
+  const params: RevokeT = {
     applyIdString: id,
     applyStatus: 'OPEN',
   };
-  getMaintainerRevoke(params)
-    .then((res) => {
+  try {
+    if (isAdminPermission.value) {
+      const res = await getAdminRevoke(params);
       if (res.code === 200) {
         message.success({
           content: '撤销成功',
         });
         pageInit();
       }
-    })
-    .catch(() => {
-      message.danger({
-        content: '操作失败',
-      });
+    } else if (isMaintainerPermission.value) {
+      const res = await getMaintainerRevoke(params);
+      if (res.code === 200) {
+        message.success({
+          content: '撤销成功',
+        });
+        pageInit();
+      }
+    }
+    isLoading.value = false;
+  } catch {
+    message.danger({
+      content: '操作失败',
     });
+  }
 };
 
+const approvalFilterParams = reactive({
+  repo: '',
+  metric: '',
+});
+
 // 待我审批
-const queryApprovalApply = (params = {}) => {
+const queryApprovalApply = (params: Record<string, string> = {}) => {
   isLoading.value = true;
   if (isAdminPermission.value) {
+    const filterParamKeys = Object.keys(params);
+    if (filterParamKeys.length && currentPage.value !== 1) {
+      currentPage.value = 1;
+    }
+    for (const key of filterParamKeys) {
+      approvalFilterParams[key as keyof typeof approvalFilterParams] = params[key];
+    }
     const newData = getParamsRules(todoParams.value);
-    getAdminApply({ ...newData, ...params })
+
+    getAdminApply({ ...newData, ...approvalFilterParams })
       .then((res) => {
         approvalData.value = res.data.list;
         total.value = res.data.total;
@@ -153,12 +203,24 @@ const queryApprovalApply = (params = {}) => {
   }
 };
 
+const approvedFilterParams = reactive({
+  repo: '',
+  metric: '',
+});
+
 // 我审批过的
-const queryApprovedApply = (params = {}) => {
+const queryApprovedApply = (params: Record<string, string> = {}) => {
   isLoading.value = true;
   if (isAdminPermission.value) {
+    const filterParamKeys = Object.keys(params);
+    if (filterParamKeys.length && currentPage.value !== 1) {
+      currentPage.value = 1;
+    }
+    for (const key of filterParamKeys) {
+      approvedFilterParams[key as keyof typeof approvedFilterParams] = params[key];
+    }
     const newData = getParamsRules(todoParams.value);
-    getAdminApply({ ...newData, ...params })
+    getAdminApply({ ...newData, ...approvedFilterParams })
       .then((res) => {
         approvedData.value = res.data.list;
         total.value = res.data.total;
@@ -178,7 +240,7 @@ const queryApprovedApply = (params = {}) => {
 const pageInit = () => {
   isError.value = false;
   if (activeName.value === 'application') {
-    applyStatus.value = '';
+    applyStatus.value = isAdminPermission.value ? 'OPEN,REVOKED' : '';
     todoName.value = 'formPage';
     applyId.value = '';
     queryMyApplication();
@@ -216,7 +278,7 @@ onMounted(() => {
         <ApprovalTable
           :columns="applicationColumns"
           @queryData="queryMyApplication"
-          :filterable-columns="['repo', 'metric', 'applyStatus']"
+          :filterParams="applicationFilterParams"
           :type="activeName"
           :data="applicationData"
           :loading="isLoading"
@@ -234,7 +296,7 @@ onMounted(() => {
           <ApprovalTable
             :columns="approvalColumns"
             @queryData="queryApprovalApply"
-            :filterable-columns="['repo', 'metric']"
+            :filterParams="approvalFilterParams"
             :type="activeName"
             :data="approvalData"
             :loading="isLoading"
@@ -249,7 +311,7 @@ onMounted(() => {
           <ApprovalTable
             :columns="approvalHistoryColumns"
             @queryData="queryApprovedApply"
-            :filterable-columns="['repo', 'metric']"
+            :filterParams="approvedFilterParams"
             :type="activeName"
             :data="approvedData"
             :loading="isLoading"

@@ -1,6 +1,6 @@
 import { request } from '@/shared/axios';
 import type { AxiosResponse } from '@/shared/axios';
-import type { AdminAppryT, CollaborationRepoT } from '@/@types/collaboration';
+import type { AdminAppryT, CollaborationRepoT, RevokeT } from '@/@types/collaboration';
 
 // 权限
 export function getCollaborationPermissions() {
@@ -21,19 +21,11 @@ export function getAdminRepos(params: CollaborationRepoT) {
 }
 
 /**
- * 获取sig列表
+ * 获取仓库/sig列表
  */
-export function getSigList() {
-  const url = `/api-dsapi/query/sig/name?community=openeuler`;
-  return request.get<{ data: Record<'openeuler', string[]> }>(url).then((res) => res.data.data.openeuler);
-}
-
-/**
- * 获取仓库列表
- */
-export function getRepoList() {
-  const url = `/api-dsapi/query/repo/sig/list?community=openeuler`;
-  return request.get<{ data: Record<string, string>[] }>(url).then((res) => res.data.data.map((item) => Object.keys(item)[0]));
+export function getRepoSigList(permission: string) {
+  const url = `/server/collaboration/${permission}/query/repos`;
+  return request.get<{ data: Record<string, string> }>(url).then((res) => res.data.data);
 }
 
 // 待我审批
@@ -50,12 +42,14 @@ export function getMaintainerApply(params: AdminAppryT) {
 }
 
 // 申请撤销
-interface RevokeT {
-  applyIdString: string;
-  applyStatus: string;
-}
+
 export function getMaintainerRevoke(params: RevokeT) {
   const url = `/server/collaboration/maintainer/revoke`;
+  return request.post(url, { ...params }).then((res: AxiosResponse) => res?.data);
+}
+
+export function getAdminRevoke(params: RevokeT) {
+  const url = `/server/collaboration/admin/revoke`;
   return request.post(url, { ...params }).then((res: AxiosResponse) => res?.data);
 }
 
@@ -66,9 +60,12 @@ export function getMaintainerApplyRepos() {
 }
 
 /** 待办中心获取待我审批/我审批过所有仓库 */
-export function getAdminApplyRepos() {
+interface ReposT {
+  apply_status: string
+}
+export function getAdminApplyRepos(params: ReposT) {
   const url = `/server/collaboration/admin/apply/repos`;
-  return request.get<{ data: { total: number, list: string[] } }>(url).then((res) => res?.data.data);
+  return request.get(url, { params }).then((res) => res?.data.data);
 }
 
 interface FeedbackT {
@@ -83,6 +80,12 @@ export function getApplyFeedback(params: FeedbackT) {
   const url = `/server/collaboration/maintainer/apply?repo=${params.repo}`;
   return request.post(url, { ...params }).then((res: AxiosResponse) => res?.data);
 }
+
+export function getAdminApplyFeedback(params: FeedbackT) {
+  const url = `/server/collaboration/admin/apply?repo=${params.repo}`;
+  return request.post(url, { ...params }).then((res: AxiosResponse) => res?.data);
+}
+
 
 interface ProcessT {
   applyIdString: string;

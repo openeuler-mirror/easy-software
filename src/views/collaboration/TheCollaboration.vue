@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { ref, watch, computed, type ComponentPublicInstance, reactive, toRefs } from 'vue';
-import { OTable, OTag, OLink, OIcon, OPopup, OPopover } from '@opensig/opendesign';
-import { getMaintainerRepos, getAdminRepos, getSigList, getRepoList } from '@/api/api-collaboration';
+import { ref, watch, computed, type ComponentPublicInstance, reactive } from 'vue';
+import { OTable, OTag, OLink, OIcon, OPopup, OPopover, useMessage } from '@opensig/opendesign';
+import { getMaintainerRepos, getAdminRepos, getRepoSigList } from '@/api/api-collaboration';
 import { useUserInfoStore } from '@/stores/user';
 import ExternalLink from '@/components/ExternalLink.vue';
 import Indicators from '@/components/collaboration/Indicators.vue';
@@ -16,6 +16,7 @@ import FilterableCheckboxes from '@/components/FilterableCheckboxes.vue';
 import { kindTypes, applicationType } from '@/data/todo';
 import { onClickOutside } from '@vueuse/core';
 import { repoStatusIndex, repoStatusArr, versionLatestStatusConvert } from '@/utils/collaboration';
+import { storeToRefs } from 'pinia';
 
 const columns = [
   { label: '软件仓库', key: 'repo', type: 'repo' },
@@ -31,8 +32,30 @@ const columns = [
   { label: '操作', key: 'operation', type: 'operation' },
 ];
 
-const allSigs = ref<string[]>();
-const allRepos = ref<string[]>();
+const message = useMessage();
+
+// 筛选条件
+const filterParams = reactive<Record<string, string | number>>({
+  repo: '',
+  kind: '',
+  sigName: '',
+  cveStatus: '',
+  issueStatus: '',
+  prStatus: '',
+  versionStatus: '',
+  orgStatus: '',
+  contributorStatus: '',
+  status: '',
+});
+
+const sigRepoMap = ref(new Map<string, string[]>());
+const allSigs = computed(() => Array.from(sigRepoMap.value.keys()));
+const allRepos = computed(() => {
+  if (filterParams.sigName) {
+    return sigRepoMap.value.get(filterParams.sigName as string) ?? [];
+  }
+  return Array.from(sigRepoMap.value.values()).flat();
+});
 
 // 筛选
 const filterIconRefs = ref(new Array<ComponentPublicInstance>(columns.length));
@@ -40,34 +63,47 @@ const filterIconRefs = ref(new Array<ComponentPublicInstance>(columns.length));
 /** 筛选组件是否显示的开关 */
 const filterSwitches = ref(columns.map(() => false));
 
+let clickOutsideStopFns: (() => void)[] = [];
+
 const setPopupClickoutSideFn = (el: any, index: number) => {
-  onClickOutside(el, () => {
-    filterSwitches.value[index] = false;
-  });
+  if (clickOutsideStopFns.length) {
+    clickOutsideStopFns.forEach((fn) => fn());
+    clickOutsideStopFns = [];
+  }
+  clickOutsideStopFns.push(
+    onClickOutside(el, () => {
+      filterSwitches.value[index] = false;
+    }) as () => void
+  );
 };
 
-const repoFilterLoading = ref(false);
-const sigFilterLoading = ref(false);
+const filterLoading = ref(false);
 
 /** 切换某个筛选组件显示开关 */
-const switchFilterVisible = (index: number) => {
+const switchFilterVisible = async (index: number) => {
   filterSwitches.value[index] = true;
-  if (index === 0) {
-    // 筛选仓库
-    if (!allRepos.value?.length) {
-      repoFilterLoading.value = true;
-      getRepoList()
-        .then((list) => (allRepos.value = list))
-        .finally(() => (repoFilterLoading.value = false));
-    }
-  }
-  if (index === 2) {
-    // 筛选sig
-    if (!allSigs.value?.length) {
-      sigFilterLoading.value = true;
-      getSigList()
-        .then((list) => (allSigs.value = list))
-        .finally(() => (sigFilterLoading.value = false));
+  if ((index === 0 || index === 2) && !sigRepoMap.value.size) {
+    filterLoading.value = true;
+    let data: Record<string, string> | null = null;
+    try {
+      if (isAdminPer.value) {
+        data = await getRepoSigList('admin');
+      } else if (isMainPer.value) {
+        data = await getRepoSigList('maintainer');
+      }
+      if (!data) {
+        return;
+      }
+      Object.entries(data).forEach(([repo, sig]) => {
+        let repoList = sigRepoMap.value.get(sig);
+        if (!repoList) {
+          repoList = [repo];
+          return sigRepoMap.value.set(sig, repoList);
+        }
+        repoList.push(repo);
+      });
+    } finally {
+      filterLoading.value = false;
     }
   }
 };
@@ -78,7 +114,7 @@ const activeFilterValues = ref(new Array<string>(columns.length));
 /** 当前有选中筛选项的表格列的数组下标 */
 const currentActiveFilterIndices = ref(new Set<number>());
 
-const onFilterChange = (type: string, index: number, val: string) => {
+const onFilterChange = (index: number, val: string) => {
   // 关掉筛选组件
   filterSwitches.value = columns.map(() => false);
   if (val) {
@@ -91,6 +127,7 @@ const onFilterChange = (type: string, index: number, val: string) => {
   if (filterParams.versionStatus === '版本正常') {
     filterParams.versionStatus = '最新版本';
   }
+
   if (currentPage.value !== 1) {
     currentPage.value = 1;
   } else {
@@ -109,20 +146,6 @@ const currentPage = ref(1);
 const pageSize = ref(10);
 const total = ref(0);
 
-// 筛选条件
-const filterParams = reactive<Record<string, string | number>>({
-  repo: '',
-  kind: '',
-  sigName: '',
-  cveStatus: '',
-  issueStatus: '',
-  prStatus: '',
-  versionStatus: '',
-  orgStatus: '',
-  contributorStatus: '',
-  status: '',
-});
-
 const searchParams = computed(() => {
   return {
     pageNum: currentPage.value,
@@ -137,7 +160,6 @@ const isError = ref(false);
 // Maintainer 数据
 const queryMaintainerRepos = () => {
   isLoading.value = true;
-
   getMaintainerRepos({ ...searchParams.value, ...filterParams })
     .then((res) => {
       reposData.value = res.data.list;
@@ -154,7 +176,6 @@ const queryMaintainerRepos = () => {
 // Admin 数据
 const queryAdminRepos = () => {
   isLoading.value = true;
-
   getAdminRepos({ ...searchParams.value, ...filterParams })
     .then((res) => {
       reposData.value = res.data.list;
@@ -171,8 +192,7 @@ const queryAdminRepos = () => {
 const pageInit = () => {
   if (isAdminPer.value) {
     queryAdminRepos();
-  }
-  if (isMainPer.value) {
+  } else if (isMainPer.value) {
     queryMaintainerRepos();
   }
 };
@@ -201,8 +221,14 @@ const showDlg = ref(false);
 const showFeedbackDlg = ref(false);
 const repoValue = ref('');
 const changeFeedback = (v: string) => {
-  showFeedbackDlg.value = true;
-  repoValue.value = v;
+  if (userInfoStore.getGiteeId) {
+    showFeedbackDlg.value = true;
+    repoValue.value = v;
+  } else {
+    message.warning({
+      content: '请绑定您的Gitee ID',
+    });
+  }
 };
 
 // 反馈历史
@@ -239,149 +265,151 @@ watch(
   </div>
   <ContentWrapper :vertical-padding="['24px', '72px']" class="collaboration-wrap">
     <AppLoading :loading="isLoading" />
-    <div class="indicators">
-      <span @click="showDlg = true" class="text"
-        ><OIcon><IconState /></OIcon>状态指标说明</span
-      >
-      <Indicators v-if="showDlg" @change="showDlg = false" />
-    </div>
-    <div class="platform-main">
-      <OTable :columns="columns" :data="reposData" :loading="loading" border="row" :class="{ admin: isAdminPer }">
-        <template #head="{ columns }">
-          <OPopup
-            trigger="none"
-            style="--popup-radius: 4px"
-            v-for="(item, index) in columns"
-            :key="item.type"
-            :visible="filterSwitches[index]"
-            :unmount-on-hide="false"
-            :offset="-8"
-            position="bl"
-          >
-            <template #target>
-              <th :class="item.type">
-                <div class="header-cell">
-                  {{ item.label }}
-                  <template v-if="item.key !== 'operation'">
-                    <OIcon
-                      :ref="(el) => (filterIconRefs[index] = el as ComponentPublicInstance)"
-                      class="filter-icon"
-                      :style="currentActiveFilterIndices.has(index) ? { color: 'var(--o-color-primary1)' } : {}"
-                      @click="switchFilterVisible(index)"
-                      ><IconFilter
-                    /></OIcon>
-                    <OPopover v-if="currentActiveFilterIndices.has(index) && activeFilterValues[index]" :target="filterIconRefs[index]" trigger="hover">
-                      <p class="bubble-content">
-                        <span class="title">{{ item.label }}:</span>
-                        {{ activeFilterValues[index] }}
-                      </p>
-                    </OPopover>
-                  </template>
-                </div>
-              </th>
-            </template>
-            <div :ref="(el) => setPopupClickoutSideFn(el, index)">
-              <FilterableCheckboxes
-                v-if="item.key === 'repo'"
-                v-model="filterParams[item.key]"
-                :loading="repoFilterLoading"
-                @change="onFilterChange(item.key, index, $event)"
-                :values="allRepos"
-              />
-              <FilterableCheckboxes
-                v-else-if="item.key === 'sigName'"
-                v-model="filterParams[item.key]"
-                :loading="sigFilterLoading"
-                @change="onFilterChange(item.key, index, $event)"
-                :values="allSigs"
-              />
-              <FilterableCheckboxes
-                v-else-if="item.key === 'kind'"
-                v-model="filterParams[item.key]"
-                @change="onFilterChange(item.key, index, $event)"
-                :filterable="false"
-                :values="kindTypes"
-              />
-              <FilterableCheckboxes
-                v-else-if="item.key === 'status'"
-                :filterable="false"
-                v-model="filterParams[item.key]"
-                @change="onFilterChange(item.key, index, $event)"
-                :values="repoStatusArr"
-              />
-              <FilterableCheckboxes
-                v-else
-                v-model="filterParams[item.key]"
-                :filterable="false"
-                @change="onFilterChange(item.key, index, $event)"
-                :values="metricTypes(item.key)"
-              />
-            </div>
-          </OPopup>
-        </template>
-        <template #td_repo="{ row }">
-          <OLink color="primary" class="link-external" hover-underline @click="changeExternalDialog(`${SRCOPENEULER + row.repo}`)"
-            ><span class="text">{{ row.repo }} </span><OIcon><IconOutlink /></OIcon
-          ></OLink>
-        </template>
-        <template #td_issueStatus="{ row }">
-          <OLink color="primary" class="link-external" hover-underline @click="changeExternalDialog(`${SRCOPENEULER + row.repo}/issues`)"
-            ><span class="text">{{ row.issueStatus }}</span> <OIcon><IconOutlink /></OIcon
-          ></OLink>
-        </template>
-        <template #td_prStatus="{ row }">
-          <OLink color="primary" class="link-external" hover-underline @click="changeExternalDialog(`${SRCOPENEULER + row.repo}/pulls`)"
-            ><span class="text">{{ row.prStatus }}</span> <OIcon><IconOutlink /></OIcon
-          ></OLink>
-        </template>
-        <template #td_cveStatus="{ row }">
-          <OLink
-            color="primary"
-            class="link-external"
-            hover-underline
-            @click="changeExternalDialog(`${SRCOPENEULER + row.repo}/issues?single_label_id=85497765`)"
-          >
-            <span class="text">{{ row.cveStatus }}</span> <OIcon><IconOutlink /></OIcon
-          ></OLink>
-        </template>
-        <template #td_status="{ row }">
-          <div class="repo-status">
-            <OTag :class="`type${repoStatusIndex(row.status)}`">{{ row.status }} </OTag>
-          </div>
-        </template>
-        <template #td_versionStatus="{ row }">
-          {{ versionLatestStatusConvert(row.versionStatus) }}
-        </template>
-
-        <template #td_operation="{ row }">
-          <div class="operation-box">
-            <OLink v-if="isMainPer" color="primary" hover-underline @click="changeFeedback(row.repo)">状态反馈</OLink>
-            <OLink color="primary" hover-underline @click="changeFeedbackHistory(row.repo)">反馈历史</OLink>
-          </div>
-        </template>
-      </OTable>
-
-      <div v-if="total > COUNT_PAGESIZE[0]" class="pagination-box">
-        <AppPagination :current="currentPage" :pagesize="pageSize" :total="total" @size-change="handleSizeChange" @current-change="handleCurrentChange" />
+    <template v-if="!isLoading">
+      <div class="indicators">
+        <span @click="showDlg = true" class="text"
+          ><OIcon><IconState /></OIcon>状态指标说明</span
+        >
+        <Indicators v-if="showDlg" @change="showDlg = false" />
       </div>
-    </div>
-    <!-- 暂无记录 -->
-    <template v-if="isError">
-      <Result404>
-        <template #description>
-          <p class="text404">暂无记录</p>
-        </template>
-      </Result404>
+      <div class="platform-main">
+        <OTable :columns="columns" :data="reposData" :loading="loading" border="row">
+          <template #head="{ columns }">
+            <OPopup
+              trigger="none"
+              style="--popup-radius: 4px"
+              v-for="(item, index) in columns"
+              :key="item.type"
+              :visible="filterSwitches[index]"
+              :unmount-on-hide="false"
+              :offset="-8"
+              position="bl"
+            >
+              <template #target>
+                <th :class="item.type">
+                  <div class="header-cell">
+                    {{ item.label }}
+                    <template v-if="item.key !== 'operation'">
+                      <OIcon
+                        :ref="(el) => (filterIconRefs[index] = el as ComponentPublicInstance)"
+                        class="filter-icon"
+                        :style="currentActiveFilterIndices.has(index) ? { color: 'var(--o-color-primary1)' } : {}"
+                        @click="switchFilterVisible(index)"
+                        ><IconFilter
+                      /></OIcon>
+                      <OPopover v-if="currentActiveFilterIndices.has(index) && activeFilterValues[index]" :target="filterIconRefs[index]" trigger="hover">
+                        <p class="bubble-content">
+                          <span class="title">{{ item.label }}:</span>
+                          {{ activeFilterValues[index] }}
+                        </p>
+                      </OPopover>
+                    </template>
+                  </div>
+                </th>
+              </template>
+              <div :ref="(el) => setPopupClickoutSideFn(el, index)">
+                <FilterableCheckboxes
+                  v-if="item.key === 'repo'"
+                  v-model="filterParams[item.key]"
+                  :loading="filterLoading"
+                  @change="onFilterChange(index, $event)"
+                  :values="allRepos"
+                />
+                <FilterableCheckboxes
+                  v-else-if="item.key === 'sigName'"
+                  v-model="filterParams[item.key]"
+                  :loading="filterLoading"
+                  @change="onFilterChange(index, $event)"
+                  :values="allSigs"
+                />
+                <FilterableCheckboxes
+                  v-else-if="item.key === 'kind'"
+                  v-model="filterParams[item.key]"
+                  @change="onFilterChange(index, $event)"
+                  :filterable="false"
+                  :values="kindTypes"
+                />
+                <FilterableCheckboxes
+                  v-else-if="item.key === 'status'"
+                  :filterable="false"
+                  v-model="filterParams[item.key]"
+                  @change="onFilterChange(index, $event)"
+                  :values="repoStatusArr"
+                />
+                <FilterableCheckboxes
+                  v-else
+                  v-model="filterParams[item.key]"
+                  :filterable="false"
+                  @change="onFilterChange(index, $event)"
+                  :values="metricTypes(item.key)"
+                />
+              </div>
+            </OPopup>
+          </template>
+          <template #td_repo="{ row }">
+            <OLink color="primary" class="link-external" hover-underline @click="changeExternalDialog(`${SRCOPENEULER + row.repo}`)"
+              ><span class="text">{{ row.repo }} </span><OIcon><IconOutlink /></OIcon
+            ></OLink>
+          </template>
+          <template #td_issueStatus="{ row }">
+            <OLink color="primary" class="link-external" hover-underline @click="changeExternalDialog(`${SRCOPENEULER + row.repo}/issues`)"
+              ><span class="text">{{ row.issueStatus }}</span> <OIcon><IconOutlink /></OIcon
+            ></OLink>
+          </template>
+          <template #td_prStatus="{ row }">
+            <OLink color="primary" class="link-external" hover-underline @click="changeExternalDialog(`${SRCOPENEULER + row.repo}/pulls`)"
+              ><span class="text">{{ row.prStatus }}</span> <OIcon><IconOutlink /></OIcon
+            ></OLink>
+          </template>
+          <template #td_cveStatus="{ row }">
+            <OLink
+              color="primary"
+              class="link-external"
+              hover-underline
+              @click="changeExternalDialog(`${SRCOPENEULER + row.repo}/issues?single_label_id=85497765`)"
+            >
+              <span class="text">{{ row.cveStatus }}</span> <OIcon><IconOutlink /></OIcon
+            ></OLink>
+          </template>
+          <template #td_status="{ row }">
+            <div class="repo-status">
+              <OTag :class="`type${repoStatusIndex(row.status)}`">{{ row.status }} </OTag>
+            </div>
+          </template>
+          <template #td_versionStatus="{ row }">
+            {{ versionLatestStatusConvert(row.versionStatus) }}
+          </template>
+
+          <template #td_operation="{ row }">
+            <div class="operation-box">
+              <OLink color="primary" hover-underline @click="changeFeedback(row.repo)">状态反馈</OLink>
+              <OLink color="primary" hover-underline @click="changeFeedbackHistory(row.repo)">反馈历史</OLink>
+            </div>
+          </template>
+        </OTable>
+
+        <div v-if="total > COUNT_PAGESIZE[0]" class="pagination-box">
+          <AppPagination :current="currentPage" :pagesize="pageSize" :total="total" @size-change="handleSizeChange" @current-change="handleCurrentChange" />
+        </div>
+      </div>
+      <!-- 暂无记录 -->
+      <template v-if="isError">
+        <Result404>
+          <template #description>
+            <p class="text404">暂无记录</p>
+          </template>
+        </Result404>
+      </template>
+
+      <!-- 跳转外部链接提示 -->
+      <ExternalLink v-if="showExternalDlg" :href="externalLink" @change="showExternalDlg = false" />
+      <!-- 状态反馈 -->
+
+      <StatusFeedback :repo="repoValue" v-if="showFeedbackDlg" @close="showFeedbackDlg = false" />
+
+      <!-- 反馈历史 -->
+      <FeedbackHistroy v-if="showFeedbacHistroykDlg" :repo="repoValue" @close="showFeedbacHistroykDlg = false" />
     </template>
-
-    <!-- 跳转外部链接提示 -->
-    <ExternalLink v-if="showExternalDlg" :href="externalLink" @change="showExternalDlg = false" />
-    <!-- 状态反馈 -->
-
-    <StatusFeedback :repo="repoValue" v-if="showFeedbackDlg" @close="showFeedbackDlg = false" />
-
-    <!-- 反馈历史 -->
-    <FeedbackHistroy v-if="showFeedbacHistroykDlg" :repo="repoValue" @close="showFeedbacHistroykDlg = false" />
   </ContentWrapper>
 </template>
 

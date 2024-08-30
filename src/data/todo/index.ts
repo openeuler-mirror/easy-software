@@ -7,7 +7,7 @@ export const applicationColumns = [
   { label: '审批人', key: 'administrator', type: 'administrator' },
   { label: '审批意见', key: 'comment', type: 'comment' },
   { label: '申请单号', key: 'applyIdString', type: 'applyId' },
-  { label: '申请时间', key: 'updateAt', type: 'updateAt' },
+  { label: '申请时间', key: 'createdAt', type: 'updateAt' },
   { label: '操作', key: 'operation', type: 'operation' },
 ]
 
@@ -18,7 +18,7 @@ export const approvalColumns = [
   { label: '修改理由', key: 'description', type: 'description' },
   { label: '申请人', key: 'maintainer', type: 'maintainer' },
   { label: '申请单号', key: 'applyIdString', type: 'applyId' },
-  { label: '申请时间', key: 'updateAt', type: 'updateAt' },
+  { label: '申请时间', key: 'createdAt', type: 'updateAt' },
   { label: '申请状态', key: 'applyStatus', type: 'applyStatus' },
   { label: '操作', key: 'operation', type: 'operation' },
 ]
@@ -30,7 +30,7 @@ export const approvalHistoryColumns = [
   { label: '审批意见', key: 'comment', type: 'comment' },
   { label: '申请人', key: 'maintainer', type: 'maintainer' },
   { label: '申请单号', key: 'applyIdString', type: 'applyId' },
-  { label: '审批时间', key: 'updateAt', type: 'updateAt' },
+  { label: '审批时间', key: 'createdAt', type: 'updateAt' },
   { label: '审批状态', key: 'applyStatus', type: 'applyStatus' },
   { label: '操作', key: 'operation', type: 'operation' },
 ]

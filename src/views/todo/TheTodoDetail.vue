@@ -18,6 +18,7 @@ const { t } = useI18n();
 const userInfoStore = useUserInfoStore();
 const isAdminPer = computed(() => userInfoStore.platformAdminPermission);
 const isMaintainerPer = computed(() => userInfoStore.platformMaintainerPermission);
+const getGiteeId = computed(() => userInfoStore.getGiteeId);
 
 const isLoading = ref(true);
 const isError = ref(false);
@@ -33,16 +34,21 @@ const formData = reactive({
 });
 
 // 我的申请
-const queryApplicationApply = () => {
-  getMaintainerApply({ name: 'formContent', applyIdString: applyId.value })
-    .then((res) => {
-      todoData.value = res.data.list[0];
-      isLoading.value = false;
-    })
-    .catch(() => {
-      isError.value = true;
-      isLoading.value = false;
-    });
+const queryApplicationApply = async () => {
+  try {
+    if (isAdminPer.value) {
+      const { data } = await getAdminApply({ name: 'formContent', applyIdString: applyId.value });
+      todoData.value = data.list[0];
+    } else if (isMaintainerPer.value) {
+      const { data } = await getMaintainerApply({ name: 'formContent', applyIdString: applyId.value });
+      todoData.value = data.list[0];
+    }
+
+    isLoading.value = false;
+  } catch {
+    isError.value = true;
+    isLoading.value = false;
+  }
 };
 
 // 待我审批
@@ -101,6 +107,13 @@ const rejected = async () => {
 };
 // 审批
 const queryAdminProcess = () => {
+  //不能审批自己提的反馈
+  if (getGiteeId.value === todoData.value.maintainer) {
+    return message.warning({
+      content: '不能审批自己提的反馈!',
+    });
+  }
+
   getAdminProcess(formData)
     .then((res) => {
       if (res.code === 200) {

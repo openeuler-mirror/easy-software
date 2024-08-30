@@ -1,13 +1,16 @@
 <script lang="ts" setup>
-import { computed } from 'vue';
+import { computed, onMounted, nextTick } from 'vue';
 import { OButton } from '@opensig/opendesign';
 import { windowOpen } from '@/utils/common';
 import { useUserInfoStore } from '@/stores/user';
+import { useRouter } from 'vue-router';
+import { useI18n } from 'vue-i18n';
 
 const userInfoStore = useUserInfoStore();
+const router = useRouter();
+const { locale } = useI18n();
 
 // 判断是否绑定gitee
-const isGiteeAccount = computed(() => !!userInfoStore.identities.find((id) => id.identity === 'gitee'));
 const isAdminPer = computed(() => userInfoStore.platformAdminPermission);
 const isMaintainerPer = computed(() => userInfoStore.platformMaintainerPermission);
 
@@ -16,13 +19,23 @@ const USER_CENTER = import.meta.env.VITE_LOGIN_URL;
 const jumpAccount = () => {
   windowOpen(USER_CENTER);
 };
+
+onMounted(() => {
+  nextTick(() => {
+    if (isAdminPer.value || isMaintainerPer.value) {
+      router.push({
+        path: `/${locale.value}/collaboration`,
+      });
+    }
+  });
+});
 </script>
 
 <template>
   <ContentWrapper verticalPadding="40px">
     <Result404>
       <template #description>
-        <template v-if="isGiteeAccount && (!isAdminPer || !isMaintainerPer)">
+        <template v-if="userInfoStore.getGiteeId && (!isAdminPer || !isMaintainerPer)">
           <div class="content">您无权限访问协作平台</div>
         </template>
         <template v-else>

@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { ref, type PropType } from 'vue';
-import { navs } from '@/data/nav';
 import { useRoute, useRouter } from 'vue-router';
 import { computed } from 'vue';
 import { useLocale } from '@/composables/useLocale';
