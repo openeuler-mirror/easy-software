@@ -243,15 +243,15 @@ watch(
             {{ row.administrator ?? '-' }}
           </template>
           <template #td_description="{ row }">
-            <TableShowOverflowTips v-if="row.description" :content="row.description" :line="1" />
+            <TableShowOverflowTips v-if="row.description" :content="row.description" :line="1" wrapper=".histroy-table" />
             <template v-else>-</template>
           </template>
           <template #td_applyIdString="{ row }">
-            <TableShowOverflowTips v-if="row.applyIdString" :content="row.applyIdString" :line="1" />
+            <TableShowOverflowTips v-if="row.applyIdString" :content="row.applyIdString" :line="1" wrapper=".histroy-table" />
             <template v-else>-</template>
           </template>
           <template #td_comment="{ row }">
-            <TableShowOverflowTips v-if="row.comment" :content="row.comment" :line="1" />
+            <TableShowOverflowTips v-if="row.comment" :content="row.comment" :line="1" wrapper=".histroy-table" />
             <template v-else>-</template>
           </template>
           <template #td_applyStatus="{ row }">
@@ -289,6 +289,7 @@ watch(
   .histroy-table {
     border: 1px solid var(--o-color-control4);
     border-radius: 4px;
+    position: relative;
     &.total {
       :deep(.o-table-wrap) {
         height: 538px;

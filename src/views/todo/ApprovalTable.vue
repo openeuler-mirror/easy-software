@@ -238,14 +238,14 @@ const revoke = () => {
         {{ versionLatestStatusConvert(row.metricStatus) }}
       </template>
       <template #td_comment="{ row }">
-        <TableShowOverflowTips v-if="row.comment" :content="row.comment" />
+        <TableShowOverflowTips v-if="row.comment" :content="row.comment" :line="2" wrapper=".table-main" />
         <template v-else>-</template>
       </template>
       <template #td_administrator="{ row }">
         {{ row.administrator ?? '-' }}
       </template>
       <template #td_description="{ row }">
-        <TableShowOverflowTips v-if="row.description" :content="row.description" />
+        <TableShowOverflowTips v-if="row.description" :content="row.description" :line="2" wrapper=".table-main" />
       </template>
 
       <template #td_applyStatus="{ row }">
@@ -285,6 +285,9 @@ const revoke = () => {
 
 <style lang="scss" scoped>
 @import '@/assets/style/category/collaboration/index.scss';
+.table-main {
+  position: relative;
+}
 .th-maintainer {
   display: flex;
   align-items: center;
