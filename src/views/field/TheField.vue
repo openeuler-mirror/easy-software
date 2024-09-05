@@ -10,7 +10,7 @@ const bannerInfo = homeData[0];
 </script>
 <template>
   <AppBanner :title="bannerInfo.name" :background-image="bannerImg" :subtitle="bannerInfo.desc" />
-  <ContentWrapper vertical-padding="40px" class="pkg-content-wrap">
+  <ContentWrapper :vertical-padding="['40px', '72px']" class="pkg-content-wrap">
     <AppPkgContent />
   </ContentWrapper>
 </template>

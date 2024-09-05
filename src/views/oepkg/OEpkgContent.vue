@@ -365,7 +365,7 @@ watch(
           <OLink v-if="filterLength > 0" color="primary" class="resetting" @click="resetTag">{{ t('software.filterSider.clear') }}</OLink>
         </div>
       </div>
-      <div class="pkg-content">
+      <div class="pkg-content" :class="pkgData.length === 0 && isLoading ? 'loading' : ''">
         <AppLoading :loading="isLoading" />
         <ResultNoApp v-if="isSearchError" type="OEPKG" />
         <div v-if="pkgData.length !== 0 && !isSearchError" class="pkg-panel">

@@ -41,7 +41,7 @@ const onMouseLeave = () => {
 
 // -------------------- 选中事件 --------------------
 const selectedIndex = computed(() => {
-  return props.options.findIndex((item) => route.name?.toString().includes(item.id));
+  return props.options.findIndex((item) => route.name?.toString().startsWith(item.id));
 });
 
 // 导航跳转

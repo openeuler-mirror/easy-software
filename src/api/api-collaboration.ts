@@ -8,15 +8,12 @@ export function getCollaborationPermissions() {
   return request.get(url).then((res: AxiosResponse) => res?.data);
 }
 
-// 软件维护详情 maintainer
-export function getMaintainerRepos(params: CollaborationRepoT) {
-  const url = `/server/collaboration/maintainer/user/repos`;
-  return request.get(url, { params }).then((res: AxiosResponse) => res?.data);
-}
-
-// 软件维护详情 admin
-export function getAdminRepos(params: CollaborationRepoT) {
-  const url = `/server/collaboration/admin/user/repos`;
+// 软件维护详情 
+export function getCollaborationRepos(params: CollaborationRepoT, permission: string) {
+  if (params.versionStatus === '版本正常') {
+    params.versionStatus = '最新版本';
+  }
+  const url = `/server/collaboration/${permission}/user/repos`;
   return request.get(url, { params }).then((res: AxiosResponse) => res?.data);
 }
 
@@ -28,28 +25,15 @@ export function getRepoSigList(permission: string) {
   return request.get<{ data: Record<string, string> }>(url).then((res) => res.data.data);
 }
 
-// 待我审批
-export function getAdminApply(params: AdminAppryT) {
-  const url = `/server/collaboration/admin/query/apply`;
-  return request.get(url, { params }).then((res: AxiosResponse) => res?.data);
-}
-
-
 // 我的申请
-export function getMaintainerApply(params: AdminAppryT) {
-  const url = `/server/collaboration/maintainer/query/apply`;
+export function getCollaborationApply(params: AdminAppryT, permission: string) {
+  const url = `/server/collaboration/${permission}/query/apply`;
   return request.get(url, { params }).then((res: AxiosResponse) => res?.data);
 }
 
 // 申请撤销
-
-export function getMaintainerRevoke(params: RevokeT) {
-  const url = `/server/collaboration/maintainer/revoke`;
-  return request.post(url, { ...params }).then((res: AxiosResponse) => res?.data);
-}
-
-export function getAdminRevoke(params: RevokeT) {
-  const url = `/server/collaboration/admin/revoke`;
+export function getTodoRevoke(params: RevokeT, permission: string) {
+  const url = `/server/collaboration/${permission}/revoke`;
   return request.post(url, { ...params }).then((res: AxiosResponse) => res?.data);
 }
 
@@ -76,13 +60,11 @@ interface FeedbackT {
   applyStatus: string;
 }
 
-export function getApplyFeedback(params: FeedbackT) {
-  const url = `/server/collaboration/maintainer/apply?repo=${params.repo}`;
-  return request.post(url, { ...params }).then((res: AxiosResponse) => res?.data);
-}
-
-export function getAdminApplyFeedback(params: FeedbackT) {
-  const url = `/server/collaboration/admin/apply?repo=${params.repo}`;
+export function getCollaborationFeedback(params: FeedbackT, permission: string) {
+  if (params.metricStatus === '版本正常') {
+    params.metricStatus = '最新版本';
+  }
+  const url = `/server/collaboration/${permission}/apply?repo=${params.repo}`;
   return request.post(url, { ...params }).then((res: AxiosResponse) => res?.data);
 }
 
