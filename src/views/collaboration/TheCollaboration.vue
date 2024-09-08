@@ -105,18 +105,15 @@ const filterIconRefs = ref(new Array<ComponentPublicInstance>(flatColumns(column
 /** 筛选组件是否显示的开关 */
 const filterSwitches = ref(flatColumns(columns).map(() => false));
 
-let clickOutsideStopFns: (() => void)[] = [];
+let clickOutsideStopFns: ((() => void) | null)[] = [];
 
 const setPopupClickoutSideFn = (el: any, index: number) => {
-  if (clickOutsideStopFns.length) {
-    clickOutsideStopFns.forEach((fn) => fn());
-    clickOutsideStopFns = [];
+  if (!el) {
+    clickOutsideStopFns[index]?.();
+    clickOutsideStopFns[index] = null;
+    return;
   }
-  clickOutsideStopFns.push(
-    onClickOutside(el, () => {
-      filterSwitches.value[index] = false;
-    }) as () => void
-  );
+  clickOutsideStopFns[index] = onClickOutside(el, () => filterSwitches.value[index] = false) as () => void;
 };
 
 const filterLoading = ref(false);
@@ -156,13 +153,16 @@ const activeFilterValues = ref(new Array<string>(flatColumns(columns).length));
 /** 当前有选中筛选项的表格列的数组下标 */
 const currentActiveFilterIndices = ref(new Set<number>());
 
-const onFilterChange = (index: number, val: string) => {
+const onFilterChange = (filterKey: string, index: number, val: (string | number)[] | string | number) => {
   // 关掉筛选组件
   filterSwitches.value = flatColumns(columns).map(() => false);
-  if (val) {
+  if ((Array.isArray(val) && val.length) || (!Array.isArray(val) && val)) {
+    val = Array.isArray(val) ? val.join() : val.toString();
+    filterParams[filterKey] = val;
     activeFilterValues.value[index] = val;
     currentActiveFilterIndices.value.add(index);
   } else {
+    filterParams[filterKey] = '';
     activeFilterValues.value[index] = '';
     currentActiveFilterIndices.value.delete(index);
   }
@@ -399,37 +399,38 @@ watch(
                   <div :ref="(el) => setPopupClickoutSideFn(el, index)">
                     <FilterableCheckboxes
                       v-if="item.key === 'repo'"
-                      v-model="filterParams[item.key]"
+                      :model-value="filterParams[item.key]"
                       :loading="filterLoading"
-                      @change="onFilterChange(index, $event)"
+                      @change="onFilterChange(item.key, index, $event)"
                       :values="allRepos"
                     />
                     <FilterableCheckboxes
                       v-else-if="item.key === 'sigName'"
-                      v-model="filterParams[item.key]"
+                      :model-value="filterParams[item.key]"
                       :loading="filterLoading"
-                      @change="onFilterChange(index, $event)"
+                      @change="onFilterChange(item.key, index, $event)"
                       :values="allSigs"
                     />
                     <FilterableCheckboxes
                       v-else-if="item.key === 'kind'"
-                      v-model="filterParams[item.key]"
-                      @change="onFilterChange(index, $event)"
+                      :model-value="filterParams[item.key]"
+                      @change="onFilterChange(item.key, index, $event)"
                       :filterable="false"
                       :values="kindTypes"
                     />
                     <FilterableCheckboxes
                       v-else-if="item.key === 'status'"
+                      :model-value="filterParams[item.key]"
                       :filterable="false"
-                      v-model="filterParams[item.key]"
-                      @change="onFilterChange(index, $event)"
+                      multi
+                      @change="onFilterChange(item.key, index, $event)"
                       :values="repoStatusArr"
                     />
                     <FilterableCheckboxes
                       v-else
-                      v-model="filterParams[item.key]"
+                      :model-value="filterParams[item.key]"
                       :filterable="false"
-                      @change="onFilterChange(index, $event)"
+                      @change="onFilterChange(item.key, index, $event)"
                       :values="metricTypes(item.key)"
                     />
                   </div>
@@ -490,9 +491,8 @@ watch(
                         <div :ref="(el) => setPopupClickoutSideFn(el, columnsChildrenIndex(idx))">
                           <FilterableCheckboxes
                             v-if="subItem.key === 'versionStatus' && subItem.isFilter"
-                            v-model="filterParams[subItem.key]"
                             :filterable="false"
-                            @change="onFilterChange(columnsChildrenIndex(idx), $event)"
+                            @change="onFilterChange(item.key, columnsChildrenIndex(idx), $event)"
                             :values="metricTypes(subItem.key)"
                           />
                         </div>

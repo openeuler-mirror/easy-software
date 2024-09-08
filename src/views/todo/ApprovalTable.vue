@@ -119,14 +119,16 @@ const switchFilterVisible = (index: number) => {
 /** 各表格列对应的已选中的筛选项 */
 const activeFilterValues = ref(new Array<string>(props.columns.length));
 
-const onFilterChange = (type: string, index: number, val: string) => {
+const onFilterChange = (type: string, index: number, val: string | number | (string | number)[]) => {
   filterSwitches.value = props.columns.map(() => false);
-  if (val) {
-    if (type === 'metric') {
+  if ((Array.isArray(val) && val.length) || (!Array.isArray(val) && val)) {
+    val = Array.isArray(val) ? val.join() : val.toString();
+    if (type === 'applyStatus') {
       activeFilterValues.value[index] = applyStatusConvert(val);
     } else {
       activeFilterValues.value[index] = val;
     }
+    innerFilterParams.value[type] = val;
     currentActiveFilterIndices.value.add(index);
   } else {
     activeFilterValues.value[index] = '';
@@ -212,23 +214,24 @@ const revoke = () => {
             </template>
             <div :ref="(el) => setPopupClickoutSideFn(el, index)">
               <FilterableCheckboxes
-                v-model="innerFilterParams[item.key]"
+                :model-value="innerFilterParams[item.key]"
                 v-if="item.key === 'metric'"
                 :filterable="false"
                 @change="onFilterChange(item.key, index, $event)"
                 :values="applyTypes"
               />
               <FilterableCheckboxes
-                v-model="innerFilterParams[item.key]"
+                :model-value="innerFilterParams[item.key]"
                 v-else-if="item.key === 'repo'"
                 :loading="repoFilterLoading"
                 @change="onFilterChange(item.key, index, $event)"
                 :values="repoList"
               />
               <FilterableCheckboxes
-                v-model="innerFilterParams[item.key]"
+                :model-value="innerFilterParams[item.key]"
                 v-else-if="item.key === 'applyStatus'"
                 :filterable="false"
+                multi
                 @change="onFilterChange(item.key, index, $event)"
                 :values="applyStatusType"
               />

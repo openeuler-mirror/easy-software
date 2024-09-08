@@ -93,16 +93,19 @@ const switchFilterVisible = (index: number) => {
 /** 各表格列对应的已选中的筛选项 */
 const activeFilterValues = ref(new Array<string>(columns.length));
 
-const onFilterChange = (type: string, index: number, val: string) => {
+const onFilterChange = (type: keyof typeof filterParams, index: number, val: string | number | (string | number)[]) => {
   filterSwitches.value = columns.map(() => false);
-  if (val) {
-    if (type === 'metric') {
-      activeFilterValues.value[index] = applyStatusConvert(val);
+  if ((Array.isArray(val) && val.length) || (!Array.isArray(val) && val)) {
+    val = Array.isArray(val) ? val.join() : val.toString();
+    if (type === 'applyStatus') {
+      activeFilterValues.value[index] = applyStatusConvert(val as string);
     } else {
       activeFilterValues.value[index] = val;
     }
+    filterParams[type] = val;
     currentActiveFilterIndices.value.add(index);
   } else {
+    filterParams[type] = '';
     activeFilterValues.value[index] = '';
     currentActiveFilterIndices.value.delete(index);
   }
@@ -195,16 +198,17 @@ watch(
                 <div :ref="(el) => setPopupClickoutSideFn(el, index)">
                   <FilterableCheckboxes
                     v-if="item.key === 'metric'"
-                    v-model="filterParams[item.key]"
+                    :model-value="filterParams[item.key]"
                     :filterable="false"
                     @change="onFilterChange(item.key, index, $event)"
                     :values="applyTypes"
                   />
                   <FilterableCheckboxes
                     v-else
-                    v-model="filterParams[item.key]"
+                    :model-value="filterParams[item.key]"
                     :loading="repoFilterLoading"
                     :filterable="false"
+                    multi
                     @change="onFilterChange(item.key, index, $event)"
                     :values="applyStatusType"
                   />
