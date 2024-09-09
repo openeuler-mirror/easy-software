@@ -4,13 +4,13 @@ import { OTab, OTabPane, useMessage } from '@opensig/opendesign';
 import { useRoute, useRouter } from 'vue-router';
 import { useLocale } from '@/composables/useLocale';
 import { approvalColumns, applicationColumns, approvalHistoryColumns } from '@/data/todo';
-import { getAdminApply, getMaintainerApply, getMaintainerRevoke, getAdminRevoke } from '@/api/api-collaboration';
+import { getCollaborationApply, getTodoRevoke } from '@/api/api-collaboration';
 import { useUserInfoStore } from '@/stores/user';
 import Result404 from '@/components/Result404.vue';
 import ApprovalTable from './ApprovalTable.vue';
 import { COUNT_PAGESIZE } from '@/data/query';
 import { getParamsRules } from '@/utils/common';
-import type { RevokeT } from '@/@types/collaboration';
+import type { RevokeT, AdminAppryT } from '@/@types/collaboration';
 
 const tabList = [
   {
@@ -45,16 +45,31 @@ const pageSize = ref(10);
 const total = ref(0);
 
 const todoName = ref('formPage');
-const applyId = ref();
 const applyStatus = ref('');
+
 const todoParams = computed(() => {
   return {
     name: todoName.value,
-    applyIdString: applyId.value,
     pageNum: currentPage.value,
     pageSize: pageSize.value,
     applyStatus: applyStatus.value,
   };
+});
+
+const applicationFilterParams = reactive({
+  repo: '',
+  metric: '',
+  applyStatus: '',
+});
+
+const approvalFilterParams = reactive({
+  repo: '',
+  metric: '',
+});
+
+const approvedFilterParams = reactive({
+  repo: '',
+  metric: '',
 });
 
 // 我的申请数据
@@ -63,6 +78,7 @@ const applicationData = ref([]);
 const approvalData = ref([]);
 // 审批历史
 const approvedData = ref([]);
+
 const isLoading = ref(false);
 
 const activeName = ref();
@@ -74,7 +90,7 @@ const onChange = (type: string) => {
   clearFilterParams(approvalFilterParams);
   clearFilterParams(approvedFilterParams);
 
-  pageInit();
+  queryTodoData();
   // 切换url参数
   router.push({
     path: `/${locale.value}/todo/${type}`,
@@ -92,44 +108,84 @@ const clearFilterParams = (data: any) => {
 const handleSizeChange = (val: number) => {
   pageSize.value = val;
   currentPage.value = 1;
-  pageInit();
+  queryTodoData();
 };
 const handleCurrentChange = (val: number) => {
   currentPage.value = val;
-  pageInit();
+  queryTodoData();
 };
 
-const applicationFilterParams = reactive({
-  repo: '',
-  metric: '',
-  applyStatus: '',
-});
+const queryTodoApply = async (paramsObj: AdminAppryT) => {
+  let resData = [];
+  let totalNum: number = 0;
+  if (isAdminPermission.value) {
+    const { data } = await getCollaborationApply(paramsObj, 'admin');
+    resData = data.list;
+    totalNum = data.total;
+  } else if (isMaintainerPermission.value) {
+    const { data } = await getCollaborationApply(paramsObj, 'maintainer');
+    resData = data.list;
+    totalNum = data.total;
+  }
 
-// 我的申请
-const queryMyApplication = async (params: Record<string, string> = {}) => {
+  return { resData, totalNum };
+};
+
+// 数据处理
+const queryTodoData = async (params: Record<string, string> = {}) => {
   isLoading.value = true;
+  isError.value = false;
+
   const filterParamKeys = Object.keys(params);
+  // 重置分页
   if (filterParamKeys.length && currentPage.value !== 1) {
     currentPage.value = 1;
   }
-  for (const key of filterParamKeys) {
-    applicationFilterParams[key as keyof typeof applicationFilterParams] = params[key];
+
+  let filterParams = {};
+  if (activeName.value === 'application') {
+    applyStatus.value = isAdminPermission.value ? 'OPEN,REVOKED' : '';
+    if (filterParamKeys.length) {
+      for (const key of filterParamKeys) {
+        applicationFilterParams[key as keyof typeof applicationFilterParams] = params[key];
+      }
+      // 如果申请状态有值就重置
+      applyStatus.value = applicationFilterParams.applyStatus;
+    }
+    filterParams = { ...applicationFilterParams };
+  } else if (activeName.value === 'approval') {
+    for (const key of filterParamKeys) {
+      approvalFilterParams[key as keyof typeof approvalFilterParams] = params[key];
+    }
+    filterParams = { ...approvalFilterParams };
+    applyStatus.value = 'OPEN';
+  } else if (activeName.value === 'approved') {
+    for (const key of filterParamKeys) {
+      approvedFilterParams[key as keyof typeof approvedFilterParams] = params[key];
+    }
+    filterParams = { ...approvedFilterParams };
+    applyStatus.value = 'APPROVED,REJECTED';
   }
-  const newData = getParamsRules(todoParams.value);
+
+  const paramsObj = { ...getParamsRules(filterParams), ...getParamsRules(todoParams.value) };
 
   try {
-    if (isAdminPermission.value) {
-      const { data } = await getAdminApply({ ...newData, ...applicationFilterParams });
-      applicationData.value = data.list;
-      total.value = data.total;
-    } else if (isMaintainerPermission.value) {
-      const { data } = await getMaintainerApply({ ...newData, ...applicationFilterParams });
-      applicationData.value = data.list;
-      total.value = data.total;
-    }
-    isLoading.value = false;
+    queryTodoApply(paramsObj).then((res) => {
+      const { resData, totalNum } = res;
+      if (activeName.value === 'approval') {
+        approvalData.value = resData;
+      } else if (activeName.value === 'approved') {
+        approvedData.value = resData;
+      } else if (activeName.value === 'application') {
+        applicationData.value = resData;
+      }
+      total.value = totalNum;
+      isLoading.value = false;
+    });
   } catch {
     applicationData.value = [];
+    approvalData.value = [];
+    approvedData.value = [];
     isError.value = true;
     isLoading.value = false;
   }
@@ -143,20 +199,20 @@ const revokeApplication = async (id: string) => {
   };
   try {
     if (isAdminPermission.value) {
-      const res = await getAdminRevoke(params);
+      const res = await getTodoRevoke(params, 'admin');
       if (res.code === 200) {
         message.success({
           content: '撤销成功',
         });
-        pageInit();
+        queryTodoData();
       }
     } else if (isMaintainerPermission.value) {
-      const res = await getMaintainerRevoke(params);
+      const res = await getTodoRevoke(params, 'maintainer');
       if (res.code === 200) {
         message.success({
           content: '撤销成功',
         });
-        pageInit();
+        queryTodoData();
       }
     }
     isLoading.value = false;
@@ -167,97 +223,9 @@ const revokeApplication = async (id: string) => {
   }
 };
 
-const approvalFilterParams = reactive({
-  repo: '',
-  metric: '',
-});
-
-// 待我审批
-const queryApprovalApply = (params: Record<string, string> = {}) => {
-  isLoading.value = true;
-  if (isAdminPermission.value) {
-    const filterParamKeys = Object.keys(params);
-    if (filterParamKeys.length && currentPage.value !== 1) {
-      currentPage.value = 1;
-    }
-    for (const key of filterParamKeys) {
-      approvalFilterParams[key as keyof typeof approvalFilterParams] = params[key];
-    }
-    const newData = getParamsRules(todoParams.value);
-
-    getAdminApply({ ...newData, ...approvalFilterParams })
-      .then((res) => {
-        approvalData.value = res.data.list;
-        total.value = res.data.total;
-
-        isLoading.value = false;
-      })
-      .catch(() => {
-        approvalData.value = [];
-        isError.value = true;
-        isLoading.value = false;
-      });
-  } else {
-    isError.value = true;
-    isLoading.value = false;
-  }
-};
-
-const approvedFilterParams = reactive({
-  repo: '',
-  metric: '',
-});
-
-// 我审批过的
-const queryApprovedApply = (params: Record<string, string> = {}) => {
-  isLoading.value = true;
-  if (isAdminPermission.value) {
-    const filterParamKeys = Object.keys(params);
-    if (filterParamKeys.length && currentPage.value !== 1) {
-      currentPage.value = 1;
-    }
-    for (const key of filterParamKeys) {
-      approvedFilterParams[key as keyof typeof approvedFilterParams] = params[key];
-    }
-    const newData = getParamsRules(todoParams.value);
-    getAdminApply({ ...newData, ...approvedFilterParams })
-      .then((res) => {
-        approvedData.value = res.data.list;
-        total.value = res.data.total;
-        isLoading.value = false;
-      })
-      .catch(() => {
-        approvedData.value = [];
-        isLoading.value = false;
-        isError.value = true;
-      });
-  } else {
-    isError.value = true;
-    isLoading.value = false;
-  }
-};
-
-const pageInit = () => {
-  isError.value = false;
-  if (activeName.value === 'application') {
-    applyStatus.value = isAdminPermission.value ? 'OPEN,REVOKED' : '';
-    todoName.value = 'formPage';
-    applyId.value = '';
-    queryMyApplication();
-  } else if (activeName.value === 'approval') {
-    todoName.value = 'formPage';
-    applyStatus.value = 'OPEN';
-    queryApprovalApply();
-  } else if (activeName.value === 'approved') {
-    todoName.value = 'formPage';
-    applyStatus.value = 'APPROVED,REJECTED';
-    queryApprovedApply();
-  }
-};
-
 onMounted(() => {
   activeName.value = (route.params?.type as string) || 'application';
-  pageInit();
+  queryTodoData();
 });
 </script>
 
@@ -271,58 +239,41 @@ onMounted(() => {
     <OTabPane v-for="item in tabList" :key="item.id" :value="item.id" :label="item.label"> </OTabPane>
   </OTab>
   <div class="todo-content">
-    <AppLoading :loading="isLoading" />
-    <!-- 我的申请 -->
-    <div v-if="activeName === 'application' && !isError" class="application">
-      <template v-if="!isLoading">
+    <div class="todo-content-table" :class="applicationData.length === 0 || approvalData.length === 0 || approvedData.length === 0 ? 'empty' : ''">
+      <AppLoading :loading="isLoading" />
+      <!-- 我的申请 -->
+      <ApprovalTable
+        v-if="activeName === 'application' && !isError"
+        :columns="applicationColumns"
+        @queryData="queryTodoData"
+        :filterParams="applicationFilterParams"
+        :type="activeName"
+        :data="applicationData"
+        @revoke="revokeApplication"
+      />
+      <!-- 判断admin权限 -->
+      <template v-if="isAdminPermission">
         <ApprovalTable
-          :columns="applicationColumns"
-          @queryData="queryMyApplication"
-          :filterParams="applicationFilterParams"
+          v-if="activeName === 'approval' && !isError"
+          :columns="approvalColumns"
+          @queryData="queryTodoData"
+          :filterParams="approvalFilterParams"
           :type="activeName"
-          :data="applicationData"
-          :loading="isLoading"
-          @revoke="revokeApplication"
+          :data="approvalData"
         />
-        <div v-if="total > COUNT_PAGESIZE[0]" class="pagination-box">
-          <AppPagination :current="currentPage" :pagesize="pageSize" :total="total" @size-change="handleSizeChange" @current-change="handleCurrentChange" />
-        </div>
+        <ApprovalTable
+          v-if="activeName === 'approved' && !isError"
+          :columns="approvalHistoryColumns"
+          @queryData="queryTodoData"
+          :filterParams="approvedFilterParams"
+          :type="activeName"
+          :data="approvedData"
+        />
       </template>
     </div>
-    <!-- 判断admin权限 -->
-    <template v-if="isAdminPermission">
-      <div v-if="activeName === 'approval' && !isError" class="approval">
-        <template v-if="!isLoading">
-          <ApprovalTable
-            :columns="approvalColumns"
-            @queryData="queryApprovalApply"
-            :filterParams="approvalFilterParams"
-            :type="activeName"
-            :data="approvalData"
-            :loading="isLoading"
-          />
-          <div v-if="total > COUNT_PAGESIZE[0]" class="pagination-box">
-            <AppPagination :current="currentPage" :pagesize="pageSize" :total="total" @size-change="handleSizeChange" @current-change="handleCurrentChange" />
-          </div>
-        </template>
-      </div>
-      <div v-if="activeName === 'approved' && !isError" class="approved">
-        <template v-if="!isLoading">
-          <ApprovalTable
-            :columns="approvalHistoryColumns"
-            @queryData="queryApprovedApply"
-            :filterParams="approvedFilterParams"
-            :type="activeName"
-            :data="approvedData"
-            :loading="isLoading"
-          />
-          <div v-if="total > COUNT_PAGESIZE[0]" class="pagination-box">
-            <AppPagination :current="currentPage" :pagesize="pageSize" :total="total" @size-change="handleSizeChange" @current-change="handleCurrentChange" />
-          </div>
-        </template>
-      </div>
-    </template>
-
+    <div v-if="total > COUNT_PAGESIZE[0] && !isError" class="pagination-box">
+      <AppPagination :current="currentPage" :pagesize="pageSize" :total="total" @size-change="handleSizeChange" @current-change="handleCurrentChange" />
+    </div>
     <!-- 暂无记录 -->
     <template v-if="(activeName === 'application' && isError) || (activeName === 'approval' && isError) || (activeName === 'approved' && isError)">
       <Result404>
@@ -363,17 +314,16 @@ onMounted(() => {
   position: relative;
 }
 .todo-content {
-  position: relative;
   min-height: calc(var(--layout-content-min-height) - 200px);
-  margin: 0 auto;
-  max-width: var(--layout-content-max-width);
-  padding: 24px var(--layout-content-padding) 72px;
-}
-.approval,
-.approved {
-  :deep(thead) {
-    .operation {
-      width: 115px;
+  margin: 24px auto 72px;
+  max-width: calc(var(--layout-content-max-width) - var(--layout-content-padding) * 2);
+  .todo-content-table {
+    position: relative;
+    &.empty {
+      min-height: 250px;
+      :deep(.o-layer.o-loading) {
+        padding-top: 10%;
+      }
     }
   }
 }

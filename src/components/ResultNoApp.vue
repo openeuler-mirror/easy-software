@@ -63,8 +63,6 @@ const clickFeedback = () => {
   padding: 40px;
   box-shadow: var(--o-shadow-1);
   flex: 1;
-  margin-top: 24px;
-  height: calc(100% - 24px);
 }
 .text {
   @include text1;

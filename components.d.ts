@@ -25,6 +25,7 @@ declare module 'vue' {
     DetailInstall: typeof import('./src/components/detail/DetailInstall.vue')['default']
     DetailMoreInfo: typeof import('./src/components/detail/DetailMoreInfo.vue')['default']
     DetailSkeleton: typeof import('./src/components/skeleton/DetailSkeleton.vue')['default']
+    ElCheckbox: typeof import('element-plus/es')['ElCheckbox']
     ElTable: typeof import('element-plus/es')['ElTable']
     ElTableColumn: typeof import('element-plus/es')['ElTableColumn']
     ExternalLink: typeof import('./src/components/ExternalLink.vue')['default']
@@ -56,5 +57,8 @@ declare module 'vue' {
     SearchTab: typeof import('./src/components/search/SearchTab.vue')['default']
     StatusFeedback: typeof import('./src/components/collaboration/StatusFeedback.vue')['default']
     TableShowOverflowTips: typeof import('./src/components/collaboration/TableShowOverflowTips.vue')['default']
+  }
+  export interface ComponentCustomProperties {
+    vLoading: typeof import('element-plus/es')['ElLoadingDirective']
   }
 }

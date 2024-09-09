@@ -4,7 +4,7 @@ import { onClickOutside } from '@vueuse/core';
 import { ODialog, OIcon, OPopover, OPopup, OTable, OTag } from '@opensig/opendesign';
 import { useLocale } from '@/composables/useLocale';
 import { useUserInfoStore } from '@/stores/user';
-import { getMaintainerApply, getAdminApply } from '@/api/api-collaboration';
+import { getCollaborationApply } from '@/api/api-collaboration';
 import { formatDateTime } from '@/utils/common';
 import { applicationTypeConvert, applyStatusConvert, versionLatestStatusConvert } from '@/utils/collaboration';
 
@@ -109,39 +109,29 @@ const onFilterChange = (type: string, index: number, val: string) => {
   if (currentPage.value !== 1) {
     currentPage.value = 1;
   }
-  pageInit();
+  queryMaintainerApply();
 };
 
-const queryMaintainerApply = () => {
+const queryMaintainerApply = async () => {
   isLoading.value = true;
-  getMaintainerApply({ ...searchParams.value, ...filterParams })
-    .then((res) => {
-      reposData.value = res.data.list;
-      total.value = res.data.total;
+  const params = { ...searchParams.value, ...filterParams };
+  try {
+    if (isAdminPer.value) {
+      const { data } = await getCollaborationApply(params, 'admin');
+      reposData.value = data.list;
+      total.value = data.total;
+    } else if (isMainPer.value) {
+      const { data } = await getCollaborationApply(params, 'maintainer');
+      reposData.value = data.list;
+      total.value = data.total;
+    }
 
-      isLoading.value = false;
-    })
-    .catch(() => {
-      reposData.value = [];
-      total.value = 0;
-      isLoading.value = false;
-    });
-};
-
-const queryAdminApply = () => {
-  isLoading.value = true;
-  getAdminApply({ ...searchParams.value, ...filterParams })
-    .then((res) => {
-      reposData.value = res.data.list;
-      total.value = res.data.total;
-
-      isLoading.value = false;
-    })
-    .catch(() => {
-      reposData.value = [];
-      total.value = 0;
-      isLoading.value = false;
-    });
+    isLoading.value = false;
+  } catch {
+    reposData.value = [];
+    total.value = 0;
+    isLoading.value = false;
+  }
 };
 
 /* ---------------分页事件------------------ */
@@ -157,22 +147,14 @@ const onChange = () => {
   emits('close');
 };
 
-const pageInit = () => {
-  if (isAdminPer.value) {
-    queryAdminApply();
-  } else if (isMainPer.value) {
-    queryMaintainerApply();
-  }
-};
-
 onMounted(() => {
-  pageInit();
+  queryMaintainerApply();
 });
 
 watch(
   () => searchParams.value,
   () => {
-    pageInit();
+    queryMaintainerApply();
   },
   { deep: true }
 );
@@ -243,15 +225,15 @@ watch(
             {{ row.administrator ?? '-' }}
           </template>
           <template #td_description="{ row }">
-            <TableShowOverflowTips v-if="row.description" :content="row.description" :line="1" />
+            <TableShowOverflowTips v-if="row.description" :content="row.description" :line="1" wrapper=".histroy-table" />
             <template v-else>-</template>
           </template>
           <template #td_applyIdString="{ row }">
-            <TableShowOverflowTips v-if="row.applyIdString" :content="row.applyIdString" :line="1" />
+            <TableShowOverflowTips v-if="row.applyIdString" :content="row.applyIdString" :line="1" wrapper=".histroy-table" />
             <template v-else>-</template>
           </template>
           <template #td_comment="{ row }">
-            <TableShowOverflowTips v-if="row.comment" :content="row.comment" :line="1" />
+            <TableShowOverflowTips v-if="row.comment" :content="row.comment" :line="1" wrapper=".histroy-table" />
             <template v-else>-</template>
           </template>
           <template #td_applyStatus="{ row }">
@@ -289,6 +271,7 @@ watch(
   .histroy-table {
     border: 1px solid var(--o-color-control4);
     border-radius: 4px;
+    position: relative;
     &.total {
       :deep(.o-table-wrap) {
         height: 538px;

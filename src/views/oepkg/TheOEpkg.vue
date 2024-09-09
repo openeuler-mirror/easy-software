@@ -4,11 +4,11 @@ import OEpkgContent from './OEpkgContent.vue';
 import { homeData } from '@/data/home/index';
 import bannerImg from '@/assets/banner/banner1.jpg';
 
-const bannerInfo = homeData[3];
+const bannerInfo = homeData[4];
 </script>
 <template>
   <AppBanner :title="bannerInfo.name" :background-image="bannerImg" :subtitle="bannerInfo.desc" />
-  <ContentWrapper vertical-padding="40px" class="pkg-content-wrap">
+  <ContentWrapper :vertical-padding="['40px', '72px']" class="pkg-content-wrap">
     <OEpkgContent />
   </ContentWrapper>
 </template>
