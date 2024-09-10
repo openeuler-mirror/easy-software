@@ -5,7 +5,7 @@ import { useLocale } from '@/composables/useLocale';
 import { formatDateTime } from '@/utils/common';
 import { useRouter, useRoute } from 'vue-router';
 import { applicationTypeCurrent, applyStatusType } from '@/data/todo';
-import { applicationTypeConvert, applyStatusConvert, versionLatestStatusConvert } from '@/utils/collaboration';
+import { applicationTypeConvert, applyStatusConvert } from '@/utils/collaboration';
 import { onClickOutside } from '@vueuse/core';
 import { getAdminApplyRepos, getMaintainerApplyRepos } from '@/api/api-collaboration';
 import { useUserInfoStore } from '@/stores/user';
@@ -243,7 +243,7 @@ const revoke = () => {
             {{ applicationTypeConvert(row.metric) }}
           </template>
           <template v-if="item.key === 'metricStatus'">
-            {{ versionLatestStatusConvert(row.metricStatus) }}
+            {{ row.metricStatus }}
           </template>
           <template v-if="item.key === 'comment'">
             <TableShowOverflowTips v-if="row.comment" :content="row.comment" :line="2" wrapper=".table-main" />

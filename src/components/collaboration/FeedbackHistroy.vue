@@ -6,7 +6,7 @@ import { useLocale } from '@/composables/useLocale';
 import { useUserInfoStore } from '@/stores/user';
 import { getCollaborationApply } from '@/api/api-collaboration';
 import { formatDateTime } from '@/utils/common';
-import { applicationTypeConvert, applyStatusConvert, versionLatestStatusConvert } from '@/utils/collaboration';
+import { applicationTypeConvert, applyStatusConvert } from '@/utils/collaboration';
 
 import { ElPagination, ElConfigProvider } from 'element-plus';
 import zhCn from 'element-plus/es/locale/lang/zh-cn';
@@ -219,7 +219,7 @@ watch(
             {{ applicationTypeConvert(row.metric) }}
           </template>
           <template #td_metricStatus="{ row }">
-            {{ versionLatestStatusConvert(row.metricStatus) }}
+            {{ row.metricStatus }}
           </template>
           <template #td_administrator="{ row }">
             {{ row.administrator ?? '-' }}

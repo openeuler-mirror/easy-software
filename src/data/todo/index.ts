@@ -63,7 +63,7 @@ export const applicationType = [
   {
     id: 'versionStatus',
     label: '软件包版本状态',
-    children: ['版本正常', '落后版本'],
+    children: ['正常版本', '落后版本'],
   },
   {
     id: 'orgStatus',
@@ -86,7 +86,7 @@ export const applicationTypeCurrent = [
   {
     id: 'versionStatus',
     label: '软件包版本状态',
-    children: ['版本正常', '落后版本'],
+    children: ['正常版本', '落后版本'],
   },
 ];
 

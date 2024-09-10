@@ -58,7 +58,7 @@ const data = [
     cve: '没有CVE',
     cveType: '没有CVE问题',
     contribution: '没有PR提交',
-    details: '版本正常',
+    details: '正常版本',
     maintenance: '健康',
     description: '没有CVE问题，且也没有PR提交，且软件包是正常稳定的',
   },
