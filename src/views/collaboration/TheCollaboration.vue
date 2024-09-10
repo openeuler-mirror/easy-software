@@ -14,13 +14,14 @@ import xss from 'xss';
 import FilterableCheckboxes from '@/components/FilterableCheckboxes.vue';
 import { kindTypes, applicationType } from '@/data/todo';
 import { onClickOutside } from '@vueuse/core';
-import { repoStatusIndex, repoStatusArr, versionLatestStatusConvert } from '@/utils/collaboration';
+import { repoStatusIndex, repoStatusArr } from '@/utils/collaboration';
 import AppLoading from '@/components/AppLoading.vue';
 
 import IconOutlink from '~icons/pkg/icon-outlink.svg';
 import IconState from '~icons/pkg/icon-state.svg';
 import IconFilter from '~icons/app/icon-filter.svg';
 import IconSetting from '~icons/app/icon-settings.svg';
+import IconHelp from '~icons/app/icon-help.svg';
 
 /**
  * isDefault 是否是默认字段
@@ -37,8 +38,8 @@ const columns = reactive<CollaborationColumnsT[]>([
     isDefault: true,
     children: [
       { label: '软件包版本状态', key: 'versionStatus', type: 'version', width: '180', isFilter: true },
-      { label: '上游版本', key: 'upstream', type: 'version', width: '120' },
-      { label: '当前版本', key: 'version', type: 'version', width: '130' },
+      { label: '上游版本', key: 'upVersion', type: 'version', width: '180' },
+      { label: '当前版本', key: 'eulerVersion', type: 'version', width: '180' },
     ],
   },
   { label: 'CVE状态', key: 'cveStatus', type: 'cve', width: '188', isDefault: true, isFilter: true },
@@ -49,7 +50,7 @@ const columns = reactive<CollaborationColumnsT[]>([
   { label: '类别', key: 'kind', type: 'kind', width: '180', isFilter: true },
   { label: 'SIG名称', key: 'sigName', type: 'sig', width: '188', isFilter: true },
   { label: '状态', key: 'status', type: 'status', width: '125', fixed: 'right', isDefault: true, isFilter: true },
-  { label: '建议', key: 'recommend', type: 'recommend', width: '150', fixed: 'right', isDefault: true },
+  { label: '建议', key: 'suggestions', type: 'recommend', width: '160', fixed: 'right', isDefault: true },
   { label: '操作', key: 'operation', type: 'operation', width: '215', fixed: 'right', isDefault: true },
 ]);
 
@@ -273,6 +274,35 @@ const metricTypes = (v: string) => {
   return applicationType[index].children;
 };
 
+// 当前版本、上游版本数据处理
+interface VersionInfoT {
+  pkg: string;
+  upVersion: string;
+  eulerVersion: string;
+}
+// 获取当前版本、上游版本数据 并去重
+const updateVersionValue = <K extends keyof VersionInfoT>(data: VersionInfoT[], type: K): string[] => {
+  let versionMap = new Set(data.map((item) => item[type]));
+  const newVersion: string[] = [];
+  Array.from(versionMap).forEach((item) => {
+    if (item) {
+      newVersion.push(item);
+    }
+  });
+  return newVersion;
+};
+// 根据当前版本、上游版本数据 获取软件包名
+const updateVersionPkg = <K extends keyof VersionInfoT>(data: VersionInfoT[], type: K) => {
+  const version = updateVersionValue(data, type);
+  const newPkg: string[] = [];
+  data.forEach((item) => {
+    if (version.includes(item[type])) {
+      newPkg.push(item.pkg);
+    }
+  });
+  return newPkg;
+};
+
 watch(
   () => searchParams.value,
   () => {
@@ -313,6 +343,7 @@ watch(
   <div class="platform-header">
     <ContentWrapper>
       <h1>软件维护详情</h1>
+      <p class="text">软件包来源于openEuler-24.09版本</p>
     </ContentWrapper>
   </div>
   <ContentWrapper :vertical-padding="['24px', '72px']" class="collaboration-wrap">
@@ -322,7 +353,7 @@ watch(
       </span>
       <OPopup trigger="click" :style="{ '--popup-radius': '4px', '--popup-bg-color': ' var(--o-color-fill2)' }" position="br">
         <template #target>
-          <OButton variant="solid" ref="settingRef" class="setting-btn" round="pill">
+          <OButton variant="outline" ref="settingRef" class="setting-btn" round="pill">
             <template #icon><IconSetting /></template>
           </OButton>
         </template>
@@ -446,6 +477,14 @@ watch(
                                 </p>
                               </OPopover>
                             </template>
+                            <template v-if="subItem.key === 'eulerVersion'">
+                              <OPopover position="top" trigger="hover">
+                                <template #target>
+                                  <OIcon class="filter-icon"><IconHelp /></OIcon>
+                                </template>
+                                <div class="box">当前软件包在openEuler系统上的版本</div>
+                              </OPopover>
+                            </template>
                           </div>
                         </template>
                         <div :ref="(el) => setPopupClickoutSideFn(el, columnsChildrenIndex(idx))">
@@ -459,7 +498,27 @@ watch(
                         </div>
                       </OPopup>
                     </template>
-                    <template #default="scope1">{{ scope1.row[subItem.key] ?? '-' }}</template>
+                    <template #default="{ row }">
+                      <template v-if="subItem.key === 'versionStatus'">
+                        {{ row.versionStatus }}
+                      </template>
+                      <template v-if="subItem.key === 'upVersion' || subItem.key === 'eulerVersion'">
+                        <OPopover
+                          v-if="row.versionDetail && row.versionDetail.length > 0 && updateVersionValue(row.versionDetail, subItem.key).length > 0"
+                          :anchor="true"
+                          position="top"
+                          trigger="hover"
+                        >
+                          <template #target>
+                            <span>{{ updateVersionValue(row.versionDetail, subItem.key).join(', ') }}</span>
+                          </template>
+                          <div class="box">
+                            <p v-for="pItem in updateVersionPkg(row.versionDetail, subItem.key)" :key="pItem">{{ pItem }}</p>
+                          </div>
+                        </OPopover>
+                        <template v-else>-</template>
+                      </template>
+                    </template>
                   </el-table-column>
                 </template>
                 <template v-else>
@@ -473,11 +532,17 @@ watch(
                       <OTag :class="`type${repoStatusIndex(row.status)}`">{{ row.status }} </OTag>
                     </div>
                   </template>
-                  <template v-if="item.key === 'versionStatus'">
-                    {{ versionLatestStatusConvert(row.versionStatus) }}
-                  </template>
+
                   <template v-if="item.key === 'orgStatus' || item.key === 'contributorStatus' || item.key === 'kind' || item.key === 'sigName'">
                     {{ row[item.key] }}
+                  </template>
+                  <template v-if="item.key === 'suggestions'">
+                    <template v-if="row.suggestions && row.suggestions.length > 0">
+                      <p v-for="rule in row.suggestions" :key="rule">
+                        {{ rule }}
+                      </p>
+                    </template>
+                    <template v-else>-</template>
                   </template>
 
                   <template v-if="item.key === 'operation'">
@@ -521,10 +586,15 @@ watch(
 @import '@/assets/style/category/collaboration/index.scss';
 .setting-btn {
   margin-left: 16px;
-  --btn-min-width: auto;
+  width: 40px;
+  height: 40px;
+  --btn-min-width: 40px;
+  --btn-height: 40px;
+  --btn-radius: 4px;
+  background: var(--o-color-fill2);
   svg {
-    width: 16px;
-    height: 16px;
+    width: 20px;
+    height: 20px;
   }
 }
 :deep(.el-table) {
@@ -572,6 +642,11 @@ watch(
     color: var(--o-color-info1);
     font-weight: 500;
     @include h1;
+  }
+  .text {
+    margin-top: 16px;
+    color: var(--o-color-info1);
+    @include text1;
   }
 }
 .indicators {

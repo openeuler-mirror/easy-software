@@ -10,9 +10,6 @@ export function getCollaborationPermissions() {
 
 // 软件维护详情 
 export function getCollaborationRepos(params: CollaborationRepoT, permission: string) {
-  if (params.versionStatus === '版本正常') {
-    params.versionStatus = '最新版本';
-  }
   const url = `/server/collaboration/${permission}/user/repos`;
   return request.get(url, { params }).then((res: AxiosResponse) => res?.data);
 }
@@ -61,9 +58,6 @@ interface FeedbackT {
 }
 
 export function getCollaborationFeedback(params: FeedbackT, permission: string) {
-  if (params.metricStatus === '版本正常') {
-    params.metricStatus = '最新版本';
-  }
   const url = `/server/collaboration/${permission}/apply?repo=${params.repo}`;
   return request.post(url, { ...params }).then((res: AxiosResponse) => res?.data);
 }

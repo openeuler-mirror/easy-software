@@ -26,6 +26,7 @@ declare module 'vue' {
     DetailMoreInfo: typeof import('./src/components/detail/DetailMoreInfo.vue')['default']
     DetailSkeleton: typeof import('./src/components/skeleton/DetailSkeleton.vue')['default']
     ElCheckbox: typeof import('element-plus/es')['ElCheckbox']
+    ElPopover: typeof import('element-plus/es')['ElPopover']
     ElTable: typeof import('element-plus/es')['ElTable']
     ElTableColumn: typeof import('element-plus/es')['ElTableColumn']
     ExternalLink: typeof import('./src/components/ExternalLink.vue')['default']
