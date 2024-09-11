@@ -16,6 +16,7 @@ export const useCheckbox = <T>(datasource: MaybeRefOrGetter<T[]>, cbValueExtract
   const clearCheckboxes = () => {
     indeterminate.value = false;
     parentCheckbox.value = EMPTY;
+    checkboxes.value = EMPTY;
   };
 
   watch(
