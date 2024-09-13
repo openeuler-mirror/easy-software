@@ -1,7 +1,6 @@
 <script lang="ts" setup>
-import { ref, onMounted, computed, watch, reactive, type ComponentPublicInstance } from 'vue';
-import { onClickOutside } from '@vueuse/core';
-import { ODialog, OIcon, OPopover, OPopup, OTable, OTag } from '@opensig/opendesign';
+import { ref, onMounted, computed, watch, reactive } from 'vue';
+import { ODialog, OTable, OTag } from '@opensig/opendesign';
 import { useLocale } from '@/composables/useLocale';
 import { useUserInfoStore } from '@/stores/user';
 import { getCollaborationApply } from '@/api/api-collaboration';
@@ -12,10 +11,9 @@ import { ElPagination, ElConfigProvider } from 'element-plus';
 import zhCn from 'element-plus/es/locale/lang/zh-cn';
 import English from 'element-plus/es/locale/lang/en';
 
-import IconFilter from '~icons/app/icon-filter.svg';
 import { COUNT_PAGESIZE } from '@/data/query';
-import FilterableCheckboxes from '../FilterableCheckboxes.vue';
 import { applicationTypeCurrent, applyStatusType } from '@/data/todo';
+import FilterableTableHeader from '../FilterableTableHeader.vue';
 
 const props = defineProps({
   repo: {
@@ -69,45 +67,12 @@ const filterParams = reactive({
   applyStatus: '',
 });
 
-const filterIconRefs = ref(new Array<ComponentPublicInstance>(columns.length));
-
-/** 筛选组件是否显示的开关 */
-const filterSwitches = ref(columns.map(() => false));
-
-const setPopupClickoutSideFn = (el: any, index: number) => {
-  onClickOutside(el, () => {
-    filterSwitches.value[index] = false;
-  });
-};
-
-/** 当前有选中筛选项的表格列的数组下标 */
-const currentActiveFilterIndices = ref(new Set<number>());
-
-const repoFilterLoading = ref(false);
-
-/** 切换某个筛选组件显示开关 */
-const switchFilterVisible = (index: number) => {
-  filterSwitches.value[index] = true;
-};
-
-/** 各表格列对应的已选中的筛选项 */
-const activeFilterValues = ref(new Array<string>(columns.length));
-
-const onFilterChange = (type: keyof typeof filterParams, index: number, val: string | number | (string | number)[]) => {
-  filterSwitches.value = columns.map(() => false);
+const onFilterChange = (type: keyof typeof filterParams, val: string | number | (string | number)[]) => {
   if ((Array.isArray(val) && val.length) || (!Array.isArray(val) && val)) {
     val = Array.isArray(val) ? val.join() : val.toString();
-    if (type === 'applyStatus') {
-      activeFilterValues.value[index] = applyStatusConvert(val as string);
-    } else {
-      activeFilterValues.value[index] = val;
-    }
     filterParams[type] = val;
-    currentActiveFilterIndices.value.add(index);
   } else {
     filterParams[type] = '';
-    activeFilterValues.value[index] = '';
-    currentActiveFilterIndices.value.delete(index);
   }
   if (currentPage.value !== 1) {
     currentPage.value = 1;
@@ -172,48 +137,30 @@ watch(
       <div class="histroy-table" :class="{ total: total > COUNT_PAGESIZE[0] }">
         <OTable :columns="columns" :data="reposData" :loading="isLoading" border="row" :small="true">
           <template #head="{ columns }">
-            <template v-for="(item, index) in columns" :key="item.type">
+            <template v-for="(item) in columns" :key="item.type">
               <th v-if="item.key !== 'metric' && item.key !== 'applyStatus'" :class="item.type">{{ item.label }}</th>
-              <OPopup v-else trigger="none" style="--popup-radius: 4px" :offset="-8" :visible="filterSwitches[index]" :unmount-on-hide="false" position="bl">
-                <template #target>
-                  <th :class="item.type">
-                    <div class="header-cell">
-                      {{ item.label }}
-                      <OIcon
-                        :ref="(el) => (filterIconRefs[index] = el as ComponentPublicInstance)"
-                        class="filter-icon"
-                        :style="currentActiveFilterIndices.has(index) ? { color: 'var(--o-color-primary1)' } : {}"
-                        @click="switchFilterVisible(index)"
-                        ><IconFilter
-                      /></OIcon>
-                      <OPopover v-if="currentActiveFilterIndices.has(index) && activeFilterValues[index]" :target="filterIconRefs[index]" trigger="hover">
-                        <p class="bubble-content">
-                          <span class="title">{{ item.label }}:</span>
-                          {{ activeFilterValues[index] }}
-                        </p>
-                      </OPopover>
-                    </div>
-                  </th>
-                </template>
-                <div :ref="(el) => setPopupClickoutSideFn(el, index)">
-                  <FilterableCheckboxes
-                    v-if="item.key === 'metric'"
-                    :model-value="filterParams[item.key]"
-                    :filterable="false"
-                    @change="onFilterChange(item.key, index, $event)"
-                    :values="applyTypes"
-                  />
-                  <FilterableCheckboxes
-                    v-else
-                    :model-value="filterParams[item.key]"
-                    :loading="repoFilterLoading"
-                    :filterable="false"
-                    multi
-                    @change="onFilterChange(item.key, index, $event)"
-                    :values="applyStatusType"
-                  />
-                </div>
-              </OPopup>
+              <th :class="item.type" v-else>
+                <FilterableTableHeader
+                  v-if="item.key === 'metric'"
+                  :model-value="filterParams[item.key]"
+                  :filterable="false"
+                  @change="onFilterChange(item.key, $event)"
+                  :options="applyTypes"
+                >
+                  {{ item.label }}
+                </FilterableTableHeader>
+                <FilterableTableHeader
+                  v-else
+                  :model-value="filterParams[item.key]"
+                  :filterable="false"
+                  multi
+                  :filter-values-display-mapper="applyStatusConvert"
+                  @change="onFilterChange(item.key, $event)"
+                  :options="applyStatusType"
+                >
+                  {{ item.label }}
+                </FilterableTableHeader>
+              </th>
             </template>
           </template>
           <template #td_createdAt="{ row }">
