@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch, computed, type ComponentPublicInstance, reactive, onMounted } from 'vue';
+import { ref, watch, computed, reactive, onMounted } from 'vue';
 import { OButton, OTag, OLink, OIcon, OPopup, OPopover, useMessage } from '@opensig/opendesign';
 import { getCollaborationRepos, getRepoSigList } from '@/api/api-collaboration';
 import { useUserInfoStore } from '@/stores/user';
@@ -11,17 +11,15 @@ import Result404 from '@/components/Result404.vue';
 import { COUNT_PAGESIZE } from '@/data/query';
 import { type CollaborationColumnsT } from '@/@types/collaboration';
 import xss from 'xss';
-import FilterableCheckboxes from '@/components/FilterableCheckboxes.vue';
 import { kindTypes, applicationType } from '@/data/todo';
-import { onClickOutside } from '@vueuse/core';
 import { repoStatusIndex, repoStatusArr } from '@/utils/collaboration';
 import AppLoading from '@/components/AppLoading.vue';
 
 import IconOutlink from '~icons/pkg/icon-outlink.svg';
 import IconState from '~icons/pkg/icon-state.svg';
-import IconFilter from '~icons/app/icon-filter.svg';
 import IconSetting from '~icons/app/icon-settings.svg';
 import IconHelp from '~icons/app/icon-help.svg';
+import FilterableTableHeader from '@/components/FilterableTableHeader.vue';
 
 /**
  * isDefault 是否是默认字段
@@ -79,48 +77,10 @@ const allRepos = computed(() => {
   return Array.from(sigRepoMap.value.values()).flat();
 });
 
-// 展开数组，获取完整长度、下标
-const flatColumns = (columns: CollaborationColumnsT[]) => {
-  let res: CollaborationColumnsT[] = [];
-  if (columns.length > 0) {
-    for (let i = 0; i < columns.length; i++) {
-      if (columns[i].children) {
-        res = res.concat(flatColumns(columns[i].children));
-      } else {
-        res.push(columns[i]);
-      }
-    }
-  }
-  return res;
-};
-
-// columns chiild index
-const columnsChildrenIndex = (index: number) => {
-  return columns.length + index;
-};
-
-// 筛选
-const filterIconRefs = ref(new Array<ComponentPublicInstance>(flatColumns(columns).length));
-
-/** 筛选组件是否显示的开关 */
-const filterSwitches = ref(flatColumns(columns).map(() => false));
-
-let clickOutsideStopFns: ((() => void) | null)[] = [];
-
-const setPopupClickoutSideFn = (el: any, index: number) => {
-  if (!el) {
-    clickOutsideStopFns[index]?.();
-    clickOutsideStopFns[index] = null;
-    return;
-  }
-  clickOutsideStopFns[index] = onClickOutside(el, () => filterSwitches.value[index] = false) as () => void;
-};
-
 const filterLoading = ref(false);
 
 /** 切换某个筛选组件显示开关 */
 const switchFilterVisible = async (index: number) => {
-  filterSwitches.value[index] = true;
   if ((index === 0 || index === 2) && !sigRepoMap.value.size) {
     filterLoading.value = true;
     let data: Record<string, string> | null = null;
@@ -147,26 +107,13 @@ const switchFilterVisible = async (index: number) => {
   }
 };
 
-/** 各表格列对应的已选中的筛选项 */
-const activeFilterValues = ref(new Array<string>(flatColumns(columns).length));
-
-/** 当前有选中筛选项的表格列的数组下标 */
-const currentActiveFilterIndices = ref(new Set<number>());
-
-const onFilterChange = (filterKey: string, index: number, val: (string | number)[] | string | number) => {
-  // 关掉筛选组件
-  filterSwitches.value = flatColumns(columns).map(() => false);
+const onFilterChange = (filterKey: string, val: (string | number)[] | string | number) => {
   if ((Array.isArray(val) && val.length) || (!Array.isArray(val) && val)) {
     val = Array.isArray(val) ? val.join() : val.toString();
     filterParams[filterKey] = val;
-    activeFilterValues.value[index] = val;
-    currentActiveFilterIndices.value.add(index);
   } else {
     filterParams[filterKey] = '';
-    activeFilterValues.value[index] = '';
-    currentActiveFilterIndices.value.delete(index);
   }
-
   if (currentPage.value !== 1) {
     currentPage.value = 1;
   } else {
@@ -375,71 +322,58 @@ watch(
               :resizable="false"
             >
               <template #header>
-                <OPopup trigger="none" style="--popup-radius: 4px" :key="item.type" :visible="filterSwitches[index]" :unmount-on-hide="false" position="bl">
-                  <template #target>
-                    <div class="header-cell">
-                      {{ item.label }}
-                      <template v-if="item.isFilter">
-                        <OIcon
-                          :ref="(el) => (filterIconRefs[index] = el as ComponentPublicInstance)"
-                          class="filter-icon"
-                          :style="currentActiveFilterIndices.has(index) ? { color: 'var(--o-color-primary1)' } : {}"
-                          @click="switchFilterVisible(index)"
-                          ><IconFilter
-                        /></OIcon>
-                        <OPopover v-if="currentActiveFilterIndices.has(index) && activeFilterValues[index]" :target="filterIconRefs[index]" trigger="hover">
-                          <p class="bubble-content">
-                            <span class="title">{{ item.label }}:</span>
-                            {{ activeFilterValues[index] }}
-                          </p>
-                        </OPopover>
-                      </template>
-                    </div>
-                  </template>
-                  <div :ref="(el) => setPopupClickoutSideFn(el, index)">
-                    <FilterableCheckboxes
-                      v-if="item.key === 'repo'"
-                      :model-value="filterParams[item.key]"
-                      :loading="filterLoading"
-                      @change="onFilterChange(item.key, index, $event)"
-                      :values="allRepos"
-                    />
-                    <FilterableCheckboxes
-                      v-else-if="item.key === 'sigName'"
-                      :model-value="filterParams[item.key]"
-                      :loading="filterLoading"
-                      @change="onFilterChange(item.key, index, $event)"
-                      :values="allSigs"
-                    />
-                    <FilterableCheckboxes
-                      v-else-if="item.key === 'kind'"
-                      :model-value="filterParams[item.key]"
-                      @change="onFilterChange(item.key, index, $event)"
-                      :filterable="false"
-                      :values="kindTypes"
-                    />
-                    <FilterableCheckboxes
-                      v-else-if="item.key === 'status'"
-                      :model-value="filterParams[item.key]"
-                      :filterable="false"
-                      multi
-                      @change="onFilterChange(item.key, index, $event)"
-                      :values="repoStatusArr"
-                    />
-                    <FilterableCheckboxes
-                      v-else
-                      :model-value="filterParams[item.key]"
-                      :filterable="false"
-                      @change="onFilterChange(item.key, index, $event)"
-                      :values="metricTypes(item.key)"
-                    />
-                  </div>
-                </OPopup>
+                <FilterableTableHeader 
+                  v-if="item.key === 'repo'"
+                  :model-value="filterParams[item.key]"
+                  :loading="filterLoading"
+                  :options="allRepos"
+                  @options-visibility-change="switchFilterVisible(index)"
+                >
+                  {{ item.label }}
+                </FilterableTableHeader>
+                <FilterableTableHeader
+                  v-else-if="item.key === 'sigName'"
+                  :model-value="filterParams[item.key]"
+                  :loading="filterLoading"
+                  @change="onFilterChange(item.key, $event)"
+                  @options-visibility-change="switchFilterVisible(index)"
+                  :options="allSigs"
+                >
+                  {{ item.label }}
+                </FilterableTableHeader>
+                <FilterableTableHeader
+                  v-else-if="item.key === 'kind'"
+                  :model-value="filterParams[item.key]"
+                  @change="onFilterChange(item.key, $event)"
+                  :searchable="false"
+                  :options="kindTypes"
+                >
+                  {{ item.label }}
+                </FilterableTableHeader>
+                <FilterableTableHeader
+                  v-else-if="item.key === 'status'"
+                  :model-value="filterParams[item.key]"
+                  :searchable="false"
+                  multi
+                  @change="onFilterChange(item.key, $event)"
+                  :options="repoStatusArr"
+                >
+                  {{ item.label }}
+                </FilterableTableHeader>
+                <FilterableTableHeader
+                  v-else
+                  :model-value="filterParams[item.key]"
+                  @change="onFilterChange(item.key, $event)"
+                  :searchable="false"
+                  :options="metricTypes(item.key)"
+                >
+                  {{ item.label }}
+                </FilterableTableHeader>
               </template>
               <template #default="{ row }">
                 <template v-if="item.children">
                   <el-table-column
-                    v-for="(subItem, idx) in item.children"
+                    v-for="subItem in item.children"
                     :label="subItem.label"
                     :prop="item.key"
                     :width="subItem.width"
@@ -448,55 +382,24 @@ watch(
                     :resizable="false"
                   >
                     <template #header>
-                      <OPopup
-                        trigger="none"
-                        style="--popup-radius: 4px"
-                        :key="item.type"
-                        :visible="filterSwitches[columnsChildrenIndex(idx)]"
-                        :unmount-on-hide="false"
-                        position="bl"
+                      <FilterableTableHeader
+                        v-if="subItem.key === 'versionStatus' && subItem.isFilter"
+                        :searchable="false"
+                        :model-value="filterParams[item.key]"
+                        @change="onFilterChange(item.key, $event)"
+                        :options="metricTypes(subItem.key)"
                       >
-                        <template #target>
-                          <div class="header-cell">
-                            {{ subItem.label }}
-                            <template v-if="subItem.isFilter">
-                              <OIcon
-                                :ref="(el) => (filterIconRefs[columnsChildrenIndex(idx)] = el as ComponentPublicInstance)"
-                                class="filter-icon"
-                                :style="currentActiveFilterIndices.has(columnsChildrenIndex(idx)) ? { color: 'var(--o-color-primary1)' } : {}"
-                                @click="switchFilterVisible(columnsChildrenIndex(idx))"
-                                ><IconFilter
-                              /></OIcon>
-                              <OPopover
-                                v-if="currentActiveFilterIndices.has(columnsChildrenIndex(idx)) && activeFilterValues[columnsChildrenIndex(idx)]"
-                                :target="filterIconRefs[columnsChildrenIndex(idx)]"
-                                trigger="hover"
-                              >
-                                <p class="bubble-content">
-                                  <span class="title">{{ subItem.label }}:</span>
-                                  {{ activeFilterValues[columnsChildrenIndex(idx)] }}
-                                </p>
-                              </OPopover>
-                            </template>
-                            <template v-if="subItem.key === 'eulerVersion'">
-                              <OPopover position="top" trigger="hover">
-                                <template #target>
-                                  <OIcon class="filter-icon"><IconHelp /></OIcon>
-                                </template>
-                                <div class="box">当前软件包在openEuler系统上的版本</div>
-                              </OPopover>
-                            </template>
-                          </div>
-                        </template>
-                        <div :ref="(el) => setPopupClickoutSideFn(el, columnsChildrenIndex(idx))">
-                          <FilterableCheckboxes
-                            v-if="subItem.key === 'versionStatus' && subItem.isFilter"
-                            :filterable="false"
-                            @change="onFilterChange(item.key, columnsChildrenIndex(idx), $event)"
-                            :values="metricTypes(subItem.key)"
-                          />
-                        </div>
-                      </OPopup>
+                        {{ subItem.label }}
+                      </FilterableTableHeader>
+                      <template v-else>
+                        {{ subItem.label }}
+                        <OPopover v-if="subItem.key === 'eulerVersion'" position="top" trigger="hover">
+                          <template #target>
+                            <OIcon class="filter-icon"><IconHelp /></OIcon>
+                          </template>
+                          <div class="box">当前软件包在openEuler系统上的版本</div>
+                        </OPopover>
+                      </template>
                     </template>
                     <template #default="{ row }">
                       <template v-if="subItem.key === 'versionStatus'">

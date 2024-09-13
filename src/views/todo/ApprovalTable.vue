@@ -1,18 +1,16 @@
 <script lang="ts" setup>
-import { ref, type PropType, type ComponentPublicInstance, onMounted, computed } from 'vue';
-import { OTable, OLink, OTag, ODialog, OButton, OPopup, OIcon, OPopover } from '@opensig/opendesign';
+import { ref, type PropType, computed } from 'vue';
+import { OLink, OTag, ODialog, OButton, OIcon, OPopover } from '@opensig/opendesign';
 import { useLocale } from '@/composables/useLocale';
 import { formatDateTime } from '@/utils/common';
 import { useRouter, useRoute } from 'vue-router';
 import { applicationTypeCurrent, applyStatusType } from '@/data/todo';
 import { applicationTypeConvert, applyStatusConvert } from '@/utils/collaboration';
-import { onClickOutside } from '@vueuse/core';
 import { getAdminApplyRepos, getMaintainerApplyRepos } from '@/api/api-collaboration';
 import { useUserInfoStore } from '@/stores/user';
-import FilterableCheckboxes from '@/components/FilterableCheckboxes.vue';
 
-import IconFilter from '~icons/app/icon-filter.svg';
 import IconHelp from '~icons/app/icon-help.svg';
+import FilterableTableHeader from '@/components/FilterableTableHeader.vue';
 
 interface ColumnsT {
   key: string;
@@ -81,58 +79,20 @@ const filterableColumns = ref(Object.keys(props.filterParams));
 
 const applyTypes = applicationTypeCurrent.map((item) => ({ label: item.label, value: item.id }));
 
-const filterIconRefs = ref(new Array<ComponentPublicInstance>(props.columns.length));
-
-/** 筛选组件是否显示的开关 */
-const filterSwitches = ref(props.columns.map(() => false));
-
-const setPopupClickoutSideFn = (el: any, index: number) => {
-  onClickOutside(el, () => {
-    filterSwitches.value[index] = false;
-  });
-};
-
-onMounted(() => {
-  Object.entries(props.filterParams).forEach(([key, value]) => {
-    if (value) {
-      const index = props.columns.findIndex((item) => item.key === key);
-      currentActiveFilterIndices.value.add(index);
-      activeFilterValues.value[index] = value;
-    }
-  });
-});
-
-/** 当前有选中筛选项的表格列的数组下标 */
-const currentActiveFilterIndices = ref(new Set<number>());
-
 const repoFilterLoading = ref(false);
 
 /** 切换某个筛选组件显示开关 */
-const switchFilterVisible = (index: number) => {
-  filterSwitches.value[index] = true;
-  if (index === 0) {
-    repoFilterLoading.value = true;
-    getRepoList();
-  }
+const switchFilterVisible = () => {
+  repoFilterLoading.value = true;
+  getRepoList();
 };
 
-/** 各表格列对应的已选中的筛选项 */
-const activeFilterValues = ref(new Array<string>(props.columns.length));
-
-const onFilterChange = (type: string, index: number, val: string | number | (string | number)[]) => {
-  filterSwitches.value = props.columns.map(() => false);
+const onFilterChange = (type: string, val: string | number | (string | number)[]) => {
   if ((Array.isArray(val) && val.length) || (!Array.isArray(val) && val)) {
     val = Array.isArray(val) ? val.join() : val.toString();
-    if (type === 'applyStatus') {
-      activeFilterValues.value[index] = applyStatusConvert(val);
-    } else {
-      activeFilterValues.value[index] = val;
-    }
     innerFilterParams.value[type] = val;
-    currentActiveFilterIndices.value.add(index);
   } else {
-    activeFilterValues.value[index] = '';
-    currentActiveFilterIndices.value.delete(index);
+    innerFilterParams.value[type] = '';
   }
   emits('queryData', innerFilterParams.value);
 };
@@ -166,7 +126,7 @@ const revoke = () => {
   <div class="table-main" :class="type">
     <el-table :data="data" border empty-text="暂无数据" style="width: 100%">
       <el-table-column
-        v-for="(item, index) in columns"
+        v-for="(item) in columns"
         :key="item.key"
         :fixed="item.fixed ?? false"
         :prop="item.key"
@@ -189,54 +149,38 @@ const revoke = () => {
             </template>
             <template v-else> {{ item.label }}</template>
           </th>
-          <OPopup v-else trigger="none" style="--popup-radius: 4px" :visible="filterSwitches[index]" :unmount-on-hide="false" position="bl">
-            <template #target>
-              <th :class="item.type">
-                <div class="header-cell">
-                  {{ item.label }}
-                  <template v-if="item.key !== 'operation'">
-                    <OIcon
-                      :ref="(el) => (filterIconRefs[index] = el as ComponentPublicInstance)"
-                      class="filter-icon"
-                      :style="currentActiveFilterIndices.has(index) ? { color: 'var(--o-color-primary1)' } : {}"
-                      @click="switchFilterVisible(index)"
-                      ><IconFilter
-                    /></OIcon>
-                    <OPopover v-if="currentActiveFilterIndices.has(index) && activeFilterValues[index]" :target="filterIconRefs[index]" trigger="hover">
-                      <p class="bubble-content">
-                        <span class="title">{{ item.label }}:</span>
-                        {{ activeFilterValues[index] }}
-                      </p>
-                    </OPopover>
-                  </template>
-                </div>
-              </th>
-            </template>
-            <div :ref="(el) => setPopupClickoutSideFn(el, index)">
-              <FilterableCheckboxes
-                :model-value="innerFilterParams[item.key]"
-                v-if="item.key === 'metric'"
-                :filterable="false"
-                @change="onFilterChange(item.key, index, $event)"
-                :values="applyTypes"
-              />
-              <FilterableCheckboxes
-                :model-value="innerFilterParams[item.key]"
-                v-else-if="item.key === 'repo'"
-                :loading="repoFilterLoading"
-                @change="onFilterChange(item.key, index, $event)"
-                :values="repoList"
-              />
-              <FilterableCheckboxes
-                :model-value="innerFilterParams[item.key]"
-                v-else-if="item.key === 'applyStatus'"
-                :filterable="false"
-                multi
-                @change="onFilterChange(item.key, index, $event)"
-                :values="applyStatusType"
-              />
-            </div>
-          </OPopup>
+          <th :class="item.type" v-else>
+            <FilterableTableHeader
+              :model-value="innerFilterParams[item.key]"
+              v-if="item.key === 'metric'"
+              :filterable="false"
+              @change="onFilterChange(item.key, $event)"
+              :options="applyTypes"
+            >
+              {{ item.label }}
+            </FilterableTableHeader>
+            <FilterableTableHeader
+              :model-value="innerFilterParams[item.key]"
+              v-else-if="item.key === 'repo'"
+              :loading="repoFilterLoading"
+              @options-visibility-change="switchFilterVisible"
+              @change="onFilterChange(item.key, $event)"
+              :options="repoList"
+            >
+              {{ item.label }}
+            </FilterableTableHeader>
+            <FilterableTableHeader
+              :model-value="innerFilterParams[item.key]"
+              v-else-if="item.key === 'applyStatus'"
+              :filterable="false"
+              :filter-values-display-mapper="applyStatusConvert"
+              multi
+              @change="onFilterChange(item.key, $event)"
+              :options="applyStatusType"
+            >
+              {{ item.label }}
+            </FilterableTableHeader>
+          </th>
         </template>
         <template #default="{ row }">
           <template v-if="item.key === 'createdAt'">
