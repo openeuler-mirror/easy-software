@@ -11,7 +11,7 @@ import Result404 from '@/components/Result404.vue';
 import { COUNT_PAGESIZE } from '@/data/query';
 import { type CollaborationColumnsT } from '@/@types/collaboration';
 import xss from 'xss';
-import { kindTypes, applicationType } from '@/data/todo';
+import { kindTypes, applicationType, securityTypes } from '@/data/todo';
 import { repoStatusIndex, repoStatusArr } from '@/utils/collaboration';
 import AppLoading from '@/components/AppLoading.vue';
 
@@ -41,12 +41,13 @@ const columns = reactive<CollaborationColumnsT[]>([
     ],
   },
   { label: 'CVE状态', key: 'cveStatus', type: 'cve', width: '188', isDefault: true, isFilter: true },
-  { label: '软件包更新状态', key: 'prStatus', type: 'pr', width: '188', isChecked: true, isFilter: true },
-  { label: 'Issue状态', key: 'issueStatus', type: 'issue', width: '188', isChecked: true, isFilter: true },
+  { label: '软件包更新状态', key: 'prStatus', type: 'pr', width: '188', isFilter: true },
+  { label: 'Issue状态', key: 'issueStatus', type: 'issue', width: '188', isFilter: true },
   { label: '贡献组织状态', key: 'orgStatus', type: 'org', width: '180', isFilter: true },
   { label: '贡献人员状态', key: 'contributorStatus', type: 'personnel', width: '180', isFilter: true },
   { label: '类别', key: 'kind', type: 'kind', width: '180', isFilter: true },
   { label: 'SIG名称', key: 'sigName', type: 'sig', width: '188', isFilter: true },
+  { label: '软件维护级别', key: 'level', type: 'level', width: '165', isFilter: true },
   { label: '状态', key: 'status', type: 'status', width: '125', fixed: 'right', isDefault: true, isFilter: true },
   { label: '建议', key: 'suggestions', type: 'recommend', width: '160', fixed: 'right', isDefault: true },
   { label: '操作', key: 'operation', type: 'operation', width: '215', fixed: 'right', isDefault: true },
@@ -66,6 +67,12 @@ const filterParams = reactive<Record<string, string | number>>({
   orgStatus: '',
   contributorStatus: '',
   status: '',
+  level: '',
+});
+
+// 软件包维护级别
+const securityLevel = computed(() => {
+  return securityTypes.map((item) => item.id);
 });
 
 const sigRepoMap = ref(new Map<string, string[]>());
@@ -80,8 +87,8 @@ const allRepos = computed(() => {
 const filterLoading = ref(false);
 
 /** 切换某个筛选组件显示开关 */
-const switchFilterVisible = async (index: number) => {
-  if ((index === 0 || index === 2) && !sigRepoMap.value.size) {
+const switchFilterVisible = async (key: string) => {
+  if ((key === 'repo' || key === 'sigName') && !sigRepoMap.value.size) {
     filterLoading.value = true;
     let data: Record<string, string> | null = null;
     try {
@@ -178,15 +185,8 @@ const handleCurrentChange = (val: number) => {
 // 外链确认
 const showExternalDlg = ref(false);
 const externalLink = ref('');
-const changeExternalDialog = (key: string, repo: string) => {
-  const repoPath = SRCOPENEULER + repo;
-  const rowTypes: Record<string, string> = {
-    repo: repoPath,
-    prStatus: `${repoPath}/pulls`,
-    cveStatus: `${repoPath}/issues?single_label_id=85497765`,
-    issueStatus: `${repoPath}/issues`,
-  };
-  externalLink.value = rowTypes[key];
+const changeExternalDialog = (repo: string) => {
+  externalLink.value = repo;
   showExternalDlg.value = true;
 };
 
@@ -241,10 +241,10 @@ const updateVersionValue = <K extends keyof VersionInfoT>(data: VersionInfoT[], 
 // 根据当前版本、上游版本数据 获取软件包名
 const updateVersionPkg = <K extends keyof VersionInfoT>(data: VersionInfoT[], type: K) => {
   const version = updateVersionValue(data, type);
-  const newPkg: string[] = [];
+  const newPkg: VersionInfoT[] = [];
   data.forEach((item) => {
     if (version.includes(item[type])) {
-      newPkg.push(item.pkg);
+      newPkg.push(item);
     }
   });
   return newPkg;
@@ -311,7 +311,7 @@ watch(
     <div v-if="!isError" class="platform-main">
       <div class="platform-main-table" :class="reposData.length === 0 ? 'empty' : ''">
         <el-table :data="reposData" empty-text="暂无数据" border style="width: 100%">
-          <template v-for="(item, index) in columns">
+          <template v-for="item in columns">
             <el-table-column
               v-if="item.isDefault || item.isChecked"
               :key="item.key"
@@ -322,53 +322,67 @@ watch(
               :resizable="false"
             >
               <template #header>
-                <FilterableTableHeader 
-                  v-if="item.key === 'repo'"
-                  :model-value="filterParams[item.key]"
-                  :loading="filterLoading"
-                  :options="allRepos"
-                  @options-visibility-change="switchFilterVisible(index)"
-                >
-                  {{ item.label }}
-                </FilterableTableHeader>
-                <FilterableTableHeader
-                  v-else-if="item.key === 'sigName'"
-                  :model-value="filterParams[item.key]"
-                  :loading="filterLoading"
-                  @change="onFilterChange(item.key, $event)"
-                  @options-visibility-change="switchFilterVisible(index)"
-                  :options="allSigs"
-                >
-                  {{ item.label }}
-                </FilterableTableHeader>
-                <FilterableTableHeader
-                  v-else-if="item.key === 'kind'"
-                  :model-value="filterParams[item.key]"
-                  @change="onFilterChange(item.key, $event)"
-                  :searchable="false"
-                  :options="kindTypes"
-                >
-                  {{ item.label }}
-                </FilterableTableHeader>
-                <FilterableTableHeader
-                  v-else-if="item.key === 'status'"
-                  :model-value="filterParams[item.key]"
-                  :searchable="false"
-                  multi
-                  @change="onFilterChange(item.key, $event)"
-                  :options="repoStatusArr"
-                >
-                  {{ item.label }}
-                </FilterableTableHeader>
-                <FilterableTableHeader
-                  v-else
-                  :model-value="filterParams[item.key]"
-                  @change="onFilterChange(item.key, $event)"
-                  :searchable="false"
-                  :options="metricTypes(item.key)"
-                >
-                  {{ item.label }}
-                </FilterableTableHeader>
+                <template v-if="item.isFilter">
+                  <FilterableTableHeader
+                    v-if="item.key === 'repo'"
+                    :model-value="filterParams[item.key]"
+                    :loading="filterLoading"
+                    :options="allRepos"
+                    @change="onFilterChange(item.key, $event)"
+                    @options-visibility-change="switchFilterVisible(item.key)"
+                  >
+                    {{ item.label }}
+                  </FilterableTableHeader>
+                  <FilterableTableHeader
+                    v-else-if="item.key === 'sigName'"
+                    :model-value="filterParams[item.key]"
+                    :loading="filterLoading"
+                    @change="onFilterChange(item.key, $event)"
+                    @options-visibility-change="switchFilterVisible(item.key)"
+                    :options="allSigs"
+                  >
+                    {{ item.label }}
+                  </FilterableTableHeader>
+                  <FilterableTableHeader
+                    v-else-if="item.key === 'kind'"
+                    :model-value="filterParams[item.key]"
+                    @change="onFilterChange(item.key, $event)"
+                    :searchable="false"
+                    :options="kindTypes"
+                  >
+                    {{ item.label }}
+                  </FilterableTableHeader>
+                  <FilterableTableHeader
+                    v-else-if="item.key === 'status'"
+                    :model-value="filterParams[item.key]"
+                    :searchable="false"
+                    multi
+                    @change="onFilterChange(item.key, $event)"
+                    :options="repoStatusArr"
+                  >
+                    {{ item.label }}
+                  </FilterableTableHeader>
+                  <FilterableTableHeader
+                    v-else-if="item.key === 'level'"
+                    :model-value="filterParams[item.key]"
+                    :searchable="false"
+                    multi
+                    @change="onFilterChange(item.key, $event)"
+                    :options="securityLevel"
+                  >
+                    {{ item.label }}
+                  </FilterableTableHeader>
+                  <FilterableTableHeader
+                    v-else
+                    :model-value="filterParams[item.key]"
+                    @change="onFilterChange(item.key, $event)"
+                    :searchable="false"
+                    :options="metricTypes(item.key)"
+                  >
+                    {{ item.label }}
+                  </FilterableTableHeader>
+                </template>
+                <template v-else>{{ item.label }}</template>
               </template>
               <template #default="{ row }">
                 <template v-if="item.children">
@@ -385,8 +399,8 @@ watch(
                       <FilterableTableHeader
                         v-if="subItem.key === 'versionStatus' && subItem.isFilter"
                         :searchable="false"
-                        :model-value="filterParams[item.key]"
-                        @change="onFilterChange(item.key, $event)"
+                        :model-value="filterParams[subItem.key]"
+                        @change="onFilterChange(subItem.key, $event)"
                         :options="metricTypes(subItem.key)"
                       >
                         {{ subItem.label }}
@@ -403,7 +417,12 @@ watch(
                     </template>
                     <template #default="{ row }">
                       <template v-if="subItem.key === 'versionStatus'">
-                        {{ row.versionStatus }}
+                        <template v-if="subItem.key === 'versionStatus' && row.versionDetailUrl">
+                          <OLink color="primary" class="link-external" hover-underline @click="changeExternalDialog(row.versionDetailUrl)">
+                            <span class="text">{{ row.versionStatus }} </span> <OIcon><IconOutlink /></OIcon>
+                          </OLink>
+                        </template>
+                        <template v-else>{{ row.versionStatus }}</template>
                       </template>
                       <template v-if="subItem.key === 'upVersion' || subItem.key === 'eulerVersion'">
                         <OPopover
@@ -416,7 +435,16 @@ watch(
                             <span>{{ updateVersionValue(row.versionDetail, subItem.key).join(', ') }}</span>
                           </template>
                           <div class="box">
-                            <p v-for="pItem in updateVersionPkg(row.versionDetail, subItem.key)" :key="pItem">{{ pItem }}</p>
+                            <p v-for="pItem in updateVersionPkg(row.versionDetail, subItem.key)" :key="pItem.pkg">
+                              {{ pItem.pkg }}
+                              {{
+                                updateVersionValue(row.versionDetail, subItem.key).length > 1
+                                  ? subItem.key === 'upVersion'
+                                    ? pItem.upVersion
+                                    : pItem.eulerVersion
+                                  : ''
+                              }}
+                            </p>
                           </div>
                         </OPopover>
                         <template v-else>-</template>
@@ -425,21 +453,37 @@ watch(
                   </el-table-column>
                 </template>
                 <template v-else>
-                  <template v-if="item.key === 'repo' || item.key === 'prStatus' || item.key === 'cveStatus' || item.key === 'issueStatus'">
-                    <OLink color="primary" class="link-external" hover-underline @click="changeExternalDialog(item.key, row.repo)">
+                  <template v-if="item.key === 'repo'">
+                    <OLink color="primary" class="link-external" hover-underline @click="changeExternalDialog(SRCOPENEULER + row.repo)">
                       <span class="text">{{ row[item.key] }} </span> <OIcon><IconOutlink /></OIcon>
                     </OLink>
                   </template>
-                  <template v-if="item.key === 'status'">
+                  <template v-else-if="item.key === 'prStatus' || item.key === 'cveStatus' || item.key === 'issueStatus'">
+                    <template v-if="item.key === 'cveStatus' && row.cveDetailUrl">
+                      <OLink color="primary" class="link-external" hover-underline @click="changeExternalDialog(row.cveDetailUrl)">
+                        <span class="text">{{ row[item.key] }} </span> <OIcon><IconOutlink /></OIcon>
+                      </OLink>
+                    </template>
+                    <template v-else-if="item.key === 'prStatus' && row.prDetailUrl">
+                      <OLink color="primary" class="link-external" hover-underline @click="changeExternalDialog(row.prDetailUrl)">
+                        <span class="text">{{ row[item.key] }} </span> <OIcon><IconOutlink /></OIcon>
+                      </OLink>
+                    </template>
+                    <template v-else-if="item.key === 'issueStatus' && row.issueDetailUrl">
+                      <OLink color="primary" class="link-external" hover-underline @click="changeExternalDialog(row.issueDetailUrl)">
+                        <span class="text">{{ row[item.key] }} </span> <OIcon><IconOutlink /></OIcon>
+                      </OLink>
+                    </template>
+                    <template v-else>
+                      {{ row[item.key] }}
+                    </template>
+                  </template>
+                  <template v-else-if="item.key === 'status'">
                     <div class="repo-status">
                       <OTag :class="`type${repoStatusIndex(row.status)}`">{{ row.status }} </OTag>
                     </div>
                   </template>
-
-                  <template v-if="item.key === 'orgStatus' || item.key === 'contributorStatus' || item.key === 'kind' || item.key === 'sigName'">
-                    {{ row[item.key] }}
-                  </template>
-                  <template v-if="item.key === 'suggestions'">
+                  <template v-else-if="item.key === 'suggestions'">
                     <template v-if="row.suggestions && row.suggestions.length > 0">
                       <p v-for="rule in row.suggestions" :key="rule">
                         {{ rule }}
@@ -448,11 +492,14 @@ watch(
                     <template v-else>-</template>
                   </template>
 
-                  <template v-if="item.key === 'operation'">
+                  <template v-else-if="item.key === 'operation'">
                     <div class="operation-box">
                       <OLink color="primary" hover-underline @click="changeFeedback(row.repo)">状态反馈</OLink>
                       <OLink color="primary" hover-underline @click="changeFeedbackHistory(row.repo)">反馈历史</OLink>
                     </div>
+                  </template>
+                  <template v-else>
+                    {{ row[item.key] }}
                   </template>
                 </template>
               </template>

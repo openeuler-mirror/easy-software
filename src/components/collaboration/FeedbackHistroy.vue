@@ -1,6 +1,7 @@
 <script lang="ts" setup>
-import { ref, onMounted, computed, watch, reactive } from 'vue';
-import { ODialog, OTable, OTag } from '@opensig/opendesign';
+import { ref, onMounted, computed, watch, reactive, type ComponentPublicInstance } from 'vue';
+import { onClickOutside } from '@vueuse/core';
+import { ODialog, OIcon, OPopover, OPopup, OTable, OTag } from '@opensig/opendesign';
 import { useLocale } from '@/composables/useLocale';
 import { useUserInfoStore } from '@/stores/user';
 import { getCollaborationApply } from '@/api/api-collaboration';
@@ -11,9 +12,10 @@ import { ElPagination, ElConfigProvider } from 'element-plus';
 import zhCn from 'element-plus/es/locale/lang/zh-cn';
 import English from 'element-plus/es/locale/lang/en';
 
+import IconFilter from '~icons/app/icon-filter.svg';
 import { COUNT_PAGESIZE } from '@/data/query';
+import FilterableTableHeader from '@/components/FilterableTableHeader.vue';
 import { applicationTypeCurrent, applyStatusType } from '@/data/todo';
-import FilterableTableHeader from '../FilterableTableHeader.vue';
 
 const props = defineProps({
   repo: {
@@ -137,29 +139,29 @@ watch(
       <div class="histroy-table" :class="{ total: total > COUNT_PAGESIZE[0] }">
         <OTable :columns="columns" :data="reposData" :loading="isLoading" border="row" :small="true">
           <template #head="{ columns }">
-            <template v-for="(item) in columns" :key="item.type">
-              <th v-if="item.key !== 'metric' && item.key !== 'applyStatus'" :class="item.type">{{ item.label }}</th>
-              <th :class="item.type" v-else>
+            <template v-for="item in columns" :key="item.type">
+              <th :class="item.type">
                 <FilterableTableHeader
                   v-if="item.key === 'metric'"
                   :model-value="filterParams[item.key]"
-                  :filterable="false"
+                  :searchable="false"
                   @change="onFilterChange(item.key, $event)"
                   :options="applyTypes"
                 >
                   {{ item.label }}
                 </FilterableTableHeader>
                 <FilterableTableHeader
-                  v-else
+                  v-else-if="item.key === 'applyStatus'"
                   :model-value="filterParams[item.key]"
-                  :filterable="false"
+                  :searchable="false"
                   multi
-                  :filter-values-display-mapper="applyStatusConvert"
                   @change="onFilterChange(item.key, $event)"
                   :options="applyStatusType"
                 >
                   {{ item.label }}
                 </FilterableTableHeader>
+
+                <template v-else> {{ item.label }}</template>
               </th>
             </template>
           </template>

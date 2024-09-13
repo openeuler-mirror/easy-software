@@ -1,5 +1,19 @@
 <script setup lang="ts">
-import { OCheckbox, OCheckboxGroup, ODivider, OIcon, OIconFilter, OIconSearch, OInput, OLink, OPopover, OPopup, ORadio, ORadioGroup, OScroller } from '@opensig/opendesign';
+import {
+  OCheckbox,
+  OCheckboxGroup,
+  ODivider,
+  OIcon,
+  OIconFilter,
+  OIconSearch,
+  OInput,
+  OLink,
+  OPopover,
+  OPopup,
+  ORadio,
+  ORadioGroup,
+  OScroller,
+} from '@opensig/opendesign';
 import { computed, ref, watch, type PropType } from 'vue';
 import { onClickOutside, useDebounceFn, useVModel } from '@vueuse/core';
 
@@ -117,9 +131,7 @@ const isFiltering = computed(() => {
   return !!modelVal.value;
 });
 
-watch(checkboxes, val => console.log(JSON.stringify(val)))
-
-watch(modelVal, val => {
+watch(modelVal, (val) => {
   if (props.multi) {
     if (Array.isArray(val)) {
       checkboxes.value = val;
@@ -129,7 +141,7 @@ watch(modelVal, val => {
   } else {
     radioVal.value = val as string | number;
   }
-})
+});
 
 /** 确认筛选值 */
 const filterConfirm = () => {
@@ -167,7 +179,7 @@ const reset = () => {
     emit('change', '');
   }
   popupVisible.value = false;
-}
+};
 </script>
 
 <template>
@@ -183,7 +195,15 @@ const reset = () => {
       </p>
     </OPopover>
     <!-- 下拉选项 -->
-    <OPopup trigger="none" @change="$emit('optionsVisibilityChange', $event)" style="--popup-radius: 4px" :visible="popupVisible" :unmount-on-hide="false" position="bl" :target="headerCellRef">
+    <OPopup
+      trigger="none"
+      @change="$emit('optionsVisibilityChange', $event)"
+      style="--popup-radius: 4px"
+      :visible="popupVisible"
+      :unmount-on-hide="false"
+      position="bl"
+      :target="headerCellRef"
+    >
       <div ref="popupRef" class="filterable-checkboxes-wrap" :style="searchable ? {} : { paddingTop: '0' }">
         <div v-if="searchable" class="input-wrap">
           <OInput clearable @clear="onFilterInput()" @input="onFilterInput" class="filter-input" placeholder="搜索">
