@@ -15,6 +15,7 @@ import { useRoute } from 'vue-router';
 
 import IconChevronDown from '~icons/app/icon-chevron-down.svg';
 import IconState from '~icons/pkg/icon-state.svg';
+import IconLevel from '~icons/pkg/icon-level.svg';
 
 interface EulerverT {
   pkgId: string;
@@ -242,7 +243,9 @@ const isSecurityShow = ref(false);
     </template>
     <div class="license">
       <p>等级</p>
-      <p>{{ data.security }}</p>
+      <p class="level-info">
+        <OIcon class="icon-level"><IconLevel /></OIcon>{{ data.security }}
+      </p>
     </div>
     <MaintenanceDescription v-if="isSecurityShow" @change="isSecurityShow = false" />
   </AppSection>
@@ -274,6 +277,20 @@ const isSecurityShow = ref(false);
 </template>
 
 <style lang="scss" scoped>
+.level-info {
+  display: flex;
+  align-items: center;
+  .icon-level {
+    width: 20px;
+    height: 20px;
+    color: var(--o-color-primary1);
+    margin-right: 8px;
+    svg {
+      width: 20px;
+      height: 20px;
+    }
+  }
+}
 .security-info {
   display: flex;
   align-items: center;
