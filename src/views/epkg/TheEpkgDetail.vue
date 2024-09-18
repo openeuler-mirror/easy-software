@@ -39,6 +39,7 @@ const appData = ref<AppInfoT>({
   size: '',
   source_code: '',
   bin_code: '',
+  security: '',
 });
 const srcRepo = ref('');
 
@@ -124,6 +125,7 @@ const getDetailValue = (data: any) => {
   appData.value.repository = data.srcRepo;
   appData.value.version = data.version;
   appData.value.license = data.license;
+  appData.value.security = data.security;
   queryVer();
 };
 

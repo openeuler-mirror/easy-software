@@ -93,3 +93,42 @@ export const applicationTypeCurrent = [
 
 export const kindTypes = ['everything-exclude-baseos', 'epol', 'baseos']
 
+// 软件维护级别
+export const securityTypes = [
+
+  {
+    id: 'L1',
+    children: [
+      '核心软件包，被依赖次数最多的软件包',
+      '1. 例行按周同步社区补丁/按牵引SLA进行修复',
+      '2. Committer梳理代码关键流程，有自维护自演进能力; 回馈上游社区，建立开源影响力',
+      '3. 基于开源测试套开展测试',
+      '4. 补充专项/DFX测试',
+    ],
+  },
+  {
+    id: 'L2',
+    children: [
+      '例行按双周同步社区补丁/按牵引SLA进行修复',
+      '2. 基于开源测试套开展测试',
+      '3. 结合使用场景测试',
+    ],
+  },
+  {
+    id: 'L3',
+    children: [
+      '1. 例行按月同步社区CVE/BUG',
+      '2. 基于开源测试套开展测试',
+    ],
+  },
+  {
+    id: 'L4',
+    children: [
+      '1. 例行按月同步社区高危漏洞/关键bug',
+      '2. 基于开源测试套开展测试',
+    ],
+  },
+  { id: 'epol', children: ['epol级别的软件包'], },
+  { id: 'oepkg', children: ['oepkg类型的所有软件包'], }
+
+]
