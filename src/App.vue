@@ -12,6 +12,7 @@ import { useLocale } from '@/composables/useLocale';
 
 import AppHeader from '@/components/header/AppHeader.vue';
 import AppFooter from '@/components/AppFooter.vue';
+import GlobalFeedback from './components/GlobalFeedback.vue';
 
 const langStore = useLangStore();
 const viewState = useViewStore();
@@ -45,6 +46,7 @@ initSensor();
     <AppHeader class="app-header" />
     <OScroller show-type="hover">
       <main class="ly-main">
+        <GlobalFeedback />
         <RouterView v-if="!viewState.notFoundPage" />
         <ResultNotFound v-else />
       </main>

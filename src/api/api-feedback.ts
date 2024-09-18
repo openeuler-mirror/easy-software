@@ -35,9 +35,28 @@ export function postFeedback(params: FeedbackT): Promise<ResponseT<string>> {
  * @returns 反馈历史列表
  */
 export function getFeedbackList(page?: number, pageSize?: number, filter?: string, sort?: SorT) {
-  const query = generateQuery({ page, pageSize, filter, sort, community: 'openeuler', repo: 'easy-software' });
-  const url = `/api-dsapi/query/repo/issues${query}`;
   return request
-    .get<ResponseT<{ total: number; data: FeedbackHistoryT[] }[]>>(url, { headers: { Accept: 'application/json' } })
+    .get<ResponseT<{ total: number; data: FeedbackHistoryT[] }[]>>('/api-dsapi/query/repo/issues', {
+      params: { page, pageSize, filter, sort, community: 'openeuler', repo: 'easy-software' },
+      headers: { Accept: 'application/json' },
+    })
     .then((res) => res?.data);
+}
+
+export function getGlobalFeedbackHistoryList(page?: number, pageSize?: number, filter?: string, sort?: SorT) {
+  return request
+    .get<ResponseT<{ total: number; data: FeedbackHistoryT[] }[]>>('/api-dsapi/query/get/nps', {
+      params: { page, pageSize, filter, sort, community: 'openeuler', repo: 'easy-software' },
+      headers: { Accept: 'application/json' },
+    })
+    .then((res) => res?.data.data);
+}
+
+export function postGlobalFeedback(feedbackPageUrl: string, feedbackValue: number, feedbackText: string) {
+  return request.post('/api-dsapi/query/globalnps/issue', {
+    feedbackPageUrl,
+    feedbackValue,
+    feedbackText,
+    community: 'software',
+  });
 }
