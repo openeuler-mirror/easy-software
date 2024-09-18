@@ -69,8 +69,24 @@ const popupRef = ref();
 const popupVisible = ref(false);
 
 onClickOutside(popupRef, () => {
+  if (!popupVisible.value) {
+    return;
+  }
+  // 不点确定直接关闭下拉
   popupVisible.value = false;
-  rollback();
+  if (props.multi) {
+    if (Array.isArray(modelVal.value)) {
+      checkboxes.value = modelVal.value;
+      return;
+    } else if (typeof modelVal.value === 'string' && modelVal.value.indexOf(',') !== -1) {
+      checkboxes.value = modelVal.value.split(',');
+      return;
+    } else {
+      clearCheckboxes();
+    }
+  } else {
+    radioVal.value = modelVal.value as string | number;
+  }
 });
 
 const onClickFilterIcon = () => (popupVisible.value = true);
@@ -153,21 +169,6 @@ const filterConfirm = () => {
     emit('change', radioVal.value);
   }
   popupVisible.value = false;
-};
-
-/** 不点确定直接关闭下拉 */
-const rollback = () => {
-  if (props.multi) {
-    if (Array.isArray(modelVal.value)) {
-      checkboxes.value = modelVal.value;
-      return;
-    } else if (typeof modelVal.value === 'string' && modelVal.value.indexOf(',') !== -1) {
-      checkboxes.value = modelVal.value.split(',');
-      return;
-    }
-  } else {
-    radioVal.value = modelVal.value as string | number;
-  }
 };
 
 const reset = () => {
