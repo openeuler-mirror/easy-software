@@ -22,6 +22,7 @@ import ImageTags from '@/views/image/ImageTags.vue';
 import DetailAside from '@/components/detail/DetailAside.vue';
 import defaultImg from '@/assets/default-logo.png';
 import IconEpkg from '~icons/pkg/epkg.svg';
+import IconOEpkg from '~icons/pkg/oepkg.svg';
 import IconImage from '~icons/pkg/image.svg';
 import IconRpm from '~icons/pkg/rpm.svg';
 import { currentFieldDetailTabInjection, pkgIdInjection } from '@/data/injectionKeys';
@@ -73,6 +74,7 @@ const srcRepos = reactive<Record<string, string | undefined>>({});
 const currentSrcRepo = computed(() => srcRepos[activeName.value]);
 const appDataName = ref('');
 const epkgData = ref();
+const oepkgData = ref();
 const rpmData = ref();
 const imgData = ref();
 const isLoading = ref(true);
@@ -81,12 +83,13 @@ provide(currentFieldDetailTabInjection, activeName);
 
 const queryEntity = () => {
   const query = route.query;
-  const { type, appPkgId, epkgPkgId, rpmPkgId } = query;
+  const { type, appPkgId, epkgPkgId, rpmPkgId, oepkgPkgId } = query;
   getDetail(
     filterEmptyParams({
       appPkgId: (appPkgId as string) || '',
       epkgPkgId: (epkgPkgId as string) || '',
       rpmPkgId: (rpmPkgId as string) || '',
+      oepkgPkgId: (oepkgPkgId as string) || '',
     })
   )
     .then((res) => {
@@ -98,6 +101,7 @@ const queryEntity = () => {
       epkgData.value = data['EPKG'];
       rpmData.value = data['RPM'];
       imgData.value = data['IMAGE'];
+      oepkgData.value = data['OEPKG'];
       appDataName.value = data[data.tags[0]].name;
       pkgId.value = data[data.tags[0]].pkgId;
       if (isValidTags(type)) {
@@ -130,6 +134,11 @@ const onChange = (tab: string) => {
     typePkg.value = 'EPKG';
     queryVer();
     getDetailValue(epkgData.value);
+  } else if (tab === 'OEPKG') {
+    tabValue.value = 'oepkg';
+    typePkg.value = 'OEPKG';
+    queryVer();
+    getDetailValue(oepkgData.value);
   } else if (tab === 'IMAGE') {
     tabValue.value = 'apppkg';
     typePkg.value = 'IMAGE';
@@ -146,7 +155,7 @@ const onChange = (tab: string) => {
 
 const handleQueryData = (tab: string) => {
   const query = route.query;
-  const { appPkgId, rpmPkgId, epkgPkgId } = query;
+  const { appPkgId, rpmPkgId, epkgPkgId, oepkgPkgId } = query;
   router.push({
     path: `/${locale.value}/field/detail`,
     query: {
@@ -154,6 +163,7 @@ const handleQueryData = (tab: string) => {
       appPkgId,
       rpmPkgId,
       epkgPkgId,
+      oepkgPkgId,
     },
   });
 };
@@ -167,7 +177,7 @@ const tagVer = ref();
 const summary = ref();
 const getDetailValue = (data: any) => {
   pkgId.value = data.pkgId;
-  if (typePkg.value === 'RPM') {
+  if (typePkg.value === 'RPM' || typePkg.value === 'OEPKG') {
     basicInfo.value = [
       { name: '详细描述', value: data?.description },
       { name: '版本支持情况', value: data.osSupport },
@@ -269,6 +279,8 @@ const getTabIcon = (tab: string) => {
     return IconEpkg;
   } else if (tab === 'IMAGE') {
     return IconImage;
+  } else if (tab === 'OEPKG') {
+    return IconOEpkg;
   }
 };
 
