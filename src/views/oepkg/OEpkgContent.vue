@@ -3,7 +3,7 @@ import { ref, watch, computed, onMounted } from 'vue';
 import { OTag, OLink, OIcon, isUndefined } from '@opensig/opendesign';
 
 import { getSearchData } from '@/api/api-search';
-import { getSearchAllFiled } from '@/api/api-domain';
+import { getSearchAllFiled, getSearchAllColumn } from '@/api/api-domain';
 import { useRoute, useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { getParamsRules } from '@/utils/common';
@@ -160,7 +160,6 @@ const oepkgColumn = {
     'openEuler-20.03-LTS',
   ],
   arch: ['x86_64', 'aarch64', 'noarch', 'i686', 's390x'],
-  category: ['AI', 'HPC', '云服务', '分布式存储', '大数据', '数据库', '其他'],
 };
 
 const filterOsList = ref<string[]>([]);
@@ -169,9 +168,22 @@ const filterCategoryList = ref<string[]>([]);
 const isFilterLoading = ref(false);
 
 const queryFilter = () => {
-  filterCategoryList.value = oepkgColumn.category;
+  filterCategoryList.value = [];
   filterArchList.value = oepkgColumn.arch;
   filterOsList.value = oepkgColumn.os;
+
+  getSearchAllColumn({
+    name: tabName.value,
+    column: 'category',
+  })
+    .then((res) => {
+      const { category } = res.data;
+      filterCategoryList.value = category;
+      isFilterLoading.value = false;
+    })
+    .catch(() => {
+      isFilterLoading.value = false;
+    });
 };
 
 const closeTag = (idx: string | number, type: string) => {
