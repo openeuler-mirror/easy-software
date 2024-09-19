@@ -18,6 +18,11 @@ defineProps({
 </template>
 
 <style lang="scss" scoped>
+.detail-row-side {
+  .title-bar {
+    margin-bottom: 16px !important;
+  }
+}
 .app-section {
   padding: 40px;
   background: var(--o-color-fill2);
