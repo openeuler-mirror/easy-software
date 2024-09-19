@@ -38,7 +38,7 @@ const typePkg = ref();
 const basicInfo = ref<DetailItemT[]>([]);
 const installation = ref('');
 const downloadData = ref('');
-const files = ref([]);
+
 const maintainer = ref<MaintainerT>({ maintainerId: '', maintainerEmail: '', maintainerGiteeId: '' });
 const upStream = ref();
 const security = ref();
@@ -177,7 +177,7 @@ const tagVer = ref();
 const summary = ref();
 const getDetailValue = (data: any) => {
   pkgId.value = data.pkgId;
-  if (typePkg.value === 'RPM' || typePkg.value === 'OEPKG') {
+  if (typePkg.value === 'RPM') {
     basicInfo.value = [
       { name: '详细描述', value: data?.description },
       { name: '版本支持情况', value: data.osSupport },
@@ -211,7 +211,6 @@ const getDetailValue = (data: any) => {
       { name: '所属仓库', value: JSON.parse(data?.repo).url, type: JSON.parse(data?.repo).type },
       { name: 'Repo源', value: JSON.parse(data?.repoType).url, type: JSON.parse(data?.repoType).type },
     ];
-    files.value = JSON.parse(data?.files);
     const newData = [
       { name: 'Requires', value: JSON.parse(data?.requires || '') },
       { name: 'Provides', value: JSON.parse(data?.provides || '') },
@@ -226,6 +225,29 @@ const getDetailValue = (data: any) => {
     });
 
     appData.value.size = data.epkgSize || 0;
+    appData.value.version = data.version;
+    summary.value = data.summary;
+  } else if (typePkg.value === 'OEPKG') {
+    basicInfo.value = [
+      { name: '详细描述', value: data?.description },
+      { name: '版本支持情况', value: data.osSupport },
+      { name: '架构', value: data.arch },
+      { name: '软件包分类', value: data.category || '其他' },
+    ];
+    const newData = [
+      { name: 'Requires', value: JSON.parse(data?.requires || '') },
+      { name: 'Provides', value: JSON.parse(data?.provides || '') },
+      { name: 'Conflicts', value: JSON.parse(data?.conflicts || '') },
+    ];
+    moreMessge.value = [];
+    // 过滤空数据
+    newData.forEach((item) => {
+      if (item.value.length > 0) {
+        moreMessge.value.push(item);
+      }
+    });
+
+    appData.value.size = data.rpmSize || 0;
     appData.value.version = data.version;
     summary.value = data.summary;
   } else if (typePkg.value === 'IMAGE') {

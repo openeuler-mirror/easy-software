@@ -5,7 +5,7 @@ import { useI18n } from 'vue-i18n';
 import { getSearchData } from '@/api/api-search';
 import { useRoute, useRouter } from 'vue-router';
 import { useLocale } from '@/composables/useLocale';
-import { getSearchAllFiled } from '@/api/api-domain';
+import { getSearchAllFiled, getSearchAllColumn } from '@/api/api-domain';
 import { isValidSearchTabName, isValidSearchKey } from '@/utils/query';
 import { TABNAME_OPTIONS, FLITERMENUOPTIONS, COUNT_PAGESIZE } from '@/data/query';
 import { getParamsRules } from '@/utils/common';
@@ -148,7 +148,6 @@ const isFilterLoading = ref(false);
 const rpmColumn = {
   os,
   arch,
-  category: ['AI', 'HPC', '云服务', '分布式存储', '大数据', '数据库', '其他'],
 };
 
 const queryFilter = () => {
@@ -158,7 +157,18 @@ const queryFilter = () => {
 
   filterOsList.value = rpmColumn.os;
   filterArchList.value = rpmColumn.arch;
-  filterCategoryList.value = rpmColumn.category;
+  getSearchAllColumn({
+    name: tabName.value,
+    column: 'category',
+  })
+    .then((res) => {
+      const { category } = res.data;
+      filterCategoryList.value = category;
+      isFilterLoading.value = false;
+    })
+    .catch(() => {
+      isFilterLoading.value = false;
+    });
 };
 
 const handleCloseTag = (idx: string | number, type: string) => {
