@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue';
-import { OButton, ODivider, OIcon, OLink, OOption, OPopup, ORate, OScroller, OSelect, OTextarea, useMessage } from '@opensig/opendesign';
+import { ref, computed, onUnmounted, onMounted } from 'vue';
+import { OButton, ODivider, OIcon, OLink, OOption, OPopup, ORate, OScroller, OSelect, OTag, OTextarea, useMessage } from '@opensig/opendesign';
 import IconOutlink from '~icons/app/icon-outlink.svg';
 import type { FeedbackHistoryT } from '@/@types/feedback';
 import { getGlobalFeedbackHistoryList, postGlobalFeedback } from '@/api/api-feedback';
@@ -9,23 +9,36 @@ import { dayjs } from 'element-plus';
 import iconButton from '~icons/app/icon-feedback.svg';
 import Result404 from './Result404.vue';
 import { useLoginStore } from '@/stores/user';
-import { windowOpen } from '@/utils/common';
+import { useI18n } from 'vue-i18n';
+import { doLogin } from '@/shared/login';
 
-const loginStore = useLoginStore()
+const STORAGE_KEY = 'globalFeedback';
+const { t } = useI18n();
+const loginStore = useLoginStore();
 const message = useMessage();
 const globalFeedbackBtnRef = ref();
+const feedbackListRef = ref();
 
 const isShowingFeedbackList = ref(false);
-const feedbackTitle = computed(() => isShowingFeedbackList.value ? '历史反馈信息' : '反馈');
+const feedbackTitle = computed(() => (isShowingFeedbackList.value ? '历史反馈信息' : '反馈'));
 const bottomLinkContent = computed(() => (isShowingFeedbackList.value ? '提交反馈' : '查看历史反馈信息'));
 
 const rateVal = ref(0);
 const feedbackContent = ref('');
 
+onMounted(() => {
+  const storage = window.sessionStorage.getItem(STORAGE_KEY)
+  if (storage) {
+    const { content, rate } = JSON.parse(storage);
+    rateVal.value = rate;
+    feedbackContent.value = content;
+  }
+})
+
 // 状态筛选
 const feedbackState = ref('');
 const feedbackOptions = [
-  { label: '全部', value: '' },
+  { label: '全部状态', value: '' },
   { label: '待办的', value: '待办的' },
   { label: '进行中', value: '进行中' },
   { label: '已完成', value: '已完成' },
@@ -41,40 +54,100 @@ const vMounted = {
   },
 };
 
-const feedbacks = ref<FeedbackHistoryT[]>([]);
-
-const getFeedbackList = () => {
-  getGlobalFeedbackHistoryList(1, 500, feedbackState.value)
-    .then((res) => {
-      if (res[0]?.data?.length) {
-        res[0].data.forEach((item) => (item.create_at = dayjs(item.create_at).format('YYYY/MM/DD HH:mm:ss')));
-        feedbacks.value = res[0].data;
-        return;
-      }
-      feedbacks.value = [];
-    })
-    .catch(() => (feedbacks.value = []));
+let canvasCtx: CanvasRenderingContext2D;
+// 计算文本长度，决定是否显示省略号
+const vCalcTextLength = {
+  mounted(el: HTMLParagraphElement) {
+    const text = el.childNodes[0]?.textContent as string;
+    if (!canvasCtx) {
+      canvasCtx = document.createElement('canvas').getContext('2d') as CanvasRenderingContext2D;
+      canvasCtx.font = window.getComputedStyle(el).getPropertyValue('font');
+    }
+    const textLen = canvasCtx.measureText(text).width;
+    const containerWidth = el.getBoundingClientRect().width;
+    const tagWidth = el.querySelector('.o-tag')?.getBoundingClientRect().width as number;
+    if (textLen >= containerWidth * 4 - tagWidth) {
+      (el.querySelector('.dots-tag') as HTMLSpanElement).style.position = 'absolute';
+      (el.querySelector('.dots') as HTMLSpanElement).style.display = 'inline-block';
+    }
+  },
 };
 
-const onClickSwitch = () => {
+const feedbacks = ref<FeedbackHistoryT[]>([]);
+
+const empty = ref(false);
+
+const tagColor = (tag: string) => {
+  switch (tag) {
+    case '待办的':
+      return 'warning';
+    case '进行中':
+      return 'primary';
+    case '已完成':
+      return 'success';
+    case '已拒绝':
+      return 'danger';
+    default:
+      return 'normal';
+  }
+};
+
+const getFeedbackList = async () => {
+  try {
+    const res = await getGlobalFeedbackHistoryList(1, 500, feedbackState.value);
+    if (res[0]?.data?.length) {
+      res[0].data.forEach((item) => (item.created_at = dayjs(item.created_at).format('YYYY/MM/DD HH:mm:ss')));
+      feedbacks.value = res[0].data;
+      return;
+    }
+    feedbacks.value = [];
+  } catch (error) {
+    feedbacks.value = [];
+  }
+};
+
+const onClickSwitch = async () => {
   isShowingFeedbackList.value = !isShowingFeedbackList.value;
   if (isShowingFeedbackList.value) {
-    getFeedbackList();
+    feedbackState.value = '';
+    await getFeedbackList();
+    if (!feedbacks.value.length) {
+      empty.value = true;
+    } else {
+      empty.value = false;
+    }
+  } else {
+    empty.value = false;
   }
 };
 
 const postFeedback = () => {
+  if (!rateVal.value) {
+    return message.warning({
+      content: t('software.feedbackMessage[1]'),
+    });
+  }
+  if (!feedbackContent.value) {
+    return message.warning({
+      content: t('software.feedbackMessage[0]'),
+    });
+  }
   if (!loginStore.isLogined) {
-    windowOpen(import.meta.env.VITE_LOGIN_URL);
+    window.sessionStorage.setItem(STORAGE_KEY, JSON.stringify({ rate: rateVal.value, content: feedbackContent.value }));
+    doLogin();
     return;
   }
   postGlobalFeedback(window.location.href, rateVal.value, feedbackContent.value)
     .then(() => {
+      window.sessionStorage.removeItem(STORAGE_KEY);
       feedbackContent.value = '';
       rateVal.value = 0;
+      message.success({ content: '反馈成功' });
     })
     .catch(() => message.danger({ content: '反馈失败' }));
 };
+
+onUnmounted(() => window.sessionStorage.removeItem(STORAGE_KEY));
 </script>
 
 <template>
@@ -87,21 +160,21 @@ const postFeedback = () => {
         <span>{{ feedbackTitle }}</span>
         <template v-if="!isShowingFeedbackList">
           <ORate v-model="rateVal" color="danger" style="margin-top: 18px" />
-          <OTextarea v-model="feedbackContent" placeholder="请输入您的反馈" resize="none" clearable style="margin-top: 20px; width: 300px; height: 88px" />
+          <OTextarea v-model="feedbackContent" placeholder="请输入您的反馈" :max-length="500" resize="none" clearable style="margin-top: 20px; width: 300px; height: 88px" />
           <OButton class="button" color="primary" variant="solid" round="pill" @click="postFeedback">提交反馈</OButton>
         </template>
-        <div class="feedback-list" v-else>
-          <template v-if="feedbacks.length">
+        <div ref="feedbackListRef" class="feedback-list" v-else>
+          <template v-if="!empty">
             <div class="title">
               <span>共{{ feedbacks.length }}条反馈信息</span>
-              <OSelect v-model="feedbackState" @change="getFeedbackList" style="max-width: 108px">
-                <OOption v-for="item in feedbackOptions" :key="item.value" :value="item.label">
+              <OSelect v-model="feedbackState" @change="getFeedbackList" :options-wrapper="feedbackListRef" style="max-width: 108px">
+                <OOption v-for="item in feedbackOptions" :key="item.value" :value="item.value" :label="item.label">
                   {{ item.label }}
                 </OOption>
               </OSelect>
             </div>
             <ODivider direction="h" style="width: 300px"></ODivider>
-            <OScroller class="scroller" :style="{ scrollerMaxHeight, minHeight: '168px' }">
+              <OScroller v-if="feedbacks.length" class="scroller" :style="{ scrollerMaxHeight, minHeight: '168px' }">
               <div class="feedback-item" v-mounted>
                 <div class="content">
                   <p class="feedback-title">t</p>
@@ -110,17 +183,24 @@ const postFeedback = () => {
               </div>
               <div class="feedback-item" v-for="(item, index) in feedbacks" :key="index">
                 <div class="content">
-                  <p class="feedback-title">
+                  <p v-calc-text-length class="feedback-title">
                     {{ item.feedback }}
+                    <span class="dots-tag">
+                      <span class="dots"> ... </span>
+                      <OTag class="tag" :color="tagColor(item.issue_customize_state)" size="small">{{ item.issue_customize_state }}</OTag>
+                    </span>
                   </p>
-                  <OLink class="out-link" href="www.baidu.com" color="primary" hover-underline target="_blank" rel="noopener noreferrer">
+                  <OLink class="out-link" :href="item.url" color="primary" hover-underline target="_blank" rel="noopener noreferrer">
                     查看详情
                     <OIcon><IconOutlink /></OIcon>
                   </OLink>
                 </div>
-                <p class="time">{{ item.create_at }}</p>
+                <p class="time">{{ item.created_at }}</p>
               </div>
             </OScroller>
+            <div v-else class="empty">
+              暂无反馈信息
+            </div>
           </template>
           <Result404 v-else>
             <template #description>
@@ -153,6 +233,7 @@ const postFeedback = () => {
   align-items: center;
   color: var(--o-color-primary1);
   box-shadow: var(--o-shadow-1);
+  z-index: 1000;
 
   cursor: pointer;
   position: fixed;
@@ -171,6 +252,7 @@ const postFeedback = () => {
   width: 360px;
   background-color: var(--o-color-fill2);
   padding: 16px 0;
+  color: var(--o-color-info2);
 
   .title {
     display: flex;
@@ -200,6 +282,14 @@ const postFeedback = () => {
     align-items: center;
     margin-top: 16px;
     width: 100%;
+
+    .empty {
+      height: 146px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      @include tip2;
+    }
 
     .title {
       display: flex;
@@ -249,6 +339,17 @@ const postFeedback = () => {
           -webkit-box-orient: vertical;
           position: relative;
           word-break: break-all;
+
+          .dots-tag {
+            background-color: var(--o-color-fill2);
+            bottom: 0;
+            right: 0;
+          }
+
+          .dots {
+            display: none;
+            margin-right: 8px;
+          }
         }
       }
 
