@@ -5,4 +5,5 @@ export interface FeedbackHistoryT {
   issue_title: string;
   body: string;
   url: string;
+  created_at: string;
 }

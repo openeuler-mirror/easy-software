@@ -31,14 +31,14 @@ export const navs = [
     },
     href: '/image',
   },
-  // {
-  //   id: 'epkg',
-  //   label: {
-  //     zh: 'EPKG',
-  //     en: 'EPKG',
-  //   },
-  //   href: '/epkg',
-  // },
+  {
+    id: 'epkg',
+    label: {
+      zh: 'EPKG',
+      en: 'EPKG',
+    },
+    href: '/epkg',
+  },
   {
     id: 'oepkg',
     label: {

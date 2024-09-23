@@ -14,13 +14,19 @@ const props = defineProps({
       return 2;
     },
   },
+  wrapper: {
+    type: String,
+    default: () => {
+      return '';
+    },
+  },
 });
 
-const contentLen = computed(() => props.content.length > props.line * 11);
+const contentLen = computed(() => props.content.length > props.line * 10);
 </script>
 
 <template>
-  <OPopover v-if="contentLen" position="top" trigger="hover">
+  <OPopover v-if="contentLen" trigger="hover" :anchor="true" :wrapper="wrapper">
     <template #target>
       <div class="line-clamp">{{ content }}</div>
     </template>
@@ -28,15 +34,21 @@ const contentLen = computed(() => props.content.length > props.line * 11);
       {{ content }}
     </div>
   </OPopover>
-  <template v-else>{{ content }} </template>
+  <template v-else
+    ><div class="txt">{{ content }}</div>
+  </template>
 </template>
 
 <style lang="scss" scoped>
+.txt {
+  word-break: break-all;
+}
 .box {
   max-width: 184px;
   max-height: 154px;
   color: var(--o-color-info1);
   overflow: hidden auto;
+  word-break: break-all;
   @include scrollbar;
   @include tip1;
 }

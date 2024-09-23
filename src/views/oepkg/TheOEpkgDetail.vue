@@ -37,6 +37,7 @@ const appData = ref<AppInfoT>({
   size: '',
   source_code: '',
   bin_code: '',
+  security: '',
 });
 const srcRepo = ref('');
 
@@ -124,6 +125,7 @@ const getDetailValue = (data: any) => {
   appData.value.bin_code = data.binDownloadUrl;
   appData.value.cover = data?.iconUrl || defaultImg;
   appData.value.repository = data.srcRepo;
+  appData.value.security = data.security;
   queryVer();
 };
 

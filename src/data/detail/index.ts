@@ -16,3 +16,8 @@ export const verColumns = [
   { label: '架构', key: 'arch', style: 'width:30%' },
   { label: '操作', key: 'flags', style: 'width:30%' },
 ];
+
+
+
+
+const securityInfo = [];

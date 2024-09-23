@@ -1,36 +1,57 @@
 <script setup lang="ts">
-import { ref, watch, computed, type ComponentPublicInstance, reactive } from 'vue';
-import { OTable, OTag, OLink, OIcon, OPopup, OPopover, useMessage } from '@opensig/opendesign';
-import { getMaintainerRepos, getAdminRepos, getRepoSigList } from '@/api/api-collaboration';
+import { ref, watch, computed, reactive, onMounted } from 'vue';
+import { OButton, OTag, OLink, OIcon, OPopup, OPopover, useMessage } from '@opensig/opendesign';
+import { getCollaborationRepos, getRepoSigList } from '@/api/api-collaboration';
 import { useUserInfoStore } from '@/stores/user';
 import ExternalLink from '@/components/ExternalLink.vue';
 import Indicators from '@/components/collaboration/Indicators.vue';
 import StatusFeedback from '@/components/collaboration/StatusFeedback.vue';
+import TableColumnSettings from './TableColumnSettings.vue';
 import Result404 from '@/components/Result404.vue';
 import { COUNT_PAGESIZE } from '@/data/query';
+import { type CollaborationColumnsT } from '@/@types/collaboration';
+import xss from 'xss';
+import { kindTypes, applicationType, securityTypes } from '@/data/todo';
+import { repoStatusIndex, repoStatusArr } from '@/utils/collaboration';
+import AppLoading from '@/components/AppLoading.vue';
 
 import IconOutlink from '~icons/pkg/icon-outlink.svg';
 import IconState from '~icons/pkg/icon-state.svg';
-import IconFilter from '~icons/app/icon-filter.svg';
-import FilterableCheckboxes from '@/components/FilterableCheckboxes.vue';
-import { kindTypes, applicationType } from '@/data/todo';
-import { onClickOutside } from '@vueuse/core';
-import { repoStatusIndex, repoStatusArr, versionLatestStatusConvert } from '@/utils/collaboration';
-import { storeToRefs } from 'pinia';
+import IconSetting from '~icons/app/icon-settings.svg';
+import IconHelp from '~icons/app/icon-help.svg';
+import FilterableTableHeader from '@/components/FilterableTableHeader.vue';
 
-const columns = [
-  { label: '软件仓库', key: 'repo', type: 'repo' },
-  { label: '类别', key: 'kind', type: 'kind' },
-  { label: 'SIG名称', key: 'sigName', type: 'sig' },
-  { label: 'CVE状态', key: 'cveStatus', type: 'cve' },
-  { label: 'Issue状态', key: 'issueStatus', type: 'issue' },
-  { label: '软件包更新状态', key: 'prStatus', type: 'pr' },
-  { label: '软件包版本状态', key: 'versionStatus', type: 'version' },
-  { label: '贡献组织状态', key: 'orgStatus', type: 'org' },
-  { label: '贡献人员状态', key: 'contributorStatus', type: 'personnel' },
-  { label: '状态', key: 'status', type: 'status' },
-  { label: '操作', key: 'operation', type: 'operation' },
-];
+/**
+ * isDefault 是否是默认字段
+ * isFilter 是否可筛选
+ * isChecked 是否可编辑
+ *
+ * **/
+const columns = reactive<CollaborationColumnsT[]>([
+  { label: '软件仓库', key: 'repo', type: 'repo', width: '200', fixed: 'left', isDefault: true, isFilter: true },
+  {
+    label: '软件包版本信息',
+    key: 'versionInfo',
+    type: 'version-box',
+    isDefault: true,
+    children: [
+      { label: '软件包版本状态', key: 'versionStatus', type: 'version', width: '180', isFilter: true },
+      { label: '上游版本', key: 'upVersion', type: 'version', width: '180' },
+      { label: '当前版本', key: 'eulerVersion', type: 'version', width: '180' },
+    ],
+  },
+  { label: 'CVE状态', key: 'cveStatus', type: 'cve', width: '188', isDefault: true, isFilter: true },
+  { label: '软件包更新状态', key: 'prStatus', type: 'pr', width: '188', isFilter: true },
+  { label: 'Issue状态', key: 'issueStatus', type: 'issue', width: '188', isFilter: true },
+  { label: '贡献组织状态', key: 'orgStatus', type: 'org', width: '180', isFilter: true },
+  { label: '贡献人员状态', key: 'contributorStatus', type: 'personnel', width: '180', isFilter: true },
+  { label: '类别', key: 'kind', type: 'kind', width: '180', isFilter: true },
+  { label: 'SIG名称', key: 'sigName', type: 'sig', width: '188', isFilter: true },
+  { label: '软件维护级别', key: 'level', type: 'level', width: '165', isFilter: true },
+  { label: '状态', key: 'status', type: 'status', width: '125', fixed: 'right', isDefault: true, isFilter: true },
+  { label: '建议', key: 'suggestions', type: 'recommend', width: '160', fixed: 'right', isDefault: true },
+  { label: '操作', key: 'operation', type: 'operation', width: '215', fixed: 'right', isDefault: true },
+]);
 
 const message = useMessage();
 
@@ -46,6 +67,12 @@ const filterParams = reactive<Record<string, string | number>>({
   orgStatus: '',
   contributorStatus: '',
   status: '',
+  level: '',
+});
+
+// 软件包维护级别
+const securityLevel = computed(() => {
+  return securityTypes.map((item) => item.id);
 });
 
 const sigRepoMap = ref(new Map<string, string[]>());
@@ -57,32 +84,11 @@ const allRepos = computed(() => {
   return Array.from(sigRepoMap.value.values()).flat();
 });
 
-// 筛选
-const filterIconRefs = ref(new Array<ComponentPublicInstance>(columns.length));
-
-/** 筛选组件是否显示的开关 */
-const filterSwitches = ref(columns.map(() => false));
-
-let clickOutsideStopFns: (() => void)[] = [];
-
-const setPopupClickoutSideFn = (el: any, index: number) => {
-  if (clickOutsideStopFns.length) {
-    clickOutsideStopFns.forEach((fn) => fn());
-    clickOutsideStopFns = [];
-  }
-  clickOutsideStopFns.push(
-    onClickOutside(el, () => {
-      filterSwitches.value[index] = false;
-    }) as () => void
-  );
-};
-
 const filterLoading = ref(false);
 
 /** 切换某个筛选组件显示开关 */
-const switchFilterVisible = async (index: number) => {
-  filterSwitches.value[index] = true;
-  if ((index === 0 || index === 2) && !sigRepoMap.value.size) {
+const switchFilterVisible = async (key: string) => {
+  if ((key === 'repo' || key === 'sigName') && !sigRepoMap.value.size) {
     filterLoading.value = true;
     let data: Record<string, string> | null = null;
     try {
@@ -108,30 +114,17 @@ const switchFilterVisible = async (index: number) => {
   }
 };
 
-/** 各表格列对应的已选中的筛选项 */
-const activeFilterValues = ref(new Array<string>(columns.length));
-
-/** 当前有选中筛选项的表格列的数组下标 */
-const currentActiveFilterIndices = ref(new Set<number>());
-
-const onFilterChange = (index: number, val: string) => {
-  // 关掉筛选组件
-  filterSwitches.value = columns.map(() => false);
-  if (val) {
-    activeFilterValues.value[index] = val;
-    currentActiveFilterIndices.value.add(index);
+const onFilterChange = (filterKey: string, val: (string | number)[] | string | number) => {
+  if ((Array.isArray(val) && val.length) || (!Array.isArray(val) && val)) {
+    val = Array.isArray(val) ? val.join() : val.toString();
+    filterParams[filterKey] = val;
   } else {
-    activeFilterValues.value[index] = '';
-    currentActiveFilterIndices.value.delete(index);
+    filterParams[filterKey] = '';
   }
-  if (filterParams.versionStatus === '版本正常') {
-    filterParams.versionStatus = '最新版本';
-  }
-
   if (currentPage.value !== 1) {
     currentPage.value = 1;
   } else {
-    pageInit();
+    queryCollaborationRepos();
   }
 };
 
@@ -158,46 +151,27 @@ const isLoading = ref(false);
 const isError = ref(false);
 
 // Maintainer 数据
-const queryMaintainerRepos = () => {
+const queryCollaborationRepos = async () => {
   isLoading.value = true;
-  getMaintainerRepos({ ...searchParams.value, ...filterParams })
-    .then((res) => {
-      reposData.value = res.data.list;
-      total.value = res.data.total;
-      isLoading.value = false;
-    })
-    .catch(() => {
-      reposData.value = [];
-      isError.value = true;
-      isLoading.value = false;
-    });
-};
+  const params = { ...searchParams.value, ...filterParams };
+  try {
+    if (isAdminPer.value) {
+      const { data } = await getCollaborationRepos(params, 'admin');
+      reposData.value = data.list;
+      total.value = data.total;
+    } else if (isMainPer.value) {
+      const { data } = await getCollaborationRepos(params, 'maintainer');
+      reposData.value = data.list;
+      total.value = data.total;
+    }
 
-// Admin 数据
-const queryAdminRepos = () => {
-  isLoading.value = true;
-  getAdminRepos({ ...searchParams.value, ...filterParams })
-    .then((res) => {
-      reposData.value = res.data.list;
-      total.value = res.data.total;
-      isLoading.value = false;
-    })
-    .catch(() => {
-      reposData.value = [];
-      isError.value = true;
-      isLoading.value = false;
-    });
-};
-
-const pageInit = () => {
-  if (isAdminPer.value) {
-    queryAdminRepos();
-  } else if (isMainPer.value) {
-    queryMaintainerRepos();
+    isLoading.value = false;
+  } catch {
+    reposData.value = [];
+    isError.value = true;
+    isLoading.value = false;
   }
 };
-
-const loading = ref(false);
 
 // 分页
 const handleSizeChange = (val: number) => {
@@ -211,8 +185,8 @@ const handleCurrentChange = (val: number) => {
 // 外链确认
 const showExternalDlg = ref(false);
 const externalLink = ref('');
-const changeExternalDialog = (href: string) => {
-  externalLink.value = href;
+const changeExternalDialog = (repo: string) => {
+  externalLink.value = repo;
   showExternalDlg.value = true;
 };
 
@@ -247,174 +221,355 @@ const metricTypes = (v: string) => {
   return applicationType[index].children;
 };
 
+// 当前版本、上游版本数据处理
+interface VersionInfoT {
+  pkg: string;
+  upVersion: string;
+  eulerVersion: string;
+}
+// 获取当前版本、上游版本数据 并去重
+const updateVersionValue = <K extends keyof VersionInfoT>(data: VersionInfoT[], type: K): string[] => {
+  let versionMap = new Set(data.map((item) => item[type]));
+  const newVersion: string[] = [];
+  Array.from(versionMap).forEach((item) => {
+    if (item) {
+      newVersion.push(item);
+    }
+  });
+  return newVersion;
+};
+// 根据当前版本、上游版本数据 获取软件包名
+const updateVersionPkg = <K extends keyof VersionInfoT>(data: VersionInfoT[], type: K) => {
+  const version = updateVersionValue(data, type);
+  const newPkg: VersionInfoT[] = [];
+  data.forEach((item) => {
+    if (version.includes(item[type])) {
+      newPkg.push(item);
+    }
+  });
+  return newPkg;
+};
+
 watch(
   () => searchParams.value,
   () => {
-    pageInit();
+    queryCollaborationRepos();
   },
   {
     immediate: true,
   }
+);
+
+const checkboxValue = ref<string[]>([]);
+const updateColumns = (v: string[]) => {
+  columns.forEach((item) => {
+    item.isChecked = v.includes(item.key) ? true : false;
+  });
+};
+
+onMounted(() => {
+  const collaborationColumns = localStorage.getItem('collaborationColumns');
+  if (collaborationColumns) {
+    updateColumns(xss(collaborationColumns).split(','));
+  }
+
+  checkboxValue.value = columns.map((item) => {
+    return item.isChecked || item.isDefault ? item.key : '';
+  });
+});
+
+watch(
+  () => checkboxValue.value,
+  (v) => {
+    updateColumns(v);
+  },
+  { deep: true }
 );
 </script>
 <template>
   <div class="platform-header">
     <ContentWrapper>
       <h1>软件维护详情</h1>
+      <p class="text">软件包来源于openEuler-24.09版本</p>
     </ContentWrapper>
   </div>
   <ContentWrapper :vertical-padding="['24px', '72px']" class="collaboration-wrap">
-    <AppLoading :loading="isLoading" />
-    <template v-if="!isLoading">
-      <div class="indicators">
-        <span @click="showDlg = true" class="text"
-          ><OIcon><IconState /></OIcon>状态指标说明</span
-        >
-        <Indicators v-if="showDlg" @change="showDlg = false" />
-      </div>
-      <div class="platform-main">
-        <OTable :columns="columns" :data="reposData" :loading="loading" border="row">
-          <template #head="{ columns }">
-            <OPopup
-              trigger="none"
-              style="--popup-radius: 4px"
-              v-for="(item, index) in columns"
-              :key="item.type"
-              :visible="filterSwitches[index]"
-              :unmount-on-hide="false"
-              :offset="-8"
-              position="bl"
+    <div class="indicators">
+      <span @click="showDlg = true" class="text">
+        <OIcon><IconState /></OIcon>状态指标说明
+      </span>
+      <OPopup trigger="click" :style="{ '--popup-radius': '4px', '--popup-bg-color': ' var(--o-color-fill2)' }" position="br">
+        <template #target>
+          <OButton variant="outline" ref="settingRef" class="setting-btn" round="pill">
+            <template #icon><IconSetting /></template>
+          </OButton>
+        </template>
+        <TableColumnSettings :options="columns" v-model="checkboxValue" />
+      </OPopup>
+      <Indicators v-if="showDlg" @change="showDlg = false" />
+    </div>
+    <div v-if="!isError" class="platform-main">
+      <div class="platform-main-table" :class="reposData.length === 0 ? 'empty' : ''">
+        <el-table :data="reposData" empty-text="暂无数据" border style="width: 100%">
+          <template v-for="item in columns">
+            <el-table-column
+              v-if="item.isDefault || item.isChecked"
+              :key="item.key"
+              :fixed="item.fixed"
+              :prop="item.key"
+              :width="item.width"
+              :class-name="item.type"
+              :resizable="false"
             >
-              <template #target>
-                <th :class="item.type">
-                  <div class="header-cell">
+              <template #header>
+                <template v-if="item.isFilter">
+                  <FilterableTableHeader
+                    v-if="item.key === 'repo'"
+                    :model-value="filterParams[item.key]"
+                    :loading="filterLoading"
+                    :options="allRepos"
+                    @change="onFilterChange(item.key, $event)"
+                    @options-visibility-change="switchFilterVisible(item.key)"
+                  >
                     {{ item.label }}
-                    <template v-if="item.key !== 'operation'">
-                      <OIcon
-                        :ref="(el) => (filterIconRefs[index] = el as ComponentPublicInstance)"
-                        class="filter-icon"
-                        :style="currentActiveFilterIndices.has(index) ? { color: 'var(--o-color-primary1)' } : {}"
-                        @click="switchFilterVisible(index)"
-                        ><IconFilter
-                      /></OIcon>
-                      <OPopover v-if="currentActiveFilterIndices.has(index) && activeFilterValues[index]" :target="filterIconRefs[index]" trigger="hover">
-                        <p class="bubble-content">
-                          <span class="title">{{ item.label }}:</span>
-                          {{ activeFilterValues[index] }}
-                        </p>
-                      </OPopover>
-                    </template>
-                  </div>
-                </th>
+                  </FilterableTableHeader>
+                  <FilterableTableHeader
+                    v-else-if="item.key === 'sigName'"
+                    :model-value="filterParams[item.key]"
+                    :loading="filterLoading"
+                    @change="onFilterChange(item.key, $event)"
+                    @options-visibility-change="switchFilterVisible(item.key)"
+                    :options="allSigs"
+                  >
+                    {{ item.label }}
+                  </FilterableTableHeader>
+                  <FilterableTableHeader
+                    v-else-if="item.key === 'kind'"
+                    :model-value="filterParams[item.key]"
+                    @change="onFilterChange(item.key, $event)"
+                    :searchable="false"
+                    :options="kindTypes"
+                  >
+                    {{ item.label }}
+                  </FilterableTableHeader>
+                  <FilterableTableHeader
+                    v-else-if="item.key === 'status'"
+                    :model-value="filterParams[item.key]"
+                    :searchable="false"
+                    multi
+                    @change="onFilterChange(item.key, $event)"
+                    :options="repoStatusArr"
+                  >
+                    {{ item.label }}
+                  </FilterableTableHeader>
+                  <FilterableTableHeader
+                    v-else-if="item.key === 'level'"
+                    :model-value="filterParams[item.key]"
+                    :searchable="false"
+                    multi
+                    @change="onFilterChange(item.key, $event)"
+                    :options="securityLevel"
+                  >
+                    {{ item.label }}
+                  </FilterableTableHeader>
+                  <FilterableTableHeader
+                    v-else
+                    :model-value="filterParams[item.key]"
+                    @change="onFilterChange(item.key, $event)"
+                    :searchable="false"
+                    :options="metricTypes(item.key)"
+                  >
+                    {{ item.label }}
+                  </FilterableTableHeader>
+                </template>
+                <template v-else>{{ item.label }}</template>
               </template>
-              <div :ref="(el) => setPopupClickoutSideFn(el, index)">
-                <FilterableCheckboxes
-                  v-if="item.key === 'repo'"
-                  v-model="filterParams[item.key]"
-                  :loading="filterLoading"
-                  @change="onFilterChange(index, $event)"
-                  :values="allRepos"
-                />
-                <FilterableCheckboxes
-                  v-else-if="item.key === 'sigName'"
-                  v-model="filterParams[item.key]"
-                  :loading="filterLoading"
-                  @change="onFilterChange(index, $event)"
-                  :values="allSigs"
-                />
-                <FilterableCheckboxes
-                  v-else-if="item.key === 'kind'"
-                  v-model="filterParams[item.key]"
-                  @change="onFilterChange(index, $event)"
-                  :filterable="false"
-                  :values="kindTypes"
-                />
-                <FilterableCheckboxes
-                  v-else-if="item.key === 'status'"
-                  :filterable="false"
-                  v-model="filterParams[item.key]"
-                  @change="onFilterChange(index, $event)"
-                  :values="repoStatusArr"
-                />
-                <FilterableCheckboxes
-                  v-else
-                  v-model="filterParams[item.key]"
-                  :filterable="false"
-                  @change="onFilterChange(index, $event)"
-                  :values="metricTypes(item.key)"
-                />
-              </div>
-            </OPopup>
-          </template>
-          <template #td_repo="{ row }">
-            <OLink color="primary" class="link-external" hover-underline @click="changeExternalDialog(`${SRCOPENEULER + row.repo}`)"
-              ><span class="text">{{ row.repo }} </span><OIcon><IconOutlink /></OIcon
-            ></OLink>
-          </template>
-          <template #td_issueStatus="{ row }">
-            <OLink color="primary" class="link-external" hover-underline @click="changeExternalDialog(`${SRCOPENEULER + row.repo}/issues`)"
-              ><span class="text">{{ row.issueStatus }}</span> <OIcon><IconOutlink /></OIcon
-            ></OLink>
-          </template>
-          <template #td_prStatus="{ row }">
-            <OLink color="primary" class="link-external" hover-underline @click="changeExternalDialog(`${SRCOPENEULER + row.repo}/pulls`)"
-              ><span class="text">{{ row.prStatus }}</span> <OIcon><IconOutlink /></OIcon
-            ></OLink>
-          </template>
-          <template #td_cveStatus="{ row }">
-            <OLink
-              color="primary"
-              class="link-external"
-              hover-underline
-              @click="changeExternalDialog(`${SRCOPENEULER + row.repo}/issues?single_label_id=85497765`)"
-            >
-              <span class="text">{{ row.cveStatus }}</span> <OIcon><IconOutlink /></OIcon
-            ></OLink>
-          </template>
-          <template #td_status="{ row }">
-            <div class="repo-status">
-              <OTag :class="`type${repoStatusIndex(row.status)}`">{{ row.status }} </OTag>
-            </div>
-          </template>
-          <template #td_versionStatus="{ row }">
-            {{ versionLatestStatusConvert(row.versionStatus) }}
-          </template>
+              <template #default="{ row }">
+                <template v-if="item.children">
+                  <el-table-column
+                    v-for="subItem in item.children"
+                    :label="subItem.label"
+                    :prop="item.key"
+                    :width="subItem.width"
+                    :key="subItem.key"
+                    :class="subItem.type"
+                    :resizable="false"
+                  >
+                    <template #header>
+                      <FilterableTableHeader
+                        v-if="subItem.key === 'versionStatus' && subItem.isFilter"
+                        :searchable="false"
+                        :model-value="filterParams[subItem.key]"
+                        @change="onFilterChange(subItem.key, $event)"
+                        :options="metricTypes(subItem.key)"
+                      >
+                        {{ subItem.label }}
+                      </FilterableTableHeader>
+                      <template v-else>
+                        {{ subItem.label }}
+                        <OPopover v-if="subItem.key === 'eulerVersion'" position="top" trigger="hover">
+                          <template #target>
+                            <OIcon class="filter-icon"><IconHelp /></OIcon>
+                          </template>
+                          <div class="box">当前软件包在openEuler系统上的版本</div>
+                        </OPopover>
+                      </template>
+                    </template>
+                    <template #default="{ row }">
+                      <template v-if="subItem.key === 'versionStatus'">
+                        <template v-if="subItem.key === 'versionStatus' && row.versionDetailUrl">
+                          <OLink color="primary" class="link-external" hover-underline @click="changeExternalDialog(row.versionDetailUrl)">
+                            <span class="text">{{ row.versionStatus }} </span> <OIcon><IconOutlink /></OIcon>
+                          </OLink>
+                        </template>
+                        <template v-else>{{ row.versionStatus }}</template>
+                      </template>
+                      <template v-if="subItem.key === 'upVersion' || subItem.key === 'eulerVersion'">
+                        <OPopover
+                          v-if="row.versionDetail && row.versionDetail.length > 0 && updateVersionValue(row.versionDetail, subItem.key).length > 0"
+                          :anchor="true"
+                          position="top"
+                          trigger="hover"
+                        >
+                          <template #target>
+                            <span>{{ updateVersionValue(row.versionDetail, subItem.key).join(', ') }}</span>
+                          </template>
+                          <div class="box">
+                            <p v-for="pItem in updateVersionPkg(row.versionDetail, subItem.key)" :key="pItem.pkg">
+                              {{ pItem.pkg }}
+                              {{
+                                updateVersionValue(row.versionDetail, subItem.key).length > 1
+                                  ? subItem.key === 'upVersion'
+                                    ? pItem.upVersion
+                                    : pItem.eulerVersion
+                                  : ''
+                              }}
+                            </p>
+                          </div>
+                        </OPopover>
+                        <template v-else>-</template>
+                      </template>
+                    </template>
+                  </el-table-column>
+                </template>
+                <template v-else>
+                  <template v-if="item.key === 'repo'">
+                    <OLink color="primary" class="link-external" hover-underline @click="changeExternalDialog(SRCOPENEULER + row.repo)">
+                      <span class="text">{{ row[item.key] }} </span> <OIcon><IconOutlink /></OIcon>
+                    </OLink>
+                  </template>
+                  <template v-else-if="item.key === 'prStatus' || item.key === 'cveStatus' || item.key === 'issueStatus'">
+                    <template v-if="item.key === 'cveStatus' && row.cveDetailUrl">
+                      <OLink color="primary" class="link-external" hover-underline @click="changeExternalDialog(row.cveDetailUrl)">
+                        <span class="text">{{ row[item.key] }} </span> <OIcon><IconOutlink /></OIcon>
+                      </OLink>
+                    </template>
+                    <template v-else-if="item.key === 'prStatus' && row.prDetailUrl">
+                      <OLink color="primary" class="link-external" hover-underline @click="changeExternalDialog(row.prDetailUrl)">
+                        <span class="text">{{ row[item.key] }} </span> <OIcon><IconOutlink /></OIcon>
+                      </OLink>
+                    </template>
+                    <template v-else-if="item.key === 'issueStatus' && row.issueDetailUrl">
+                      <OLink color="primary" class="link-external" hover-underline @click="changeExternalDialog(row.issueDetailUrl)">
+                        <span class="text">{{ row[item.key] }} </span> <OIcon><IconOutlink /></OIcon>
+                      </OLink>
+                    </template>
+                    <template v-else>
+                      {{ row[item.key] }}
+                    </template>
+                  </template>
+                  <template v-else-if="item.key === 'status'">
+                    <div class="repo-status">
+                      <OTag :class="`type${repoStatusIndex(row.status)}`">{{ row.status }} </OTag>
+                    </div>
+                  </template>
+                  <template v-else-if="item.key === 'suggestions'">
+                    <template v-if="row.suggestions && row.suggestions.length > 0">
+                      <p v-for="rule in row.suggestions" :key="rule">
+                        {{ rule }}
+                      </p>
+                    </template>
+                    <template v-else>-</template>
+                  </template>
 
-          <template #td_operation="{ row }">
-            <div class="operation-box">
-              <OLink color="primary" hover-underline @click="changeFeedback(row.repo)">状态反馈</OLink>
-              <OLink color="primary" hover-underline @click="changeFeedbackHistory(row.repo)">反馈历史</OLink>
-            </div>
+                  <template v-else-if="item.key === 'operation'">
+                    <div class="operation-box">
+                      <OLink color="primary" hover-underline @click="changeFeedback(row.repo)">状态反馈</OLink>
+                      <OLink color="primary" hover-underline @click="changeFeedbackHistory(row.repo)">反馈历史</OLink>
+                    </div>
+                  </template>
+                  <template v-else>
+                    {{ row[item.key] }}
+                  </template>
+                </template>
+              </template>
+            </el-table-column>
           </template>
-        </OTable>
-
-        <div v-if="total > COUNT_PAGESIZE[0]" class="pagination-box">
-          <AppPagination :current="currentPage" :pagesize="pageSize" :total="total" @size-change="handleSizeChange" @current-change="handleCurrentChange" />
-        </div>
+        </el-table>
+        <AppLoading :loading="isLoading" />
       </div>
-      <!-- 暂无记录 -->
-      <template v-if="isError">
-        <Result404>
-          <template #description>
-            <p class="text404">暂无记录</p>
-          </template>
-        </Result404>
-      </template>
-
-      <!-- 跳转外部链接提示 -->
-      <ExternalLink v-if="showExternalDlg" :href="externalLink" @change="showExternalDlg = false" />
-      <!-- 状态反馈 -->
-
-      <StatusFeedback :repo="repoValue" v-if="showFeedbackDlg" @close="showFeedbackDlg = false" />
-
-      <!-- 反馈历史 -->
-      <FeedbackHistroy v-if="showFeedbacHistroykDlg" :repo="repoValue" @close="showFeedbacHistroykDlg = false" />
+      <div v-if="total > COUNT_PAGESIZE[0]" class="pagination-box">
+        <AppPagination :current="currentPage" :pagesize="pageSize" :total="total" @size-change="handleSizeChange" @current-change="handleCurrentChange" />
+      </div>
+    </div>
+    <!-- 暂无记录 -->
+    <template v-if="isError">
+      <Result404>
+        <template #description>
+          <p class="text404">暂无记录</p>
+        </template>
+      </Result404>
     </template>
+
+    <!-- 跳转外部链接提示 -->
+    <ExternalLink v-if="showExternalDlg" :href="externalLink" @change="showExternalDlg = false" />
+    <!-- 状态反馈 -->
+
+    <StatusFeedback :repo="repoValue" v-if="showFeedbackDlg" @close="showFeedbackDlg = false" />
+
+    <!-- 反馈历史 -->
+    <FeedbackHistroy v-if="showFeedbacHistroykDlg" :repo="repoValue" @close="showFeedbacHistroykDlg = false" />
   </ContentWrapper>
 </template>
 
 <style scoped lang="scss">
 @import '@/assets/style/category/collaboration/index.scss';
+.setting-btn {
+  margin-left: 16px;
+  width: 40px;
+  height: 40px;
+  --btn-min-width: 40px;
+  --btn-height: 40px;
+  --btn-radius: 4px;
+  background: var(--o-color-fill2);
+  svg {
+    width: 20px;
+    height: 20px;
+  }
+}
+:deep(.el-table) {
+  .version-box {
+    border-bottom: 1px solid var(--o-color-control4) !important;
+    text-align: center;
+  }
+  .cell {
+    color: var(--o-color-info1);
+  }
+  .header-cell {
+    display: flex;
+    align-items: center;
+  }
+  .version-box {
+    .header-cell {
+      justify-content: center;
+    }
+  }
+  .o-icon svg {
+    width: 16px;
+    height: 16px;
+  }
+}
+
 .collaboration-wrap {
   position: relative;
   min-height: calc(var(--layout-content-min-height) - 154px);
@@ -437,6 +592,11 @@ watch(
     color: var(--o-color-info1);
     font-weight: 500;
     @include h1;
+  }
+  .text {
+    margin-top: 16px;
+    color: var(--o-color-info1);
+    @include text1;
   }
 }
 .indicators {
@@ -479,120 +639,12 @@ watch(
   }
 }
 .platform-main {
-  @mixin liner {
-    content: '';
-    box-shadow: inset -10px 0 10px -10px rgba(0, 0, 0, 0.15);
-    height: 100%;
-    position: absolute;
-    top: 0;
-    width: 8px;
-  }
-  :deep(.o-table) {
-    --oper-width: 215px;
-    &.admin {
-      --oper-width: 125px;
-    }
-
-    .o-table-wrap {
-      overflow-x: auto;
-      overflow-y: hidden;
-      @include scrollbar;
-      &::-webkit-scrollbar {
-        height: 6px;
-      }
-    }
-    table {
-      table-layout: fixed;
-    }
-
-    tr {
-      td {
-        &:first-child,
-        &:nth-of-type(10),
-        &:nth-of-type(11) {
-          position: sticky;
-          z-index: 2;
-          background: var(--table-bg-color);
-        }
-        &:first-child {
-          left: 0;
-          &::before {
-            right: -9px;
-            transform: scaleX(-1);
-            @include liner;
-          }
-        }
-        &:nth-of-type(11) {
-          right: 0;
-        }
-        &:nth-of-type(10) {
-          right: var(--oper-width);
-          &::before {
-            left: -9px;
-            @include liner;
-          }
-        }
-      }
-      &.last {
-        td {
-          border-bottom: 0 none;
-        }
-      }
-      &:hover td {
-        background: var(--table-row-hover);
-      }
-    }
-    th {
-      &:first-child,
-      &:nth-of-type(10),
-      &:nth-of-type(11) {
-        position: sticky;
-        z-index: 2;
-        background: var(--table-head-bg);
-      }
-      &:first-child {
-        left: 0;
-        &::before {
-          right: -7px;
-          transform: scaleX(-1);
-          @include liner;
-        }
-      }
-      &:nth-of-type(10) {
-        right: var(--oper-width);
-        &::before {
-          left: -9px;
-          @include liner;
-        }
-      }
-      &:nth-of-type(11) {
-        right: 0;
-      }
-    }
-
-    thead {
-      .repo {
-        width: 200px;
-      }
-      .cve,
-      .sig,
-      .issue,
-      .pr,
-      .version {
-        width: 188px;
-      }
-      .org,
-      .personnel {
-        width: 160px;
-      }
-      .kind {
-        width: 180px;
-      }
-      .status {
-        width: 125px;
-      }
-      .operation {
-        width: var(--oper-width);
+  .platform-main-table {
+    position: relative;
+    &.empty {
+      min-height: 250px;
+      :deep(.o-layer.o-loading) {
+        padding-top: 10%;
       }
     }
   }

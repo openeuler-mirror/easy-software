@@ -3,6 +3,7 @@ import { OTable, useMessage, OButton, OTag, OIcon, OLink } from '@opensig/opende
 import OCodeCopy from '@/components/OCodeCopy.vue';
 import { ref, computed, watch, type PropType } from 'vue';
 import ExternalLink from '@/components/ExternalLink.vue';
+import MaintenanceDescription from '@/components/detail/MaintenanceDescription.vue';
 import { useClipboard } from '@/composables/useClipboard';
 import { getCode } from '@/utils/common';
 import { verColumns } from '@/data/detail/index';
@@ -13,6 +14,8 @@ import { useI18n } from 'vue-i18n';
 import { useRoute } from 'vue-router';
 
 import IconChevronDown from '~icons/app/icon-chevron-down.svg';
+import IconState from '~icons/pkg/icon-state.svg';
+import IconLevel from '~icons/pkg/icon-level.svg';
 
 interface EulerverT {
   pkgId: string;
@@ -213,6 +216,8 @@ watch(
 const onCodeSuccess = () => {
   collectDownloadData();
 };
+
+const isSecurityShow = ref(false);
 </script>
 
 <template>
@@ -229,6 +234,20 @@ const onCodeSuccess = () => {
         </p>
       </div>
     </div>
+  </AppSection>
+  <AppSection title="软件分级" v-if="data.security">
+    <template #append>
+      <div @click="isSecurityShow = true" class="security-info">
+        <OIcon><IconState /></OIcon>说明
+      </div>
+    </template>
+    <div class="license">
+      <p>等级</p>
+      <p class="level-info">
+        <OIcon class="icon-level"><IconLevel /></OIcon>{{ data.security }}
+      </p>
+    </div>
+    <MaintenanceDescription v-if="isSecurityShow" @change="isSecurityShow = false" />
   </AppSection>
   <AppSection title="软件合规" v-if="data.license">
     <div class="license">
@@ -258,6 +277,32 @@ const onCodeSuccess = () => {
 </template>
 
 <style lang="scss" scoped>
+.level-info {
+  display: flex;
+  align-items: center;
+  .icon-level {
+    width: 20px;
+    height: 20px;
+    color: var(--o-color-primary1);
+    margin-right: 8px;
+    svg {
+      width: 20px;
+      height: 20px;
+    }
+  }
+}
+.security-info {
+  display: flex;
+  align-items: center;
+  color: var(--o-color-info1);
+  cursor: pointer;
+  @include tip2;
+  svg {
+    width: 16px;
+    height: 16px;
+    margin-right: 8px;
+  }
+}
 .app-section {
   padding: 32px 40px;
 }

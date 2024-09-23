@@ -1,38 +1,38 @@
 export const applicationColumns = [
-  { label: '软件仓库', key: 'repo', type: 'repo' },
-  { label: '申请类型', key: 'metric', type: 'metric' },
-  { label: '修改状态', key: 'metricStatus', type: 'metricStatus' },
-  { label: '修改理由', key: 'description', type: 'description' },
-  { label: '申请状态', key: 'applyStatus', type: 'applyStatus' },
-  { label: '审批人', key: 'administrator', type: 'administrator' },
-  { label: '审批意见', key: 'comment', type: 'comment' },
-  { label: '申请单号', key: 'applyIdString', type: 'applyId' },
-  { label: '申请时间', key: 'createdAt', type: 'updateAt' },
-  { label: '操作', key: 'operation', type: 'operation' },
+  { label: '软件仓库', key: 'repo', type: 'repo', fixed: 'left', width: '180' },
+  { label: '申请类型', key: 'metric', type: 'metric', width: '160' },
+  { label: '修改状态', key: 'metricStatus', type: 'metricStatus', width: '140' },
+  { label: '修改理由', key: 'description', type: 'description', width: '180' },
+  { label: '申请状态', key: 'applyStatus', type: 'applyStatus', width: '130' },
+  { label: '审批人', key: 'administrator', type: 'administrator', width: '130' },
+  { label: '审批意见', key: 'comment', type: 'comment', width: '180' },
+  { label: '申请单号', key: 'applyIdString', type: 'applyId', width: '180' },
+  { label: '申请时间', key: 'createdAt', type: 'updateAt', width: '180' },
+  { label: '操作', key: 'operation', type: 'operation', fixed: 'right', width: '220' },
 ]
 
 export const approvalColumns = [
-  { label: '软件仓库', key: 'repo', type: 'repo' },
-  { label: '申请类型', key: 'metric', type: 'metric' },
-  { label: '修改状态', key: 'metricStatus', type: 'metricStatus' },
-  { label: '修改理由', key: 'description', type: 'description' },
-  { label: '申请人', key: 'maintainer', type: 'maintainer' },
-  { label: '申请单号', key: 'applyIdString', type: 'applyId' },
-  { label: '申请时间', key: 'createdAt', type: 'updateAt' },
-  { label: '申请状态', key: 'applyStatus', type: 'applyStatus' },
-  { label: '操作', key: 'operation', type: 'operation' },
+  { label: '软件仓库', key: 'repo', type: 'repo', width: '180' },
+  { label: '申请类型', key: 'metric', type: 'metric', width: '160' },
+  { label: '修改状态', key: 'metricStatus', type: 'metricStatus', width: '140' },
+  { label: '修改理由', key: 'description', type: 'description', width: '' },
+  { label: '申请人', key: 'maintainer', type: 'maintainer', width: '130' },
+  { label: '申请单号', key: 'applyIdString', type: 'applyId', width: '180' },
+  { label: '申请时间', key: 'createdAt', type: 'updateAt', width: '180' },
+  { label: '申请状态', key: 'applyStatus', type: 'applyStatus', width: '130' },
+  { label: '操作', key: 'operation', type: 'operation', width: '130' },
 ]
 
 export const approvalHistoryColumns = [
-  { label: '软件仓库', key: 'repo', type: 'repo' },
-  { label: '申请类型', key: 'metric', type: 'metric' },
-  { label: '修改状态', key: 'metricStatus', type: 'metricStatus' },
-  { label: '审批意见', key: 'comment', type: 'comment' },
-  { label: '申请人', key: 'maintainer', type: 'maintainer' },
-  { label: '申请单号', key: 'applyIdString', type: 'applyId' },
-  { label: '审批时间', key: 'createdAt', type: 'updateAt' },
-  { label: '审批状态', key: 'applyStatus', type: 'applyStatus' },
-  { label: '操作', key: 'operation', type: 'operation' },
+  { label: '软件仓库', key: 'repo', type: 'repo', width: '180' },
+  { label: '申请类型', key: 'metric', type: 'metric', width: '160' },
+  { label: '修改状态', key: 'metricStatus', type: 'metricStatus', width: '140' },
+  { label: '审批意见', key: 'comment', type: 'comment', width: '' },
+  { label: '申请人', key: 'maintainer', type: 'maintainer', width: '130' },
+  { label: '申请单号', key: 'applyIdString', type: 'applyId', width: '180' },
+  { label: '审批时间', key: 'createdAt', type: 'updateAt', width: '180' },
+  { label: '审批状态', key: 'applyStatus', type: 'applyStatus', width: '130' },
+  { label: '操作', key: 'operation', type: 'operation', width: '130' },
 ]
 
 // 申请状态
@@ -63,7 +63,7 @@ export const applicationType = [
   {
     id: 'versionStatus',
     label: '软件包版本状态',
-    children: ['版本正常', '落后版本'],
+    children: ['正常版本', '落后版本'],
   },
   {
     id: 'orgStatus',
@@ -86,10 +86,49 @@ export const applicationTypeCurrent = [
   {
     id: 'versionStatus',
     label: '软件包版本状态',
-    children: ['版本正常', '落后版本'],
+    children: ['正常版本', '落后版本'],
   },
 ];
 
 
 export const kindTypes = ['everything-exclude-baseos', 'epol', 'baseos']
 
+// 软件维护级别
+export const securityTypes = [
+
+  {
+    id: 'L1',
+    children: [
+      '核心软件包，被依赖次数最多的软件包',
+      '1. 例行按周同步社区补丁/按牵引SLA进行修复',
+      '2. Committer梳理代码关键流程，有自维护自演进能力; 回馈上游社区，建立开源影响力',
+      '3. 基于开源测试套开展测试',
+      '4. 补充专项/DFX测试',
+    ],
+  },
+  {
+    id: 'L2',
+    children: [
+      '1. 例行按双周同步社区补丁/按牵引SLA进行修复',
+      '2. 基于开源测试套开展测试',
+      '3. 结合使用场景测试',
+    ],
+  },
+  {
+    id: 'L3',
+    children: [
+      '1. 例行按月同步社区CVE/BUG',
+      '2. 基于开源测试套开展测试',
+    ],
+  },
+  {
+    id: 'L4',
+    children: [
+      '1. 例行按月同步社区高危漏洞/关键bug',
+      '2. 基于开源测试套开展测试',
+    ],
+  },
+  { id: 'epol', children: ['epol级别的软件包'], },
+  { id: 'oepkg', children: ['oepkg类型的所有软件包'], }
+
+]
