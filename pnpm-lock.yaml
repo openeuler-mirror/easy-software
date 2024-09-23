@@ -6,8 +6,8 @@ settings:
 
 dependencies:
   '@opensig/opendesign':
-    specifier: 0.0.64
-    version: 0.0.64(vue@3.3.4)
+    specifier: 0.0.68
+    version: 0.0.68(vue@3.3.4)
   '@vueuse/core':
     specifier: 9.12.0
     version: 9.12.0(vue@3.3.4)
@@ -816,8 +816,8 @@ packages:
       fastq: 1.17.0
     dev: true
 
-  /@opensig/opendesign@0.0.64(vue@3.3.4):
-    resolution: {integrity: sha512-JA/YoFZVMlTyio+7yACHCs7097E0jlb/6oev1CfjRQd8eN5LU1NYnV/9j4dTALMAGXe2khqniOLNYXKS6Wrm+g==}
+  /@opensig/opendesign@0.0.68(vue@3.3.4):
+    resolution: {integrity: sha512-eWiZTVWEGSsM/BuWWNJKFiYl6NnGVONjKlIYT7ja6BMd0aLfIBKV4ElhfYrnT21lzygnFbLW5ompRPdT24t2tQ==}
     peerDependencies:
       vue: ^3.1.0
     dependencies:

@@ -44,7 +44,7 @@ const onChange = (option: string[]) => {
 </script>
 
 <template>
-  <div class="check_box">
+  <div class="check-box">
     <OScroller class="content" showType="always" :style="{ '--scroller-padding': '0 16px 0 0' }">
       <OCheckboxGroup v-model="checkboxValue" direction="v" @change="onChange" :style="{ '--checkbox-group-gap': '12px' }">
         <template v-for="item in options" :key="item.key">
@@ -59,10 +59,12 @@ const onChange = (option: string[]) => {
 
 <style lang="scss" scoped>
 .content {
-  padding: 8px;
-  max-height: 320px;
+  padding: 4px 8px 4px 4px;
+  max-height: 292px;
   :deep(.o-checkbox) {
     @include tip1;
+    height: 38px;
+    margin: 0 !important;
   }
 }
 </style>
