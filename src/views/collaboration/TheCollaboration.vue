@@ -238,6 +238,16 @@ const updateVersionValue = <K extends keyof VersionInfoT>(data: VersionInfoT[], 
   });
   return newVersion;
 };
+
+// 超出2行 显示...
+const updateVersionLength = <K extends keyof VersionInfoT>(data: VersionInfoT[], type: K): string[] => {
+  let version = updateVersionValue(data, type);
+  if (version.length > 1) {
+    return version.slice(0, 2).concat('...');
+  }
+  return version;
+};
+
 // 根据当前版本、上游版本数据 获取软件包名
 const updateVersionPkg = <K extends keyof VersionInfoT>(data: VersionInfoT[], type: K) => {
   const version = updateVersionValue(data, type);
@@ -432,9 +442,9 @@ watch(
                           trigger="hover"
                         >
                           <template #target>
-                            <span>{{ updateVersionValue(row.versionDetail, subItem.key).join(', ') }}</span>
+                            <span>{{ updateVersionLength(row.versionDetail, subItem.key).join(', ') }}</span>
                           </template>
-                          <div class="box">
+                          <div class="version-box">
                             <p v-for="pItem in updateVersionPkg(row.versionDetail, subItem.key)" :key="pItem.pkg">
                               {{ pItem.pkg }}
                               {{
@@ -572,7 +582,18 @@ watch(
     height: 16px;
   }
 }
-
+.version-box {
+  max-width: 184px;
+  max-height: 154px;
+  color: var(--o-color-info1);
+  overflow: hidden auto;
+  word-break: break-all;
+  @include scrollbar;
+  @include tip1;
+  p:not(:last-child) {
+    margin-bottom: 2px;
+  }
+}
 .collaboration-wrap {
   position: relative;
   min-height: calc(var(--layout-content-min-height) - 154px);
