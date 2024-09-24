@@ -220,7 +220,7 @@ onUnmounted(() => window.sessionStorage.removeItem(STORAGE_KEY));
           <div class="mask" v-if="loading">
             <OIcon><IconLoading class="o-rotating" /></OIcon>
           </div>
-          <template v-if="true">
+          <template v-if="loginStore.isLogined && !empty">
             <div class="title">
               <span>共{{ feedbacks.length }}条反馈信息</span>
               <OSelect v-model="feedbackState" @change="getFeedbackList" :options-wrapper="feedbackListRef" style="max-width: 108px; max-height: 80px;">
