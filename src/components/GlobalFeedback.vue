@@ -30,7 +30,7 @@ const isDetailPage = computed(() => {
   if (!route.name) {
     return false;
   }
-  return (route.name as string).endsWith('-detail')
+  return (route.name as string).endsWith('-detail') && route.name !== 'todo-detail';
 });
 
 const isShowingFeedbackList = ref(false);
@@ -185,7 +185,7 @@ onUnmounted(() => window.sessionStorage.removeItem(STORAGE_KEY));
 
 <template>
   <Teleport to="body">
-    <div ref="globalFeedbackBtnRef" v-if="!isDetailPage" class="global-feedback-btn" :style="{ color: popupVisible ? 'var(--o-color-primary1)' : 'var(--o-color-control3)' }">
+    <div ref="globalFeedbackBtnRef" v-show="!isDetailPage" class="global-feedback-btn" :style="{ color: popupVisible ? 'var(--o-color-primary1)' : 'var(--o-color-control3)' }">
       <iconButton />
     </div>
     <OPopup v-model:visible="popupVisible" wrap-class="global-feedback-popup" :target="globalFeedbackBtnRef" trigger="click" position="right">
@@ -218,10 +218,10 @@ onUnmounted(() => window.sessionStorage.removeItem(STORAGE_KEY));
           <div class="mask" v-if="loading">
             <OIcon><IconLoading class="o-rotating" /></OIcon>
           </div>
-          <template v-if="loginStore.isLogined && !empty">
+          <template v-if="true">
             <div class="title">
               <span>共{{ feedbacks.length }}条反馈信息</span>
-              <OSelect v-model="feedbackState" @change="getFeedbackList" :options-wrapper="feedbackListRef" style="max-width: 108px">
+              <OSelect v-model="feedbackState" @change="getFeedbackList" :options-wrapper="feedbackListRef" style="max-width: 108px; max-height: 80px;">
                 <OOption v-for="item in feedbackOptions" :key="item.value" :value="item.value" :label="item.label">
                   {{ item.label }}
                 </OOption>
@@ -364,6 +364,10 @@ onUnmounted(() => window.sessionStorage.removeItem(STORAGE_KEY));
     align-items: center;
     margin-top: 16px;
     width: 100%;
+
+    :deep(.o-popup) {
+      height: 100px;
+    }
 
     .mask {
       display: flex;
