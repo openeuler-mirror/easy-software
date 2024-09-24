@@ -198,7 +198,7 @@ onUnmounted(() => window.sessionStorage.removeItem(STORAGE_KEY));
           <div class="mask" v-if="loading">
             <OIcon><IconLoading class="o-rotating" /></OIcon>
           </div>
-          <template v-if="!empty">
+          <template v-if="loginStore.isLogined && !empty">
             <div class="title">
               <span>共{{ feedbacks.length }}条反馈信息</span>
               <OSelect v-model="feedbackState" @change="getFeedbackList" :options-wrapper="feedbackListRef" style="max-width: 108px">
@@ -240,7 +240,14 @@ onUnmounted(() => window.sessionStorage.removeItem(STORAGE_KEY));
           </template>
           <Result404 v-else>
             <template #description>
-              <p class="empty-desc">暂无反馈消息</p>
+              <p class="empty-desc">
+                <template v-if="!loginStore.isLogined">
+                  <OLink color="primary" @click="doLogin">登录</OLink>可查看历史反馈信息
+                </template>
+                <template v-else>
+                  暂无反馈消息
+                </template>
+              </p>
             </template>
           </Result404>
         </div>
