@@ -218,6 +218,10 @@ const onCodeSuccess = () => {
 };
 
 const isSecurityShow = ref(false);
+// 是否显示图标
+const isSecurityIconShow = (v: string) => {
+  return ['L1', 'L2', 'L3', 'L4'].includes(v);
+};
 </script>
 
 <template>
@@ -244,7 +248,7 @@ const isSecurityShow = ref(false);
     <div class="license">
       <p>等级</p>
       <p class="level-info">
-        <OIcon class="icon-level"><IconLevel /></OIcon>{{ data.security }}
+        <OIcon v-if="isSecurityIconShow(data.security)" class="icon-level"><IconLevel /></OIcon>{{ data.security }}
       </p>
     </div>
     <MaintenanceDescription v-if="isSecurityShow" @change="isSecurityShow = false" />

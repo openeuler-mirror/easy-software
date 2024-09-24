@@ -128,6 +128,16 @@ let clearDataAfterJump = false;
 const showExternalDlg = ref(false);
 const externalLink = ref('');
 const onExternalDialog = () => {
+  if (rateVal.value === 0) {
+    return message.warning({
+      content: t('software.feedbackMessage[1]'),
+    });
+  } else if (feedbackTxa.value === '') {
+    return message.warning({
+      content: t('software.feedbackMessage[0]'),
+    });
+  }
+
   getIssueUrl();
   externalLink.value = decodeURIComponent(issueUrl.value);
   showExternalDlg.value = true;
@@ -169,16 +179,9 @@ const jumpOut = () => {
         />
         <div class="action">
           <OButton color="primary" variant="solid" size="large" @click="clickSubmit">{{ t('software.feedbackButton[0]') }}</OButton>
+          <OButton color="primary" size="large" @click="onExternalDialog">提交issue</OButton>
         </div>
-        <p class="other-text">其他反馈方式</p>
-        <div class="feedback-other">
-          <a @click="onExternalDialog()">
-            <OIcon><IconIssue /></OIcon>提交issue
-          </a>
-          <a :href="OPENEULER_FORUM" target="_blank" rel="noopener noreferrer">
-            <OIcon><IconHelp /></OIcon>发帖求助
-          </a>
-        </div>
+        <p class="other-text">您也可以使用<a :href="OPENEULER_FORUM" target="_blank" rel="noopener noreferrer"> 发帖求助 </a>进行反馈</p>
       </div>
     </div>
     <ODivider style="--o-divider-gap: 24px" />
@@ -200,37 +203,6 @@ const jumpOut = () => {
 .popover-content {
   @include text1;
 }
-
-.feedback-other {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  a + a {
-    margin-left: 24px;
-  }
-  a {
-    @include text1;
-    color: var(--o-color-info1);
-    line-height: 64px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: var(--o-color-control2-light);
-    border-radius: 4px;
-    transition: all var(--o-duration-s) var(--o-easing-standard);
-    .o-icon {
-      font-size: 32px;
-      margin-right: 12px;
-      color: var(--o-color-info2);
-      svg {
-        width: 32px;
-        height: 32px;
-      }
-    }
-    &:hover {
-      background: var(--o-color-control3-light);
-    }
-  }
-}
 .history-title {
   font-size: 22px;
   line-height: 30px;
@@ -248,7 +220,7 @@ const jumpOut = () => {
   }
 }
 .other-text {
-  margin: 32px 0 16px;
+  margin: 24px 0 0;
   @include text1;
   color: var(--o-color-info1);
   font-weight: 500;
