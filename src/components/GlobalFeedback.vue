@@ -110,7 +110,7 @@ const loading = ref(false);
 const getFeedbackList = async () => {
   try {
     loading.value = true;
-    const res = await getGlobalFeedbackHistoryList(1, 500, feedbackState.value);
+    const res = await getGlobalFeedbackHistoryList(1, 100, feedbackState.value);
     if (res[0]?.data?.length) {
       res[0].data.forEach((item) => {
         item.feedback = (item.feedback.replace(REPLACE_REGEXP, '').match(FEEDBACK_REGEXP)?.[1] as string).trim();
