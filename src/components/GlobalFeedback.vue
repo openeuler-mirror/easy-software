@@ -25,7 +25,13 @@ const globalFeedbackBtnRef = ref();
 const feedbackListRef = ref();
 const route = useRoute();
 
-const isDetailPage = computed(() => (route.name as string).endsWith('-detail'));
+
+const isDetailPage = computed(() => {
+  if (!route.name) {
+    return false;
+  }
+  return (route.name as string).endsWith('-detail')
+});
 
 const isShowingFeedbackList = ref(false);
 const feedbackTitle = computed(() => (isShowingFeedbackList.value ? '历史反馈信息' : '反馈'));
