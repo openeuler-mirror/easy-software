@@ -11,13 +11,13 @@ const useScrollBottom = (scrollerRef: Ref<InstanceType<typeof OScroller>>, callb
 
   onMounted(() => {
     nextTick(() => {
-      const container = scrollerRef.value?.getContainerEl() as HTMLDivElement;
+      const container = (scrollerRef.value?.$el as HTMLDivElement).querySelector('.o-scroller-container');
       container && container.addEventListener('scroll', onScroll);
     });
   });
 
   onUnmounted(() => {
-    const container = scrollerRef.value?.getContainerEl() as HTMLDivElement;
+    const container = (scrollerRef.value?.$el as HTMLDivElement).querySelector('.o-scroller-container');
     container && container.removeEventListener('scroll', onScroll);
   });
 };

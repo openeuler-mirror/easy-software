@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, onUnmounted, onMounted, watch } from 'vue';
-import { OButton, ODivider, OIcon, OIconClose, OLink, OOption, OPopup, ORate, OScroller, OSelect, OTag, OTextarea, useMessage } from '@opensig/opendesign';
+import { OButton, ODivider, OIcon, OIconClose, OLink, OOption, OPopover, OPopup, ORate, OScroller, OSelect, OTag, OTextarea, useMessage } from '@opensig/opendesign';
 import IconOutlink from '~icons/app/icon-outlink.svg';
 import type { FeedbackHistoryT } from '@/@types/feedback';
 import { getGlobalFeedbackHistoryList, postGlobalFeedback } from '@/api/api-feedback';
@@ -12,6 +12,8 @@ import { useLoginStore } from '@/stores/user';
 import { useI18n } from 'vue-i18n';
 import { doLogin } from '@/shared/login';
 import IconLoading from '~icons/app/icon-loading.svg';
+import IconHelp from '~icons/app/icon-help.svg';
+import { useRoute } from 'vue-router';
 
 const FEEDBACK_REGEXP = /(.*?)4. 【用户名】.*$/;
 const REPLACE_REGEXP = /\r|\n/g;
@@ -21,6 +23,9 @@ const loginStore = useLoginStore();
 const message = useMessage();
 const globalFeedbackBtnRef = ref();
 const feedbackListRef = ref();
+const route = useRoute();
+
+const isDetailPage = computed(() => (route.name as string).endsWith('-detail'));
 
 const isShowingFeedbackList = ref(false);
 const feedbackTitle = computed(() => (isShowingFeedbackList.value ? '历史反馈信息' : '反馈'));
@@ -174,13 +179,22 @@ onUnmounted(() => window.sessionStorage.removeItem(STORAGE_KEY));
 
 <template>
   <Teleport to="body">
-    <div ref="globalFeedbackBtnRef" class="global-feedback-btn" :style="{ color: popupVisible ? 'var(--o-color-primary1)' : 'var(--o-color-control3)' }">
+    <div ref="globalFeedbackBtnRef" v-if="!isDetailPage" class="global-feedback-btn" :style="{ color: popupVisible ? 'var(--o-color-primary1)' : 'var(--o-color-control3)' }">
       <iconButton />
     </div>
-    <OPopup v-model:visible="popupVisible" wrap-class="popup-border-none" :target="globalFeedbackBtnRef" body-class="global-feedback" trigger="click" position="right">
+    <OPopup v-model:visible="popupVisible" wrap-class="global-feedback-popup" :target="globalFeedbackBtnRef" trigger="click" position="right">
       <div class="global-feedback">
         <OIconClose class="close-icon" @click="onClickCloseIcon" />
-        <span class="title">{{ feedbackTitle }}</span>
+        <p class="title">{{ feedbackTitle }}
+          <OPopover>
+            <template #target>
+              <OIcon v-show="isShowingFeedbackList" class="help-icon"><IconHelp /></OIcon>
+            </template>
+            <p style="max-width: 170px; word-break: break-all;">
+              历史反馈信息内容更新有延迟，请耐心等待
+            </p>
+          </OPopover>
+        </p>
         <template v-if="!isShowingFeedbackList">
           <ORate v-model="rateVal" color="danger" style="margin-top: 18px" />
           <OTextarea
@@ -189,7 +203,7 @@ onUnmounted(() => window.sessionStorage.removeItem(STORAGE_KEY));
             :max-length="500"
             resize="none"
             clearable
-            style="margin-top: 20px; width: 300px; height: 88px;"
+            style="margin-top: 20px; width: 300px;"
             :inputOnOutlimit="false"
           />
           <OButton class="button" color="primary" variant="solid" round="pill" @click="postFeedback">提交反馈</OButton>
@@ -299,6 +313,13 @@ onUnmounted(() => window.sessionStorage.removeItem(STORAGE_KEY));
 
   .title {
     font-weight: 500;
+    display: flex;
+    align-items: center;
+
+    .help-icon {
+      width: 16px;
+      margin-left: 10px;
+    }
   }
 
   .close-icon {
