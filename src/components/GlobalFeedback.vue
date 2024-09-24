@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { ref, computed, onUnmounted, onMounted } from 'vue';
-import { OButton, ODivider, OIcon, OLink, OOption, OPopup, ORate, OScroller, OSelect, OTag, OTextarea, useMessage } from '@opensig/opendesign';
+import { ref, computed, onUnmounted, onMounted, watch } from 'vue';
+import { OButton, ODivider, OIcon, OIconClose, OLink, OOption, OPopup, ORate, OScroller, OSelect, OTag, OTextarea, useMessage } from '@opensig/opendesign';
 import IconOutlink from '~icons/app/icon-outlink.svg';
 import type { FeedbackHistoryT } from '@/@types/feedback';
 import { getGlobalFeedbackHistoryList, postGlobalFeedback } from '@/api/api-feedback';
@@ -11,7 +11,10 @@ import Result404 from './Result404.vue';
 import { useLoginStore } from '@/stores/user';
 import { useI18n } from 'vue-i18n';
 import { doLogin } from '@/shared/login';
+import IconLoading from '~icons/app/icon-loading.svg';
 
+const FEEDBACK_REGEXP = /(.*?)4. 【用户名】.*$/;
+const REPLACE_REGEXP = /\r|\n/g;
 const STORAGE_KEY = 'globalFeedback';
 const { t } = useI18n();
 const loginStore = useLoginStore();
@@ -26,14 +29,24 @@ const bottomLinkContent = computed(() => (isShowingFeedbackList.value ? '提交�
 const rateVal = ref(0);
 const feedbackContent = ref('');
 
+const popupVisible = ref(false);
+
+watch(popupVisible, (val) => {
+  if (!val) {
+    isShowingFeedbackList.value = false;
+  }
+});
+
+const onClickCloseIcon = () => (popupVisible.value = false);
+
 onMounted(() => {
-  const storage = window.sessionStorage.getItem(STORAGE_KEY)
+  const storage = window.sessionStorage.getItem(STORAGE_KEY);
   if (storage) {
     const { content, rate } = JSON.parse(storage);
     rateVal.value = rate;
     feedbackContent.value = content;
   }
-})
+});
 
 // 状态筛选
 const feedbackState = ref('');
@@ -92,50 +105,59 @@ const tagColor = (tag: string) => {
   }
 };
 
+const loading = ref(false);
+
 const getFeedbackList = async () => {
   try {
+    loading.value = true;
     const res = await getGlobalFeedbackHistoryList(1, 500, feedbackState.value);
     if (res[0]?.data?.length) {
-      res[0].data.forEach((item) => (item.created_at = dayjs(item.created_at).format('YYYY/MM/DD HH:mm:ss')));
+      res[0].data.forEach((item) => {
+        item.feedback = (item.feedback.replace(REPLACE_REGEXP, '').match(FEEDBACK_REGEXP)?.[1] as string).trim();
+        item.created_at = dayjs(item.created_at).format('YYYY/MM/DD HH:mm:ss');
+      });
       feedbacks.value = res[0].data;
       return;
     }
     feedbacks.value = [];
   } catch (error) {
     feedbacks.value = [];
+  } finally {
+    loading.value = false;
   }
 };
 
 const onClickSwitch = async () => {
   isShowingFeedbackList.value = !isShowingFeedbackList.value;
   if (isShowingFeedbackList.value) {
-    feedbackState.value = '';
-    await getFeedbackList();
-    if (!feedbacks.value.length) {
-      empty.value = true;
-    } else {
-      empty.value = false;
-    }
-  } else {
     empty.value = false;
+    feedbackState.value = '';
+    if (loginStore.isLogined) {
+      await getFeedbackList();
+    } else {
+      feedbacks.value = [];
+    }
+    empty.value = !feedbacks.value.length;
+  } else {
+    empty.value = true;
   }
 };
 
 const postFeedback = () => {
+  if (!loginStore.isLogined) {
+    window.sessionStorage.setItem(STORAGE_KEY, JSON.stringify({ rate: rateVal.value ?? 0, content: feedbackContent.value ?? '' }));
+    doLogin();
+    return;
+  }
   if (!rateVal.value) {
     return message.warning({
       content: t('software.feedbackMessage[1]'),
     });
   }
-  if (!feedbackContent.value) {
+  if (!feedbackContent.value.trim()) {
     return message.warning({
       content: t('software.feedbackMessage[0]'),
     });
-  }
-  if (!loginStore.isLogined) {
-    window.sessionStorage.setItem(STORAGE_KEY, JSON.stringify({ rate: rateVal.value, content: feedbackContent.value }));
-    doLogin();
-    return;
   }
   postGlobalFeedback(window.location.href, rateVal.value, feedbackContent.value)
     .then(() => {
@@ -152,18 +174,30 @@ onUnmounted(() => window.sessionStorage.removeItem(STORAGE_KEY));
 
 <template>
   <Teleport to="body">
-    <div ref="globalFeedbackBtnRef" class="global-feedback-btn">
+    <div ref="globalFeedbackBtnRef" class="global-feedback-btn" :style="{ color: popupVisible ? 'var(--o-color-primary1)' : 'var(--o-color-control3)' }">
       <iconButton />
     </div>
-    <OPopup :target="globalFeedbackBtnRef" trigger="click" position="right">
+    <OPopup v-model:visible="popupVisible" wrap-class="popup-border-none" :target="globalFeedbackBtnRef" body-class="global-feedback" trigger="click" position="right">
       <div class="global-feedback">
-        <span>{{ feedbackTitle }}</span>
+        <OIconClose class="close-icon" @click="onClickCloseIcon" />
+        <span class="title">{{ feedbackTitle }}</span>
         <template v-if="!isShowingFeedbackList">
           <ORate v-model="rateVal" color="danger" style="margin-top: 18px" />
-          <OTextarea v-model="feedbackContent" placeholder="请输入您的反馈" :max-length="500" resize="none" clearable style="margin-top: 20px; width: 300px; height: 88px" />
+          <OTextarea
+            v-model="feedbackContent"
+            placeholder="请输入您的反馈"
+            :max-length="500"
+            resize="none"
+            clearable
+            style="margin-top: 20px; width: 300px; height: 88px;"
+            :inputOnOutlimit="false"
+          />
           <OButton class="button" color="primary" variant="solid" round="pill" @click="postFeedback">提交反馈</OButton>
         </template>
         <div ref="feedbackListRef" class="feedback-list" v-else>
+          <div class="mask" v-if="loading">
+            <OIcon><IconLoading class="o-rotating" /></OIcon>
+          </div>
           <template v-if="!empty">
             <div class="title">
               <span>共{{ feedbacks.length }}条反馈信息</span>
@@ -174,10 +208,14 @@ onUnmounted(() => window.sessionStorage.removeItem(STORAGE_KEY));
               </OSelect>
             </div>
             <ODivider direction="h" style="width: 300px"></ODivider>
-              <OScroller v-if="feedbacks.length" class="scroller" :style="{ scrollerMaxHeight, minHeight: '168px' }">
+            <OScroller v-if="feedbacks.length" class="scroller" :style="{ maxHeight: scrollerMaxHeight, minHeight: '168px' }">
               <div class="feedback-item" v-mounted>
                 <div class="content">
                   <p class="feedback-title">t</p>
+                  <OLink class="out-link" target="_blank" rel="noopener noreferrer">
+                    查看详情
+                    <OIcon><IconOutlink /></OIcon>
+                  </OLink>
                 </div>
                 <p class="time">t</p>
               </div>
@@ -198,9 +236,7 @@ onUnmounted(() => window.sessionStorage.removeItem(STORAGE_KEY));
                 <p class="time">{{ item.created_at }}</p>
               </div>
             </OScroller>
-            <div v-else class="empty">
-              暂无反馈信息
-            </div>
+            <div v-else class="empty">暂无反馈信息</div>
           </template>
           <Result404 v-else>
             <template #description>
@@ -209,7 +245,7 @@ onUnmounted(() => window.sessionStorage.removeItem(STORAGE_KEY));
           </Result404>
         </div>
         <ODivider direction="h" class="divider"></ODivider>
-        <div class="title">
+        <div class="bottom-link">
           <OLink @click="onClickSwitch">{{ bottomLinkContent }}</OLink>
         </div>
       </div>
@@ -231,8 +267,7 @@ onUnmounted(() => window.sessionStorage.removeItem(STORAGE_KEY));
   display: flex;
   justify-content: center;
   align-items: center;
-  color: var(--o-color-primary1);
-  box-shadow: var(--o-shadow-1);
+  box-shadow: var(--o-shadow-3);
   z-index: 1000;
 
   cursor: pointer;
@@ -253,10 +288,23 @@ onUnmounted(() => window.sessionStorage.removeItem(STORAGE_KEY));
   background-color: var(--o-color-fill2);
   padding: 16px 0;
   color: var(--o-color-info2);
+  border: none;
 
   .title {
+    font-weight: 500;
+  }
+
+  .close-icon {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    cursor: pointer;
+  }
+
+  .bottom-link {
     display: flex;
     justify-content: center;
+    @include tip1;
   }
 
   .rating-wrap {
@@ -283,6 +331,19 @@ onUnmounted(() => window.sessionStorage.removeItem(STORAGE_KEY));
     margin-top: 16px;
     width: 100%;
 
+    .mask {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-color: var(--o-color-fill2);
+      position: absolute;
+      left: 0;
+      bottom: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 2;
+    }
+
     .empty {
       height: 146px;
       display: flex;
@@ -300,14 +361,14 @@ onUnmounted(() => window.sessionStorage.removeItem(STORAGE_KEY));
     }
 
     .scroller {
-      padding: 0 30px;
       width: 100%;
+      padding: 0 30px;
     }
 
     .feedback-item {
       margin-top: 10px;
       padding-bottom: 10px;
-      border-bottom: 1px solid var(--o-color-control1-light);
+      border-bottom: 1px solid var(--o-color-control4);
 
       .out-link {
         flex-shrink: 0;
@@ -356,7 +417,7 @@ onUnmounted(() => window.sessionStorage.removeItem(STORAGE_KEY));
       .time {
         @include tip2;
         margin-top: 8px;
-        color: var(--o-color-control1);
+        color: var(--o-color-control2);
       }
     }
   }
