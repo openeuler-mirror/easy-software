@@ -28,7 +28,7 @@ const route = useRoute();
 
 const isDetailPage = computed(() => {
   if (!route.name) {
-    return false;
+    return true;
   }
   return (route.name as string).endsWith('-detail') && route.name !== 'todo-detail';
 });
@@ -185,10 +185,12 @@ onUnmounted(() => window.sessionStorage.removeItem(STORAGE_KEY));
 
 <template>
   <Teleport to="body">
-    <div ref="globalFeedbackBtnRef" v-show="!isDetailPage" class="global-feedback-btn" :style="{ color: popupVisible ? 'var(--o-color-primary1)' : 'var(--o-color-control3)' }">
-      <iconButton />
-    </div>
-    <OPopup v-model:visible="popupVisible" wrap-class="global-feedback-popup" :target="globalFeedbackBtnRef" trigger="click" position="right">
+    <OPopup v-if="!isDetailPage" v-model:visible="popupVisible" wrap-class="global-feedback-popup"  trigger="click" position="right">
+      <template #target>
+        <div ref="globalFeedbackBtnRef" class="global-feedback-btn" :style="{ color: popupVisible ? 'var(--o-color-primary1)' : 'var(--o-color-control3)' }">
+          <iconButton />
+        </div>
+      </template>
       <div class="global-feedback">
         <OIconClose class="close-icon" @click="onClickCloseIcon" />
         <p class="title">{{ feedbackTitle }}
