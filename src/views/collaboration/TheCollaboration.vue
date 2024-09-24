@@ -41,16 +41,16 @@ const columns = reactive<CollaborationColumnsT[]>([
     ],
   },
   { label: 'CVE状态', key: 'cveStatus', type: 'cve', width: '188', isDefault: true, isFilter: true },
-  { label: '软件包更新状态', key: 'prStatus', type: 'pr', width: '188', isFilter: true },
   { label: 'Issue状态', key: 'issueStatus', type: 'issue', width: '188', isFilter: true },
+  { label: '软件包更新状态', key: 'prStatus', type: 'pr', width: '188', isFilter: true },
   { label: '贡献组织状态', key: 'orgStatus', type: 'org', width: '180', isFilter: true },
   { label: '贡献人员状态', key: 'contributorStatus', type: 'personnel', width: '180', isFilter: true },
   { label: '类别', key: 'kind', type: 'kind', width: '180', isFilter: true },
   { label: 'SIG名称', key: 'sigName', type: 'sig', width: '188', isFilter: true },
   { label: '软件维护级别', key: 'level', type: 'level', width: '165', isFilter: true },
   { label: '状态', key: 'status', type: 'status', width: '125', fixed: 'right', isDefault: true, isFilter: true },
-  { label: '建议', key: 'suggestions', type: 'recommend', width: '160', fixed: 'right', isDefault: true },
-  { label: '操作', key: 'operation', type: 'operation', width: '215', fixed: 'right', isDefault: true },
+  { label: '建议', key: 'suggestions', type: 'recommend', width: '203', fixed: 'right', isDefault: true },
+  { label: '操作', key: 'operation', type: 'operation', width: '160', fixed: 'right', isDefault: true },
 ]);
 
 const message = useMessage();
@@ -494,8 +494,8 @@ watch(
 
                   <template v-else-if="item.key === 'operation'">
                     <div class="operation-box">
-                      <OLink color="primary" hover-underline @click="changeFeedback(row.repo)">状态反馈</OLink>
-                      <OLink color="primary" hover-underline @click="changeFeedbackHistory(row.repo)">反馈历史</OLink>
+                      <OLink color="primary" hover-underline @click="changeFeedback(row.repo)">反馈</OLink>
+                      <OLink color="primary" hover-underline @click="changeFeedbackHistory(row.repo)">历史</OLink>
                     </div>
                   </template>
                   <template v-else>
@@ -542,9 +542,12 @@ watch(
   --btn-height: 40px;
   --btn-radius: 4px;
   background: var(--o-color-fill2);
+  color: var(--o-color-info1);
   svg {
-    width: 20px;
-    height: 20px;
+    width: 24px;
+    height: 24px;
+    fill: currentColor;
+    color: var(--o-color-info1);
   }
 }
 :deep(.el-table) {

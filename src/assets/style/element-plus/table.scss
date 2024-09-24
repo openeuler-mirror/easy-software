@@ -11,9 +11,11 @@
   border-spacing: 0;
   color: var(--o-color-info1);
   @include text1;
-  // .el-table__inner-wrapper::before {
-  //   background-color: transparent;
-  // }
+  &.is-scrolling-right .el-table-fixed-column--left.is-last-column.el-table__cell,
+  &.is-scrolling-middle .el-table-fixed-column--left.is-last-column.el-table__cell {
+    border-right: 1px solid transparent !important;
+  }
+
   .el-table__row {
     &.hover-row {
       .el-table-fixed-column--left,

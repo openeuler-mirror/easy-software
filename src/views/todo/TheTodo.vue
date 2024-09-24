@@ -35,7 +35,6 @@ const message = useMessage();
 
 const isAdminPermission = computed(() => userInfoStore.platformAdminPermission);
 const isMaintainerPermission = computed(() => userInfoStore.platformMaintainerPermission);
-
 // 报错提示
 const isError = ref(false);
 
@@ -85,16 +84,27 @@ const activeName = ref();
 const onChange = (type: string) => {
   currentPage.value = 1;
   pageSize.value = 10;
-
-  clearFilterParams(applicationFilterParams);
-  clearFilterParams(approvalFilterParams);
-  clearFilterParams(approvedFilterParams);
-
-  queryTodoData();
+  pageInit();
   // 切换url参数
   router.push({
     path: `/${locale.value}/todo/${type}`,
   });
+};
+
+const pageInit = () => {
+  if ((activeName.value === 'application' && isMaintainerPermission.value) || isAdminPermission.value) {
+    clearFilterParams(applicationFilterParams);
+    queryTodoData();
+    isNotData.value = true;
+  } else if (isAdminPermission.value) {
+    clearFilterParams(approvalFilterParams);
+    clearFilterParams(approvedFilterParams);
+    queryTodoData();
+    isNotData.value = true;
+  } else {
+    isError.value = true;
+    isNotData.value = false;
+  }
 };
 
 // 清楚筛选数据
@@ -131,6 +141,7 @@ const queryTodoApply = async (paramsObj: AdminAppryT) => {
   return { resData, totalNum };
 };
 
+const isNotData = ref(true);
 // 数据处理
 const queryTodoData = async (params: Record<string, string> = {}) => {
   isLoading.value = true;
@@ -179,8 +190,16 @@ const queryTodoData = async (params: Record<string, string> = {}) => {
       } else if (activeName.value === 'application') {
         applicationData.value = resData;
       }
-      total.value = totalNum;
       isLoading.value = false;
+      if (resData.length > 0) {
+        isNotData.value = false;
+      }
+      if (resData.length === 0 && filterParamKeys.length === 0) {
+        isError.value = true;
+        isNotData.value = false;
+      }
+
+      total.value = totalNum;
     });
   } catch {
     applicationData.value = [];
@@ -225,7 +244,7 @@ const revokeApplication = async (id: string) => {
 
 onMounted(() => {
   activeName.value = (route.params?.type as string) || 'application';
-  queryTodoData();
+  pageInit();
 });
 </script>
 
@@ -239,20 +258,23 @@ onMounted(() => {
     <OTabPane v-for="item in tabList" :key="item.id" :value="item.id" :label="item.label"> </OTabPane>
   </OTab>
   <div class="todo-content">
-    <div class="todo-content-table" :class="applicationData.length === 0 || approvalData.length === 0 || approvedData.length === 0 ? 'empty' : ''">
-      <AppLoading :loading="isLoading" />
-      <!-- 我的申请 -->
-      <ApprovalTable
-        v-if="activeName === 'application' && !isError"
-        :columns="applicationColumns"
-        @queryData="queryTodoData"
-        :filterParams="applicationFilterParams"
-        :type="activeName"
-        :data="applicationData"
-        @revoke="revokeApplication"
-      />
+    <div class="todo-content-table" :class="isNotData ? 'empty' : ''">
+      <template v-if="isAdminPermission || (isMaintainerPermission && activeName === 'application')">
+        <AppLoading :loading="isLoading" />
+        <!-- 我的申请 -->
+        <ApprovalTable
+          v-if="activeName === 'application' && !isError"
+          :columns="applicationColumns"
+          @queryData="queryTodoData"
+          :filterParams="applicationFilterParams"
+          :type="activeName"
+          :data="applicationData"
+          @revoke="revokeApplication"
+        />
+      </template>
       <!-- 判断admin权限 -->
       <template v-if="isAdminPermission">
+        <AppLoading :loading="isLoading" />
         <ApprovalTable
           v-if="activeName === 'approval' && !isError"
           :columns="approvalColumns"
