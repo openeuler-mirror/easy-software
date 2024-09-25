@@ -1,5 +1,5 @@
 import type { OScroller } from '@opensig/opendesign';
-import { type Ref, onUnmounted, onMounted, nextTick } from 'vue';
+import { type Ref, onMounted, nextTick } from 'vue';
 
 const useScrollBottom = (scrollerRef: Ref<InstanceType<typeof OScroller>>, callback: () => void) => {
   const onScroll = (event: Event) => {
@@ -14,11 +14,6 @@ const useScrollBottom = (scrollerRef: Ref<InstanceType<typeof OScroller>>, callb
       const container = (scrollerRef.value?.$el as HTMLDivElement).querySelector('.o-scroller-container');
       container && container.addEventListener('scroll', onScroll);
     });
-  });
-
-  onUnmounted(() => {
-    const container = (scrollerRef.value?.$el as HTMLDivElement).querySelector('.o-scroller-container');
-    container && container.removeEventListener('scroll', onScroll);
   });
 };
 export default useScrollBottom;
