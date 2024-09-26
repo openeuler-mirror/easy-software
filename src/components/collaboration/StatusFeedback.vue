@@ -2,7 +2,7 @@
 import { ref, reactive, computed } from 'vue';
 import { ODialog, OButton, OForm, OTextarea, OFormItem, ORadioGroup, ORadio, OSelect, OOption, type FieldResultT, useMessage } from '@opensig/opendesign';
 import { applicationTypeCurrent } from '@/data/todo';
-import { getApplyFeedback, getAdminApplyFeedback } from '@/api/api-collaboration';
+import { getCollaborationFeedback } from '@/api/api-collaboration';
 import { useUserInfoStore } from '@/stores/user';
 
 const props = defineProps({
@@ -86,9 +86,10 @@ const descriptionRules = [
 ];
 
 // Maintainer 反馈
-const queryMaintainerFeedback = () => {
-  getApplyFeedback(formData)
-    .then((res) => {
+const queryCollaborationFeedback = async () => {
+  try {
+    if (isAdminPer.value) {
+      const res = await getCollaborationFeedback(formData, 'admin');
       if (res.code === 200) {
         message.success({
           content: '反馈成功',
@@ -96,19 +97,8 @@ const queryMaintainerFeedback = () => {
         showDlg.value = false;
         emits('close');
       }
-    })
-    .catch(() => {
-      message.danger({
-        content: '操作失败',
-      });
-      showDlg.value = false;
-    });
-};
-
-// Admin 反馈
-const queryAdminFeedback = () => {
-  getAdminApplyFeedback(formData)
-    .then((res) => {
+    } else if (isMainPer.value) {
+      const res = await getCollaborationFeedback(formData, 'maintainer');
       if (res.code === 200) {
         message.success({
           content: '反馈成功',
@@ -116,27 +106,20 @@ const queryAdminFeedback = () => {
         showDlg.value = false;
         emits('close');
       }
-    })
-    .catch(() => {
-      message.danger({
-        content: '操作失败',
-      });
-      showDlg.value = false;
+    }
+  } catch {
+    message.danger({
+      content: '操作失败',
     });
+    showDlg.value = false;
+  }
 };
 
 const onSubmit = (results: FieldResultT[]) => {
   if (results.find((item) => item?.type === 'danger')) {
     return;
   } else {
-    if (formData.metricStatus === '版本正常') {
-      formData.metricStatus = '最新版本';
-    }
-    if (isAdminPer.value) {
-      queryAdminFeedback();
-    } else if (isMainPer.value) {
-      queryMaintainerFeedback();
-    }
+    queryCollaborationFeedback();
   }
 };
 </script>

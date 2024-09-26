@@ -31,16 +31,18 @@ declare module 'vue' {
     FeedbackHistory: typeof import('./src/components/feedbackHistory/FeedbackHistory.vue')['default']
     FeedbackHistoryItem: typeof import('./src/components/feedbackHistory/FeedbackHistoryItem.vue')['default']
     FeedbackHistroy: typeof import('./src/components/collaboration/FeedbackHistroy.vue')['default']
-    FilterableCheckboxes: typeof import('./src/components/FilterableCheckboxes.vue')['default']
+    FilterableTableHeader: typeof import('./src/components/FilterableTableHeader.vue')['default']
     FilterCheckbox: typeof import('./src/components/filter/FilterCheckbox.vue')['default']
     FilterHeader: typeof import('./src/components/filter/FilterHeader.vue')['default']
     FilterItemSkeleton: typeof import('./src/components/skeleton/FilterItemSkeleton.vue')['default']
     FilterOrder: typeof import('./src/components/filter/FilterOrder.vue')['default']
     FilterRadio: typeof import('./src/components/filter/FilterRadio.vue')['default']
+    GlobalFeedback: typeof import('./src/components/GlobalFeedback.vue')['default']
     HeaderNav: typeof import('./src/components/header/HeaderNav.vue')['default']
     HeaderTheme: typeof import('./src/components/header/HeaderTheme.vue')['default']
     HomeSkeleton: typeof import('./src/components/skeleton/HomeSkeleton.vue')['default']
     Indicators: typeof import('./src/components/collaboration/Indicators.vue')['default']
+    MaintenanceDescription: typeof import('./src/components/detail/MaintenanceDescription.vue')['default']
     OCardItem: typeof import('./src/components/OCardItem.vue')['default']
     OCardItemSkeleton: typeof import('./src/components/skeleton/OCardItemSkeleton.vue')['default']
     OCodeCopy: typeof import('./src/components/OCodeCopy.vue')['default']
@@ -56,5 +58,8 @@ declare module 'vue' {
     SearchTab: typeof import('./src/components/search/SearchTab.vue')['default']
     StatusFeedback: typeof import('./src/components/collaboration/StatusFeedback.vue')['default']
     TableShowOverflowTips: typeof import('./src/components/collaboration/TableShowOverflowTips.vue')['default']
+  }
+  export interface ComponentCustomProperties {
+    vLoading: typeof import('element-plus/es')['ElLoadingDirective']
   }
 }

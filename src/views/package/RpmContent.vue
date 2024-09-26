@@ -373,7 +373,7 @@ watch(
           >
         </div>
       </div>
-      <div class="pkg-content">
+      <div class="pkg-content" :class="pkgData.length === 0 && isLoading ? 'loading' : ''">
         <AppLoading :loading="isLoading" />
         <ResultNoApp v-if="isSearchError" type="RPM" />
         <div v-if="pkgData.length !== 0 && !isSearchError" class="pkg-panel">

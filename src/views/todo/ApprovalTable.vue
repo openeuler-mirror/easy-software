@@ -1,24 +1,23 @@
 <script lang="ts" setup>
-import { ref, type PropType, type ComponentPublicInstance, onMounted, computed } from 'vue';
-import { OTable, OLink, OTag, ODialog, OButton, OPopup, OIcon, OPopover } from '@opensig/opendesign';
+import { ref, type PropType, computed } from 'vue';
+import { OLink, OTag, ODialog, OButton, OIcon, OPopover } from '@opensig/opendesign';
 import { useLocale } from '@/composables/useLocale';
 import { formatDateTime } from '@/utils/common';
 import { useRouter, useRoute } from 'vue-router';
 import { applicationTypeCurrent, applyStatusType } from '@/data/todo';
-import { applicationTypeConvert, applyStatusConvert, versionLatestStatusConvert } from '@/utils/collaboration';
-import { onClickOutside } from '@vueuse/core';
+import { applicationTypeConvert, applyStatusConvert } from '@/utils/collaboration';
 import { getAdminApplyRepos, getMaintainerApplyRepos } from '@/api/api-collaboration';
 import { useUserInfoStore } from '@/stores/user';
-import FilterableCheckboxes from '@/components/FilterableCheckboxes.vue';
 
-import IconFilter from '~icons/app/icon-filter.svg';
 import IconHelp from '~icons/app/icon-help.svg';
+import FilterableTableHeader from '@/components/FilterableTableHeader.vue';
 
 interface ColumnsT {
   key: string;
   label: string;
   width?: string;
   type?: string;
+  fixed?: string;
 }
 
 const props = defineProps({
@@ -45,7 +44,6 @@ const props = defineProps({
 });
 
 const userInfoStore = useUserInfoStore();
-const isMainPer = computed(() => userInfoStore.platformMaintainerPermission);
 const isAdminPer = computed(() => userInfoStore.platformAdminPermission);
 
 const router = useRouter();
@@ -81,56 +79,20 @@ const filterableColumns = ref(Object.keys(props.filterParams));
 
 const applyTypes = applicationTypeCurrent.map((item) => ({ label: item.label, value: item.id }));
 
-const filterIconRefs = ref(new Array<ComponentPublicInstance>(props.columns.length));
-
-/** 筛选组件是否显示的开关 */
-const filterSwitches = ref(props.columns.map(() => false));
-
-const setPopupClickoutSideFn = (el: any, index: number) => {
-  onClickOutside(el, () => {
-    filterSwitches.value[index] = false;
-  });
-};
-
-onMounted(() => {
-  Object.entries(props.filterParams).forEach(([key, value]) => {
-    if (value) {
-      const index = props.columns.findIndex((item) => item.key === key);
-      currentActiveFilterIndices.value.add(index);
-      activeFilterValues.value[index] = value;
-    }
-  });
-});
-
-/** 当前有选中筛选项的表格列的数组下标 */
-const currentActiveFilterIndices = ref(new Set<number>());
-
 const repoFilterLoading = ref(false);
 
 /** 切换某个筛选组件显示开关 */
-const switchFilterVisible = (index: number) => {
-  filterSwitches.value[index] = true;
-  if (index === 0) {
-    repoFilterLoading.value = true;
-    getRepoList();
-  }
+const switchFilterVisible = () => {
+  repoFilterLoading.value = true;
+  getRepoList();
 };
 
-/** 各表格列对应的已选中的筛选项 */
-const activeFilterValues = ref(new Array<string>(props.columns.length));
-
-const onFilterChange = (type: string, index: number, val: string) => {
-  filterSwitches.value = props.columns.map(() => false);
-  if (val) {
-    if (type === 'metric') {
-      activeFilterValues.value[index] = applyStatusConvert(val);
-    } else {
-      activeFilterValues.value[index] = val;
-    }
-    currentActiveFilterIndices.value.add(index);
+const onFilterChange = (type: string, val: string | number | (string | number)[]) => {
+  if ((Array.isArray(val) && val.length) || (!Array.isArray(val) && val)) {
+    val = Array.isArray(val) ? val.join() : val.toString();
+    innerFilterParams.value[type] = val;
   } else {
-    activeFilterValues.value[index] = '';
-    currentActiveFilterIndices.value.delete(index);
+    innerFilterParams.value[type] = '';
   }
   emits('queryData', innerFilterParams.value);
 };
@@ -162,9 +124,17 @@ const revoke = () => {
 
 <template>
   <div class="table-main" :class="type">
-    <OTable :columns="columns" :data="data" :loading="loading" border="all">
-      <template #head="{ columns }">
-        <template v-for="(item, index) in columns" :key="item.type">
+    <el-table :data="data" border empty-text="暂无数据" style="width: 100%">
+      <el-table-column
+        v-for="(item) in columns"
+        :key="item.key"
+        :fixed="item.fixed ?? false"
+        :prop="item.key"
+        :width="item.width"
+        :class-name="item.type"
+        :resizable="false"
+      >
+        <template #header>
           <th v-if="!filterableColumns.includes(item.key)" :class="item.type">
             <template v-if="item.label === '申请人'">
               <div class="th-maintainer">
@@ -179,95 +149,80 @@ const revoke = () => {
             </template>
             <template v-else> {{ item.label }}</template>
           </th>
-          <OPopup v-else trigger="none" style="--popup-radius: 4px" :offset="-8" :visible="filterSwitches[index]" :unmount-on-hide="false" position="bl">
-            <template #target>
-              <th :class="item.type">
-                <div class="header-cell">
-                  {{ item.label }}
-                  <template v-if="item.key !== 'operation'">
-                    <OIcon
-                      :ref="(el) => (filterIconRefs[index] = el as ComponentPublicInstance)"
-                      class="filter-icon"
-                      :style="currentActiveFilterIndices.has(index) ? { color: 'var(--o-color-primary1)' } : {}"
-                      @click="switchFilterVisible(index)"
-                      ><IconFilter
-                    /></OIcon>
-                    <OPopover v-if="currentActiveFilterIndices.has(index) && activeFilterValues[index]" :target="filterIconRefs[index]" trigger="hover">
-                      <p class="bubble-content">
-                        <span class="title">{{ item.label }}:</span>
-                        {{ activeFilterValues[index] }}
-                      </p>
-                    </OPopover>
-                  </template>
-                </div>
-              </th>
-            </template>
-            <div :ref="(el) => setPopupClickoutSideFn(el, index)">
-              <FilterableCheckboxes
-                v-model="innerFilterParams[item.key]"
-                v-if="item.key === 'metric'"
-                :filterable="false"
-                @change="onFilterChange(item.key, index, $event)"
-                :values="applyTypes"
-              />
-              <FilterableCheckboxes
-                v-model="innerFilterParams[item.key]"
-                v-else-if="item.key === 'repo'"
-                :loading="repoFilterLoading"
-                @change="onFilterChange(item.key, index, $event)"
-                :values="repoList"
-              />
-              <FilterableCheckboxes
-                v-model="innerFilterParams[item.key]"
-                v-else-if="item.key === 'applyStatus'"
-                :filterable="false"
-                @change="onFilterChange(item.key, index, $event)"
-                :values="applyStatusType"
-              />
-            </div>
-          </OPopup>
+          <th :class="item.type" v-else>
+            <FilterableTableHeader
+              :model-value="innerFilterParams[item.key]"
+              v-if="item.key === 'metric'"
+              :filterable="false"
+              @change="onFilterChange(item.key, $event)"
+              :options="applyTypes"
+            >
+              {{ item.label }}
+            </FilterableTableHeader>
+            <FilterableTableHeader
+              :model-value="innerFilterParams[item.key]"
+              v-else-if="item.key === 'repo'"
+              :loading="repoFilterLoading"
+              @options-visibility-change="switchFilterVisible"
+              @change="onFilterChange(item.key, $event)"
+              :options="repoList"
+            >
+              {{ item.label }}
+            </FilterableTableHeader>
+            <FilterableTableHeader
+              :model-value="innerFilterParams[item.key]"
+              v-else-if="item.key === 'applyStatus'"
+              :filterable="false"
+              :filter-values-display-mapper="applyStatusConvert"
+              multi
+              @change="onFilterChange(item.key, $event)"
+              :options="applyStatusType"
+            >
+              {{ item.label }}
+            </FilterableTableHeader>
+          </th>
         </template>
-      </template>
-      <template #td_createdAt="{ row }">
-        {{ formatDateTime(row.createdAt, true) }}
-      </template>
-      <template #td_metric="{ row }">
-        {{ applicationTypeConvert(row.metric) }}
-      </template>
-      <template #td_metricStatus="{ row }">
-        {{ versionLatestStatusConvert(row.metricStatus) }}
-      </template>
-      <template #td_comment="{ row }">
-        <TableShowOverflowTips v-if="row.comment" :content="row.comment" />
-        <template v-else>-</template>
-      </template>
-      <template #td_administrator="{ row }">
-        {{ row.administrator ?? '-' }}
-      </template>
-      <template #td_description="{ row }">
-        <TableShowOverflowTips v-if="row.description" :content="row.description" />
-      </template>
+        <template #default="{ row }">
+          <template v-if="item.key === 'createdAt'">
+            {{ formatDateTime(row.createdAt, true) }}
+          </template>
+          <template v-if="item.key === 'metric'">
+            {{ applicationTypeConvert(row.metric) }}
+          </template>
+          <template v-if="item.key === 'metricStatus'">
+            {{ row.metricStatus }}
+          </template>
+          <template v-if="item.key === 'comment'">
+            <TableShowOverflowTips v-if="row.comment" :content="row.comment" :line="2" wrapper=".table-main" />
+            <template v-else>-</template>
+          </template>
+          <template v-if="item.key === 'administrator'">
+            {{ row.administrator ?? '-' }}
+          </template>
+          <template v-if="item.key === 'description'">
+            <TableShowOverflowTips v-if="row.description" :content="row.description" :line="2" wrapper=".table-main" />
+          </template>
 
-      <template #td_applyStatus="{ row }">
-        <div class="apply-status">
-          <OTag v-if="row.applyStatus" :class="row.applyStatus?.toLocaleLowerCase()">{{ applyStatusConvert(row.applyStatus) }} </OTag>
-        </div>
-      </template>
-      <template #td_operation="{ row }">
-        <template v-if="type === 'application'">
-          <div class="oper-box">
-            <OLink color="primary" hover-underline @click="jumpTo(row.applyIdString)">申请详情</OLink>
-            <OLink color="danger" v-if="row.applyStatus === 'OPEN'" hover-underline @click="revokeApplication(row.applyIdString)">撤销申请</OLink>
-          </div>
+          <template v-if="item.key === 'applyStatus'">
+            <div class="apply-status">
+              <OTag v-if="row.applyStatus" :class="row.applyStatus?.toLocaleLowerCase()">{{ applyStatusConvert(row.applyStatus) }} </OTag>
+            </div>
+          </template>
+          <template v-if="item.key === 'operation'">
+            <template v-if="type === 'application'">
+              <div class="oper-box">
+                <OLink color="primary" hover-underline @click="jumpTo(row.applyIdString)">申请详情</OLink>
+                <OLink color="danger" v-if="row.applyStatus === 'OPEN'" hover-underline @click="revokeApplication(row.applyIdString)">撤销申请</OLink>
+              </div>
+            </template>
+            <template v-else>
+              <OLink color="primary" hover-underline @click="jumpTo(row.applyIdString)">{{ type === 'approval' ? '审批' : '审批详情' }}</OLink>
+            </template>
+          </template>
         </template>
-        <template v-if="type === 'approval'">
-          <OLink color="primary" hover-underline @click="jumpTo(row.applyIdString)">审批</OLink>
-        </template>
-        <template v-if="type === 'approved'">
-          <OLink color="primary" hover-underline @click="jumpTo(row.applyIdString)">审批详情</OLink>
-        </template>
-      </template>
-    </OTable>
+      </el-table-column>
+    </el-table>
+
     <ODialog v-model:visible="showDlg" class="revoke-dlg" :unmount-on-hide="true" :mask="true" size="small">
       <template #header>
         <p class="title">确认撤销</p>
@@ -285,6 +240,9 @@ const revoke = () => {
 
 <style lang="scss" scoped>
 @import '@/assets/style/category/collaboration/index.scss';
+.table-main {
+  position: relative;
+}
 .th-maintainer {
   display: flex;
   align-items: center;
@@ -329,120 +287,6 @@ const revoke = () => {
   .row-name {
     display: flex;
     align-items: center;
-  }
-}
-thead {
-  .repo {
-    width: 180px;
-  }
-  .metric,
-  .metricStatus,
-  .description {
-    width: 140px;
-  }
-  .applyStatus {
-    width: 130px;
-  }
-  .administrator,
-  .maintainer {
-    width: 130px;
-  }
-
-  .applyId {
-    width: 140px;
-  }
-
-  .comment {
-    width: 180px;
-  }
-  .updateAt {
-    width: 180px;
-  }
-  .operation {
-    width: 220px;
-  }
-}
-.application {
-  :deep(.o-table) {
-    @mixin liner {
-      content: '';
-      box-shadow: inset -10px 0 10px -10px rgba(0, 0, 0, 0.15);
-      height: 100%;
-      position: absolute;
-      top: 0;
-      width: 8px;
-    }
-    .o-table-wrap {
-      overflow-x: auto;
-      overflow-y: hidden;
-      @include scrollbar;
-      &::-webkit-scrollbar {
-        height: 6px;
-      }
-    }
-    table {
-      table-layout: fixed;
-    }
-
-    tr {
-      td {
-        &:first-child {
-          position: sticky;
-          z-index: 2;
-          background: var(--table-bg-color);
-          left: 0;
-          &::before {
-            right: -9px;
-            transform: scaleX(-1);
-            @include liner;
-          }
-        }
-        &:last-child {
-          width: 220px;
-          position: sticky;
-          right: 0;
-          z-index: 2;
-          background: var(--table-bg-color);
-          &::before {
-            left: -9px;
-            @include liner;
-          }
-        }
-      }
-      &.last {
-        td {
-          border-bottom: 0 none;
-        }
-      }
-      &:hover td {
-        background: var(--table-row-hover);
-      }
-    }
-
-    th {
-      &:first-child {
-        position: sticky;
-        z-index: 2;
-        background: var(--table-head-bg);
-        left: 0;
-        &::before {
-          right: -7px;
-          transform: scaleX(-1);
-          @include liner;
-        }
-      }
-      &:last-child {
-        width: 220px;
-        position: sticky;
-        right: 0;
-        z-index: 2;
-        background: var(--table-head-bg);
-        &::before {
-          left: -9px;
-          @include liner;
-        }
-      }
-    }
   }
 }
 </style>

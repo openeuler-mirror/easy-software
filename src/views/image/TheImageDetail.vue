@@ -29,7 +29,6 @@ const basicInfo = ref<DetailItemT[]>([]);
 const installation = ref('');
 const downloadData = ref('');
 const maintainer = ref<MaintainerT>({ maintainerId: '', maintainerEmail: '', maintainerGiteeId: '' });
-const security = ref();
 const appData = ref<AppInfoT>({
   name: '',
   license: '',
@@ -39,6 +38,7 @@ const appData = ref<AppInfoT>({
   size: '',
   source_code: '',
   bin_code: '',
+  security: '',
 });
 const srcRepo = ref('');
 
@@ -93,6 +93,7 @@ const getDetailValue = (data: ImageDetailT) => {
     binDownloadUrl,
     iconUrl,
     srcRepo,
+    security,
     osSupport,
     arch,
     appSize,
@@ -114,7 +115,6 @@ const getDetailValue = (data: ImageDetailT) => {
 
   summary.value = description;
   latestSupportOs.value = latestOsSupport;
-  security.value = securityLevel;
 
   downloadData.value = mkit(data?.download || '', { isCopy: true, Tag: data.appVer });
   installation.value = mkit(data?.installation || '', { isCopy: true, Tag: data.appVer });
@@ -129,6 +129,7 @@ const getDetailValue = (data: ImageDetailT) => {
     size: appSize,
     license: license,
     version: appVer,
+    security: security,
   };
 
   if (name) {

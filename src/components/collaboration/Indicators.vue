@@ -1,8 +1,8 @@
 <script lang="ts" setup>
 import { ref, computed } from 'vue';
-import { OTable, OTag, ODialog } from '@opensig/opendesign';
+import { OTable, OTag, ODialog, OTab, OTabPane, OScroller } from '@opensig/opendesign';
 import { repoStatusIndex } from '@/utils/collaboration';
-import { applicationType } from '@/data/todo/';
+import { applicationType, securityTypes } from '@/data/todo/';
 
 const columns = [
   { label: 'CVE分类', key: 'cve', type: 'cve' },
@@ -11,6 +11,11 @@ const columns = [
   { label: '详细描述', key: 'details', type: 'details' },
   { label: '维护状态', key: 'maintenance', type: 'maintenance' },
   { label: '描述', key: 'description', type: 'description' },
+];
+
+const securityColumns = [
+  { label: '软件包维护级别', key: 'id' },
+  { label: '描述', key: 'children' },
 ];
 
 const data = [
@@ -58,7 +63,7 @@ const data = [
     cve: '没有CVE',
     cveType: '没有CVE问题',
     contribution: '没有PR提交',
-    details: '版本正常',
+    details: '正常版本',
     maintenance: '健康',
     description: '没有CVE问题，且也没有PR提交，且软件包是正常稳定的',
   },
@@ -141,6 +146,11 @@ const emits = defineEmits<{
 const onChange = () => {
   emits('change');
 };
+
+const activeName = ref('status');
+const onChangeTabs = (v: string) => {
+  activeName.value = v;
+};
 </script>
 
 <template>
@@ -148,6 +158,7 @@ const onChange = () => {
     v-model:visible="showDlg"
     :unmount-on-hide="true"
     :mask="true"
+    :scroller="false"
     size="large"
     :style="{
       '--dlg-width': '1170px',
@@ -155,33 +166,61 @@ const onChange = () => {
     @change="onChange"
   >
     <template #header>
-      <p class="title">状态指标说明</p>
+      <p class="title">软件维护信息说明</p>
     </template>
-    <div class="indicators">
-      <p class="title">软件包维护状态指标</p>
-      <OTable class="main-table" :columns="columns" :data="data" :cell-span="cellSpanFn" border="all" :small="true">
-        <template #td_maintenance="{ row }">
-          <div class="repo-status">
-            <OTag :class="`type${repoStatusIndex(row.maintenance)}`" size="small">{{ row.maintenance }} </OTag>
+    <OTab variant="text" @change="onChangeTabs" v-model="activeName" size="large">
+      <OTabPane class="tab-pane status" label="状态指标说明" value="status">
+        <OScroller class="tab-pane-content" showType="always">
+          <div class="indicators">
+            <p class="title">软件包维护状态指标</p>
+            <OTable class="main-table" :columns="columns" :data="data" :cell-span="cellSpanFn" border="all" :small="true">
+              <template #td_maintenance="{ row }">
+                <div class="repo-status">
+                  <OTag :class="`type${repoStatusIndex(row.maintenance)}`" size="small">{{ row.maintenance }} </OTag>
+                </div>
+              </template>
+            </OTable>
+            <p class="title">详细指标</p>
+            <div v-for="item in indicatorsInfo" :key="item.id" class="indicators-info">
+              <div class="title">{{ item.label }}</div>
+              <div class="box">
+                <div v-for="(child, index) in item.children" :key="child" class="rows">
+                  <span class="child"> {{ child }}</span> <span v-if="item.desc[index]" class="desc">{{ item.desc[index] }}</span>
+                </div>
+              </div>
+            </div>
           </div>
-        </template>
-      </OTable>
-      <p class="title">详细指标</p>
-      <div v-for="item in indicatorsInfo" :key="item.id" class="indicators-info">
-        <div class="title">{{ item.label }}</div>
-        <div class="box">
-          <div v-for="(child, index) in item.children" :key="child" class="rows">
-            <span class="child"> {{ child }}</span> <span v-if="item.desc[index]" class="desc">{{ item.desc[index] }}</span>
-          </div>
-        </div>
-      </div>
-    </div>
+        </OScroller>
+      </OTabPane>
+      <OTabPane class="tab-pane security" label="软件维护级别说明" value="security">
+        <OScroller class="tab-pane-content" showType="always">
+          <OTable class="main-table" :columns="securityColumns" :data="securityTypes" border="all" :small="true">
+            <template #td_children="{ row }">
+              <p v-for="(item, index) in row.children" :key="item">
+                <template v-if="index === 0"
+                  >{{ item }}<strong>{{ row.label }}</strong></template
+                >
+                <template v-else>{{ item }}</template>
+              </p>
+            </template>
+          </OTable>
+        </OScroller>
+      </OTabPane>
+    </OTab>
   </ODialog>
 </template>
 
 <style lang="scss" scoped>
 @import '@/assets/style/category/collaboration/index.scss';
-
+:deep(.tab-pane) {
+  &.security .main-table {
+    margin: 0;
+  }
+  .tab-pane-content {
+    padding: 24px 0 0;
+    max-height: 524px;
+  }
+}
 :deep(.o-table) {
   margin: 16px 0;
   tbody {

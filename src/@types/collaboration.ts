@@ -10,7 +10,6 @@ export interface AdminAppryT extends CollaborationT {
   applyStatus?: string;
   repo?: string;
   metric?: string;
-  timeOrder?: string;
 }
 
 export interface CollaborationRepoT {
@@ -20,6 +19,12 @@ export interface CollaborationRepoT {
   kind?: string;
   sigName?: string;
   status?: string;
+  cveStatus?: string;
+  issueStatus?: string;
+  prStatus?: string;
+  versionStatus?: string;
+  orgStatus?: string;
+  contributorStatus?: string;
 }
 
 
@@ -29,3 +34,17 @@ export interface RevokeT {
 }
 
 export type PlatformPermission = ('maintainer' | 'admin')[]
+
+
+export interface CollaborationColumnsT {
+  label: string;
+  key: string;
+  type: string;
+  width?: string;
+  fixed?: string;
+  isFilter?: boolean;
+  isDefault?: boolean;
+  isChecked?: boolean;
+  children?: CollaborationColumnsT[];
+}
+

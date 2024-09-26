@@ -11,7 +11,9 @@ import xss from 'xss';
 import ExternalLink from '@/components/ExternalLink.vue';
 import AppSection from '@/components/AppSection.vue';
 
-import IconHelp from '~icons/app/icon-help.svg';
+import IconHelp from '~icons/pkg/icon-help.svg';
+import IconHelpTips from '~icons/app/icon-help.svg';
+import IconIssue from '~icons/pkg/icon-issue.svg';
 import FeedbackHistory from '@/components/feedbackHistory/FeedbackHistory.vue';
 
 const props = defineProps({
@@ -187,7 +189,7 @@ const jumpOut = () => {
       历史反馈信息
       <OPopover position="top" trigger="hover" style="width: 184px">
         <template #target>
-          <OIcon ref="flagsRef" class="flags-icon"><IconHelp /></OIcon>
+          <OIcon ref="flagsRef" class="flags-icon"><IconHelpTips /></OIcon>
         </template>
         <div class="popover-content">历史反馈信息内容更新有延迟，请耐心等待</div>
       </OPopover>
@@ -201,7 +203,6 @@ const jumpOut = () => {
 .popover-content {
   @include text1;
 }
-
 .history-title {
   font-size: 22px;
   line-height: 30px;

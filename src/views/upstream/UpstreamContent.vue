@@ -57,6 +57,9 @@ const queryAppVersion = () => {
       appData.value = res.data.list;
       total.value = res.data.total;
       isLoading.value = false;
+      if (appData.value.length === 0) {
+        isSearchError.value = true;
+      }
     })
     .catch(() => {
       appData.value = [];
@@ -86,10 +89,8 @@ const querySearch = () => {
   const newData = getParamsRules(searchParams.value);
   getSearchData(newData)
     .then((res) => {
-      if (res.code === 200) {
-        appData.value = res.data.appversion;
-        total.value = res.data.total;
-      }
+      appData.value = res.data.appversion;
+      total.value = res.data.total;
       isLoading.value = false;
       isSearch.value = true;
       if (appData.value.length === 0) {
@@ -173,11 +174,11 @@ const total = ref(0);
 const handleSizeChange = (val: number) => {
   pageSize.value = val;
   currentPage.value = 1;
-  queryAppVersion();
+  pageSearch();
 };
 const handleCurrentChange = (val: number) => {
   currentPage.value = val;
-  queryAppVersion();
+  pageSearch();
 };
 
 // 判断是否是搜索页
@@ -269,7 +270,7 @@ watch(
           <OLink color="primary" class="resetting" @click="handleResettingTag">{{ t('software.filterSider.clear') }}</OLink>
         </div>
       </div>
-      <div class="pkg-content">
+      <div class="pkg-content" :class="appData.length === 0 && isLoading ? 'loading' : ''">
         <AppLoading :loading="isLoading" />
         <ResultNoApp v-if="isSearchError" :type="t('upstream.title')" />
         <div v-if="appData.length !== 0 && !isSearchError" class="pkg-panel">

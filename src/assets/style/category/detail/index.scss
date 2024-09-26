@@ -41,6 +41,7 @@
     align-items: top;
     border-bottom: 1px solid var(--o-color-control4);
     border-right: 1px solid var(--o-color-control4);
+    word-break: break-word;
     &:first-child {
       border-top: 1px solid var(--o-color-control4);
     }

@@ -53,6 +53,7 @@ const appData = ref<AppInfoT>({
   size: '',
   source_code: '',
   bin_code: '',
+  security: '',
 });
 
 // 过滤空参数
@@ -283,6 +284,7 @@ const getDetailValue = (data: any) => {
   appData.value.cover = data?.iconUrl || defaultImg;
   appData.value.repository = data.srcRepo;
   appData.value.license = data.license;
+  appData.value.security = data.security;
 };
 
 // 获取img分类

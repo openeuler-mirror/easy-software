@@ -2,8 +2,8 @@
 import { ref, onMounted, computed, reactive } from 'vue';
 import { OButton, OTag, OForm, OTextarea, OFormItem, useMessage, type FieldResultT, ODialog, OBreadcrumb, OBreadcrumbItem } from '@opensig/opendesign';
 import { useRoute, useRouter } from 'vue-router';
-import { getAdminApply, getMaintainerApply, getAdminProcess } from '@/api/api-collaboration';
-import { applicationTypeConvert, applyStatusConvert, versionLatestStatusConvert } from '@/utils/collaboration';
+import { getCollaborationApply, getAdminProcess } from '@/api/api-collaboration';
+import { applicationTypeConvert, applyStatusConvert } from '@/utils/collaboration';
 import { formatDateTime } from '@/utils/common';
 import { useUserInfoStore } from '@/stores/user';
 import { useLocale } from '@/composables/useLocale';
@@ -37,15 +37,16 @@ const formData = reactive({
 const queryApplicationApply = async () => {
   try {
     if (isAdminPer.value) {
-      const { data } = await getAdminApply({ name: 'formContent', applyIdString: applyId.value });
+      const { data } = await getCollaborationApply({ name: 'formContent', applyIdString: applyId.value }, 'admin');
       todoData.value = data.list[0];
     } else if (isMaintainerPer.value) {
-      const { data } = await getMaintainerApply({ name: 'formContent', applyIdString: applyId.value });
+      const { data } = await getCollaborationApply({ name: 'formContent', applyIdString: applyId.value }, 'maintainer');
       todoData.value = data.list[0];
     }
 
     isLoading.value = false;
   } catch {
+    todoData.value = [];
     isError.value = true;
     isLoading.value = false;
   }
@@ -53,13 +54,13 @@ const queryApplicationApply = async () => {
 
 // 待我审批
 const queryApprovalApply = () => {
-  getAdminApply({ name: 'formContent', applyIdString: applyId.value })
+  getCollaborationApply({ name: 'formContent', applyIdString: applyId.value }, 'admin')
     .then((res) => {
       todoData.value = res.data.list[0];
-
       isLoading.value = false;
     })
     .catch(() => {
+      todoData.value = [];
       isError.value = true;
       isLoading.value = false;
     });
@@ -182,7 +183,7 @@ onMounted(() => {
         <OFormItem label="申请类型：">
           {{ applicationTypeConvert(todoData.metric) }}
         </OFormItem>
-        <OFormItem label="修改状态："> {{ versionLatestStatusConvert(todoData.metricStatus) }} </OFormItem>
+        <OFormItem label="修改状态："> {{ todoData.metricStatus }} </OFormItem>
         <OFormItem label="修改理由：">{{ todoData.description }} </OFormItem>
         <OFormItem label="申请时间："> {{ formatDateTime(todoData.createdAt, true) }} </OFormItem>
       </OForm>

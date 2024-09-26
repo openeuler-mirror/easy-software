@@ -44,16 +44,16 @@ const routes = [
     name: 'image',
     component: () => import('@/views/image/TheImage.vue'),
   },
-  // {
-  //   path: '/zh/epkg',
-  //   name: 'epkg',
-  //   component: () => import('@/views/epkg/TheEpkg.vue'),
-  // },
-  // {
-  //   path: '/zh/epkg/detail',
-  //   name: 'epkg-detail',
-  //   component: () => import('@/views/epkg/TheEpkgDetail.vue'),
-  // },
+  {
+    path: '/zh/epkg',
+    name: 'epkg',
+    component: () => import('@/views/epkg/TheEpkg.vue'),
+  },
+  {
+    path: '/zh/epkg/detail',
+    name: 'epkg-detail',
+    component: () => import('@/views/epkg/TheEpkgDetail.vue'),
+  },
   {
     path: '/zh/oepkg',
     name: 'oepkg',
@@ -159,12 +159,10 @@ router.beforeEach(async (to) => {
       const { data } = await getCollaborationPermissions();
 
       if (data.permissions.length > 0) {
-        if (data.permissions.includes('administrator')) {
-          userInfoStore.platformAdminPermission = true;
-        }
-        if (data.permissions.includes('maintainer')) {
-          userInfoStore.platformMaintainerPermission = true;
-        }
+
+        userInfoStore.platformAdminPermission = data.permissions.includes('administrator') ? true : false;
+        userInfoStore.platformMaintainerPermission = data.permissions.includes('maintainer') ? true : false;
+
       } else {
         return isPlatform ? { name: 'collaboration-permission' } : true;
       }

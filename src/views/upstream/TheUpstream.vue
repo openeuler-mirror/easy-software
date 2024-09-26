@@ -12,7 +12,7 @@ const bannerInfo = {
 
 <template>
   <AppBanner :title="bannerInfo.title" :background-image="bannerImg" :subtitle="bannerInfo.desc" />
-  <ContentWrapper vertical-padding="40px" class="pkg-content-wrap">
+  <ContentWrapper :vertical-padding="['40px', '72px']" class="pkg-content-wrap">
     <UpstreamContent />
   </ContentWrapper>
 </template>

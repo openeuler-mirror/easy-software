@@ -31,6 +31,7 @@ export interface AppInfoT {
   size: string | null;
   source_code: string;
   bin_code: string;
+  security?: string;
 }
 
 export interface MaintainerT {

@@ -21,7 +21,7 @@ watch(
 
 <template>
   <OLoading v-model:visible="isLoading" :wrapper="null">
-    <OIcon><IconLoading class="o-rotating" /></OIcon>加载中
+    <OIcon><IconLoading class="o-rotating" /></OIcon>加载中...
   </OLoading>
 </template>
 

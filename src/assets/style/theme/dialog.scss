@@ -6,32 +6,25 @@
     color: var(--o-color-info1);
   }
   &.o-loading {
-    --layer-mask: var(--o-color-fill1);
     --loading-mask-icon-color: var(--o-color-info1);
     --layer-align: top;
+    --layer-origin: top;
     --loading-mask-color: var(--o-color-info1);
+    --layer-mask: var(--o-color-info4-inverse);
+    transition: none;
+    padding-top: 23%;
     .o-loading-main {
-      padding-top: 15%;
       flex-direction: column;
       justify-content: flex-start;
       @include text1;
       .o-loading-icon {
-        font-size: 80px;
-        margin-bottom: 16px;
-        @include respond-to('laptop') {
-          font-size: 64px;
-          margin-bottom: 12px;
-        }
+        font-size: 24px;
+        margin-bottom: 12px;
       }
       .o-rotating {
-        width: 80px;
-        height: 80px;
-        margin-bottom: 16px;
-        @include respond-to('laptop') {
-          width: 64px;
-          height: 64px;
-          margin-bottom: 12px;
-        }
+        width: 24px;
+        height: 24px;
+        margin-bottom: 12px;
       }
     }
   }
