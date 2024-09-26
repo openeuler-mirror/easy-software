@@ -196,7 +196,12 @@ const onChangeTabs = (v: string) => {
         <OScroller class="tab-pane-content" showType="always">
           <OTable class="main-table" :columns="securityColumns" :data="securityTypes" border="all" :small="true">
             <template #td_children="{ row }">
-              <p v-for="item in row.children" :key="item">{{ item }}</p>
+              <p v-for="(item, index) in row.children" :key="item">
+                <template v-if="index === 0"
+                  >{{ item }}<strong>{{ row.label }}</strong></template
+                >
+                <template v-else>{{ item }}</template>
+              </p>
             </template>
           </OTable>
         </OScroller>
