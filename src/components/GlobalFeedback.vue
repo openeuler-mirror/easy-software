@@ -110,7 +110,7 @@ const vCalcTextLength = {
 
 const feedbacks = ref<FeedbackHistoryT[]>([]);
 
-const empty = ref(false);
+const empty = ref(true);
 
 const tagColor = (tag: string) => {
   switch (tag) {
@@ -152,7 +152,7 @@ const getFeedbackList = async () => {
 const onClickSwitch = async () => {
   isShowingFeedbackList.value = !isShowingFeedbackList.value;
   if (isShowingFeedbackList.value) {
-    empty.value = false;
+    empty.value = true;
     feedbackState.value = '';
     if (loginStore.isLogined) {
       await getFeedbackList();
@@ -217,14 +217,14 @@ onUnmounted(() => window.sessionStorage.removeItem(STORAGE_KEY));
             </OPopover>
           </p>
           <template v-if="!isShowingFeedbackList">
-            <ORate v-model="rateVal" color="danger" style="margin-top: 18px" />
+            <ORate v-model="rateVal" color="danger" style="margin-top: 16px" />
             <OTextarea
               v-model="feedbackContent"
               placeholder="请输入您的反馈"
               :max-length="500"
               resize="none"
               clearable
-              style="margin-top: 20px; width: 300px;"
+              style="margin-top: 16px; width: 300px; height: 88px;"
               :inputOnOutlimit="false"
             />
             <OButton class="button" color="primary" variant="solid" round="pill" @click="postFeedback">提交反馈</OButton>
@@ -286,7 +286,6 @@ onUnmounted(() => window.sessionStorage.removeItem(STORAGE_KEY));
               </template>
             </Result404>
           </div>
-          <ODivider direction="h" class="divider"></ODivider>
           <div class="bottom-link">
             <OLink @click="onClickSwitch">{{ bottomLinkContent }}</OLink>
           </div>
@@ -339,14 +338,15 @@ onUnmounted(() => window.sessionStorage.removeItem(STORAGE_KEY));
   width: 360px;
   background-color: var(--o-color-fill2);
   padding: 16px 0;
+  padding-bottom: 0;
   color: var(--o-color-info2);
   border: none;
-  min-height: 292px;
 
   .title {
     font-weight: 500;
     display: flex;
     align-items: center;
+    @include tip1;
 
     .help-icon {
       width: 16px;
@@ -364,6 +364,11 @@ onUnmounted(() => window.sessionStorage.removeItem(STORAGE_KEY));
   .bottom-link {
     display: flex;
     justify-content: center;
+    align-items: center;
+    margin-top: 16px;
+    border-top: 1px solid var(--o-color-control4);
+    height: 46px;
+    width: 100%;
     @include tip1;
   }
 
@@ -406,6 +411,7 @@ onUnmounted(() => window.sessionStorage.removeItem(STORAGE_KEY));
       width: 100%;
       height: 100%;
       z-index: 2;
+      height: 176px;
     }
 
     .empty {
