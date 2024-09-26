@@ -98,8 +98,9 @@ export const securityTypes = [
 
   {
     id: 'L1',
+    label: '最高',
     children: [
-      '核心软件包，被依赖次数最多的软件包',
+      '软件包维护优先级',
       '1. 例行按周同步社区补丁/按牵引SLA进行修复',
       '2. Committer梳理代码关键流程，有自维护自演进能力; 回馈上游社区，建立开源影响力',
       '3. 基于开源测试套开展测试',
@@ -108,7 +109,9 @@ export const securityTypes = [
   },
   {
     id: 'L2',
+    label: '高',
     children: [
+      '软件包维护优先级',
       '1. 例行按双周同步社区补丁/按牵引SLA进行修复',
       '2. 基于开源测试套开展测试',
       '3. 结合使用场景测试',
@@ -116,19 +119,31 @@ export const securityTypes = [
   },
   {
     id: 'L3',
+    label: '中',
     children: [
+      '软件包维护优先级',
       '1. 例行按月同步社区CVE/BUG',
       '2. 基于开源测试套开展测试',
     ],
   },
   {
     id: 'L4',
+    label: '较低',
     children: [
+      '软件包维护优先级',
       '1. 例行按月同步社区高危漏洞/关键bug',
       '2. 基于开源测试套开展测试',
     ],
   },
-  { id: 'epol', children: ['epol级别的软件包'], },
-  { id: 'oepkg', children: ['oepkg类型的所有软件包'], }
+  {
+    id: 'epol',
+    label: '低',
+    children: ['软件包维护优先级', 'epol级别的软件包'],
+  },
+  {
+    id: 'oepkg',
+    label: '低',
+    children: ['软件包维护优先级', 'oepkg类型的所有软件包'],
+  }
 
 ]
