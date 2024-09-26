@@ -44,7 +44,7 @@ export function getFeedbackList(page?: number, pageSize?: number, filter?: strin
 
 export function getGlobalFeedbackHistoryList(page?: number, pageSize?: number, filter?: string, sort: SorT = 'desc') {
   return request
-    .get<ResponseT<{ total: number; data: FeedbackHistoryT[] }[]>>('/api-datastat/query/get/nps', {
+    .get<ResponseT<{ total: number; data: FeedbackHistoryT[] }[]>>('/api-dsapi/query/get/nps', {
       params: { page, pageSize, filter, sort, community: 'openeuler', repo: 'easy-software' },
       headers: { Accept: 'application/json' },
     })
@@ -52,7 +52,7 @@ export function getGlobalFeedbackHistoryList(page?: number, pageSize?: number, f
 }
 
 export function postGlobalFeedback(feedbackPageUrl: string, feedbackValue: number, feedbackText: string) {
-  return request.post('/api-datastat/query/globalnps/issue?community=software', {
+  return request.post('/api-dsapi/query/globalnps/issue?community=software', {
     feedbackPageUrl,
     feedbackValue,
     feedbackText,
