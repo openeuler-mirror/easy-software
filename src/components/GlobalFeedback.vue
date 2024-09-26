@@ -200,10 +200,10 @@ onUnmounted(() => window.sessionStorage.removeItem(STORAGE_KEY));
 
 <template>
   <Teleport to="body">
-    <div class="global-feedback-btn" @click="onClick" :style="{ color: popupVisible ? 'var(--o-color-primary1)' : 'var(--o-color-control3)' }">
+    <div class="global-feedback-btn" v-if="!isDetailPage" @click="onClick" :style="{ color: popupVisible ? 'var(--o-color-primary1)' : 'var(--o-color-control3)' }">
       <iconButton />
       <div class="popup-target" ref="popupTargetRef"></div>
-      <OPopup v-if="!isDetailPage" :target="popupTargetRef" v-model:visible="popupVisible" body-class="global-feedback-popup" trigger="none" position="lb">
+      <OPopup :target="popupTargetRef" v-model:visible="popupVisible" body-class="global-feedback-popup" trigger="none" position="lb">
         <div ref="popupBodyRef" class="global-feedback">
           <OIconClose class="close-icon" @click="onClickCloseIcon" />
           <p class="title">{{ feedbackTitle }}
@@ -233,7 +233,7 @@ onUnmounted(() => window.sessionStorage.removeItem(STORAGE_KEY));
             <div class="mask" v-if="loading">
               <OIcon><IconLoading class="o-rotating" /></OIcon>
             </div>
-            <template v-if="true">
+            <template v-if="loginStore.isLogined && !empty">
               <div class="title">
                 <span>共{{ feedbacks.length }}条反馈信息</span>
                 <OSelect v-model="feedbackState" @change="getFeedbackList" :options-wrapper="feedbackListRef" style="max-width: 108px; max-height: 80px;">
@@ -324,7 +324,7 @@ onUnmounted(() => window.sessionStorage.removeItem(STORAGE_KEY));
 
   .popup-target {
     position: absolute;
-    top: 300px;
+    top: 304px;
     width: 100%;
     height: 1px;
     background-color: transparent;
@@ -341,6 +341,7 @@ onUnmounted(() => window.sessionStorage.removeItem(STORAGE_KEY));
   padding: 16px 0;
   color: var(--o-color-info2);
   border: none;
+  min-height: 292px;
 
   .title {
     font-weight: 500;
