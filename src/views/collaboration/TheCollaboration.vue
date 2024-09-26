@@ -35,22 +35,22 @@ const columns = reactive<CollaborationColumnsT[]>([
     type: 'version-box',
     isDefault: true,
     children: [
-      { label: '软件包版本状态', key: 'versionStatus', type: 'version', width: '180', isFilter: true },
-      { label: '上游版本', key: 'upVersion', type: 'version', width: '180' },
-      { label: '当前版本', key: 'eulerVersion', type: 'version', width: '180' },
+      { label: '版本状态', key: 'versionStatus', type: 'version', width: '150', isFilter: true },
+      { label: '上游版本', key: 'upVersion', type: 'version', width: '140' },
+      { label: '当前版本', key: 'eulerVersion', type: 'version', width: '150' },
     ],
   },
-  { label: 'CVE状态', key: 'cveStatus', type: 'cve', width: '188', isDefault: true, isFilter: true },
+  { label: 'CVE状态', key: 'cveStatus', type: 'cve', width: '180', isDefault: true, isFilter: true },
+  { label: '维护级别', key: 'level', type: 'level', width: '136', isDefault: true, isFilter: true },
   { label: 'Issue状态', key: 'issueStatus', type: 'issue', width: '188', isFilter: true },
   { label: '软件包更新状态', key: 'prStatus', type: 'pr', width: '188', isFilter: true },
   { label: '贡献组织状态', key: 'orgStatus', type: 'org', width: '180', isFilter: true },
   { label: '贡献人员状态', key: 'contributorStatus', type: 'personnel', width: '180', isFilter: true },
   { label: '类别', key: 'kind', type: 'kind', width: '180', isFilter: true },
   { label: 'SIG名称', key: 'sigName', type: 'sig', width: '188', isFilter: true },
-  { label: '软件维护级别', key: 'level', type: 'level', width: '165', isFilter: true },
   { label: '状态', key: 'status', type: 'status', width: '125', fixed: 'right', isDefault: true, isFilter: true },
-  { label: '建议', key: 'suggestions', type: 'recommend', width: '203', fixed: 'right', isDefault: true },
-  { label: '操作', key: 'operation', type: 'operation', width: '160', fixed: 'right', isDefault: true },
+  { label: '建议', key: 'suggestions', type: 'recommend', width: '190', fixed: 'right', isDefault: true },
+  { label: '操作', key: 'operation', type: 'operation', width: '145', fixed: 'right', isDefault: true },
 ]);
 
 const message = useMessage();
@@ -370,6 +370,16 @@ watch(
                     multi
                     @change="onFilterChange(item.key, $event)"
                     :options="securityLevel"
+                  >
+                    {{ item.label }}
+                  </FilterableTableHeader>
+                  <FilterableTableHeader
+                    v-else-if="item.key === 'cveStatus'"
+                    :model-value="filterParams[item.key]"
+                    @change="onFilterChange(item.key, $event)"
+                    :searchable="false"
+                    multi
+                    :options="metricTypes(item.key)"
                   >
                     {{ item.label }}
                   </FilterableTableHeader>
