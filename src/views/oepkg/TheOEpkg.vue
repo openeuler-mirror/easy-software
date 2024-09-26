@@ -4,7 +4,7 @@ import OEpkgContent from './OEpkgContent.vue';
 import { homeData } from '@/data/home/index';
 import bannerImg from '@/assets/banner/banner1.jpg';
 
-const bannerInfo = homeData[4];
+const bannerInfo = homeData[3];
 </script>
 <template>
   <AppBanner :title="bannerInfo.name" :background-image="bannerImg" :subtitle="bannerInfo.desc" />
