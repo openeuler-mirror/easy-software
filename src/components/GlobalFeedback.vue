@@ -14,6 +14,7 @@ import { doLogin } from '@/shared/login';
 import IconLoading from '~icons/app/icon-loading.svg';
 import IconHelp from '~icons/app/icon-help.svg';
 import { useRoute } from 'vue-router';
+import { onClickOutside } from '@vueuse/core';
 
 const FEEDBACK_REGEXP = /(.*?)4. 【用户名】.*$/;
 const REPLACE_REGEXP = /\r|\n/g;
@@ -21,10 +22,10 @@ const STORAGE_KEY = 'globalFeedback';
 const { t } = useI18n();
 const loginStore = useLoginStore();
 const message = useMessage();
-const globalFeedbackBtnRef = ref();
+const popupTargetRef = ref();
+const popupBodyRef = ref();
 const feedbackListRef = ref();
 const route = useRoute();
-
 
 const isDetailPage = computed(() => {
   if (!route.name) {
@@ -42,9 +43,19 @@ const feedbackContent = ref('');
 
 const popupVisible = ref(false);
 
+onClickOutside(popupBodyRef, (event) => {
+  event.stopPropagation();
+  if (popupVisible.value) {
+    popupVisible.value = false;
+  }
+});
+
 watch(popupVisible, (val) => {
   if (!val) {
     isShowingFeedbackList.value = false;
+    rateVal.value = 0;
+    feedbackContent.value = '';
+    window.sessionStorage.removeItem(STORAGE_KEY)
   }
 });
 
@@ -180,105 +191,108 @@ const postFeedback = () => {
     .catch(() => message.danger({ content: '反馈失败' }));
 };
 
+const onClick = () => {
+  popupVisible.value = !popupVisible.value;
+};
+
 onUnmounted(() => window.sessionStorage.removeItem(STORAGE_KEY));
 </script>
 
 <template>
   <Teleport to="body">
-    <OPopup v-if="!isDetailPage" v-model:visible="popupVisible" wrap-class="global-feedback-popup"  trigger="click" position="right">
-      <template #target>
-        <div ref="globalFeedbackBtnRef" class="global-feedback-btn" :style="{ color: popupVisible ? 'var(--o-color-primary1)' : 'var(--o-color-control3)' }">
-          <iconButton />
-        </div>
-      </template>
-      <div class="global-feedback">
-        <OIconClose class="close-icon" @click="onClickCloseIcon" />
-        <p class="title">{{ feedbackTitle }}
-          <OPopover>
-            <template #target>
-              <OIcon v-show="isShowingFeedbackList" class="help-icon"><IconHelp /></OIcon>
-            </template>
-            <p style="max-width: 170px; word-break: break-all;">
-              历史反馈信息内容更新有延迟，请耐心等待
-            </p>
-          </OPopover>
-        </p>
-        <template v-if="!isShowingFeedbackList">
-          <ORate v-model="rateVal" color="danger" style="margin-top: 18px" />
-          <OTextarea
-            v-model="feedbackContent"
-            placeholder="请输入您的反馈"
-            :max-length="500"
-            resize="none"
-            clearable
-            style="margin-top: 20px; width: 300px;"
-            :inputOnOutlimit="false"
-          />
-          <OButton class="button" color="primary" variant="solid" round="pill" @click="postFeedback">提交反馈</OButton>
-        </template>
-        <div ref="feedbackListRef" class="feedback-list" v-else>
-          <div class="mask" v-if="loading">
-            <OIcon><IconLoading class="o-rotating" /></OIcon>
-          </div>
-          <template v-if="loginStore.isLogined && !empty">
-            <div class="title">
-              <span>共{{ feedbacks.length }}条反馈信息</span>
-              <OSelect v-model="feedbackState" @change="getFeedbackList" :options-wrapper="feedbackListRef" style="max-width: 108px; max-height: 80px;">
-                <OOption v-for="item in feedbackOptions" :key="item.value" :value="item.value" :label="item.label">
-                  {{ item.label }}
-                </OOption>
-              </OSelect>
-            </div>
-            <ODivider direction="h" style="width: 300px"></ODivider>
-            <OScroller v-if="feedbacks.length" class="scroller" :style="{ maxHeight: scrollerMaxHeight, minHeight: '168px' }">
-              <div class="feedback-item" v-mounted>
-                <div class="content">
-                  <p class="feedback-title">t</p>
-                  <OLink class="out-link" target="_blank" rel="noopener noreferrer">
-                    查看详情
-                    <OIcon><IconOutlink /></OIcon>
-                  </OLink>
-                </div>
-                <p class="time">t</p>
-              </div>
-              <div class="feedback-item" v-for="(item, index) in feedbacks" :key="index">
-                <div class="content">
-                  <p v-calc-text-length class="feedback-title">
-                    {{ item.feedback }}
-                    <span class="dots-tag">
-                      <span class="dots"> ... </span>
-                      <OTag class="tag" :color="tagColor(item.issue_customize_state)" size="small">{{ item.issue_customize_state }}</OTag>
-                    </span>
-                  </p>
-                  <OLink class="out-link" :href="item.url" color="primary" hover-underline target="_blank" rel="noopener noreferrer">
-                    查看详情
-                    <OIcon><IconOutlink /></OIcon>
-                  </OLink>
-                </div>
-                <p class="time">{{ item.created_at }}</p>
-              </div>
-            </OScroller>
-            <div v-else class="empty">暂无反馈信息</div>
-          </template>
-          <Result404 v-else>
-            <template #description>
-              <p class="empty-desc">
-                <template v-if="!loginStore.isLogined">
-                  <OLink color="primary" @click="doLogin">登录</OLink>可查看历史反馈信息
-                </template>
-                <template v-else>
-                  暂无反馈消息
-                </template>
+    <div class="global-feedback-btn" @click="onClick" :style="{ color: popupVisible ? 'var(--o-color-primary1)' : 'var(--o-color-control3)' }">
+      <iconButton />
+      <div class="popup-target" ref="popupTargetRef"></div>
+      <OPopup v-if="!isDetailPage" :target="popupTargetRef" v-model:visible="popupVisible" body-class="global-feedback-popup" trigger="none" position="lb">
+        <div ref="popupBodyRef" class="global-feedback">
+          <OIconClose class="close-icon" @click="onClickCloseIcon" />
+          <p class="title">{{ feedbackTitle }}
+            <OPopover>
+              <template #target>
+                <OIcon v-show="isShowingFeedbackList" class="help-icon"><IconHelp /></OIcon>
+              </template>
+              <p style="max-width: 170px; word-break: break-all;">
+                历史反馈信息内容更新有延迟，请耐心等待
               </p>
+            </OPopover>
+          </p>
+          <template v-if="!isShowingFeedbackList">
+            <ORate v-model="rateVal" color="danger" style="margin-top: 18px" />
+            <OTextarea
+              v-model="feedbackContent"
+              placeholder="请输入您的反馈"
+              :max-length="500"
+              resize="none"
+              clearable
+              style="margin-top: 20px; width: 300px;"
+              :inputOnOutlimit="false"
+            />
+            <OButton class="button" color="primary" variant="solid" round="pill" @click="postFeedback">提交反馈</OButton>
+          </template>
+          <div ref="feedbackListRef" class="feedback-list" v-else>
+            <div class="mask" v-if="loading">
+              <OIcon><IconLoading class="o-rotating" /></OIcon>
+            </div>
+            <template v-if="true">
+              <div class="title">
+                <span>共{{ feedbacks.length }}条反馈信息</span>
+                <OSelect v-model="feedbackState" @change="getFeedbackList" :options-wrapper="feedbackListRef" style="max-width: 108px; max-height: 80px;">
+                  <OOption v-for="item in feedbackOptions" :key="item.value" :value="item.value" :label="item.label">
+                    {{ item.label }}
+                  </OOption>
+                </OSelect>
+              </div>
+              <ODivider direction="h" style="width: 300px"></ODivider>
+              <OScroller v-if="feedbacks.length" class="scroller" :style="{ maxHeight: scrollerMaxHeight, minHeight: '168px' }">
+                <div class="feedback-item" v-mounted>
+                  <div class="content">
+                    <p class="feedback-title">t</p>
+                    <OLink class="out-link" target="_blank" rel="noopener noreferrer">
+                      查看详情
+                      <OIcon><IconOutlink /></OIcon>
+                    </OLink>
+                  </div>
+                  <p class="time">t</p>
+                </div>
+                <div class="feedback-item" v-for="(item, index) in feedbacks" :key="index">
+                  <div class="content">
+                    <p v-calc-text-length class="feedback-title">
+                      {{ item.feedback }}
+                      <span class="dots-tag">
+                        <span class="dots"> ... </span>
+                        <OTag class="tag" :color="tagColor(item.issue_customize_state)" size="small">{{ item.issue_customize_state }}</OTag>
+                      </span>
+                    </p>
+                    <OLink class="out-link" :href="item.url" color="primary" hover-underline target="_blank" rel="noopener noreferrer">
+                      查看详情
+                      <OIcon><IconOutlink /></OIcon>
+                    </OLink>
+                  </div>
+                  <p class="time">{{ item.created_at }}</p>
+                </div>
+              </OScroller>
+              <div v-else class="empty">暂无反馈信息</div>
             </template>
-          </Result404>
+            <Result404 v-else>
+              <template #description>
+                <p class="empty-desc">
+                  <template v-if="!loginStore.isLogined">
+                    <OLink color="primary" @click="doLogin">登录</OLink>可查看历史反馈信息
+                  </template>
+                  <template v-else>
+                    暂无反馈消息
+                  </template>
+                </p>
+              </template>
+            </Result404>
+          </div>
+          <ODivider direction="h" class="divider"></ODivider>
+          <div class="bottom-link">
+            <OLink @click="onClickSwitch">{{ bottomLinkContent }}</OLink>
+          </div>
         </div>
-        <ODivider direction="h" class="divider"></ODivider>
-        <div class="bottom-link">
-          <OLink @click="onClickSwitch">{{ bottomLinkContent }}</OLink>
-        </div>
-      </div>
-    </OPopup>
+      </OPopup>
+    </div>
   </Teleport>
 </template>
 
@@ -293,6 +307,7 @@ onUnmounted(() => window.sessionStorage.removeItem(STORAGE_KEY));
 }
 
 .global-feedback-btn {
+  position: absolute;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -306,6 +321,14 @@ onUnmounted(() => window.sessionStorage.removeItem(STORAGE_KEY));
   width: 48px;
   height: 48px;
   background-color: var(--o-color-fill2);
+
+  .popup-target {
+    position: absolute;
+    top: 300px;
+    width: 100%;
+    height: 1px;
+    background-color: transparent;
+  }
 }
 
 .global-feedback {
