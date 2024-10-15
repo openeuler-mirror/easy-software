@@ -46,7 +46,7 @@ export const formatDateTime = (v: string, isTime?: boolean) => {
 /**
  * 滚动至顶部
  * @param {number} top 滑动到的顶部
- * @param {boolean} mooth 是否平滑滑动
+ * @param {boolean} smooth 是否平滑滑动
  */
 export const scrollToTop = (top: number = 0, smooth: boolean = true) => {
   if (isClient) {
