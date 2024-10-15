@@ -8,6 +8,7 @@ import { windowOpen } from '@/utils/common';
 import LoginIcon from '~icons/app/icon-login.svg';
 
 const USER_CENTER = import.meta.env.VITE_LOGIN_URL;
+const MESSAGE_CENTER = import.meta.env.VITE_MESSAGE_CENTER_URL;
 
 const { username, photo } = storeToRefs(useUserInfoStore());
 const userInfoArea = ref();
@@ -15,8 +16,8 @@ const loginStore = useLoginStore();
 
 const login = () => doLogin();
 
-const toUserCenter = () => {
-  windowOpen(USER_CENTER);
+const jumpTo = (v: string) => {
+  windowOpen(v);
 };
 </script>
 
@@ -29,7 +30,10 @@ const toUserCenter = () => {
       </div>
       <template #dropdown>
         <ODropdownItem>
-          <div class="header-user-menu-item" @click="toUserCenter">个人中心</div>
+          <div class="header-user-menu-item" @click="jumpTo(USER_CENTER)">个人中心</div>
+        </ODropdownItem>
+        <ODropdownItem>
+          <div class="header-user-menu-item" @click="jumpTo(MESSAGE_CENTER)">消息中心</div>
         </ODropdownItem>
         <ODropdownItem>
           <div class="header-user-menu-item" @click="logout">退出登录</div>
