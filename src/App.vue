@@ -43,7 +43,7 @@ initSensor();
 
 <template>
   <OConfigProvider :locale="isZh ? zhCN : enUS">
-    <AppHeader class="app-header" />
+    <AppHeader />
     <OScroller show-type="hover">
       <main class="ly-main">
         <GlobalFeedback />
@@ -82,9 +82,7 @@ initSensor();
     --layout-header-max-width: 100%;
     --layout-header-padding: 5%;
 
-    --layout-content-padding: 12px;
-
-    --layout-screen-height: 100%;
+    --layout-content-padding: 5%;
   }
 }
 </style>
@@ -102,8 +100,5 @@ initSensor();
   min-height: calc(var(--layout-content-min-height) + var(--layout-header-height));
   background-color: var(--o-color-fill1);
   padding-top: var(--layout-header-height);
-  @include respond-to('<=laptop') {
-    min-height: calc(var(--layout-content-min-height) - var(--layout-footer-height));
-  }
 }
 </style>

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, watch, nextTick } from 'vue';
+import { computed, watch, nextTick, onMounted, onUnmounted, ref } from 'vue';
 import { ODivider, OLink } from '@opensig/opendesign';
 import { useRouter, useRoute } from 'vue-router';
 import { useLangStore } from '@/stores/common';
@@ -70,36 +70,53 @@ const jump = (href: string) => {
     }
   });
 };
+
+// -------------------- 出现横向滚动条时，头部导航自适应 --------------------
+const headerLeft = ref(0);
+
+const onScroll = () => {
+  headerLeft.value = window.scrollX;
+};
+
+onMounted(() => {
+  window.addEventListener('scroll', onScroll);
+});
+
+onUnmounted(() => {
+  window.removeEventListener('scroll', onScroll);
+});
 </script>
 
 <template>
-  <div class="header-wrap">
-    <div class="header-content">
-      <div class="header-left">
-        <div class="logo">
-          <a target="_blank" :href="`${OPENEULER}/zh/`" class="community-logo" rel="noopener noreferrer">
-            <img :src="isDark ? openeulerLogoDark : openeulerLogo" />
-          </a>
-          <ODivider direction="v" :darker="true" />
-          <span @click="goHome" class="logo-text">{{ t('software.softwareHome') }}</span>
-          <span v-if="isCollaboration" class="collaboration-text">协作平台</span>
+  <div class="app-header">
+    <div class="app-header-wrap" :style="{ right: `${headerLeft}px` }">
+      <div class="header-content">
+        <div class="header-left">
+          <div class="logo">
+            <a target="_blank" :href="`${OPENEULER}/zh/`" class="community-logo" rel="noopener noreferrer">
+              <img :src="isDark ? openeulerLogoDark : openeulerLogo" />
+            </a>
+            <ODivider direction="v" :darker="true" />
+            <span @click="goHome" class="logo-text">{{ t('software.softwareHome') }}</span>
+            <span v-if="isCollaboration" class="collaboration-text">协作平台</span>
+          </div>
+          <HeaderNav v-if="route.name" :options="isCollaboration ? collaborationNav : navs" />
         </div>
-        <HeaderNav v-if="route.name" :options="isCollaboration ? collaborationNav : navs" />
-      </div>
-      <div class="header-right">
-        <template v-if="loginStore.isLogined && route.name">
-          <OLink v-if="isCollaboration" class="todo" @click="jump(`todo`)" :class="{ active: isTodo }">待办中心</OLink>
-          <OLink v-else class="collaboration" @click="jump(`collaboration`)">协作平台</OLink>
-        </template>
-        <HeaderTheme />
-        <AppLogin />
+        <div class="header-right">
+          <template v-if="loginStore.isLogined && route.name">
+            <OLink v-if="isCollaboration" class="todo" @click="jump(`todo`)" :class="{ active: isTodo }">待办中心</OLink>
+            <OLink v-else class="collaboration" @click="jump(`collaboration`)">协作平台</OLink>
+          </template>
+          <HeaderTheme />
+          <AppLogin />
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <style lang="scss" scoped>
-.header-wrap {
+.app-header {
   height: 64px;
   position: fixed;
   top: 0;
@@ -109,6 +126,11 @@ const jump = (href: string) => {
   box-shadow: var(--o-shadow-1);
   min-width: 1440px;
   width: 100%;
+
+  .app-header-wrap {
+    position: relative;
+    height: 100%;
+  }
   .header-content {
     display: flex;
     align-items: center;
