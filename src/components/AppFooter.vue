@@ -19,7 +19,6 @@ import {
   OPENEULER_CONTACT,
 } from '@/data/config';
 
-import ContentWrapper from '@/components/ContentWrapper.vue';
 import ExternalLink from '@/components/ExternalLink.vue';
 
 import LogoFooter from '@/assets/footer/footer-logo2.png';
@@ -244,12 +243,8 @@ const onExternalDialog = (href: string) => {
 $color: #fff;
 .footer {
   background: #1e1e1e;
-  &.migration {
-    margin-left: 300px;
-    @media (max-width: 1100px) {
-      margin-left: 0;
-    }
-  }
+  min-height: var(--layout-footer-height);
+
   .footer-inner {
     width: var(--layout-content-max-width);
     padding: 0 var(--layout-content-padding);
