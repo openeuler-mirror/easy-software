@@ -50,7 +50,6 @@ const props = defineProps({
 });
 
 const { t } = useI18n();
-const pkgId = inject<Ref<string>>(pkgIdInjection, ref(''));
 // -------------------- 快速反馈 --------------------
 const rateVal = ref(0);
 const feedbackTxa = ref('');

@@ -16,6 +16,10 @@ import { useRoute } from 'vue-router';
 import IconChevronDown from '~icons/app/icon-chevron-down.svg';
 import IconState from '~icons/pkg/icon-state.svg';
 import IconLevel from '~icons/pkg/icon-level.svg';
+import { oa } from '@/shared/analytics';
+import { inject } from 'vue';
+import type { Ref } from 'vue';
+import { pkgIdInjection } from '@/data/injectionKeys';
 
 interface EulerverT {
   pkgId: string;
@@ -129,21 +133,20 @@ const copyText = (e: MouseEvent, val: any) => {
   });
 };
 
+const pkgId = inject<Ref<string>>(pkgIdInjection, ref(''));
+
 // ---------------------下载埋点--------------------
 const collectDownloadData = () => {
-  const sensors = (window as any)['sensorsDataAnalytic201505'];
   const { href } = window.location;
   const downloadTime = new Date();
-  sensors?.setProfile({
-    ...(window as any)['sensorsCustomBuriedData'],
-    profileType: 'download',
+  oa.report('download', () => ({
     origin: href,
     softwareName: props.data.name,
     version: props.data.version,
-    pkgId: route.query.pkgId as string,
+    pkgId: pkgId.value,
     type: props.type,
     downloadTime,
-  });
+  }));
 };
 
 // ---------------------版本支持情况--------------------
