@@ -327,7 +327,7 @@ watch(
     </div>
 
     <div class="pkg-main">
-      <FilterHeader :title="t('software.all')" @sort="changeSortValue" :isSort="false" :is-clear="isClear" :total="total" @clear="clearFilterInput" />
+      <FilterHeader :title="t('software.all')" :type="tabName" @sort="changeSortValue" :is-clear="isClear" :total="total" @clear="clearFilterInput" />
 
       <div v-if="isSearchDocs || searchOs || searchArch || searchCategory.length > 0" class="search-result">
         <p v-if="!isPageSearch" class="text">

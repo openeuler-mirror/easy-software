@@ -6,7 +6,6 @@ import { useI18n } from 'vue-i18n';
 import { useRouter, useRoute } from 'vue-router';
 import { useLocale } from '@/composables/useLocale';
 import { useSearchStore } from '@/stores/search';
-import { useLoginStore, useUserInfoStore } from '@/stores/user';
 
 interface MenuT {
   key: string;
@@ -25,14 +24,11 @@ const router = useRouter();
 const route = useRoute();
 const { locale } = useLocale();
 const searchStore = useSearchStore();
-const loginStore = useLoginStore();
-const userStore = useUserInfoStore();
 
 const searchKey = ref('');
 const tabName = ref('');
 const fliterSelected = ref('');
 const searchCategoryValue = ref(props.menu[0]?.key || 'all');
-const showAppVersion = computed(() => loginStore.isLogined && userStore.upstreamPermission);
 
 let nameOrderInfo: MenuT = {
   key: '',
@@ -121,12 +117,7 @@ watch(
 <template>
   <OTab v-model="searchCategoryValue" :line="false" variant="text" :style="{ '--tab-nav-justify': 'left' }" @change="(v) => onChangeTabs(v)">
     <template v-for="item in menu" :key="item.key">
-      <OTabPane
-        v-if="item.key !== 'appversion' || showAppVersion"
-        class="pane"
-        :value="item.key"
-        :label="t(`software.${item.key}`) + `（${searchDocCount(item.docCount)}）`"
-      >
+      <OTabPane v-if="item.key !== 'appversion'" class="pane" :value="item.key" :label="t(`software.${item.key}`) + `（${searchDocCount(item.docCount)}）`">
       </OTabPane>
     </template>
   </OTab>

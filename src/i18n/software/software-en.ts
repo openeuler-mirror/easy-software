@@ -15,6 +15,7 @@ export default {
   filterSummary: 'Summary',
   filterFile: 'File',
   searchPlaceholder: 'Enter content for search, separate multiple keywords with commas',
+  searchPlaceholder1: 'Search',
 
   viewAll: 'All',
   upList: 'Collapse',
@@ -47,6 +48,7 @@ export default {
     type: 'Type',
     operation: 'Operation',
     imageName: 'Image Name',
+    subPath: 'subPath',
   },
 
   //反馈

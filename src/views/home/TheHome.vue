@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { OAnchor, OAnchorItem, OCard } from '@opensig/opendesign';
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, onUnmounted } from 'vue';
 import { getSearchAllFiled } from '@/api/api-domain';
 import type { AppT } from '@/@types/app';
 import HomeHeader from './HomeHeader.vue';
@@ -34,14 +34,37 @@ const queryAllpkg = () => {
     });
 };
 
+// -------------------- 滚动头部搜索显示隐藏 --------------------
+let oscrollDom = document.querySelector('#app > .o-scroller > .o-scroller-container');
+let headDom = document.querySelector('.app-header');
+const onScroll = (e: Event) => {
+  if (!headDom) {
+    headDom = document.querySelector('.app-header');
+  }
+  const { scrollTop } = e.target as HTMLElement;
+  const targetDom = document.querySelector('#all');
+
+  if (scrollTop >= (targetDom as HTMLElement)?.offsetTop) {
+    headDom.classList.add('search-show');
+  } else {
+    headDom.classList.remove('search-show');
+  }
+};
+
 onMounted(() => {
+  oscrollDom?.addEventListener('scroll', onScroll, { passive: true });
   queryAllpkg();
+});
+
+onUnmounted(() => {
+  headDom.classList.remove('search-show');
+  oscrollDom?.removeEventListener('scroll', onScroll);
 });
 </script>
 
 <template>
   <div>
-    <HomeHeader />
+    <HomeHeader :class="{ show: isShow }" />
     <ContentWrapper vertical-padding="72px">
       <div ref="pkgRef" class="pkg-wrap">
         <div v-if="size.width > 1900 && pkgData && pkgData.length" class="anchor">
