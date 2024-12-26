@@ -8,6 +8,7 @@ import type { SorT } from '@/@types/type-sort';
 import { useSearchStore } from '@/stores/search';
 
 import IconTimeOrder from '~icons/app/icon-time-order.svg';
+
 import IconSearch from '~icons/app/icon-search.svg';
 
 const props = defineProps({
@@ -17,17 +18,19 @@ const props = defineProps({
       return '';
     },
   },
-  isSort: {
-    type: Boolean,
-    default: () => true,
+  total: {
+    type: Number,
+    default: () => 0,
   },
   isClear: {
     type: Boolean,
     default: () => false,
   },
-  total: {
-    type: Number,
-    default: () => 0,
+  type: {
+    type: String,
+    default: () => {
+      return '';
+    },
   },
 });
 const msg = useMessage();
@@ -197,7 +200,7 @@ watch(
         </template>
       </OInput>
     </div>
-    <div class="search-right">
+    <div v-if="type === 'all'" class="search-right">
       <OLink @click="clearAll()" class="filter-sort" :class="{ active: activeIndex === -1 }">
         {{ t('software.sortTitle') }}
       </OLink>

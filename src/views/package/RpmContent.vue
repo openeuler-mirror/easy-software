@@ -7,7 +7,7 @@ import { useRoute, useRouter } from 'vue-router';
 import { useLocale } from '@/composables/useLocale';
 import { getSearchAllFiled, getSearchAllColumn } from '@/api/api-domain';
 import { isValidSearchTabName, isValidSearchKey } from '@/utils/query';
-import { TABNAME_OPTIONS, FLITERMENUOPTIONS, COUNT_PAGESIZE } from '@/data/query';
+import { TABNAME_OPTIONS, FLITERMENUOPTIONS, COUNT_PAGESIZE, SORTPARAMS } from '@/data/query';
 import { getParamsRules } from '@/utils/common';
 import { useViewStore } from '@/stores/common';
 import { useSearchStore } from '@/stores/search';
@@ -31,6 +31,7 @@ const columns = [
   { label: t('software.columns.os'), key: 'os', type: 'os' },
   { label: t('software.columns.arch'), key: 'arch', type: 'arch' },
   { label: t('software.columns.category'), key: 'category', type: 'category' },
+  { label: t('software.columns.subPath'), key: 'subPath', type: 'sub-path' },
   { label: t('software.columns.timeorder'), key: 'rpmUpdateAt', type: 'time' },
   { label: t('software.columns.size'), key: 'rpmSize', type: 'size' },
   { label: t('software.columns.operation'), key: 'operation', type: 'operation' },
@@ -184,13 +185,11 @@ const handleCloseTag = (idx: string | number, type: string) => {
 };
 
 // 重置筛选结果
-const isClear = ref(false);
 const handleResettingTag = () => {
   searchOs.value = [];
   searchArch.value = [];
   searchCategory.value = [];
   isSearchDocs.value = false;
-  isClear.value = true;
   nameOrder.value = '';
   timeOrder.value = '';
   currentPage.value = 1;
@@ -202,30 +201,22 @@ const handleResettingTag = () => {
   }
 };
 
-// 更新时间、字母排序
-const changeSortValue = (v: string[] | string) => {
+const changeSortBy = (v: string[]) => {
   nameOrder.value = '';
   timeOrder.value = '';
   if (Array.isArray(v)) {
-    if (v[0] === 'timeOrder') {
-      timeOrder.value = v[1];
-    } else if (v[0] === 'nameOrder') {
-      nameOrder.value = v[1];
+    if (v[0] === 'time') {
+      timeOrder.value = SORTPARAMS[v[1]];
+    } else if (v[0] === 'name') {
+      nameOrder.value = SORTPARAMS[v[1]];
     }
-  } else {
-    isClear.value = false;
   }
   currentPage.value = 1;
 };
 
-// 清除排序
-const clearFilterInput = () => {
-  searchKey.value = '';
-};
-
 // 分页
 const currentPage = ref(1);
-const pageSize = ref(10);
+const pageSize = ref(20);
 const total = ref(0);
 const handleSizeChange = (val: number) => {
   pageSize.value = val;
@@ -347,7 +338,7 @@ watch(
     </div>
 
     <div class="pkg-main">
-      <FilterHeader title="RPM" @sort="changeSortValue" :total="total" @clear="clearFilterInput" :is-clear="isClear" />
+      <FilterHeader title="RPM" :total="total" />
       <div v-if="isSearchDocs || searchArch.length > 0 || searchOs.length > 0 || searchCategory.length > 0" class="search-result">
         <p v-if="!isPageSearch" class="text">
           <template v-if="isSearchDocs">
@@ -377,7 +368,7 @@ watch(
         <AppLoading :loading="isLoading" />
         <ResultNoApp v-if="isSearchError" type="RPM" />
         <div v-if="pkgData.length !== 0 && !isSearchError" class="pkg-panel">
-          <OTableItemNew :data="pkgData" :columns="columns" :type="tabName" />
+          <OTableItemNew :data="pkgData" :columns="columns" :type="tabName" @sort="changeSortBy" />
 
           <div v-if="total > COUNT_PAGESIZE[0]" class="pagination-box">
             <AppPagination :current="currentPage" :pagesize="pageSize" :total="total" @size-change="handleSizeChange" @current-change="handleCurrentChange" />

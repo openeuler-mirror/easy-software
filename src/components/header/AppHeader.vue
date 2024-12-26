@@ -71,6 +71,8 @@ const jump = (href: string) => {
   });
 };
 
+const isPageHome = ref(false);
+
 // -------------------- 出现横向滚动条时，头部导航自适应 --------------------
 const headerLeft = ref(0);
 
@@ -80,11 +82,21 @@ const onScroll = () => {
 
 onMounted(() => {
   window.addEventListener('scroll', onScroll);
+
+  isPageHome.value = route.name === 'home';
 });
 
 onUnmounted(() => {
   window.removeEventListener('scroll', onScroll);
 });
+
+watch(
+  () => route.name,
+  () => {
+    isPageHome.value = route.name === 'home';
+  },
+  { deep: true }
+);
 </script>
 
 <template>
@@ -103,6 +115,9 @@ onUnmounted(() => {
           <HeaderNav v-if="route.name" :options="isCollaboration ? collaborationNav : navs" />
         </div>
         <div class="header-right">
+          <div class="header-search">
+            <SearchFilter :show="false" :is-header="true" v-if="isPageHome" />
+          </div>
           <template v-if="loginStore.isLogined && route.name">
             <OLink v-if="isCollaboration" class="todo" @click="jump(`todo`)" :class="{ active: isTodo }">待办中心</OLink>
             <OLink v-else class="collaboration" @click="jump(`collaboration`)">协作平台</OLink>
@@ -116,17 +131,67 @@ onUnmounted(() => {
 </template>
 
 <style lang="scss" scoped>
+.search-show {
+  :deep(.search-content) {
+    border-radius: 4px;
+  }
+}
+.header-search {
+  display: flex;
+  align-items: center;
+  position: relative;
+  z-index: 10;
+  margin-right: 20px;
+  opacity: 0;
+  visibility: hidden;
+  transition: all var(--o-duration-m2) var(--o-easing-standard);
+
+  :deep(.search) {
+    --search-height: 30px;
+    .search-content-detail {
+      padding-left: 0;
+      .recommend {
+        width: 100%;
+        box-shadow: none;
+        background: none;
+        padding: 16px 0 0;
+      }
+    }
+
+    .o-input {
+      --input-height: var(--search-height);
+    }
+    .o-select {
+      --select-height: var(--search-height);
+      --select-padding: 0 12px;
+    }
+    .search-input {
+      width: 160px;
+    }
+    .search-icon,
+    .o-input-clear {
+      width: 18px;
+      height: 18px;
+    }
+  }
+}
+
 .app-header {
   height: 64px;
   position: fixed;
   top: 0;
   left: 0;
-  z-index: 9999;
+  z-index: 999;
   background: var(--o-color-fill2);
   box-shadow: var(--o-shadow-1);
   min-width: 1440px;
   width: 100%;
-
+  &.search-show {
+    .header-search {
+      opacity: 1;
+      visibility: visible;
+    }
+  }
   .app-header-wrap {
     position: relative;
     height: 100%;

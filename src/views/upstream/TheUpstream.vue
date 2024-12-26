@@ -5,7 +5,7 @@ import UpstreamContent from './UpstreamContent.vue';
 import bannerImg from '@/assets/banner/banner1.jpg';
 
 const bannerInfo = {
-  title: '上游兼容应用全景',
+  title: '上游软件包',
   desc: 'openEuler支持的软件包版本与上游软件的兼容状态列表',
 };
 </script>

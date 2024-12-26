@@ -24,6 +24,10 @@ defineProps({
     type: Boolean,
     default: () => true,
   },
+  isHeader: {
+    type: Boolean,
+    default: () => false,
+  },
 });
 const msg = useMessage();
 const router = useRouter();
@@ -133,19 +137,13 @@ const queryDocsAll = () => {
   };
   getSearchDataAll(params)
     .then((res) => {
-      try {
-        if (res.data.length) {
-          recommendList.value = res.data;
-        } else {
-          isNoFound.value = true;
-          recommendList.value = [];
-        }
-        isLoading.value = false;
-      } catch {
+      if (res.data.length) {
+        recommendList.value = res.data;
+      } else {
         isNoFound.value = true;
-        isLoading.value = false;
         recommendList.value = [];
       }
+      isLoading.value = false;
     })
     .catch(() => {
       recommendList.value = [];
@@ -171,9 +169,11 @@ const trottleSearch = (v: string) => {
 
 // 判断是否是搜索页
 const isPageSearch = ref(false);
+const isPageHome = ref(false);
 
 onMounted(() => {
   isPageSearch.value = route.name === 'search';
+  isPageHome.value = route.name === 'home';
 });
 
 // -------------------- 监听 url query 变化 触发搜索 ---------------------
@@ -203,120 +203,185 @@ watch(
   () => route.query,
   () => {
     handleQueryData();
+    isPageHome.value = route.name === 'home';
   },
   { deep: true }
 );
 </script>
 
 <template>
-  <div ref="searchRef" class="search" :class="show ? 'xl' : 'large'">
-    <OSelect
-      v-model="defaultValue"
-      style="width: 120px"
-      :placeholder="FLITERMENUOPTIONS[0].name"
-      variant="text"
-      :size="show ? 'large' : 'medium'"
-      round="0"
-      @change="(v) => changeFilter(v)"
-    >
-      <OOption v-for="item in FLITERMENUOPTIONS" :key="item.id" :label="item.name" :value="item.id" />
-    </OSelect>
-    <ODivider direction="v" :darker="true" :style="{ '--o-divider-label-gap': 0 }" />
-    <div class="search-box">
-      <OInput
-        v-model="searchInput"
-        :placeholder="t('software.searchPlaceholder')"
-        variant="solid"
-        round="0"
-        clearable
-        class="search-input"
-        :max-length="100"
-        @press-enter="(v) => changeSearchInput(v)"
-        @input="trottleSearch"
-        @clear="clearInput"
-        @focus="changeSearchFocus(true)"
-        @blur="changeSearchBlur"
-      >
-        <template #prefix>
-          <OIcon class="search-icon"><IconSearch /></OIcon>
-        </template>
-      </OInput>
-      <div v-if="isLoading" v-loading.nomask="isLoading" class="recommend"></div>
-      <SearchRecommend
-        v-else
-        ref="searchRecommendRef"
-        v-show="isFocus"
-        :options="recommendList"
-        :search-value="searchInput"
-        :filter-value="fliterSelected"
-        :isFeedback="isNoFound"
-        @click-recommend="clickRecommend"
-      />
+  <div ref="searchRef" class="search" :class="[show ? 'xl' : 'large', isFocus && 'is-expanded', isHeader && isPageHome && 'header-show']">
+    <div class="search-panel">
+      <div class="search-content">
+        <OSelect
+          v-model="defaultValue"
+          :placeholder="FLITERMENUOPTIONS[0].name"
+          variant="text"
+          :size="show ? 'large' : 'medium'"
+          round="0"
+          @change="(v) => changeFilter(v)"
+        >
+          <OOption v-for="item in FLITERMENUOPTIONS" :key="item.id" :label="item.name" :value="item.id" />
+        </OSelect>
+        <ODivider direction="v" :darker="true" :style="{ '--o-divider-label-gap': 0 }" />
+
+        <OInput
+          v-model="searchInput"
+          :placeholder="isHeader ? t('software.searchPlaceholder1') : t('software.searchPlaceholder')"
+          variant="solid"
+          round="0"
+          clearable
+          class="search-input"
+          :max-length="100"
+          @press-enter="(v) => changeSearchInput(v)"
+          @input="trottleSearch"
+          @clear="clearInput"
+          @focus="changeSearchFocus(true)"
+          @blur="changeSearchBlur"
+        >
+          <template #prefix>
+            <OIcon class="search-icon"><IconSearch /></OIcon>
+          </template>
+        </OInput>
+      </div>
+      <div class="search-content-detail">
+        <div v-if="isLoading" v-loading.nomask="isLoading" class="recommend"></div>
+        <SearchRecommend
+          v-else
+          ref="searchRecommendRef"
+          v-show="isFocus"
+          :options="recommendList"
+          :search-value="searchInput"
+          :filter-value="fliterSelected"
+          :isFeedback="isNoFound"
+          @click-recommend="clickRecommend"
+        />
+      </div>
     </div>
   </div>
 </template>
 
 <style lang="scss" scoped>
-.recommend {
-  position: absolute;
-  z-index: 99;
-  top: 52px;
-  width: 100%;
-  background-color: var(--o-color-control-light);
-  box-shadow: var(--o-shadow-2);
-  height: auto;
-  padding: 16px 16px 12px;
-  border-radius: 4px;
-  p {
-    text-align: center;
-    @include tip1;
-    color: var(--o-color-info3);
+.search {
+  --select-width: 120px;
+  --search-height: 40px;
+  :deep(.o-input) {
+    @include text1;
   }
-  &.o-layer-open {
-    padding: 24px;
+  &.xl {
+    --search-height: 48px;
+    :deep(.o-select) {
+      height: var(--search-height);
+    }
+    :deep(.search-input) {
+      height: var(--search-height);
+    }
   }
-  :deep(.o-loading) {
-    .o-loading-main {
-      padding: 0;
-      justify-content: center;
 
-      .o-loading-icon {
-        font-size: 24px;
-        margin-bottom: 0;
+  &.header-show {
+    max-width: 512px;
+    position: absolute;
+    right: 0;
+    transform: scaleX(1);
+    transform-origin: right;
+    z-index: 60;
+    top: -32px;
+    padding: 16px 0;
+    transition: all var(--o-duration-m2) var(--o-easing-standard);
+
+    --select-width: 94px;
+    &.is-expanded {
+      transform: scaleX(1);
+      background: var(--o-color-fill2);
+      border-radius: var(--o-radius-s);
+      box-shadow: var(--o-shadow-2);
+      padding: 16px;
+
+      .search-detail {
+        width: 100%;
+        border-color: transparent;
       }
-      svg {
-        width: 24px;
-        height: 24px;
-        margin-bottom: 0;
+      .search-input {
+        flex: 1;
+      }
+      .search-content {
+        width: 480px;
+        box-shadow: none;
+      }
+      .recommend {
+        position: relative;
+        top: 0;
+        min-height: 32px;
+      }
+    }
+    :deep(.o-input) {
+      @include tip1;
+    }
+  }
+
+  .search-panel {
+    position: relative;
+  }
+
+  .search-content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid var(--o-color-control1);
+    border-radius: 8px;
+
+    background: var(--o-color-fill2);
+    box-shadow: var(--o-shadow-1);
+
+    transition: all var(--o-duration-m1) var(--o-easing-standard-in);
+  }
+  :deep(.o-layer.o-loading) {
+    padding-top: 0;
+  }
+
+  .search-content-detail {
+    padding-left: var(--select-width);
+    .recommend {
+      position: absolute;
+      z-index: 99;
+      top: calc(var(--search-height) + 4px);
+      width: calc(100% - var(--select-width));
+      background-color: var(--o-color-control-light);
+      box-shadow: var(--o-shadow-2);
+      height: auto;
+      padding: 16px 16px 12px;
+      border-radius: 4px;
+      p {
+        text-align: center;
+        @include tip1;
+        color: var(--o-color-info3);
+      }
+      &.o-layer-open {
+        padding: 24px;
+      }
+      :deep(.o-loading) {
+        .o-loading-main {
+          padding: 0;
+          justify-content: center;
+
+          .o-loading-icon {
+            font-size: 24px;
+            margin-bottom: 0;
+          }
+          svg {
+            width: 24px;
+            height: 24px;
+            margin-bottom: 0;
+          }
+        }
       }
     }
   }
-}
-.search {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background: var(--o-color-fill2);
-  box-shadow: var(--o-shadow-1);
-  border-radius: 8px;
-  transition: all var(--o-duration-m1) var(--o-easing-standard-in);
-  border: 1px solid var(--o-color-control1);
-
   .search-icon {
     font-size: 24px;
   }
-  &.xl {
-    :deep(.o-select) {
-      height: 48px;
-    }
-    :deep(.search-input) {
-      height: 48px;
-    }
-  }
-  &.large {
-    :deep(.o-input) {
-      @include text1;
-    }
+  :deep(.o-select) {
+    width: var(--select-width);
   }
 
   :deep(.search-input) {
@@ -326,7 +391,8 @@ watch(
 :deep(.o-input-wrap) {
   background: none;
   border: 0 none;
-  padding-right: 0;
+  padding: 0 4px 0 12px;
+  align-items: center;
 }
 
 .search-input {
@@ -334,6 +400,6 @@ watch(
 }
 .search-box {
   position: relative;
-  width: 100%;
+  flex: 1;
 }
 </style>
