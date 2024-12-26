@@ -1,9 +1,10 @@
 <script lang="ts" setup>
 import { ref, type PropType } from 'vue';
-import { OTable, OLink, ODialog, OPopover } from '@opensig/opendesign';
+import { OTable, OLink, ODialog, OPopover, OTag } from '@opensig/opendesign';
 import { useLocale } from '@/composables/useLocale';
 import { formatDateTime, checkOriginLink, windowOpen, xssAllTag, getPkgName } from '@/utils/common';
 import { useI18n } from 'vue-i18n';
+import { SORTPARAMS } from '@/data/query';
 
 import OCodeCopy from '@/components/OCodeCopy.vue';
 import ExternalLink from '@/components/ExternalLink.vue';
@@ -83,16 +84,56 @@ const collectDownloadData = (pkgId: string, name: string, version: string) => {
     downloadTime,
   });
 };
+
+// 表格筛选
+const emits = defineEmits<{
+  (e: 'sort', value: string[]): void;
+}>();
+const timeIndex = ref(0);
+const nameIndex = ref(0);
+
+const changeSortBy = (type: string) => {
+  const updateIndex = (index) => {
+    if (index.value >= 2) {
+      index.value = 0;
+    } else {
+      index.value++;
+    }
+  };
+
+  if (type === 'name') {
+    updateIndex(nameIndex);
+    emits('sort', ['name', nameIndex.value]);
+  } else if (type === 'rpmUpdateAt') {
+    updateIndex(timeIndex);
+    emits('sort', ['time', timeIndex.value]);
+  } else {
+    return;
+  }
+};
 </script>
 
 <template>
   <div class="table-main">
-    <OTable :columns="columns" :data="data" :loading="loading" border="all">
+    <OTable :columns="columns" :data="data" :loading="loading" :small="true" border="row-frame" :class="type">
       <template #head="{ columns }">
-        <th v-for="item in columns" :key="item.type" :class="item.type">{{ item.label }}</th>
+        <th v-for="item in columns" :key="item.type" :class="item.type">
+          <template v-if="item.key === 'name' || item.key === 'rpmUpdateAt'">
+            <div v-if="item.key === 'name'" @click="changeSortBy('name')" class="thead-th sort">
+              {{ item.label }}
+              <span class="order" :class="SORTPARAMS[nameIndex]"></span>
+            </div>
+            <div v-if="item.key === 'rpmUpdateAt'" @click="changeSortBy(item.key)" class="thead-th sort">
+              {{ item.label }}
+              <span class="order" :class="SORTPARAMS[timeIndex]"></span>
+            </div>
+          </template>
+          <div v-else class="thead-th">{{ item.label }}</div>
+        </th>
       </template>
       <template #td_name="{ row }">
-        <a :href="jumpTo(row.pkgId)" class="row-name max" target="_blank" rel="noopener noreferrer">
+        <span v-if="type === 'appversion'" v-dompurify-html="row.name"></span>
+        <a v-else :href="jumpTo(row.pkgId)" class="row-name max" target="_blank" rel="noopener noreferrer">
           <span v-dompurify-html="row.name" class="td-break" :title="xssAllTag(row.name)"></span>
           <template v-if="row.originPkg">
             <OPopover position="top" trigger="hover">
@@ -121,23 +162,36 @@ const collectDownloadData = (pkgId: string, name: string, version: string) => {
       </template>
       <!-- rpm size -->
       <template #th_rpmSize="{ column }">
-        <div class="label" style="justify-content: right">
+        <div class="label">
           {{ column.label }}
         </div>
       </template>
       <template #td_rpmSize="{ row }">
-        <p class="size" style="text-align: right">{{ row.rpmSize }}</p>
+        <p class="size">{{ row.rpmSize }}</p>
       </template>
       <!-- epkg size -->
       <template #th_epkgSize="{ column }">
-        <div class="label" style="justify-content: right">
+        <div class="label">
           {{ column.label }}
         </div>
       </template>
       <template #td_epkgSize="{ row }">
-        <p class="size" style="text-align: right">{{ row.epkgSize }}</p>
+        <p class="size">{{ row.epkgSize }}</p>
       </template>
-
+      <template #td_upstreamVersion="{ row }">
+        {{ row.upstreamVersion }}
+      </template>
+      <template #td_compatibleVersion="{ row }">
+        {{ row.compatibleVersion }}
+      </template>
+      <template #td_status="{ row }">
+        <OTag v-if="row.status" class="app-tag" :class="row.status.toLocaleLowerCase()">{{ row.status }} </OTag>
+        <template v-else>-</template>
+      </template>
+      <template #td_subPath="{ row }">
+        <template v-if="row.subPath">{{ row.subPath }}</template>
+        <template v-else>-</template>
+      </template>
       <template #td_operation="{ row }">
         <!-- 应用镜像 -->
         <template v-if="type === 'apppkg'">
@@ -173,6 +227,24 @@ const collectDownloadData = (pkgId: string, name: string, version: string) => {
   height: 16px;
   margin-left: 8px;
 }
+
+.app-tag {
+  min-width: 92px;
+  color: var(--o-color-white);
+  &.outdated {
+    --tag-bg-color: #058ef0;
+    --tag-bd-color: #058ef0;
+  }
+  &.ok {
+    --tag-bg-color: #0bb151;
+    --tag-bd-color: #0bb151;
+  }
+  &.missing {
+    --tag-bg-color: #c7000b;
+    --tag-bd-color: #c7000b;
+  }
+}
+
 .operation-box {
   display: grid;
   align-items: center;
@@ -209,7 +281,7 @@ const collectDownloadData = (pkgId: string, name: string, version: string) => {
 }
 
 :deep(.o-table) {
-  --table-cell-height: 80px;
+  --table-cell-height: 62px;
   .label {
     display: flex;
     align-items: center;
@@ -235,7 +307,9 @@ const collectDownloadData = (pkgId: string, name: string, version: string) => {
       }
     }
   }
-
+  td {
+    vertical-align: top;
+  }
   .td-break {
     word-break: break-all;
   }
@@ -251,34 +325,103 @@ const collectDownloadData = (pkgId: string, name: string, version: string) => {
     display: flex;
     align-items: center;
   }
+  &.oepkg {
+    --table-cell-height: auto;
+    thead {
+      .name {
+        width: 200px;
+      }
+      .os {
+        width: 160px;
+      }
+      .version {
+        width: 100px;
+      }
+    }
+  }
+  &.apppkg {
+    --table-cell-height: auto;
+    thead {
+      .os {
+        width: 180px;
+      }
+      .arch,
+      .category {
+        width: 100px;
+      }
+    }
+  }
+  &.appversion {
+    --table-cell-height: auto;
+  }
   thead {
+    .order {
+      height: 12px;
+      width: 8px;
+      position: relative;
+      margin-left: 8px;
+      color: var(--o-color-control1);
+
+      &:after,
+      &:before {
+        content: '';
+        position: absolute;
+        border: 6px solid transparent;
+        border-width: 5px 4px;
+        left: 0;
+        color: #a0a2a8;
+      }
+
+      &:before {
+        border-bottom-color: currentColor;
+        top: -5px;
+      }
+
+      &:after {
+        border-top-color: currentColor;
+        top: 7px;
+      }
+      &.asc:before,
+      &.desc:after {
+        color: var(--o-color-info1);
+      }
+    }
+    .thead-th {
+      display: flex;
+      align-items: center;
+      &.sort {
+        cursor: pointer;
+      }
+    }
     .name {
-      width: 165px;
+      width: 200px;
     }
     .tag {
       width: 200px;
     }
     .version {
-      width: 138px;
+      width: 115px;
     }
     .os {
-      width: 180px;
+      width: 108px;
     }
     .arch {
-      width: 110px;
+      width: 80px;
     }
     .category {
-      width: 90px;
+      width: 80px;
     }
     .time {
-      width: 130px;
+      width: 90px;
+    }
+    .sub-path {
+      width: 160px;
     }
     .size {
-      width: 120px;
-      text-align: right;
+      width: 80px;
     }
     .operation {
-      width: 100px;
+      width: 60px;
     }
   }
 }

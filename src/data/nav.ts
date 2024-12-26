@@ -50,8 +50,8 @@ export const navs = [
   {
     id: 'upstream',
     label: {
-      zh: '上游兼容应用全景',
-      en: '上游兼容应用全景',
+      zh: '上游软件包',
+      en: '上游软件包',
     },
     href: '/upstream',
   },

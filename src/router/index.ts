@@ -4,7 +4,6 @@ import { scrollToTop } from '@/utils/common';
 import { useLangStore, useViewStore } from '@/stores/common';
 import { tryLogin } from '@/shared/login';
 import { useLoginStore, useUserInfoStore } from '@/stores/user';
-import { queryUpstreamPermission } from '@/api/api-user';
 import { getCollaborationPermissions } from '@/api/api-collaboration';
 import { COLLABORATIONPERMISSION } from '@/data/query';
 
@@ -135,15 +134,10 @@ router.beforeEach(async (to) => {
   langStore.lang = lang;
 
   const userInfoStore = useUserInfoStore();
-  const isUpstream = to.name === 'upstream';
   const isPlatform = COLLABORATIONPERMISSION.includes(to.name as string);
   const loginStore = useLoginStore();
 
   if (loginStore.isLogined) {
-    if (isUpstream) {
-      return userInfoStore.upstreamPermission ? true : { name: 'notFound' };
-    }
-
     if (isPlatform) {
       return userInfoStore.platformAdminPermission || userInfoStore.platformMaintainerPermission ? true : { name: 'collaboration-permission' };
     }
@@ -173,20 +167,11 @@ router.beforeEach(async (to) => {
   }
 
   // 没登陆、没权限 直接404
-  if (!loginStore.isLogined && (isUpstream || isPlatform)) {
+  if (!loginStore.isLogined && isPlatform) {
     return { name: 'notFound' };
   }
 
-  if (userInfoStore.upstreamPermission === null && loginStore.isLogined && !isPlatform) {
-    try {
-      const { data } = await queryUpstreamPermission();
-      if (data.allow_access) {
-        userInfoStore.upstreamPermission = data.allow_access;
-      }
-    } catch {
-      userInfoStore.upstreamPermission = false;
-    }
-  }
+
 
   return true;
 });

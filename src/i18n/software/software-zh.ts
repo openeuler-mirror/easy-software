@@ -15,6 +15,7 @@ export default {
   filterSummary: '按概要',
   filterFile: '按文件',
   searchPlaceholder: '输入内容进行搜索，多个关键字请用逗号隔开',
+  searchPlaceholder1: '搜索',
   searchFilterTips: '为您找到符合条件的筛选{0}个',
 
   viewAll: '显示全部',
@@ -48,6 +49,7 @@ export default {
     type: '类型',
     operation: '操作',
     imageName: '镜像名称',
+    subPath: '子目录',
   },
 
   //反馈

@@ -32,6 +32,12 @@ export const FLITERMENUOPTIONS = [
   },
 ];
 
+// 表格筛选
+export const SORTPARAMS = {
+  0: '',
+  1: 'desc',
+  2: 'asc',
+};
 
 // 分页器数量
 export const COUNT_PAGESIZE = [10, 20, 40, 80];

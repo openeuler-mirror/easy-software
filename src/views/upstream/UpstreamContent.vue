@@ -1,13 +1,13 @@
 <script lang="ts" setup>
 import { ref, watch, onMounted, computed } from 'vue';
-import { OTag, OLink, OIcon, OTable } from '@opensig/opendesign';
+import { OTag, OLink, OIcon } from '@opensig/opendesign';
 import { useI18n } from 'vue-i18n';
 import { useRoute } from 'vue-router';
 import { getParamsRules } from '@/utils/common';
 import { getUpstreamColumn, getUpstream } from '@/api/api-upstream';
 import { getSearchData } from '@/api/api-search';
 import { useViewStore } from '@/stores/common';
-import { COUNT_PAGESIZE } from '@/data/query';
+import { COUNT_PAGESIZE, SORTPARAMS } from '@/data/query';
 
 import FilterRadio from '@/components/filter/FilterRadio.vue';
 import AppLoading from '@/components/AppLoading.vue';
@@ -152,24 +152,9 @@ const handleResettingTag = () => {
   isSearch.value = false;
 };
 
-// 更新时间、字母排序
-const changeSortValue = (v: string[] | string) => {
-  nameOrder.value = '';
-  currentPage.value = 1;
-  if (Array.isArray(v)) {
-    if (v[0] === 'nameOrder') {
-      nameOrder.value = v[1];
-    }
-  }
-};
-// 清除排序
-const clearFilterInput = () => {
-  searchKey.value = '';
-};
-
 // 分页
 const currentPage = ref(1);
-const pageSize = ref(10);
+const pageSize = ref(20);
 const total = ref(0);
 const handleSizeChange = (val: number) => {
   pageSize.value = val;
@@ -202,6 +187,16 @@ const pageSearch = () => {
       querySearch();
     }
   }
+};
+
+const changeSortBy = (v: string[]) => {
+  nameOrder.value = '';
+  if (Array.isArray(v)) {
+    if (v[0] === 'name') {
+      nameOrder.value = SORTPARAMS[v[1]];
+    }
+  }
+  currentPage.value = 1;
 };
 
 watch(
@@ -257,7 +252,7 @@ watch(
       </template>
     </div>
     <div class="pkg-main">
-      <FilterHeader :title="t('upstream.name')" :isSort="false" @sort="changeSortValue" :total="total" @clear="clearFilterInput" />
+      <FilterHeader :title="t('upstream.name')" :total="total" />
       <div v-if="searchOs || isSearch || showSearchFilterTags" class="search-result">
         <p v-if="!isPageSearch" class="text">
           为您找到符合条件的筛选<span class="total">{{ total }}</span
@@ -274,20 +269,8 @@ watch(
         <AppLoading :loading="isLoading" />
         <ResultNoApp v-if="isSearchError" :type="t('upstream.title')" />
         <div v-if="appData.length !== 0 && !isSearchError" class="pkg-panel">
-          <OTable :columns="columns" :data="appData" border="all">
-            <template #td_name="{ row }">
-              <span v-dompurify-html="row.name"></span>
-            </template>
-            <template #td_upstreamVersion="{ row }">
-              {{ row.upstreamVersion }}
-            </template>
-            <template #td_compatibleVersion="{ row }">
-              {{ row.compatibleVersion }}
-            </template>
-            <template #td_status="{ row }">
-              <OTag v-if="row.status" class="app-tag" :class="row.status.toLocaleLowerCase()">{{ row.status }} </OTag>
-            </template>
-          </OTable>
+          <OTableItemNew :data="appData" :columns="columns" :type="tabName" @sort="changeSortBy" />
+
           <div v-if="total > COUNT_PAGESIZE[0]" class="pagination-box">
             <AppPagination :current="currentPage" :pagesize="pageSize" :total="total" @size-change="handleSizeChange" @current-change="handleCurrentChange" />
           </div>
@@ -299,26 +282,4 @@ watch(
 
 <style lang="scss" scoped>
 @import '@/assets/style/category/content/index.scss';
-.app-tag {
-  min-width: 92px;
-  color: var(--o-color-white);
-  &.outdated {
-    --tag-bg-color: #058ef0;
-    --tag-bd-color: #058ef0;
-  }
-  &.ok {
-    --tag-bg-color: #0bb151;
-    --tag-bd-color: #0bb151;
-  }
-  &.missing {
-    --tag-bg-color: #c7000b;
-    --tag-bd-color: #c7000b;
-  }
-}
-
-:deep(.o-table) {
-  --table-edge-padding: 24px;
-  --table-cell-padding: 12px 16px;
-  --table-head-cell-padding: 12px 16px;
-}
 </style>

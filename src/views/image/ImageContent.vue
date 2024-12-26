@@ -6,7 +6,7 @@ import { useRoute, useRouter } from 'vue-router';
 import { getSearchAllFiled, getSearchAllColumn } from '@/api/api-domain';
 import { useI18n } from 'vue-i18n';
 import { isValidSearchTabName, isValidSearchKey } from '@/utils/query';
-import { TABNAME_OPTIONS, FLITERMENUOPTIONS, COUNT_PAGESIZE } from '@/data/query';
+import { TABNAME_OPTIONS, FLITERMENUOPTIONS, COUNT_PAGESIZE, SORTPARAMS } from '@/data/query';
 import { getParamsRules } from '@/utils/common';
 import { useViewStore } from '@/stores/common';
 import { useSearchStore } from '@/stores/search';
@@ -172,13 +172,11 @@ const closeTag = (idx: string | number, type: string) => {
 };
 
 // 重置筛选结果
-const isClear = ref(false);
 const resetTag = () => {
   searchArch.value = [];
   searchOs.value = [];
   searchCategory.value = [];
   isSearchDocs.value = false;
-  isClear.value = true;
   nameOrder.value = '';
   currentPage.value = 1;
 
@@ -193,26 +191,19 @@ const filterList = computed(() => {
   return [...searchArch.value, ...searchOs.value, ...searchCategory.value];
 });
 
-// 更新时间、字母排序
-const changeSortValue = (v: string[] | string) => {
+const changeSortBy = (v: string[]) => {
   nameOrder.value = '';
-  currentPage.value = 1;
   if (Array.isArray(v)) {
-    if (v[0] === 'nameOrder') {
-      nameOrder.value = v[1];
+    if (v[0] === 'name') {
+      nameOrder.value = SORTPARAMS[v[1]];
     }
-  } else {
-    isClear.value = false;
   }
-};
-// 清除input数据
-const clearFilterInput = () => {
-  searchKey.value = '';
+  currentPage.value = 1;
 };
 
 // 分页
 const currentPage = ref(1);
-const pageSize = ref(10);
+const pageSize = ref(20);
 const total = ref(0);
 const handleSizeChange = (val: number) => {
   pageSize.value = val;
@@ -325,7 +316,7 @@ watch(
     </div>
 
     <div class="pkg-main">
-      <FilterHeader title="应用镜像" :isSort="false" @sort="changeSortValue" :total="total" :is-clear="isClear" @clear="clearFilterInput" />
+      <FilterHeader title="应用镜像" :total="total" />
       <div v-if="isSearchDocs || filterList.length > 0" class="search-result">
         <p v-if="!isPageSearch" class="text">
           <template v-if="isSearchDocs">
@@ -349,7 +340,7 @@ watch(
         <AppLoading :loading="isLoading" />
         <ResultNoApp v-if="isSearchError" type="应用镜像" />
         <div v-if="pkgData.length !== 0 && !isSearchError" class="pkg-panel">
-          <OTableItemNew :data="pkgData" :columns="columns" :type="tabName" />
+          <OTableItemNew :data="pkgData" :columns="columns" :type="tabName" @sort="changeSortBy" />
           <div v-if="total > COUNT_PAGESIZE[0]" class="pagination-box">
             <AppPagination :current="currentPage" :pagesize="pageSize" :total="total" @size-change="handleSizeChange" @current-change="handleCurrentChange" />
           </div>

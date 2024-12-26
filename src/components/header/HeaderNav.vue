@@ -3,7 +3,6 @@ import { ref, type PropType } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { computed } from 'vue';
 import { useLocale } from '@/composables/useLocale';
-import { useLoginStore, useUserInfoStore } from '@/stores/user';
 
 interface NavsT {
   id: string;
@@ -23,11 +22,7 @@ const props = defineProps({
 
 const route = useRoute();
 const router = useRouter();
-const userInfoStore = useUserInfoStore();
-const loginStore = useLoginStore();
 const { isZh, locale } = useLocale();
-
-const upstreamPermission = computed(() => loginStore.isLogined && userInfoStore.upstreamPermission);
 
 // -------------------- hover事件 --------------------
 const activeIndex = ref(-1);
@@ -55,7 +50,6 @@ const jumpTo = (href: string) => {
     <ul class="nav-list">
       <template v-for="(item, idx) in options" :key="item.id">
         <li
-          v-if="item.id !== 'upstream' || upstreamPermission"
           :id="'e2e_headerNav_' + item.id"
           class="nav-item"
           :class="{
