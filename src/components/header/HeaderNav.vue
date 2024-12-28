@@ -40,8 +40,8 @@ const selectedIndex = computed(() => {
 });
 
 // 导航跳转
-const jumpTo = (href: string) => {
-  router.push(`/${locale.value}` + href);
+const jumpTo = (href: string, id: string) => {
+  router.push(`/${locale.value}${id === 'home' ? '' : href}`);
 };
 </script>
 
@@ -59,7 +59,7 @@ const jumpTo = (href: string) => {
           @mouseenter="onMouseEnter(idx)"
           @mouseleave="onMouseLeave"
         >
-          <span @click="jumpTo(item.href)" class="nav-item-link">{{ isZh ? item.label.zh : item.label.en }}</span>
+          <span @click="jumpTo(item.href, item.id)" class="nav-item-link">{{ isZh ? item.label.zh : item.label.en }}</span>
         </li>
       </template>
     </ul>

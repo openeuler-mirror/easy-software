@@ -64,7 +64,7 @@ onUnmounted(() => {
 
 <template>
   <div>
-    <HomeHeader :class="{ show: isShow }" />
+    <HomeHeader />
     <ContentWrapper vertical-padding="72px">
       <div ref="pkgRef" class="pkg-wrap">
         <div v-if="size.width > 1900 && pkgData && pkgData.length" class="anchor">
