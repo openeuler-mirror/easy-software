@@ -27,6 +27,10 @@ const props = defineProps({
     type: Boolean,
     default: () => false,
   },
+  isTime: {
+    type: Boolean,
+    default: () => false,
+  },
   type: {
     type: String,
     default: () => {
@@ -202,7 +206,7 @@ watch(
       <OLink @click="clearAll()" class="filter-sort" :class="{ active: activeIndex === -1 }">
         {{ t('software.sortTitle') }}
       </OLink>
-      <template v-if="isSort">
+      <template v-if="isTime">
         <OLink @click="changeSortBy('timeOrder', 'time')" class="filter-sort time" :class="{ active: activeIndex === 0 }">
           {{ t('software.timeOrder') }}
           <template #suffix
