@@ -10,6 +10,7 @@ import { useSearchStore } from '@/stores/search';
 import IconTimeOrder from '~icons/app/icon-time-order.svg';
 
 import IconSearch from '~icons/app/icon-search.svg';
+import { oa } from '@/shared/analytics';
 
 const props = defineProps({
   title: {
@@ -23,6 +24,10 @@ const props = defineProps({
     default: () => 0,
   },
   isClear: {
+    type: Boolean,
+    default: () => false,
+  },
+  isTime: {
     type: Boolean,
     default: () => false,
   },
@@ -87,18 +92,15 @@ const replaceWinUrl = () => {
 
 // ---------------------搜索埋点--------------------
 const collectDownloadData = (keyword: string) => {
-  const sensors = (window as any)['sensorsDataAnalytic201505'];
   const { href } = window.location;
   const downloadTime = new Date();
-  sensors?.setProfile({
-    ...(window as any)['sensorsCustomBuriedData'],
-    profileType: 'search',
+  oa.report('search', () => ({
     origin: href,
     keyword,
     filter: 'all',
     pkg: props.title,
     downloadTime,
-  });
+  }));
 };
 
 const isTimeOrder = ref(false);
@@ -204,7 +206,7 @@ watch(
       <OLink @click="clearAll()" class="filter-sort" :class="{ active: activeIndex === -1 }">
         {{ t('software.sortTitle') }}
       </OLink>
-      <template v-if="isSort">
+      <template v-if="isTime">
         <OLink @click="changeSortBy('timeOrder', 'time')" class="filter-sort time" :class="{ active: activeIndex === 0 }">
           {{ t('software.timeOrder') }}
           <template #suffix

@@ -105,7 +105,7 @@ watch(
       <div class="header-content">
         <div class="header-left">
           <div class="logo">
-            <a target="_blank" :href="`${OPENEULER}/zh/`" class="community-logo" rel="noopener noreferrer">
+            <a target="_blank" :href="`${OPENEULER}/${locale}`" class="community-logo" rel="noopener noreferrer">
               <img :src="isDark ? openeulerLogoDark : openeulerLogo" />
             </a>
             <ODivider direction="v" :darker="true" />

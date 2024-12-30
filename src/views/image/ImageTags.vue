@@ -2,6 +2,7 @@
 import { type PropType } from 'vue';
 import { OTable } from '@opensig/opendesign';
 import { useRoute } from 'vue-router';
+import { oa } from '@/shared/analytics';
 
 interface OptionsT {
   name: string;
@@ -41,19 +42,16 @@ const columnTags = [
 // ---------------------下载埋点--------------------
 // 应用镜像埋点
 const onCodeSuccess = (version: string) => {
-  const sensors = (window as any)['sensorsDataAnalytic201505'];
   const { href } = window.location;
   const downloadTime = new Date();
-  sensors?.setProfile({
-    ...(window as any)['sensorsCustomBuriedData'],
-    profileType: 'download',
+  oa.report('download', () => ({
     origin: href,
     softwareName: props.options.name,
     version,
     pkgId: route.query.pkgId as string,
     type: 'IMAGE',
     downloadTime,
-  });
+  }));
 };
 </script>
 

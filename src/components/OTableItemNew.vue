@@ -5,6 +5,7 @@ import { useLocale } from '@/composables/useLocale';
 import { formatDateTime, checkOriginLink, windowOpen, xssAllTag, getPkgName } from '@/utils/common';
 import { useI18n } from 'vue-i18n';
 import { SORTPARAMS } from '@/data/query';
+import { oa } from '@/shared/analytics';
 
 import OCodeCopy from '@/components/OCodeCopy.vue';
 import ExternalLink from '@/components/ExternalLink.vue';
@@ -70,19 +71,16 @@ const onExternalDialog = (href: string, name: string, version: string, pkgId?: s
 
 // ---------------------下载埋点--------------------
 const collectDownloadData = (pkgId: string, name: string, version: string) => {
-  const sensors = (window as any)['sensorsDataAnalytic201505'];
   const { href } = window.location;
   const downloadTime = new Date();
-  sensors?.setProfile({
-    ...(window as any)['sensorsCustomBuriedData'],
-    profileType: 'download',
+  oa.report('download', () => ({
     origin: href,
     softwareName: name,
     version,
     pkgId,
     type: getPkgName(props.type).toLocaleUpperCase(),
     downloadTime,
-  });
+  }));
 };
 
 // 表格筛选

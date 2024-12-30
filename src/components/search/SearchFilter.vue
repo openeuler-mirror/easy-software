@@ -14,6 +14,7 @@ import { TABNAME_OPTIONS, FLITERMENUOPTIONS } from '@/data/query';
 import SearchRecommend from '@/components/search/SearchRecommend.vue';
 
 import IconSearch from '~icons/app/icon-search.svg';
+import { oa } from '@/shared/analytics';
 
 defineProps({
   placeholder: {
@@ -78,18 +79,15 @@ const replaceWinUrl = () => {
 
 // ---------------------搜索埋点--------------------
 const collectDownloadData = (keyword: string, filter: string, pkg: string) => {
-  const sensors = (window as any)['sensorsDataAnalytic201505'];
   const { href } = window.location;
   const downloadTime = new Date();
-  sensors?.setProfile({
-    ...(window as any)['sensorsCustomBuriedData'],
-    profileType: 'search',
+  oa.report('search', () => ({
     origin: href,
     keyword,
     filter,
     pkg,
     downloadTime,
-  });
+  }));
 };
 
 // ----------------- 联想搜索 -------------------------
