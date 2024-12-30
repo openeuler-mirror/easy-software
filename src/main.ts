@@ -2,8 +2,7 @@ import { createApp } from 'vue';
 import { createPinia } from 'pinia';
 import directives from './directives';
 import VueDOMPurifyHTML from 'vue-dompurify-html';
-import ElementPlus from 'element-plus'
-
+import ElementPlus from 'element-plus';
 
 import '@/assets/style/base.scss';
 import 'element-plus/theme-chalk/src/index.scss';
@@ -20,8 +19,12 @@ import { initRound } from '@opensig/opendesign';
 import App from './App.vue';
 import router from './router';
 import i18n from './i18n';
+import { enableOA, reportPerformance } from './shared/analytics';
 
 initRound('pill');
+
+enableOA();
+reportPerformance();
 
 const app = createApp(App);
 
@@ -31,7 +34,7 @@ app.use(i18n);
 app.use(createPinia());
 // 路由
 app.use(router);
-app.use(ElementPlus)
+app.use(ElementPlus);
 
 app.use(VueDOMPurifyHTML);
 

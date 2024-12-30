@@ -19,6 +19,7 @@ import { getCode } from '@/utils/common';
 
 import defaultImg from '@/assets/default-logo.png';
 import { pkgIdInjection } from '@/data/injectionKeys';
+import { oa } from '@/shared/analytics';
 
 const tabValue = ref('apppkg');
 const { t } = useI18n();
@@ -177,19 +178,16 @@ const tagsOptions = computed(() => {
 
 // ---------------------下载埋点--------------------
 const onCodeSuccess = () => {
-  const sensors = (window as any)['sensorsDataAnalytic201505'];
   const { href } = window.location;
   const downloadTime = new Date();
-  sensors?.setProfile({
-    ...(window as any)['sensorsCustomBuriedData'],
-    profileType: 'download',
+  oa.report('download', () => ({
     origin: href,
     softwareName: appData.value.name,
     version: appData.value.version,
     pkgId: route.query.pkgId as string,
     type: 'IMAGE',
     downloadTime,
-  });
+  }));
 };
 </script>
 

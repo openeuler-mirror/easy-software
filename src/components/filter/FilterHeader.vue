@@ -10,6 +10,7 @@ import { useSearchStore } from '@/stores/search';
 import IconTimeOrder from '~icons/app/icon-time-order.svg';
 
 import IconSearch from '~icons/app/icon-search.svg';
+import { oa } from '@/shared/analytics';
 
 const props = defineProps({
   title: {
@@ -87,18 +88,15 @@ const replaceWinUrl = () => {
 
 // ---------------------搜索埋点--------------------
 const collectDownloadData = (keyword: string) => {
-  const sensors = (window as any)['sensorsDataAnalytic201505'];
   const { href } = window.location;
   const downloadTime = new Date();
-  sensors?.setProfile({
-    ...(window as any)['sensorsCustomBuriedData'],
-    profileType: 'search',
+  oa.report('search', () => ({
     origin: href,
     keyword,
     filter: 'all',
     pkg: props.title,
     downloadTime,
-  });
+  }));
 };
 
 const isTimeOrder = ref(false);

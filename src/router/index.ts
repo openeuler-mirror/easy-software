@@ -1,11 +1,12 @@
 import { createRouter, createWebHistory } from 'vue-router';
 
 import { scrollToTop } from '@/utils/common';
-import { useLangStore, useViewStore } from '@/stores/common';
+import { useLangStore, usePrevPage, useViewStore } from '@/stores/common';
 import { tryLogin } from '@/shared/login';
 import { useLoginStore, useUserInfoStore } from '@/stores/user';
 import { getCollaborationPermissions } from '@/api/api-collaboration';
 import { COLLABORATIONPERMISSION } from '@/data/query';
+import { reportPV } from '@/shared/analytics';
 
 const routes = [
   {
@@ -153,14 +154,11 @@ router.beforeEach(async (to) => {
       const { data } = await getCollaborationPermissions();
 
       if (data.permissions.length > 0) {
-
         userInfoStore.platformAdminPermission = data.permissions.includes('administrator') ? true : false;
         userInfoStore.platformMaintainerPermission = data.permissions.includes('maintainer') ? true : false;
-
       } else {
         return isPlatform ? { name: 'collaboration-permission' } : true;
       }
-
     } catch {
       return isPlatform ? { name: 'collaboration-permission' } : true;
     }
@@ -171,12 +169,19 @@ router.beforeEach(async (to) => {
     return { name: 'notFound' };
   }
 
-
-
   return true;
 });
 
-router.afterEach(() => {
+router.beforeEach((to, from) => {
+  if (to.name !== 'notFound' && to.path !== from.path) {
+    usePrevPage().prevPageUrl = window.location.href;
+  }
+});
+
+router.afterEach((to, from) => {
+  if (to.name !== 'notFound' && to.path !== from.path) {
+    reportPV(usePrevPage().prevPageUrl);
+  }
   useViewStore().$patch({ notFoundPage: false });
 });
 
