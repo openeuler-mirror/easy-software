@@ -3,7 +3,7 @@ import { defineStore } from 'pinia';
 /**
  * 搜索》首字母排序
  */
-export const useSearchStore = defineStore('serach', {
+export const useSearchStore = defineStore('search', {
   state: () => {
     return {
       nameOrder: false,

@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
-import { useRouter } from 'vue-router';
 import { useLocale } from '@/composables/useLocale';
-import { checkOriginLink, windowOpen } from '@/utils/common';
+import { checkOriginLink, windowOpen, getYearByOffset } from '@/utils/common';
 import {
   OSCHINA,
   CSDN_BLOG,
@@ -48,7 +47,6 @@ import CodeTitleGzh from '@/assets/footer/img-gzh.png';
 import CodeImgXzs from '@/assets/footer/code-xzs.png';
 import CodeImgZgz from '@/assets/footer/code-zgz.png';
 
-const router = useRouter();
 const { t, isZh } = useLocale();
 
 // 友情链接
@@ -210,7 +208,7 @@ const onExternalDialog = (href: string) => {
           <div class="footer-option-item">
             <a v-for="link in footLink" :key="link.URL" class="link" :href="link.URL" target="_blank">{{ link.NAME }}</a>
           </div>
-          <p class="copyright">{{ t('common.FOOTER.COPY_RIGHT') }}</p>
+          <p class="copyright">{{ t('common.FOOTER.COPY_RIGHT', { year: getYearByOffset() }) }}</p>
           <p class="license">
             <span>{{ t('common.FOOTER.LICENSED_1') }}</span>
             {{ t('common.FOOTER.LICENSED_2') }}
