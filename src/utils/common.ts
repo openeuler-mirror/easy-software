@@ -97,7 +97,7 @@ export const checkOriginLink = (path: string) => {
  * @param {data} any 地址
  * @returns {object} 成功返回参数对象
  */
-import type { SearchSQLT, SearchESParamsT } from '@/@types/domain';
+
 export const getParamsRules = (data: any) => {
   type ParamsKeyT = keyof any;
 
@@ -179,4 +179,22 @@ export const generateQuery = (queries: Record<string, any>): string => {
     return `?${parseResultArr.join("&")}`;
   }
   return '';
+}
+
+
+
+/**
+ * 获取指定时区偏移量的年份
+ * @param {number} offset - 时区偏移量（单位：小时）。例如，UTC+8 时区，传入 8。
+ * @returns {number} - 指定时区偏移量对应的年份
+ */
+export const getYearByOffset = ()=> {
+  // 获取当前时间的 UTC 时间
+  const now = new Date();
+  const utcTime = new Date(now.getTime() + now.getTimezoneOffset() * 60000);
+
+  // 设置偏移
+  utcTime.setHours(utcTime.getHours() + 8);
+
+  return utcTime.getFullYear();
 }

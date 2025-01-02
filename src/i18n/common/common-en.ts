@@ -9,7 +9,7 @@ export default {
     ATOM_PC: '/atom-pc.png',
     ATOM_MO: '/atom-mo.png',
     MAIL: OPENEULER_CONTACT,
-    COPY_RIGHT: 'Copyright © 2024 openEuler. All rights reserved.',
+    COPY_RIGHT: 'Copyright © {year} openEuler. All rights reserved.',
     LICENSED_1: 'Licensed under',
     LICENSED_2: 'the MulanPSL2',
     RIGHT_LIST: [
