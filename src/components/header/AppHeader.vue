@@ -134,6 +134,7 @@ watch(
 .search-show {
   :deep(.search-content) {
     border-radius: 4px;
+    box-shadow: none;
   }
 }
 .header-search {
