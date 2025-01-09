@@ -82,7 +82,7 @@ onMounted(() => {
   >
     <template #main>
       <div class="pkg-info">
-        <a :href="jumpTo(data.pkgIds)" target="_blank" rel="noopener noreferrer" class="name-info">
+        <a :href="jumpTo(data.pkgIds)" target="_blank" rel="noopener" class="name-info">
           <span v-dompurify-html="data.name" class="name"></span><span v-if="data.arch" class="arch">/{{ data.arch }}</span>
         </a>
         <div class="pkg-icon"><img :src="data.iconUrl || defaultImg" class="icon" :class="{ 'default-img': !data.iconUrl }" /></div>
@@ -90,7 +90,7 @@ onMounted(() => {
       <p v-if="data.os" class="pkg-os">{{ data.os }}</p>
       <div class="pkg-box">
         <div v-if="data.tags && data.tags.length > 0" class="tags-box">
-          <a :href="jumpTo(data.pkgIds, tag)" v-for="tag in data.tags" :key="tag" target="_blank" rel="noopener noreferrer">
+          <a :href="jumpTo(data.pkgIds, tag)" v-for="tag in data.tags" :key="tag" target="_blank" rel="noopener">
             <OTag style="--o-icon_size_control-xs: 0" variant="outline" :class="`${tag.toLocaleLowerCase()}-icon`">
               <template #icon>
                 <OIcon><component :is="getTagsIcon(tag)" /></OIcon>

@@ -14,7 +14,7 @@ import { TABNAME_OPTIONS, FLITERMENUOPTIONS } from '@/data/query';
 import SearchRecommend from '@/components/search/SearchRecommend.vue';
 
 import IconSearch from '~icons/app/icon-search.svg';
-import { oa } from '@/shared/analytics';
+import { oaReport } from '@/shared/analytics';
 
 defineProps({
   placeholder: {
@@ -81,13 +81,17 @@ const replaceWinUrl = () => {
 const collectDownloadData = (keyword: string, filter: string, pkg: string) => {
   const { href } = window.location;
   const downloadTime = new Date();
-  oa.report('search', () => ({
-    origin: href,
-    keyword,
-    filter,
-    pkg,
-    downloadTime,
-  }));
+  oaReport(
+    'search',
+    {
+      origin: href,
+      keyword,
+      filter,
+      pkg,
+      downloadTime,
+    },
+    'search_software'
+  );
 };
 
 // ----------------- 联想搜索 -------------------------

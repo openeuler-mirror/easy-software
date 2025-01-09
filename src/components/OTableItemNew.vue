@@ -5,7 +5,7 @@ import { useLocale } from '@/composables/useLocale';
 import { formatDateTime, checkOriginLink, windowOpen, xssAllTag, getPkgName } from '@/utils/common';
 import { useI18n } from 'vue-i18n';
 import { SORTPARAMS } from '@/data/query';
-import { oa } from '@/shared/analytics';
+import { oaReport } from '@/shared/analytics';
 
 import OCodeCopy from '@/components/OCodeCopy.vue';
 import ExternalLink from '@/components/ExternalLink.vue';
@@ -73,14 +73,14 @@ const onExternalDialog = (href: string, name: string, version: string, pkgId?: s
 const collectDownloadData = (pkgId: string, name: string, version: string) => {
   const { href } = window.location;
   const downloadTime = new Date();
-  oa.report('download', () => ({
+  oaReport('download', {
     origin: href,
     softwareName: name,
     version,
     pkgId,
     type: getPkgName(props.type).toLocaleUpperCase(),
     downloadTime,
-  }));
+  });
 };
 
 // 表格筛选
@@ -131,7 +131,7 @@ const changeSortBy = (type: string) => {
       </template>
       <template #td_name="{ row }">
         <span v-if="type === 'appversion'" v-dompurify-html="row.name"></span>
-        <a v-else :href="jumpTo(row.pkgId)" class="row-name max" target="_blank" rel="noopener noreferrer">
+        <a v-else :href="jumpTo(row.pkgId)" class="row-name max" target="_blank" rel="noopener">
           <span v-dompurify-html="row.name" class="td-break" :title="xssAllTag(row.name)"></span>
           <template v-if="row.originPkg">
             <OPopover position="top" trigger="hover">

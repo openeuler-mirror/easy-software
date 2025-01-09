@@ -26,7 +26,7 @@ import IconOEpkg from '~icons/pkg/oepkg.svg';
 import IconImage from '~icons/pkg/image.svg';
 import IconRpm from '~icons/pkg/rpm.svg';
 import { currentFieldDetailTabInjection, pkgIdInjection } from '@/data/injectionKeys';
-import { oa } from '@/shared/analytics';
+import { oaReport } from '@/shared/analytics';
 
 const { locale } = useLocale();
 const { t } = useI18n();
@@ -342,14 +342,14 @@ const tagsOptions = computed(() => {
 const onCodeSuccess = () => {
   const { href } = window.location;
   const downloadTime = new Date();
-  oa.report('download', () => ({
+  oaReport('download', {
     origin: href,
     softwareName: appData.value.name,
     version: appData.value.version,
     pkgId: route.query.pkgId as string,
     type: 'IMAGE',
     downloadTime,
-  }));
+  });
 };
 </script>
 <template>
