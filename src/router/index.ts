@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router';
 
 import { scrollToTop } from '@/utils/common';
-import { useLangStore, usePrevPage, useViewStore } from '@/stores/common';
+import { useLangStore, useViewStore } from '@/stores/common';
 import { tryLogin } from '@/shared/login';
 import { useLoginStore, useUserInfoStore } from '@/stores/user';
 import { getCollaborationPermissions } from '@/api/api-collaboration';
@@ -173,14 +173,14 @@ router.beforeEach(async (to) => {
 });
 
 router.beforeEach((to, from) => {
-  if (to.name !== 'notFound' && to.path !== from.path) {
-    usePrevPage().prevPageUrl = window.location.href;
+  if (to.name !== 'notFound' && from.path !== '/' && to.path !== from.path) {
+    to.meta.$referrer = window.location.href;
   }
 });
 
 router.afterEach((to, from) => {
   if (to.name !== 'notFound' && to.path !== from.path) {
-    reportPV(usePrevPage().prevPageUrl);
+    reportPV(to.meta.$referrer as string);
   }
   useViewStore().$patch({ notFoundPage: false });
 });

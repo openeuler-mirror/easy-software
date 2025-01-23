@@ -16,7 +16,7 @@ import { useRoute } from 'vue-router';
 import IconChevronDown from '~icons/app/icon-chevron-down.svg';
 import IconState from '~icons/pkg/icon-state.svg';
 import IconLevel from '~icons/pkg/icon-level.svg';
-import { oa } from '@/shared/analytics';
+import { oaReport } from '@/shared/analytics';
 import { inject } from 'vue';
 import type { Ref } from 'vue';
 import { pkgIdInjection } from '@/data/injectionKeys';
@@ -139,14 +139,14 @@ const pkgId = inject<Ref<string>>(pkgIdInjection, ref(''));
 const collectDownloadData = () => {
   const { href } = window.location;
   const downloadTime = new Date();
-  oa.report('download', () => ({
+  oaReport('download', {
     origin: href,
     softwareName: props.data.name,
     version: props.data.version,
     pkgId: pkgId.value,
     type: props.type,
     downloadTime,
-  }));
+  });
 };
 
 // ---------------------版本支持情况--------------------
