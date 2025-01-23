@@ -36,9 +36,3 @@ export const useAppearance = defineStore('appearance', {
     theme: 'light',
   }),
 });
-
-export const usePrevPage = defineStore('prevPage', {
-  state: () => ({
-    prevPageUrl: '',
-  }),
-});

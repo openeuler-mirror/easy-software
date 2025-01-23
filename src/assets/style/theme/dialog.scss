@@ -5,12 +5,14 @@
   .o-dlg-header {
     color: var(--o-color-info1);
   }
+
   &.o-loading {
     --loading-mask-icon-color: var(--o-color-info1);
     --layer-align: top;
     --layer-origin: top;
     --loading-mask-color: var(--o-color-info1);
-    --layer-mask: var(--o-color-info4-inverse);
+    --layer-mask: transparent;
+
     transition: none;
     padding-top: 23%;
     .o-loading-main {
