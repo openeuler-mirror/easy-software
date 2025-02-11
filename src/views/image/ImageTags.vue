@@ -2,7 +2,6 @@
 import { type PropType } from 'vue';
 import { OTable } from '@opensig/opendesign';
 import { useRoute } from 'vue-router';
-import { oaReport } from '@/shared/analytics';
 
 interface OptionsT {
   name: string;
@@ -31,6 +30,10 @@ const props = defineProps({
   },
 });
 
+const emit = defineEmits<{
+  (event: 'copy', val: Record<string, any>): void;
+}>();
+
 const route = useRoute();
 
 const columnTags = [
@@ -41,16 +44,10 @@ const columnTags = [
 
 // ---------------------下载埋点--------------------
 // 应用镜像埋点
-const onCodeSuccess = (version: string) => {
-  const { href } = window.location;
-  const downloadTime = new Date();
-  oaReport('download', {
-    origin: href,
-    softwareName: props.options.name,
-    version,
-    pkgId: route.query.pkgId as string,
-    type: 'IMAGE',
-    downloadTime,
+const onCodeSuccess = (row: any) => {
+  emit('copy', {
+    architectures: row.arch,
+    tag: row.appVer,
   });
 };
 </script>
@@ -58,7 +55,7 @@ const onCodeSuccess = (version: string) => {
 <template>
   <OTable :columns="columnTags" :data="data" :loading="loading" border="all">
     <template #td_dockerStr="{ row }">
-      <div class="docker"><OCodeCopy :code="row.dockerStr" @success="onCodeSuccess(row.appVer)" /></div>
+      <div class="docker"><OCodeCopy :code="row.dockerStr" @success="onCodeSuccess(row)" /></div>
     </template>
   </OTable>
 </template>

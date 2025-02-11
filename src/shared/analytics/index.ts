@@ -3,6 +3,7 @@ import { reportAnalytics } from '@/api/api-analytics';
 import type { Awaitable } from '@vueuse/core';
 import { COOKIE_AGREED_STATUS, useCookieStore } from '@/stores/common';
 import router from '@/router';
+import { useLoginStore } from '@/stores/user';
 
 export const oa = new OpenAnalytics({
   appKey: 'openEuler',
@@ -77,10 +78,12 @@ export const oaReport = <T extends Record<string, any>>(
   if (!oa.enabled) {
     return;
   }
+  const loginStore = useLoginStore();
   return oa.report(
     event,
     async () => ({
       $service,
+      loginStatus: loginStore.isLogined,
       ...(typeof eventData === 'function' ? await eventData() : eventData),
     }),
     options

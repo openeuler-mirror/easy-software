@@ -11,6 +11,9 @@ import OCodeCopy from '@/components/OCodeCopy.vue';
 import ExternalLink from '@/components/ExternalLink.vue';
 
 import IconUbuntu from '@/assets/ubuntu.png';
+import { useRoute } from 'vue-router';
+import { watch } from 'vue';
+import { computed } from 'vue';
 
 interface ColumnsT {
   key: string;
@@ -38,6 +41,7 @@ const props = defineProps({
   },
 });
 
+const route = useRoute();
 const { t } = useI18n();
 const { locale } = useLocale();
 const jumpTo = (id: string) => {
@@ -46,40 +50,78 @@ const jumpTo = (id: string) => {
   return newHref;
 };
 
+const isPageSearch = computed(() => route.name === 'search');
+
+const reportAnalytics = (data: Record<string, any>, event = 'click') => {
+  if (isPageSearch.value) {
+    oaReport(
+      event,
+      {
+        module: 'search_page',
+        tab: route.query.tab ?? '',
+        ...data,
+      },
+      'search_portal'
+    );
+    return;
+  }
+  oaReport(event, {
+    module: route.name,
+    ...data,
+  });
+};
+
 const showDlg = ref(false);
 const codeInput = ref('');
-const openDownloadDialog = (name: string, version: string, pkgId: string) => {
-  const v = version ? `:${version}` : '';
-  codeInput.value = `docker pull openeuler/${xssAllTag(name)}${v}`;
+let copyCmdAppInfo: any;
+
+watch(showDlg, (val) => {
+  if (!val && copyCmdAppInfo) {
+    copyCmdAppInfo = null;
+  }
+});
+
+const openDownloadDialog = (row: any) => {
+  const v = row.appVer ? `:${row.appVer}` : '';
+  codeInput.value = `docker pull openeuler/${xssAllTag(row.name)}${v}`;
   showDlg.value = true;
-  collectDownloadData(pkgId, name, version);
+  copyCmdAppInfo = { ...row };
+  collectDownloadData(row);
 };
 
 const showExternalDlg = ref(false);
 const externalLink = ref('');
-const onExternalDialog = (href: string, name: string, version: string, pkgId?: string) => {
-  externalLink.value = href;
-  if (pkgId) {
-    collectDownloadData(pkgId, name, version);
+const onExternalDialog = (row: any) => {
+  externalLink.value = row.binDownloadUrl;
+  if (row.pkgId) {
+    collectDownloadData(row);
   }
-  if (checkOriginLink(href)) {
-    windowOpen(href, '_blank');
+  if (checkOriginLink(row.binDownloadUrl)) {
+    windowOpen(row.binDownloadUrl, '_blank');
   } else {
     showExternalDlg.value = true;
   }
 };
 
 // ---------------------下载埋点--------------------
-const collectDownloadData = (pkgId: string, name: string, version: string) => {
-  const { href } = window.location;
-  const downloadTime = new Date();
-  oaReport('download', {
-    origin: href,
-    softwareName: name,
-    version,
-    pkgId,
-    type: getPkgName(props.type).toLocaleUpperCase(),
-    downloadTime,
+const collectDownloadData = (row: any) => {
+  reportAnalytics({
+    type: 'download',
+    app_name: xssAllTag(row.name),
+    version: row.appVer || row.version,
+    os_version: row.os,
+    architecture: row.arch,
+  });
+};
+
+const onCopySuccess = () => {
+  if (!copyCmdAppInfo) return;
+  reportAnalytics({
+    type: 'cmd_copy',
+    app_name: xssAllTag(copyCmdAppInfo.name),
+    version: copyCmdAppInfo.appVer,
+    os_version: copyCmdAppInfo.os,
+    architecture: copyCmdAppInfo.arch,
   });
 };
 
@@ -109,6 +151,16 @@ const changeSortBy = (type: string) => {
     return;
   }
 };
+
+const onClickLink = (row: any) => {
+  reportAnalytics({
+    type: isPageSearch.value ? 'search_content' : 'go_detail',
+    app_name: xssAllTag(row.name),
+    version: row.appVer || row.version,
+    os_version: row.os,
+    architecture: row.arch,
+  });
+};
 </script>
 
 <template>
@@ -131,7 +183,7 @@ const changeSortBy = (type: string) => {
       </template>
       <template #td_name="{ row }">
         <span v-if="type === 'appversion'" v-dompurify-html="row.name"></span>
-        <a v-else :href="jumpTo(row.pkgId)" class="row-name max" target="_blank" rel="noopener">
+        <a v-else :href="jumpTo(row.pkgId)" @click="onClickLink(row)" class="row-name max" target="_blank" rel="noopener">
           <span v-dompurify-html="row.name" class="td-break" :title="xssAllTag(row.name)"></span>
           <template v-if="row.originPkg">
             <OPopover position="top" trigger="hover">
@@ -193,13 +245,11 @@ const changeSortBy = (type: string) => {
       <template #td_operation="{ row }">
         <!-- 应用镜像 -->
         <template v-if="type === 'apppkg'">
-          <OLink color="primary" hover-underline @click="openDownloadDialog(row.name, row.appVer, row.pkgId)">{{ t('software.columns.download') }}</OLink>
+          <OLink color="primary" hover-underline @click="openDownloadDialog(row)">{{ t('software.columns.download') }}</OLink>
         </template>
         <template v-else>
           <span>
-            <OLink v-if="row.binDownloadUrl" @click="onExternalDialog(row.binDownloadUrl, row.name, row.appVer, row.pkgId)" color="primary" hover-underline>{{
-              t('software.columns.download')
-            }}</OLink>
+            <OLink v-if="row.binDownloadUrl" @click="onExternalDialog(row)" color="primary" hover-underline>{{ t('software.columns.download') }}</OLink>
           </span>
         </template>
       </template>
@@ -211,7 +261,7 @@ const changeSortBy = (type: string) => {
       </template>
       <div class="apppkg-download">
         <p class="text">{{ t('software.installImage.text') }}</p>
-        <OCodeCopy :code="codeInput" />
+        <OCodeCopy :code="codeInput" @success="onCopySuccess" />
       </div>
     </ODialog>
     <!-- 跳转外部链接提示 -->

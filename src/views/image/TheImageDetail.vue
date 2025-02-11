@@ -20,6 +20,7 @@ import { getCode } from '@/utils/common';
 import defaultImg from '@/assets/default-logo.png';
 import { pkgIdInjection } from '@/data/injectionKeys';
 import { oaReport } from '@/shared/analytics';
+import useDetailPageAnalytics from '@/composables/useDetailPageAnalytics';
 
 const tabValue = ref('apppkg');
 const { t } = useI18n();
@@ -44,6 +45,7 @@ const appData = ref<AppInfoT>({
 const srcRepo = ref('');
 
 const isLoading = ref(true);
+const { reportAnalytics, vCopyInstallation, reportFeedback, goFeedback } = useDetailPageAnalytics(appData, basicInfo, 'IMAGE');
 
 //详情请求
 const queryPkg = () => {
@@ -152,7 +154,10 @@ const queryTags = () => {
 const isTags = ref(false);
 const onChange = (v: string) => {
   isTags.value = v === 'Tags' ? true : false;
-
+  reportAnalytics({
+    type: 'switch_tab',
+    target: v,
+  });
   if (tagsValue.value.length === 0) {
     queryTags();
   }
@@ -178,15 +183,16 @@ const tagsOptions = computed(() => {
 
 // ---------------------下载埋点--------------------
 const onCodeSuccess = () => {
-  const { href } = window.location;
-  const downloadTime = new Date();
-  oaReport('download', {
-    origin: href,
-    softwareName: appData.value.name,
-    version: appData.value.version,
-    pkgId: route.query.pkgId as string,
-    type: 'IMAGE',
-    downloadTime,
+  reportAnalytics({
+    type: 'install_guide',
+    target: '获取应用镜像',
+  });
+};
+
+const onImageTagsCmdCopy = (data: Record<string, any>) => {
+  reportAnalytics({
+    ...data,
+    type: 'tags_cmd_copy',
   });
 };
 </script>
@@ -198,7 +204,7 @@ const onCodeSuccess = () => {
       <!-- 锚点 -->
       <AppBreadcrumb id="image" :name="appData.name" />
 
-      <DetailHead :data="appData" :basicInfo="summary" :maintainer="maintainer" />
+      <DetailHead @go-feedback="goFeedback" :data="appData" :basicInfo="summary" :maintainer="maintainer" />
 
       <div class="detail-row">
         <div class="detail-row-main" :class="{ tags: isTags }">
@@ -221,17 +227,25 @@ const onCodeSuccess = () => {
                       <p class="text">获取应用镜像</p>
                       <OCodeCopy :code="getCode(downloadData)" @success="onCodeSuccess" />
                     </div>
-                    <div v-if="imageUsage" v-dompurify-html="imageUsage" v-copy-code="true" class="markdown-body download"></div>
+                    <div v-if="imageUsage" v-copy-installation v-dompurify-html="imageUsage" v-copy-code="true" class="markdown-body download"></div>
                   </DetailInstall>
                 </template>
-                <ImageTags v-else :data="tagsValue" :options="tagsOptions" :loading="isTagLoading" />
+                <ImageTags @copy="onImageTagsCmdCopy" v-else :data="tagsValue" :options="tagsOptions" :loading="isTagLoading" />
               </OTabPane>
             </OTab>
           </AppSection>
-          <AppFeedback v-if="!isTags" :name="appData.name" :version="appData.version" type="应用镜像" :maintainer="maintainer" :srcRepo="srcRepo" />
+          <AppFeedback
+            v-if="!isTags"
+            @report-analytics="reportFeedback"
+            :name="appData.name"
+            :version="appData.version"
+            type="应用镜像"
+            :maintainer="maintainer"
+            :srcRepo="srcRepo"
+          />
         </div>
         <div v-if="!isTags" class="detail-row-side">
-          <DetailAside :data="appData" :type="'IMAGE'" :downloadData="downloadData" :ver-data="verData" :tagVer="tagVer" />
+          <DetailAside @report-analytics="reportAnalytics" :data="appData" :type="'IMAGE'" :downloadData="downloadData" :ver-data="verData" :tagVer="tagVer" />
         </div>
       </div>
     </template>

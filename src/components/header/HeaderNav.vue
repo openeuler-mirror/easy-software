@@ -3,6 +3,7 @@ import { ref, type PropType } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { computed } from 'vue';
 import { useLocale } from '@/composables/useLocale';
+import { oaReport } from '@/shared/analytics';
 
 interface NavsT {
   id: string;
@@ -41,6 +42,7 @@ const selectedIndex = computed(() => {
 
 // 导航跳转
 const jumpTo = (href: string, id: string) => {
+  oaReport('click', { module: 'navigation', target: id });
   router.push(`/${locale.value}${id === 'home' ? '' : href}`);
 };
 </script>
