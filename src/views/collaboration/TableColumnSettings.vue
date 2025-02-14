@@ -22,24 +22,11 @@ const emits = defineEmits<{
 const checkboxValue = useVModel(props, 'modelValue', emits);
 
 // 获取可操作的项
-const getActionableItems = computed(() => {
-  let arr: string[] = [];
-  props.options.forEach((item) => {
-    if (!item.isDefault) {
-      arr.push(item.key);
-    }
-  });
-  return arr;
-});
+const getActionableItems = computed(() => props.options.filter((item) => !item.isDefault).map((item) => item.key));
 
 const onChange = (option: string[]) => {
-  const activeArr: string[] = [];
-  getActionableItems.value.forEach((item) => {
-    if (option.includes(item)) {
-      activeArr.push(item);
-    }
-  });
-  localStorage.setItem('collaborationColumns', xss(activeArr.join()));
+  const activeArr = getActionableItems.value.filter((item) => option.includes(item));
+  localStorage.setItem('collaboration-columns', JSON.stringify(activeArr));
 };
 </script>
 
