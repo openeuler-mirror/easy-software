@@ -101,6 +101,7 @@
   .el-table__expand-icon {
     display: flex;
     align-items: center;
+    justify-content: center;
     > .el-icon {
       font-size: 16px;
       color: var(--o-color-info1);

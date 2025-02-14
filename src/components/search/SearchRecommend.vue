@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref, defineExpose, watch, computed, type PropType } from 'vue';
+import { ref, watch, computed, type PropType } from 'vue';
 import { OLink, OIcon, useMessage } from '@opensig/opendesign';
 import type { RecommendItemT } from '@/@types/search';
 import { useI18n } from 'vue-i18n';
@@ -9,7 +9,7 @@ import { GITEE } from '@/data/config';
 import ExternalLink from '@/components/ExternalLink.vue';
 
 import { useLocale } from '@/composables/useLocale';
-import xss from 'xss';
+import useSearchHistory from '@/composables/useSearchHistory';
 
 import IconChevronRight from '~icons/app/icon-chevron-right.svg';
 
@@ -91,36 +91,7 @@ const clickFeedback = () => {
 };
 
 // -------------------- 历史搜索记录----------------------
-const searchHistory = ref<string[]>([]);
-const loadSearchHistory = () => {
-  // 从 localStorage 加载搜索历史
-  const history = localStorage.getItem('searchHistory');
-
-  try {
-    if (history) {
-      searchHistory.value = JSON.parse(xss(history));
-    }
-  } catch {
-    searchHistory.value = [];
-  }
-};
-loadSearchHistory();
-const getSearchHistory = (searchValue: string) => {
-  if (searchValue && Array.isArray(searchHistory.value)) {
-    // 添加到历史记录并更新 localStorage
-    searchHistory.value.unshift(searchValue);
-    searchHistory.value = Array.from(new Set(searchHistory.value)); // 去重
-    if (searchHistory.value.length > 6) {
-      // 最多保持6条搜集记录
-      searchHistory.value.pop();
-    }
-
-    const newHistory = JSON.stringify(searchHistory.value);
-    localStorage.setItem('searchHistory', xss(newHistory));
-  }
-};
-
-defineExpose({ getSearchHistory });
+const searchHistory = useSearchHistory();
 
 watch(
   () => props.isFeedback,
@@ -171,10 +142,10 @@ const searchDocCount = (v: number) => {
       </OLink>
     </div>
   </div>
-  <div v-else-if="searchHistory.length > 0 && searchValue === ''" class="recommend">
+  <div v-else-if="searchHistory.list.value.length > 0 && searchValue === ''" class="recommend">
     <span class="history">{{ t('software.history') }}</span>
     <ul>
-      <li v-for="(item, index) in searchHistory" :key="index" @click="goSearch(item)">{{ item }}</li>
+      <li v-for="(item, index) in searchHistory.list.value" :key="index" @click="goSearch(item)">{{ item }}</li>
     </ul>
   </div>
   <div v-else-if="searchOptions.length === 0 && isShow" class="recommend">
