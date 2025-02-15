@@ -70,7 +70,5 @@ export async function tryLogin() {
     loginStore.setLoginStatus(LOGIN_STATUS.DONE);
   } catch (error) {
     loginStore.setLoginStatus(LOGIN_STATUS.FAILED);
-
-
   }
 }

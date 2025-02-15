@@ -16,7 +16,7 @@ export const useUserInfoStore = defineStore('userInfo', {
       platformAdminPermission: null as boolean | null,
       // 协作平台maintainer权限
       platformMaintainerPermission: null as boolean | null,
-    }
+    };
   },
   getters: {
     // 获取giteeID
@@ -24,7 +24,7 @@ export const useUserInfoStore = defineStore('userInfo', {
       const id = status.identities.find((id) => id.identity === 'gitee');
       return id ? id.login_name : '';
     },
-  }
+  },
 });
 
 /**
@@ -34,6 +34,7 @@ export const useLoginStore = defineStore('login', {
   state: () => {
     return {
       loginStatus: LOGIN_STATUS.NOT,
+      loginStatusChecked: false,
     };
   },
   actions: {

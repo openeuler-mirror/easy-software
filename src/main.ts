@@ -19,12 +19,8 @@ import { initRound } from '@opensig/opendesign';
 import App from './App.vue';
 import router from './router';
 import i18n from './i18n';
-import { enableOA, reportPerformance } from './shared/analytics';
 
 initRound('pill');
-
-enableOA();
-reportPerformance();
 
 const app = createApp(App);
 
