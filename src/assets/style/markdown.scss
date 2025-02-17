@@ -57,7 +57,7 @@
   pre {
     position: relative;
     border-radius: var(--layout-pkg-radius);
-    background-color: var(--o-color-control2-light);
+    background-color: var(--o-color-control2-light) !important;
     padding: 0;
     overflow: hidden;
 

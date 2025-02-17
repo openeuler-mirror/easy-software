@@ -1,6 +1,21 @@
 <script setup lang="ts">
 import { ref, computed, onUnmounted, onMounted, watch } from 'vue';
-import { OButton, ODivider, OIcon, OIconClose, OLink, OOption, OPopover, OPopup, ORate, OScroller, OSelect, OTag, OTextarea, useMessage } from '@opensig/opendesign';
+import {
+  OButton,
+  ODivider,
+  OIcon,
+  OIconClose,
+  OLink,
+  OOption,
+  OPopover,
+  OPopup,
+  ORate,
+  OScroller,
+  OSelect,
+  OTag,
+  OTextarea,
+  useMessage,
+} from '@opensig/opendesign';
 import IconOutlink from '~icons/app/icon-outlink.svg';
 import type { FeedbackHistoryT } from '@/@types/feedback';
 import { getGlobalFeedbackHistoryList, postGlobalFeedback } from '@/api/api-feedback';
@@ -18,7 +33,7 @@ import { onClickOutside } from '@vueuse/core';
 
 const FEEDBACK_REGEXP = /(.*?)4. 【用户名】.*$/;
 const REPLACE_REGEXP = /\r|\n/g;
-const STORAGE_KEY = 'globalFeedback';
+const STORAGE_KEY = 'global-feedback';
 const { t } = useI18n();
 const loginStore = useLoginStore();
 const message = useMessage();
@@ -55,7 +70,7 @@ watch(popupVisible, (val) => {
     isShowingFeedbackList.value = false;
     rateVal.value = 0;
     feedbackContent.value = '';
-    window.sessionStorage.removeItem(STORAGE_KEY)
+    window.sessionStorage.removeItem(STORAGE_KEY);
   }
 });
 
@@ -200,20 +215,24 @@ onUnmounted(() => window.sessionStorage.removeItem(STORAGE_KEY));
 
 <template>
   <Teleport to="body">
-    <div class="global-feedback-btn" v-if="!isDetailPage" @click="onClick" :style="{ color: popupVisible ? 'var(--o-color-primary1)' : 'var(--o-color-control3)' }">
+    <div
+      class="global-feedback-btn"
+      v-if="!isDetailPage"
+      @click="onClick"
+      :style="{ color: popupVisible ? 'var(--o-color-primary1)' : 'var(--o-color-control3)' }"
+    >
       <iconButton />
       <div class="popup-target" ref="popupTargetRef"></div>
       <OPopup :target="popupTargetRef" v-model:visible="popupVisible" body-class="global-feedback-popup" trigger="none" position="lb">
         <div ref="popupBodyRef" class="global-feedback">
           <OIconClose class="close-icon" @click="onClickCloseIcon" />
-          <p class="title">{{ feedbackTitle }}
+          <p class="title">
+            {{ feedbackTitle }}
             <OPopover>
               <template #target>
                 <OIcon v-show="isShowingFeedbackList" class="help-icon"><IconHelp /></OIcon>
               </template>
-              <p style="max-width: 170px; word-break: break-all;">
-                历史反馈信息内容更新有延迟，请耐心等待
-              </p>
+              <p style="max-width: 170px; word-break: break-all">历史反馈信息内容更新有延迟，请耐心等待</p>
             </OPopover>
           </p>
           <template v-if="!isShowingFeedbackList">
@@ -224,7 +243,7 @@ onUnmounted(() => window.sessionStorage.removeItem(STORAGE_KEY));
               :max-length="500"
               resize="none"
               clearable
-              style="margin-top: 16px; width: 300px; height: 88px;"
+              style="margin-top: 16px; width: 300px; height: 88px"
               :inputOnOutlimit="false"
             />
             <OButton class="button" color="primary" variant="solid" round="pill" @click="postFeedback">提交反馈</OButton>
@@ -236,7 +255,7 @@ onUnmounted(() => window.sessionStorage.removeItem(STORAGE_KEY));
             <template v-if="loginStore.isLogined && !empty">
               <div class="title">
                 <span>共{{ feedbacks.length }}条反馈信息</span>
-                <OSelect v-model="feedbackState" @change="getFeedbackList" :options-wrapper="feedbackListRef" style="max-width: 108px; max-height: 80px;">
+                <OSelect v-model="feedbackState" @change="getFeedbackList" :options-wrapper="feedbackListRef" style="max-width: 108px; max-height: 80px">
                   <OOption v-for="item in feedbackOptions" :key="item.value" :value="item.value" :label="item.label">
                     {{ item.label }}
                   </OOption>
@@ -276,12 +295,8 @@ onUnmounted(() => window.sessionStorage.removeItem(STORAGE_KEY));
             <Result404 v-else>
               <template #description>
                 <p class="empty-desc">
-                  <template v-if="!loginStore.isLogined">
-                    <OLink color="primary" @click="doLogin">登录</OLink>可查看历史反馈信息
-                  </template>
-                  <template v-else>
-                    暂无反馈消息
-                  </template>
+                  <template v-if="!loginStore.isLogined"> <OLink color="primary" @click="doLogin">登录</OLink>可查看历史反馈信息 </template>
+                  <template v-else> 暂无反馈消息 </template>
                 </p>
               </template>
             </Result404>

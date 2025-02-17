@@ -269,9 +269,9 @@ const updateColumns = (v: string[]) => {
 };
 
 onMounted(() => {
-  const collaborationColumns = localStorage.getItem('collaborationColumns');
+  const collaborationColumns = localStorage.getItem('collaboration-columns');
   if (collaborationColumns) {
-    updateColumns(xss(collaborationColumns).split(','));
+    updateColumns(JSON.parse(xss(collaborationColumns)));
   }
 
   checkboxValue.value = columns.map((item) => {
