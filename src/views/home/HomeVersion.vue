@@ -284,6 +284,7 @@ const showMore = () => {
 .expand-data {
   margin: 12px 48px 12px 64px;
   border: 1px solid var(--el-table-border-color);
+  border-bottom: 0 none;
   border-radius: 4px;
   .arch-box {
     display: grid;

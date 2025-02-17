@@ -8,6 +8,7 @@ import { getSearchDataAll } from '@/api/api-search';
 import type { RecommendItemT } from '@/@types/search';
 import { onClickOutside } from '@vueuse/core';
 import { useLocale } from '@/composables/useLocale';
+import useSearchHistory from '@/composables/useSearchHistory';
 import { useI18n } from 'vue-i18n';
 import { TABNAME_OPTIONS, FLITERMENUOPTIONS } from '@/data/query';
 
@@ -64,8 +65,9 @@ const changeSearchInput = (v: string) => {
   replaceWinUrl();
 };
 
+const searchHistory = useSearchHistory();
 const replaceWinUrl = () => {
-  searchRecommendRef.value?.getSearchHistory(searchInput.value);
+  searchHistory.add(searchInput.value);
   collectDownloadData(searchInput.value, defaultValue.value, tabName.value);
   router.push({
     path: `/${locale.value}/search`,
