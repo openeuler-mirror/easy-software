@@ -1,45 +1,14 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed } from 'vue';
 import { useLocale } from '@/composables/useLocale';
-import { checkOriginLink, windowOpen, getYearByOffset } from '@/utils/common';
-import {
-  OSCHINA,
-  CSDN_BLOG,
-  JUEJIN,
-  BILIBILI_SPACE,
-  INFOQ,
-  CTO51,
-  REDDIT,
-  LINKEDIN,
-  TWITTER,
-  YOUTUBE,
-  OPENEULER,
-  OPENATOM,
-  OPENEULER_CONTACT,
-} from '@/data/config';
-
-import ExternalLink from '@/components/ExternalLink.vue';
+import { getYearByOffset } from '@/utils/common';
+import { OPENEULER, OPENATOM, OPENEULER_CONTACT } from '@/data/config';
 
 import LogoFooter from '@/assets/footer/footer-logo2.png';
 import LogoFooter1 from '@/assets/footer-logo1.png';
 import LogoAtom from '@/assets/footer/atom-logo.svg';
 import FooterBg from '@/assets/footer/footer-bg.png';
 import FooterBgMo from '@/assets/footer/footer-bg-mo.png';
-
-// 中文友情链接
-import LogoBilibili from '@/assets/footer/bilibili.png';
-import LogoInfoq from '@/assets/footer/infoq.png';
-import LogoJuejin from '@/assets/footer/juejin.png';
-import LogoOschina from '@/assets/footer/oschina.png';
-import LogoCsdn from '@/assets/footer/csdn.png';
-import Logo51cto from '@/assets/footer/51cto.png';
-
-// 英文、俄文友情链接
-import LogoRedditSquare from '@/assets/footer/reddit-square@2x.png';
-import LogoBilibili2 from '@/assets/footer/bilibili@2x.png';
-import LogoLinkedin from '@/assets/footer/linkedin@2x.png';
-import LogoYoutube from '@/assets/footer/youtube@2x.png';
-import LogoTwitter from '@/assets/footer/twitter@2x.png';
 
 // 公众号、小助手
 import CodeTitleXzs from '@/assets/footer/img-xzs.png';
@@ -49,68 +18,6 @@ import CodeImgZgz from '@/assets/footer/code-zgz.png';
 
 const { t, isZh } = useLocale();
 
-// 友情链接
-const linksData: any = {
-  zh: [
-    {
-      href: OSCHINA + '/openeuler',
-      logo: LogoOschina,
-      id: 'oschina',
-    },
-    {
-      href: CSDN_BLOG + '/openEuler_?spm=1000.2115.3001.5343',
-      logo: LogoCsdn,
-      id: 'csdn',
-    },
-    {
-      href: JUEJIN + '/user/3183782863845454',
-      logo: LogoJuejin,
-      id: 'juejin',
-    },
-    {
-      href: BILIBILI_SPACE + '/527064077/channel/series',
-      logo: LogoBilibili,
-      id: 'bilibili',
-    },
-    {
-      href: INFOQ + '/profile/6E6CE3E2316F28/publish',
-      logo: LogoInfoq,
-      id: 'infoq',
-    },
-    {
-      href: CTO51 + '/u_14948868',
-      logo: Logo51cto,
-      id: '51cto',
-    },
-  ],
-  en: [
-    {
-      href: REDDIT + '/r/openEuler/',
-      logo: LogoRedditSquare,
-      id: 'reddit-square',
-    },
-    {
-      href: LINKEDIN + '/company/openeuler',
-      logo: LogoLinkedin,
-      id: 'linkedin',
-    },
-    {
-      href: TWITTER + '/openEuler',
-      logo: LogoTwitter,
-      id: 'twitter',
-    },
-    {
-      href: BILIBILI_SPACE + '/527064077/channel/series',
-      logo: LogoBilibili2,
-      id: 'bilibili',
-    },
-    {
-      href: YOUTUBE + '/channel/UCPzSqXqCgmJmdIicbY7GAeA',
-      logo: LogoYoutube,
-      id: 'youtube',
-    },
-  ],
-};
 // 隐私链接
 const linksData2 = {
   zh: [
@@ -151,8 +58,6 @@ const linksData2 = {
   ],
 };
 
-const linkList = computed(() => (isZh.value ? linksData.zh : linksData.en));
-
 const footLink = computed(() => (isZh.value ? linksData2.zh : linksData2.en));
 
 // 公众号、小助手
@@ -173,17 +78,6 @@ const footerCodeList = [
 const footBg = {
   pc: `url(${FooterBg})`,
   mo: `url(${FooterBgMo})`,
-};
-
-const showExternalDlg = ref(false);
-const externalLink = ref('');
-const onExternalDialog = (href: string) => {
-  externalLink.value = href;
-  if (checkOriginLink(href)) {
-    windowOpen(href, '_blank');
-  } else {
-    showExternalDlg.value = true;
-  }
 };
 </script>
 
@@ -224,15 +118,8 @@ const onExternalDialog = (href: string) => {
               </div>
             </span>
           </div>
-          <div class="footer-links" :class="isZh ? 'zh' : ''">
-            <span v-for="item in linkList" :key="item.id" @click="onExternalDialog(item.href)" class="links-logo">
-              <img :src="item.logo" alt="" />
-            </span>
-          </div>
         </div>
       </div>
-      <!-- 跳转外部链接提示 -->
-      <ExternalLink v-if="showExternalDlg" :href="externalLink" @change="showExternalDlg = false" />
     </div>
   </div>
 </template>
@@ -411,7 +298,6 @@ $color: #fff;
     .code-box {
       display: flex;
       justify-content: right;
-      margin-bottom: 16px;
       .code-pop + .code-pop {
         margin-left: 16px;
       }
