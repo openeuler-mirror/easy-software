@@ -1,5 +1,6 @@
 export const os = [
   'openEuler-24.09',
+  'openEuler-24.03-LTS-SP1',
   'openEuler-24.03-LTS',
   'openEuler-23.09',
   'openEuler-23.03',
@@ -18,13 +19,6 @@ export const os = [
   'openEuler-20.03-LTS-SP1',
   'openEuler-20.03-LTS',
   'openEuler-preview',
-]
+];
 
-export const arch = [
-  "x86_64",
-  "aarch64",
-  "noarch",
-  "riscv64",
-  "loongarch64",
-  "sw_64",
-]
+export const arch = ['x86_64', 'aarch64', 'noarch', 'riscv64', 'loongarch64', 'sw_64'];
