@@ -122,7 +122,7 @@ const queryAllpkg = () => {
       }
       isLoading.value = false;
     })
-    .catch((err) => {
+    .catch(() => {
       useViewStore().showNotFound();
       total.value = 0;
       pkgData.value = [];
@@ -147,6 +147,7 @@ const pageSearch = () => {
 // 获取筛选参数列表
 const oepkgColumn = {
   os: [
+    'openEuler-24.03-LTS-SP1',
     'openEuler-24.03-LTS',
     'openEuler-22.03-LTS-SP4',
     'openEuler-22.03-LTS-SP3',
