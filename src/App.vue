@@ -5,7 +5,6 @@ import { RouterView } from 'vue-router';
 import { OScroller, OConfigProvider } from '@opensig/opendesign';
 import zhCN from '@opensig/opendesign/es/locale/lang/zh-cn';
 import enUS from '@opensig/opendesign/es/locale/lang/en-us';
-import { BAIDU_HM } from '@/data/config';
 
 import { useLangStore, useViewStore } from '@/stores/common';
 import { useLocale } from '@/composables/useLocale';
@@ -13,11 +12,11 @@ import { useLocale } from '@/composables/useLocale';
 import AppHeader from '@/components/header/AppHeader.vue';
 import AppFooter from '@/components/AppFooter.vue';
 import GlobalFeedback from './components/GlobalFeedback.vue';
+import CookieNotice from './components/CookieNotice.vue';
 
 const langStore = useLangStore();
 const viewState = useViewStore();
 const { locale } = useI18n();
-
 watch(
   () => langStore.lang,
   (val) => {
@@ -27,18 +26,6 @@ watch(
 
 // -------------------- 组件国际化 --------------------
 const { isZh } = useLocale();
-
-// -------------------- 埋点 --------------------
-const initSensor = () => {
-  // 百度统计
-  (function () {
-    const hm = document.createElement('script');
-    hm.src = BAIDU_HM;
-    const s = document.getElementsByTagName('HEAD')[0];
-    s.appendChild(hm);
-  })();
-};
-initSensor();
 </script>
 
 <template>
@@ -52,6 +39,7 @@ initSensor();
       </main>
       <AppFooter />
     </OScroller>
+    <CookieNotice />
   </OConfigProvider>
 </template>
 

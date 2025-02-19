@@ -6,7 +6,6 @@ import { tryLogin } from '@/shared/login';
 import { useLoginStore, useUserInfoStore } from '@/stores/user';
 import { getCollaborationPermissions } from '@/api/api-collaboration';
 import { COLLABORATIONPERMISSION } from '@/data/query';
-import { reportPV } from '@/shared/analytics';
 
 const routes = [
   {
@@ -147,6 +146,7 @@ router.beforeEach(async (to) => {
   }
 
   await tryLogin();
+  loginStore.loginStatusChecked = true;
 
   // 协作平台权限
   if ((userInfoStore.platformMaintainerPermission === null || userInfoStore.platformAdminPermission === null) && loginStore.isLogined) {
@@ -172,16 +172,7 @@ router.beforeEach(async (to) => {
   return true;
 });
 
-router.beforeEach((to, from) => {
-  if (to.name !== 'notFound' && from.path !== '/' && to.path !== from.path) {
-    to.meta.$referrer = window.location.href;
-  }
-});
-
-router.afterEach((to, from) => {
-  if (to.name !== 'notFound' && to.path !== from.path) {
-    reportPV(to.meta.$referrer as string);
-  }
+router.afterEach(() => {
   useViewStore().$patch({ notFoundPage: false });
 });
 
