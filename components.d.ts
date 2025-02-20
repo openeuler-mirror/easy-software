@@ -19,6 +19,7 @@ declare module 'vue' {
     AppTableToggle: typeof import('./src/components/AppTableToggle.vue')['default']
     CBreadcrumb: typeof import('./src/components/collaboration/CBreadcrumb.vue')['default']
     ContentWrapper: typeof import('./src/components/ContentWrapper.vue')['default']
+    CookieNotice: typeof import('./src/components/CookieNotice.vue')['default']
     DetailAside: typeof import('./src/components/detail/DetailAside.vue')['default']
     DetailBasicInfo: typeof import('./src/components/detail/DetailBasicInfo.vue')['default']
     DetailHeader: typeof import('./src/components/detail/DetailHeader.vue')['default']

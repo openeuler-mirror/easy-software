@@ -1,3 +1,4 @@
+import { getCustomCookie } from '@/utils/cookie';
 import { defineStore } from 'pinia';
 
 // 语言
@@ -35,4 +36,39 @@ export const useAppearance = defineStore('appearance', {
   state: () => ({
     theme: 'light',
   }),
+});
+
+export const COOKIE_AGREED_STATUS = {
+  NOT_SIGNED: '0', // 未签署
+  ALL_AGREED: '1', // 同意所有cookie
+  NECCESSARY_AGREED: '2', // 仅同意必要cookie
+};
+
+export const COOKIE_KEY = 'agreed-cookiepolicy';
+
+export const useCookieStore = defineStore('cookie', {
+  state: () => ({
+    status: COOKIE_AGREED_STATUS.NOT_SIGNED,
+    version: '20240830',
+  }),
+  getters: {
+    isAllAgreed: (state) => state.status === COOKIE_AGREED_STATUS.ALL_AGREED,
+  },
+  actions: {
+    getUserCookieStatus() {
+      const cookieVal = getCustomCookie(COOKIE_KEY) ?? '0';
+      const cookieStatusVal = cookieVal[0];
+      const privacyVersionVal = cookieVal.slice(1);
+      if (privacyVersionVal !== this.version) {
+        this.status = COOKIE_AGREED_STATUS.NOT_SIGNED;
+      } else if (cookieStatusVal === COOKIE_AGREED_STATUS.ALL_AGREED) {
+        this.status = COOKIE_AGREED_STATUS.ALL_AGREED;
+      } else if (cookieStatusVal === COOKIE_AGREED_STATUS.NECCESSARY_AGREED) {
+        this.status = COOKIE_AGREED_STATUS.NECCESSARY_AGREED;
+      } else {
+        this.status = COOKIE_AGREED_STATUS.NOT_SIGNED;
+      }
+      return this.status;
+    },
+  },
 });

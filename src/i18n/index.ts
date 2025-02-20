@@ -5,6 +5,7 @@ import software from './software';
 import upstream from './upstream';
 import detail from '@/i18n/detail';
 import collaboration from '@/i18n/collaboration';
+import cookie from './cookie';
 
 const messages = {
   zh: {
@@ -13,6 +14,7 @@ const messages = {
     upstream: upstream.zh,
     detail: detail.zh,
     collaboration: collaboration.zh,
+    cookie: cookie.zh,
   },
   en: {
     common: common.en,
@@ -20,6 +22,7 @@ const messages = {
     upstream: upstream.en,
     detail: detail.en,
     collaboration: collaboration.en,
+    cookie: cookie.en,
   },
 };
 
