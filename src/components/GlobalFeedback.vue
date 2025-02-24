@@ -29,7 +29,8 @@ import { doLogin } from '@/shared/login';
 import IconLoading from '~icons/app/icon-loading.svg';
 import IconHelp from '~icons/app/icon-help.svg';
 import { useRoute } from 'vue-router';
-import { onClickOutside } from '@vueuse/core';
+import { onClickOutside, useDebounceFn } from '@vueuse/core';
+import { oaReport } from '@/shared/analytics';
 
 const FEEDBACK_REGEXP = /(.*?)4. 【用户名】.*$/;
 const REPLACE_REGEXP = /\r|\n/g;
@@ -58,6 +59,30 @@ const feedbackContent = ref('');
 
 const popupVisible = ref(false);
 
+const reportAnalytics = (data: Record<string, any>, event = 'click') => {
+  oaReport(event, {
+    module: 'global_feedback',
+    tab: route.name,
+    ...data,
+  });
+};
+
+const onRateChange = (val: number) => {
+  reportAnalytics({
+    type: 'rate',
+    target: val,
+  });
+};
+
+const onInput = useDebounceFn(() => {
+  reportAnalytics(
+    {
+      content: feedbackContent.value,
+    },
+    'input'
+  );
+}, 500);
+
 onClickOutside(popupBodyRef, (event) => {
   event.stopPropagation();
   if (popupVisible.value) {
@@ -71,6 +96,11 @@ watch(popupVisible, (val) => {
     rateVal.value = 0;
     feedbackContent.value = '';
     window.sessionStorage.removeItem(STORAGE_KEY);
+  }
+  if (val) {
+    reportAnalytics({
+      type: 'open',
+    });
   }
 });
 
@@ -196,6 +226,12 @@ const postFeedback = () => {
       content: t('software.feedbackMessage[0]'),
     });
   }
+  reportAnalytics({
+    type: 'submit',
+    content: feedbackContent.value,
+    rate: rateVal.value,
+  });
+
   postGlobalFeedback(window.location.href, rateVal.value, feedbackContent.value)
     .then(() => {
       window.sessionStorage.removeItem(STORAGE_KEY);
@@ -236,8 +272,9 @@ onUnmounted(() => window.sessionStorage.removeItem(STORAGE_KEY));
             </OPopover>
           </p>
           <template v-if="!isShowingFeedbackList">
-            <ORate v-model="rateVal" color="danger" style="margin-top: 16px" />
+            <ORate v-model="rateVal" @change="onRateChange" color="danger" style="margin-top: 16px" />
             <OTextarea
+              @input="onInput"
               v-model="feedbackContent"
               placeholder="请输入您的反馈"
               :max-length="500"

@@ -18,6 +18,7 @@ import DetailAside from '@/components/detail/DetailAside.vue';
 import defaultImg from '@/assets/default-logo.png';
 import { provide } from 'vue';
 import { pkgIdInjection } from '@/data/injectionKeys';
+import useDetailPageAnalytics from '@/composables/useDetailPageAnalytics';
 
 const { t } = useI18n();
 const route = useRoute();
@@ -43,6 +44,7 @@ const appData = ref<AppInfoT>({
   security: '',
 });
 const srcRepo = ref('');
+const { reportAnalytics, goFeedback, vCopyInstallation, reportFeedback } = useDetailPageAnalytics(appData, basicInfo, 'RPM');
 
 const isLoading = ref(true);
 //详情请求
@@ -139,7 +141,7 @@ const queryVer = () => {
       <!-- 锚点 -->
       <AppBreadcrumb id="rpm" :name="appData.name" />
       <!-- 头部信息 -->
-      <DetailHead :data="appData" :basicInfo="summary" :maintainer="maintainer" />
+      <DetailHead @go-feedback="goFeedback" :data="appData" :basicInfo="summary" :maintainer="maintainer" />
 
       <div class="detail-row">
         <div class="detail-row-main">
@@ -153,7 +155,7 @@ const queryVer = () => {
             <!-- 安装指引 -->
             <DetailInstall :title="`> ${t('detail.installation')}`">
               <div v-if="downloadData" v-dompurify-html="downloadData" v-copy-code="true" class="markdown-body download"></div>
-              <div v-if="installation" v-dompurify-html="installation" v-copy-code="true" class="markdown-body installation"></div>
+              <div v-if="installation" v-copy-installation v-dompurify-html="installation" v-copy-code="true" class="markdown-body installation"></div>
             </DetailInstall>
 
             <!-- 更多信息 -->
@@ -162,10 +164,17 @@ const queryVer = () => {
           </AppSection>
 
           <!-- 反馈 -->
-          <AppFeedback :name="appData.name" :version="appData.version" type="RPM" :maintainer="maintainer" :srcRepo="srcRepo" />
+          <AppFeedback
+            @report-analytics="reportFeedback"
+            :name="appData.name"
+            :version="appData.version"
+            type="RPM"
+            :maintainer="maintainer"
+            :srcRepo="srcRepo"
+          />
         </div>
         <div class="detail-row-side">
-          <DetailAside :data="appData" :ver-data="verData" :tagVer="tagVer" :type="'RPM'" />
+          <DetailAside @report-analytics="reportAnalytics" :data="appData" :ver-data="verData" :tagVer="tagVer" :type="'RPM'" />
         </div>
       </div>
     </template>

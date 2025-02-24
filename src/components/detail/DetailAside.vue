@@ -60,6 +60,10 @@ const props = defineProps({
 const { t } = useI18n();
 const route = useRoute();
 
+const emit = defineEmits<{
+  (event: 'reportAnalytics', data: Record<string, any>): void;
+}>();
+
 const tableData = ref([
   {
     name: '二进制包下载',
@@ -75,7 +79,7 @@ const externalLink = ref('');
 const onExternalDialog = (href: string) => {
   externalLink.value = href;
 
-  collectDownloadData();
+  collectDownloadData(href === props.data.bin_code ? 'binary' : 'source_code');
   showExternalDlg.value = true;
 };
 const show = ref(true);
@@ -125,7 +129,7 @@ const copyText = (e: MouseEvent, val: any) => {
     text: val,
     target: e,
     success: () => {
-      collectDownloadData();
+      collectDownloadData(val === props.data.bin_code ? 'binary' : 'source_code', true);
       message.success({
         content: '复制成功',
       });
@@ -136,17 +140,14 @@ const copyText = (e: MouseEvent, val: any) => {
 const pkgId = inject<Ref<string>>(pkgIdInjection, ref(''));
 
 // ---------------------下载埋点--------------------
-const collectDownloadData = () => {
-  const { href } = window.location;
-  const downloadTime = new Date();
-  oaReport('download', {
-    origin: href,
-    softwareName: props.data.name,
-    version: props.data.version,
-    pkgId: pkgId.value,
-    type: props.type,
-    downloadTime,
-  });
+const collectDownloadData = (download_type?: 'binary' | 'source_code' | null, isCopy?: boolean) => {
+  const data: Record<string, string> = {
+    type: isCopy ? 'copy_url' : 'download',
+  };
+  if (download_type) {
+    data.download_type = download_type;
+  }
+  emit('reportAnalytics', data);
 };
 
 // ---------------------版本支持情况--------------------
@@ -217,7 +218,7 @@ watch(
 
 // 应用镜像埋点
 const onCodeSuccess = () => {
-  collectDownloadData();
+  collectDownloadData(null, true);
 };
 
 const isSecurityShow = ref(false);

@@ -24,8 +24,9 @@ const props = defineProps<{
   version: string;
 }>();
 
-defineEmits<{
+const emit = defineEmits<{
   (event: 'goToUrl', url: string): void;
+  (event: 'changeCategory', val: string): void;
 }>();
 
 /** 是否首次进入 */
@@ -96,13 +97,17 @@ const handleSizeChange = (size: number) => {
 const handleCurrentChange = (page: number) => {
   currentPage.value = page;
 };
+
+const onChangeCategory = (val: string) => {
+  emit('changeCategory', val || '全部');
+};
 </script>
 
 <template>
   <header class="filter-items" v-if="showFilter">
     <div class="filter-left">
       共{{ totalCount }}条反馈信息
-      <ORadioGroup v-model="radioVal" :style="{ '--radio-group-gap': '16px' }">
+      <ORadioGroup @change="onChangeCategory" v-model="radioVal" :style="{ '--radio-group-gap': '16px' }">
         <ORadio v-for="item in filterItems" :key="item.value" :value="item.value">
           <template #radio="{ checked }">
             <OToggle :checked="checked" style="--toggle-radius: 4px">

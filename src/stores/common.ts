@@ -49,7 +49,6 @@ export const COOKIE_KEY = 'agreed-cookiepolicy';
 export const useCookieStore = defineStore('cookie', {
   state: () => ({
     status: COOKIE_AGREED_STATUS.NOT_SIGNED,
-    version: '20240830',
   }),
   getters: {
     isAllAgreed: (state) => state.status === COOKIE_AGREED_STATUS.ALL_AGREED,
@@ -58,10 +57,7 @@ export const useCookieStore = defineStore('cookie', {
     getUserCookieStatus() {
       const cookieVal = getCustomCookie(COOKIE_KEY) ?? '0';
       const cookieStatusVal = cookieVal[0];
-      const privacyVersionVal = cookieVal.slice(1);
-      if (privacyVersionVal !== this.version) {
-        this.status = COOKIE_AGREED_STATUS.NOT_SIGNED;
-      } else if (cookieStatusVal === COOKIE_AGREED_STATUS.ALL_AGREED) {
+      if (cookieStatusVal === COOKIE_AGREED_STATUS.ALL_AGREED) {
         this.status = COOKIE_AGREED_STATUS.ALL_AGREED;
       } else if (cookieStatusVal === COOKIE_AGREED_STATUS.NECCESSARY_AGREED) {
         this.status = COOKIE_AGREED_STATUS.NECCESSARY_AGREED;

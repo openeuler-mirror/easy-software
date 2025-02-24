@@ -1,8 +1,8 @@
 <script lang="ts" setup>
-import { type PropType, ref, onMounted } from 'vue';
+import { type PropType, ref, onMounted, computed } from 'vue';
 import { OCard, OTag, OIcon } from '@opensig/opendesign';
 import type { AppItemT, PkgIdsT, PkgTypeT } from '@/@types/app';
-import { getTagsIcon } from '@/utils/common';
+import { getTagsIcon, xssAllTag } from '@/utils/common';
 import { useLocale } from '@/composables/useLocale';
 import { useI18n } from 'vue-i18n';
 import { useRoute } from 'vue-router';
@@ -11,11 +11,17 @@ import { maintainerDefaults } from '@/data/query';
 
 import defaultImg from '@/assets/default-logo.png';
 import IconUser from '~icons/app/icon-user.svg';
+import { oaReport } from '@/shared/analytics';
+import { dataType } from 'element-plus/es/components/table-v2/src/common.mjs';
 
-defineProps({
+const props = defineProps({
   data: {
     type: Object as PropType<AppItemT>,
     default: () => {},
+  },
+  fieldName: {
+    type: String,
+    required: false,
   },
 });
 const route = useRoute();
@@ -68,6 +74,78 @@ onMounted(() => {
   isPageSearch.value = route.name === 'search';
   isPageHome.value = route.name === 'home';
 });
+
+const reportAnalytics = (data: Record<string, any>, event = 'click') => {
+  let module: string;
+  if (isPageHome.value) {
+    module = 'home_page';
+  } else if (isPageSearch.value) {
+    module = 'search_page';
+  } else {
+    module = 'field';
+  }
+  if (isPageSearch.value) {
+    oaReport(
+      event,
+      {
+        module,
+        app_name: xssAllTag(props.data.name),
+        version: props.data.version,
+        os_version: props.data.os,
+        architecture: props.data.arch,
+        ...data,
+      },
+      'search_software'
+    );
+    return;
+  }
+  oaReport(event, {
+    module,
+    app_name: xssAllTag(props.data.name),
+    version: props.data.version,
+    os_version: props.data.os,
+    architecture: props.data.arch,
+    ...data,
+  });
+};
+
+const onClickLink = (event: MouseEvent, isTag?: boolean) => {
+  const target = event.currentTarget as HTMLElement;
+  if (isPageHome.value) {
+    const obj: Record<string, any> = {
+      level1: '领域应用',
+      level2: props.fieldName || '',
+      level3: props.data.name || '',
+      target: target.textContent,
+      type: isTag ? 'tag' : 'card',
+    };
+    if (isTag) {
+      obj.level4 = target.textContent;
+    }
+    reportAnalytics(obj);
+    return;
+  }
+  if (isPageSearch.value) {
+    reportAnalytics({
+      tab: route.query.tab,
+      type: 'search_content',
+      target: target.textContent,
+      content: route.query.name,
+    });
+    return;
+  }
+  if (isTag) {
+    reportAnalytics({
+      type: 'tag',
+      target: target.textContent,
+    });
+    return;
+  }
+  reportAnalytics({
+    type: 'go_detail',
+    target: target.textContent,
+  });
+};
 </script>
 
 <template>
@@ -82,7 +160,7 @@ onMounted(() => {
   >
     <template #main>
       <div class="pkg-info">
-        <a :href="jumpTo(data.pkgIds)" target="_blank" rel="noopener" class="name-info">
+        <a :href="jumpTo(data.pkgIds)" @click="onClickLink" target="_blank" rel="noopener" class="name-info">
           <span v-dompurify-html="data.name" class="name"></span><span v-if="data.arch" class="arch">/{{ data.arch }}</span>
         </a>
         <div class="pkg-icon"><img :src="data.iconUrl || defaultImg" class="icon" :class="{ 'default-img': !data.iconUrl }" /></div>
@@ -90,7 +168,7 @@ onMounted(() => {
       <p v-if="data.os" class="pkg-os">{{ data.os }}</p>
       <div class="pkg-box">
         <div v-if="data.tags && data.tags.length > 0" class="tags-box">
-          <a :href="jumpTo(data.pkgIds, tag)" v-for="tag in data.tags" :key="tag" target="_blank" rel="noopener">
+          <a :href="jumpTo(data.pkgIds, tag)" v-for="tag in data.tags" :key="tag" @click="onClickLink($event, true)" target="_blank" rel="noopener">
             <OTag style="--o-icon_size_control-xs: 0" variant="outline" :class="`${tag.toLocaleLowerCase()}-icon`">
               <template #icon>
                 <OIcon><component :is="getTagsIcon(tag)" /></OIcon>

@@ -1,20 +1,18 @@
 <script lang="ts" setup>
-import { inject, ref, type Ref } from 'vue';
+import { ref } from 'vue';
 import { ORate, OTextarea, useMessage, OIcon, OButton, ODivider, OPopover } from '@opensig/opendesign';
 import { GITEE } from '@/data/config';
 import { useI18n } from 'vue-i18n';
 import { OPENEULER_FORUM } from '@/data/config';
 import { postFeedback } from '@/api/api-feedback';
-import { pkgIdInjection } from '@/data/injectionKeys';
 
 import xss from 'xss';
 import ExternalLink from '@/components/ExternalLink.vue';
 import AppSection from '@/components/AppSection.vue';
 
-import IconHelp from '~icons/pkg/icon-help.svg';
 import IconHelpTips from '~icons/app/icon-help.svg';
-import IconIssue from '~icons/pkg/icon-issue.svg';
 import FeedbackHistory from '@/components/feedbackHistory/FeedbackHistory.vue';
+import { useDebounceFn } from '@vueuse/core';
 
 const props = defineProps({
   name: {
@@ -49,11 +47,27 @@ const props = defineProps({
   },
 });
 
+const emit = defineEmits<{
+  (event: 'reportAnalytics', data: any, eventName: string): void;
+}>();
+
+const reportAnalytics = (data: Record<string, any>, event: 'click' | 'input' = 'click') => {
+  emit('reportAnalytics', data, event);
+};
+
 const { t } = useI18n();
 // -------------------- 快速反馈 --------------------
 const rateVal = ref(0);
 const feedbackTxa = ref('');
 const message = useMessage();
+
+const onRateChange = (val: number) => {
+  reportAnalytics({ target: val, type: 'rate' });
+};
+
+const onInput = useDebounceFn(() => {
+  reportAnalytics({ content: feedbackTxa.value }, 'input');
+}, 500);
 
 const clickSubmit = () => {
   if (rateVal.value === 0) {
@@ -65,6 +79,11 @@ const clickSubmit = () => {
       content: t('software.feedbackMessage[0]'),
     });
   }
+  reportAnalytics({
+    type: 'quick_feedback',
+    content: feedbackTxa.value,
+    rate: rateVal.value,
+  });
 
   const params = {
     feedbackPageUrl: window.location.href,
@@ -136,6 +155,11 @@ const onExternalDialog = () => {
       content: t('software.feedbackMessage[0]'),
     });
   }
+  reportAnalytics({
+    type: 'submit_issue',
+    content: feedbackTxa.value,
+    rate: rateVal.value,
+  });
 
   getIssueUrl();
   externalLink.value = decodeURIComponent(issueUrl.value);
@@ -156,17 +180,29 @@ const jumpOut = () => {
     clearData();
   }
 };
+
+const onClickLink = () => {
+  reportAnalytics({ type: 'post_topic' });
+};
+
+const onChangeHistoryCategory = (val: string) => {
+  reportAnalytics({
+    type: 'history_category',
+    target: val,
+  });
+};
 </script>
 
 <template>
   <AppSection :title="t('software.feedbackTitle')" class="feedback">
     <div class="feedback-content">
       <div class="rate-box">
-        <ORate v-model="rateVal" color="danger" size="large" />
+        <ORate @change="onRateChange" v-model="rateVal" color="danger" size="large" />
       </div>
       <div class="feedback-from">
         <OTextarea
           v-model="feedbackTxa"
+          @input="onInput"
           round="4px"
           :placeholder="t('software.feedbackPlaceholder')"
           :max-length="200"
@@ -180,7 +216,7 @@ const jumpOut = () => {
           <OButton color="primary" variant="solid" size="large" @click="clickSubmit">{{ t('software.feedbackButton[0]') }}</OButton>
           <OButton color="primary" size="large" @click="onExternalDialog">提交issue</OButton>
         </div>
-        <p class="other-text">您也可以使用<a :href="OPENEULER_FORUM" target="_blank" rel="noopener noreferrer"> 发帖求助 </a>进行反馈</p>
+        <p class="other-text">您也可以使用<a :href="OPENEULER_FORUM" @click="onClickLink" target="_blank" rel="noopener noreferrer"> 发帖求助 </a>进行反馈</p>
       </div>
     </div>
     <ODivider style="--o-divider-gap: 24px" />
@@ -193,7 +229,13 @@ const jumpOut = () => {
         <div class="popover-content">历史反馈信息内容更新有延迟，请耐心等待</div>
       </OPopover>
     </h3>
-    <FeedbackHistory :fieldDetailTab="props.fieldDetailTab" @goToUrl="goToFeedbackDetailUrl" :name="props.name" :version="props.version" />
+    <FeedbackHistory
+      @change-category="onChangeHistoryCategory"
+      :fieldDetailTab="props.fieldDetailTab"
+      @goToUrl="goToFeedbackDetailUrl"
+      :name="props.name"
+      :version="props.version"
+    />
   </AppSection>
   <ExternalLink v-if="showExternalDlg" :href="externalLink" @change="jumpOut" />
 </template>
