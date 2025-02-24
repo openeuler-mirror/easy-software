@@ -89,7 +89,7 @@ const toggleNoticeVisible = (val: boolean) => {
 const acceptAll = () => {
   cookieStore.status = COOKIE_AGREED_STATUS.ALL_AGREED;
   removeCustomCookie(COOKIE_KEY);
-  setCustomCookie(COOKIE_KEY, `${COOKIE_AGREED_STATUS.ALL_AGREED}${cookieStore.version}`, 180, COOKIE_DOMAIN);
+  setCustomCookie(COOKIE_KEY, `${COOKIE_AGREED_STATUS.ALL_AGREED}`, 180, COOKIE_DOMAIN);
   toggleNoticeVisible(false);
   initSensor();
 };
@@ -98,7 +98,7 @@ const acceptAll = () => {
 const rejectAll = () => {
   cookieStore.status = COOKIE_AGREED_STATUS.NECCESSARY_AGREED;
   removeCustomCookie(COOKIE_KEY);
-  setCustomCookie(COOKIE_KEY, `${COOKIE_AGREED_STATUS.NECCESSARY_AGREED}${cookieStore.version}`, 180, COOKIE_DOMAIN);
+  setCustomCookie(COOKIE_KEY, `${COOKIE_AGREED_STATUS.NECCESSARY_AGREED}`, 180, COOKIE_DOMAIN);
   toggleNoticeVisible(false);
   removeSensor();
 };
