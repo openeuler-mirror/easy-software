@@ -41,6 +41,18 @@ const defaultValue = ref('all');
 const searchInput = ref('');
 const tabName = ref('all');
 const fliterSelected = ref(defaultValue.value);
+
+const reportAnalytics = (data: Record<string, any>, event = 'click') => {
+  oaReport(
+    event,
+    {
+      module: isPageHome.value ? 'home_page' : 'search_page',
+      ...data,
+    },
+    'search_software'
+  );
+};
+
 const changeFilter = (v: string) => {
   fliterSelected.value = v;
   if (searchInput.value !== '') {
@@ -58,7 +70,10 @@ const changeSearchInput = (v: string) => {
       content: '文字长度不能超过100字符',
     });
   }
-
+  reportAnalytics({
+    type: 'search',
+    content: v,
+  });
   isLoading.value = false;
   isFocus.value = false;
   searchInput.value = v;
@@ -68,7 +83,6 @@ const changeSearchInput = (v: string) => {
 const searchHistory = useSearchHistory();
 const replaceWinUrl = () => {
   searchHistory.add(searchInput.value);
-  collectDownloadData(searchInput.value, defaultValue.value, tabName.value);
   router.push({
     path: `/${locale.value}/search`,
     query: {
@@ -77,23 +91,6 @@ const replaceWinUrl = () => {
       key: defaultValue.value,
     },
   });
-};
-
-// ---------------------搜索埋点--------------------
-const collectDownloadData = (keyword: string, filter: string, pkg: string) => {
-  const { href } = window.location;
-  const downloadTime = new Date();
-  oaReport(
-    'search',
-    {
-      origin: href,
-      keyword,
-      filter,
-      pkg,
-      downloadTime,
-    },
-    'search_software'
-  );
 };
 
 // ----------------- 联想搜索 -------------------------
@@ -114,6 +111,9 @@ const clickRecommend = (v: string) => {
 const isFocus = ref(false);
 const changeSearchFocus = (state: boolean) => {
   isFocus.value = state;
+  reportAnalytics({
+    type: 'search_input',
+  });
 };
 
 const changeSearchBlur = () => {
@@ -122,6 +122,15 @@ const changeSearchBlur = () => {
     if (searchInput.value === '' || name !== searchInput.value) {
       searchInput.value = name;
     }
+    return;
+  }
+  if (searchInput.value) {
+    reportAnalytics(
+      {
+        content: searchInput.value,
+      },
+      'input'
+    );
   }
 };
 

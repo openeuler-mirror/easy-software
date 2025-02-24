@@ -38,6 +38,10 @@ defineProps({
   },
 });
 
+const emit = defineEmits<{
+  (event: 'goFeedback'): void;
+}>();
+
 const { isDark } = useTheme();
 const route = useRoute();
 const showExternalDlg = ref(false);
@@ -59,6 +63,7 @@ const scrollToAnchor = (id: string) => {
     top = document.querySelector('.feedback')?.offsetTop;
   }
   scrollToTop(top, false);
+  emit('goFeedback');
 };
 </script>
 

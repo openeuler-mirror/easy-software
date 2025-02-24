@@ -14,6 +14,7 @@ import DetailAside from '@/components/detail/DetailAside.vue';
 
 import defaultImg from '@/assets/default-logo.png';
 import { pkgIdInjection } from '@/data/injectionKeys';
+import useDetailPageAnalytics from '@/composables/useDetailPageAnalytics';
 
 const route = useRoute();
 const { mkit } = useMarkdown();
@@ -40,6 +41,7 @@ const appData = ref<AppInfoT>({
   security: '',
 });
 const srcRepo = ref('');
+const { reportAnalytics, goFeedback, vCopyInstallation, reportFeedback } = useDetailPageAnalytics(appData, basicInfo, 'OEPKG');
 
 const isLoading = ref(true);
 
@@ -147,7 +149,7 @@ const queryVer = () => {
       <!-- 锚点 -->
       <AppBreadcrumb id="oepkg" :name="appData.name" />
 
-      <DetailHead :data="appData" :basicInfo="summary" :maintainer="maintainer" />
+      <DetailHead @go-feedback="goFeedback" :data="appData" :basicInfo="summary" :maintainer="maintainer" />
 
       <div class="detail-row">
         <div class="detail-row-main">
@@ -161,7 +163,7 @@ const queryVer = () => {
             <!-- 安装指引 -->
             <DetailInstall :title="`> ${t('detail.installation')}`">
               <div v-if="downloadData" v-dompurify-html="downloadData" v-copy-code="true" class="markdown-body download"></div>
-              <div v-if="installation" v-dompurify-html="installation" v-copy-code="true" class="markdown-body installation"></div>
+              <div v-if="installation" v-copy-installation v-dompurify-html="installation" v-copy-code="true" class="markdown-body installation"></div>
             </DetailInstall>
 
             <!-- 更多信息 -->
@@ -170,10 +172,17 @@ const queryVer = () => {
           </AppSection>
 
           <!-- 反馈 -->
-          <AppFeedback :name="appData.name" :version="appData.version" type="OEPKG" :maintainer="maintainer" :srcRepo="srcRepo" />
+          <AppFeedback
+            @report-analytics="reportFeedback"
+            :name="appData.name"
+            :version="appData.version"
+            type="OEPKG"
+            :maintainer="maintainer"
+            :srcRepo="srcRepo"
+          />
         </div>
         <div class="detail-row-side">
-          <DetailAside :data="appData" :ver-data="verData" :license="license" :tagVer="tagVer" :type="'OEPKG'" />
+          <DetailAside @report-analytics="reportAnalytics" :data="appData" :ver-data="verData" :license="license" :tagVer="tagVer" :type="'OEPKG'" />
         </div></div
     ></template>
   </ContentWrapper>

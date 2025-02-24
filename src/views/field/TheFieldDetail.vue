@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref, onMounted, type PropType, computed, provide, reactive } from 'vue';
+import { ref, onMounted, type PropType, computed, provide, reactive, type Directive } from 'vue';
 import { OTab, OTabPane, OIcon } from '@opensig/opendesign';
 import { useRoute, useRouter } from 'vue-router';
 import { getDetail, getTags, getVer } from '@/api/api-domain';
@@ -13,6 +13,7 @@ import { useLocale } from '@/composables/useLocale';
 import { useViewStore } from '@/stores/common';
 import type { ParamsKeyT } from '@/@types/detail';
 import { getCode } from '@/utils/common';
+import useDetailPageAnalytics from '@/composables/useDetailPageAnalytics';
 
 import AppFeedback from '@/components/AppFeedback.vue';
 import DetailHead from '@/components/detail/DetailHeader.vue';
@@ -112,7 +113,7 @@ const queryEntity = () => {
         activeName.value = data.tags[0];
       }
 
-      onChange(activeName.value);
+      onChange(activeName.value, true);
       isLoading.value = false;
     })
     .catch(() => {
@@ -123,7 +124,10 @@ const queryEntity = () => {
 
 //tab切换
 const tabValue = ref();
-const onChange = (tab: string) => {
+
+const { reportAnalytics, vCopyInstallation, goFeedback, reportFeedback } = useDetailPageAnalytics(appData, basicInfo, activeName);
+
+const onChange = (tab: string, noReport?: boolean) => {
   isTags.value = false;
   imgName.value = tagList[0].lable;
   if (tab === 'RPM') {
@@ -148,6 +152,12 @@ const onChange = (tab: string) => {
     getDetailValue(imgData.value);
   } else {
     useViewStore().showNotFound();
+  }
+  if (noReport !== true) {
+    reportAnalytics({
+      type: 'switch_app_type',
+      target: tab,
+    });
   }
   // 切换url参数
   if (route.query.type) {
@@ -325,6 +335,10 @@ const repeatTags = (v: string) => {
 const isTags = ref(false);
 const onChangeImage = (v: string) => {
   isTags.value = v === 'Tags' ? true : false;
+  reportAnalytics({
+    type: 'switch_tab',
+    target: v,
+  });
   if (tagsValue.value.length === 0) {
     queryTags();
   }
@@ -371,7 +385,7 @@ const onCodeSuccess = () => {
     <OTabPane class="tab-pane" v-for="item in tabList" :key="item" :label="item">
       <template #nav><OIcon :icon="getTabIcon(item)" class="tabs-icon" /> {{ repeatTags(item) }}</template>
       <ContentWrapper>
-        <DetailHead :data="appData" :basicInfo="summary" :maintainer="maintainer" />
+        <DetailHead @go-feedback="goFeedback" :data="appData" :basicInfo="summary" :maintainer="maintainer" />
         <div class="detail-row">
           <div class="detail-row-main" :class="{ tags: isTags }">
             <AppSection :title="`> ${t('detail.information')}`" v-if="item !== 'IMAGE'">
@@ -383,7 +397,7 @@ const onCodeSuccess = () => {
 
               <!-- 安装指引 -->
               <DetailInstall :title="`> ${t('detail.installation')}`">
-                <div v-if="installation" v-dompurify-html="installation" v-copy-code="true" class="markdown-body installation"></div>
+                <div v-if="installation" v-copy-installation v-dompurify-html="installation" v-copy-code="true" class="markdown-body installation"></div>
               </DetailInstall>
 
               <!-- 更多信息 -->
@@ -422,6 +436,7 @@ const onCodeSuccess = () => {
 
             <!-- 反馈 -->
             <AppFeedback
+              @report-analytics="reportFeedback"
               v-if="!isTags"
               :name="appData.name"
               :version="appData.version"
@@ -432,7 +447,7 @@ const onCodeSuccess = () => {
             />
           </div>
           <div v-if="!isTags" class="detail-row-side">
-            <DetailAside :data="appData" :type="item" :downloadData="downloadData" :ver-data="verData" :tagVer="tagVer" />
+            <DetailAside @report-analytics="reportAnalytics" :data="appData" :type="item" :downloadData="downloadData" :ver-data="verData" :tagVer="tagVer" />
           </div>
         </div>
       </ContentWrapper>

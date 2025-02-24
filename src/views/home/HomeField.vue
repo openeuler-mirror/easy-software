@@ -6,6 +6,7 @@ import { useRouter } from 'vue-router';
 import { useLocale } from '@/composables/useLocale';
 
 import IconChevronDown from '~icons/app/icon-chevron-right.svg';
+import { oaReport } from '@/shared/analytics';
 
 defineProps({
   data: {
@@ -18,6 +19,13 @@ defineProps({
 const router = useRouter();
 const { locale } = useLocale();
 const jumpTo = (name: string) => {
+  oaReport('click', {
+    module: 'home_page',
+    type: 'more',
+    level1: '领域应用',
+    level2: name,
+    target: '了解更多',
+  });
   router.push({
     path: `/${locale.value}/field`,
     query: {
@@ -42,7 +50,7 @@ const jumpTo = (name: string) => {
         </div>
         <ORow gap="32px" flex-wrap="wrap">
           <OCol v-for="subItem in item.children.slice(0, 4)" :key="subItem.name" flex="0 1 25%">
-            <OCardItem :data="subItem" />
+            <OCardItem :data="subItem" :field-name="item.name" />
           </OCol>
         </ORow>
       </template>

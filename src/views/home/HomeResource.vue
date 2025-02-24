@@ -2,6 +2,7 @@
 import { OIcon } from '@opensig/opendesign';
 import { homeData } from '@/data/home/index';
 import { useLocale } from '@/composables/useLocale';
+import { oaReport } from '@/shared/analytics';
 
 const { locale } = useLocale();
 
@@ -18,12 +19,28 @@ const resourceLeave = (id: string) => {
     path.setAttribute('fill', '');
   }
 };
+
+const onClickLink = (name: string) => {
+  oaReport('click', {
+    module: 'home_page',
+    type: 'resource',
+    level1: '获取资源',
+    level2: name,
+    target: name,
+  });
+};
 </script>
 
 <template>
   <div class="resource-content">
     <div v-for="item in homeData" :key="item.name" class="resource-panel">
-      <RouterLink :to="`/${locale}${item.href}`" class="resource-item" @mouseenter="resourceHover(item.id)" @mouseleave="resourceLeave(item.id)">
+      <RouterLink
+        :to="`/${locale}${item.href}`"
+        @click="onClickLink(item.name)"
+        class="resource-item"
+        @mouseenter="resourceHover(item.id)"
+        @mouseleave="resourceLeave(item.id)"
+      >
         <OIcon><component :is="item.icon" /></OIcon>
         <p class="title">{{ item.name }}</p>
         <p class="desc">{{ item.desc }}</p>

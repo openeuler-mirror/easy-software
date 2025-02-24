@@ -3,7 +3,7 @@ import { ref, watch, computed, type PropType } from 'vue';
 import { OLink, OIcon, useMessage } from '@opensig/opendesign';
 import type { RecommendItemT } from '@/@types/search';
 import { useI18n } from 'vue-i18n';
-import { useRouter } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { getTagsIcon, xssAllTag, getPkgName } from '@/utils/common';
 import { GITEE } from '@/data/config';
 import ExternalLink from '@/components/ExternalLink.vue';
@@ -12,6 +12,7 @@ import { useLocale } from '@/composables/useLocale';
 import useSearchHistory from '@/composables/useSearchHistory';
 
 import IconChevronRight from '~icons/app/icon-chevron-right.svg';
+import { oaReport } from '@/shared/analytics';
 
 const props = defineProps({
   searchValue: {
@@ -34,20 +35,43 @@ const props = defineProps({
 const msg = useMessage();
 const { t } = useI18n();
 const router = useRouter();
+const route = useRoute();
 const { locale } = useLocale();
 const isShow = ref(props.isFeedback);
 
+const isPageHome = computed(() => route.name === 'home');
+
+const reportAnalytics = (data: Record<string, any>, event = 'click') => {
+  oaReport(
+    event,
+    {
+      module: isPageHome.value ? 'home_page' : 'search_page',
+      content: props.searchValue,
+      ...data,
+      ...(route.query.tab ? { tab: route.query.tab } : {}),
+    },
+    'search_software'
+  );
+};
+
 const jumpPages = (type: string) => {
+  reportAnalytics({
+    type: `search_${type}`,
+  });
   router.push({
     path: `/${locale.value}/${getPkgName(type)}`,
     query: { name: props.searchValue },
   });
 };
 
-const goDetail = (key: string, id: string) => {
+const goDetail = (ev: MouseEvent, key: string, id: string) => {
   const type = getPkgName(key);
   const pkgName = ['filed', 'rpm', 'epkg', 'image', 'oepkg'];
   if (pkgName.includes(type)) {
+    reportAnalytics({
+      type: `suggest_${key}`,
+      target: (ev.currentTarget as HTMLElement).textContent,
+    });
     router.push({
       path: `/${locale.value}/${getPkgName(key)}/detail`,
       query: { type: type, pkgId: id },
@@ -59,7 +83,12 @@ const goDetail = (key: string, id: string) => {
   }
 };
 
-const goSearch = (name: string) => {
+const goSearch = (name: string, isHistory?: boolean) => {
+  if (!isHistory && isPageHome.value) {
+    reportAnalytics({
+      type: 'search',
+    });
+  }
   router.push({
     path: `/${locale.value}/search`,
     query: { name: `${xssAllTag(name)}`, tab: 'all', key: props.filterValue },
@@ -130,7 +159,7 @@ const searchDocCount = (v: number) => {
         <li
           v-for="(subitem, idx) in item.nameDocs"
           :key="idx"
-          @click="goDetail(item.key, subitem.pkgId)"
+          @click="goDetail($event, item.key, subitem.pkgId)"
           v-dompurify-html="`${subitem.name} ${subitem.version ? `:${subitem.version}` : ''}`"
         ></li>
       </ul>
@@ -145,7 +174,7 @@ const searchDocCount = (v: number) => {
   <div v-else-if="searchHistory.list.value.length > 0 && searchValue === ''" class="recommend">
     <span class="history">{{ t('software.history') }}</span>
     <ul>
-      <li v-for="(item, index) in searchHistory.list.value" :key="index" @click="goSearch(item)">{{ item }}</li>
+      <li v-for="(item, index) in searchHistory.list.value" :key="index" @click="goSearch(item, true)">{{ item }}</li>
     </ul>
   </div>
   <div v-else-if="searchOptions.length === 0 && isShow" class="recommend">
