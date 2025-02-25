@@ -16,7 +16,6 @@ import { useRoute } from 'vue-router';
 import IconChevronDown from '~icons/app/icon-chevron-down.svg';
 import IconState from '~icons/pkg/icon-state.svg';
 import IconLevel from '~icons/pkg/icon-level.svg';
-import { oaReport } from '@/shared/analytics';
 import { inject } from 'vue';
 import type { Ref } from 'vue';
 import { pkgIdInjection } from '@/data/injectionKeys';

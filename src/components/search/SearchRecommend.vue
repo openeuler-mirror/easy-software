@@ -12,7 +12,7 @@ import { useLocale } from '@/composables/useLocale';
 import useSearchHistory from '@/composables/useSearchHistory';
 
 import IconChevronRight from '~icons/app/icon-chevron-right.svg';
-import { oaReport } from '@/shared/analytics';
+import { searchReport } from '@/shared/analytics';
 
 const props = defineProps({
   searchValue: {
@@ -42,15 +42,14 @@ const isShow = ref(props.isFeedback);
 const isPageHome = computed(() => route.name === 'home');
 
 const reportAnalytics = (data: Record<string, any>, event = 'click') => {
-  oaReport(
+  searchReport(
     event,
     {
       module: isPageHome.value ? 'home_page' : 'search_page',
       content: props.searchValue,
       ...data,
       ...(route.query.tab ? { tab: route.query.tab } : {}),
-    },
-    'search_software'
+    }
   );
 };
 

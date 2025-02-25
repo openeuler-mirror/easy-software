@@ -10,7 +10,7 @@ import { useSearchStore } from '@/stores/search';
 import IconTimeOrder from '~icons/app/icon-time-order.svg';
 
 import IconSearch from '~icons/app/icon-search.svg';
-import { oaReport } from '@/shared/analytics';
+import { searchReport } from '@/shared/analytics';
 
 const props = defineProps({
   title: {
@@ -94,7 +94,7 @@ const replaceWinUrl = () => {
 const collectDownloadData = (keyword: string) => {
   const { href } = window.location;
   const downloadTime = new Date();
-  oaReport(
+  searchReport(
     'search',
     {
       origin: href,
@@ -102,8 +102,7 @@ const collectDownloadData = (keyword: string) => {
       filter: 'all',
       pkg: props.title,
       downloadTime,
-    },
-    'search_software'
+    }
   );
 };
 
