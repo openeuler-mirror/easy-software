@@ -15,7 +15,7 @@ import { TABNAME_OPTIONS, FLITERMENUOPTIONS } from '@/data/query';
 import SearchRecommend from '@/components/search/SearchRecommend.vue';
 
 import IconSearch from '~icons/app/icon-search.svg';
-import { oaReport } from '@/shared/analytics';
+import { searchReport } from '@/shared/analytics';
 
 defineProps({
   placeholder: {
@@ -43,13 +43,12 @@ const tabName = ref('all');
 const fliterSelected = ref(defaultValue.value);
 
 const reportAnalytics = (data: Record<string, any>, event = 'click') => {
-  oaReport(
+  searchReport(
     event,
     {
       module: isPageHome.value ? 'home_page' : 'search_page',
       ...data,
-    },
-    'search_software'
+    }
   );
 };
 

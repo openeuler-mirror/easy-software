@@ -60,35 +60,35 @@ export const disableOA = () => {
   });
 };
 
-/**
- * @param event 事件名
- * @param eventData 上报数据
- * @param $service service字段取值
- * @param options options
- */
-export const oaReport = <T extends Record<string, any>>(
-  event: string,
-  eventData?: T | ((...opt: any[]) => Awaitable<T>),
-  $service = 'software',
-  options?: {
-    immediate?: boolean;
-    eventOptions?: any;
-  }
-) => {
-  if (!oa.enabled) {
-    return;
-  }
-  const loginStore = useLoginStore();
-  return oa.report(
-    event,
-    async () => ({
-      $service,
-      loginStatus: loginStore.isLogined,
-      ...(typeof eventData === 'function' ? await eventData() : eventData),
-    }),
-    options
-  );
+type Service = 'software' | 'search_software'
+
+export const getReportFn = ($service: Service = 'software') => {
+  return (
+    event: string,
+    data?: Record<string, any> | ((...opt: any[]) => Awaitable<Record<string, any>>),
+    options?: {
+      immediate?: boolean;
+      eventOptions?: any;
+    }
+  ) => {
+    if (!oa.enabled) {
+      return;
+    }
+    const loginStore = useLoginStore();
+    return oa.report(
+      event,
+      async () => ({
+        $service,
+        loginStatus: loginStore.isLogined,
+        ...(typeof data === 'function' ? await data() : data),
+      }),
+      options
+    );
+  };
 };
+
+export const searchReport = getReportFn('search_software');
+export const oaReport = getReportFn();
 
 export const reportPV = ($referrer?: string) => {
   oaReport(OpenEventKeys.PV, $referrer ? { $referrer } : undefined);
