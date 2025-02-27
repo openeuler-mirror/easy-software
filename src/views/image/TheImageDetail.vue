@@ -19,7 +19,6 @@ import { getCode } from '@/utils/common';
 
 import defaultImg from '@/assets/default-logo.png';
 import { pkgIdInjection } from '@/data/injectionKeys';
-import { oaReport } from '@/shared/analytics';
 import useDetailPageAnalytics from '@/composables/useDetailPageAnalytics';
 
 const tabValue = ref('apppkg');

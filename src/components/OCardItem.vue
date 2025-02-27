@@ -11,7 +11,7 @@ import { maintainerDefaults } from '@/data/query';
 
 import defaultImg from '@/assets/default-logo.png';
 import IconUser from '~icons/app/icon-user.svg';
-import { oaReport } from '@/shared/analytics';
+import { oaReport, searchReport } from '@/shared/analytics';
 import { dataType } from 'element-plus/es/components/table-v2/src/common.mjs';
 
 const props = defineProps({
@@ -85,7 +85,7 @@ const reportAnalytics = (data: Record<string, any>, event = 'click') => {
     module = 'field';
   }
   if (isPageSearch.value) {
-    oaReport(
+    searchReport(
       event,
       {
         module,
@@ -95,18 +95,22 @@ const reportAnalytics = (data: Record<string, any>, event = 'click') => {
         architecture: props.data.arch,
         ...data,
       },
-      'search_software'
+      { immediate: true }
     );
     return;
   }
-  oaReport(event, {
-    module,
-    app_name: xssAllTag(props.data.name),
-    version: props.data.version,
-    os_version: props.data.os,
-    architecture: props.data.arch,
-    ...data,
-  });
+  oaReport(
+    event,
+    {
+      module,
+      app_name: xssAllTag(props.data.name),
+      version: props.data.version,
+      os_version: props.data.os,
+      architecture: props.data.arch,
+      ...data,
+    },
+    { immediate: true }
+  );
 };
 
 const onClickLink = (event: MouseEvent, isTag?: boolean) => {

@@ -15,7 +15,7 @@ import { TABNAME_OPTIONS, FLITERMENUOPTIONS } from '@/data/query';
 import SearchRecommend from '@/components/search/SearchRecommend.vue';
 
 import IconSearch from '~icons/app/icon-search.svg';
-import { oaReport } from '@/shared/analytics';
+import { searchReport } from '@/shared/analytics';
 
 defineProps({
   placeholder: {
@@ -43,13 +43,12 @@ const tabName = ref('all');
 const fliterSelected = ref(defaultValue.value);
 
 const reportAnalytics = (data: Record<string, any>, event = 'click') => {
-  oaReport(
+  searchReport(
     event,
     {
       module: isPageHome.value ? 'home_page' : 'search_page',
       ...data,
-    },
-    'search_software'
+    }
   );
 };
 
@@ -109,28 +108,30 @@ const clickRecommend = (v: string) => {
 };
 
 const isFocus = ref(false);
+let focusInput: string | null;
 const changeSearchFocus = (state: boolean) => {
   isFocus.value = state;
+  focusInput = searchInput.value;
   reportAnalytics({
     type: 'search_input',
   });
 };
 
 const changeSearchBlur = () => {
-  const name = route.query.name as string;
-  if (isPageSearch.value) {
-    if (searchInput.value === '' || name !== searchInput.value) {
-      searchInput.value = name;
-    }
-    return;
-  }
-  if (searchInput.value) {
+  if (searchInput.value && focusInput !== searchInput.value) {
     reportAnalytics(
       {
         content: searchInput.value,
       },
       'input'
     );
+  }
+  focusInput = null;
+  const name = route.query.name as string;
+  if (isPageSearch.value) {
+    if (searchInput.value === '' || name !== searchInput.value) {
+      searchInput.value = name;
+    }
   }
 };
 
