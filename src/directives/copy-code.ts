@@ -7,14 +7,13 @@ export default {
     if (binding.value) {
       el.addEventListener('click', function (event: MouseEvent) {
         const target = event?.target as HTMLElement;
-        const currentTarget = event.currentTarget as HTMLElement;
         if (target?.className.includes('copy')) {
           message.success({
             content: '复制成功',
             duration: 1000,
           });
         }
-        if (currentTarget?.classList.contains('installation')) {
+        if (this.classList.contains('installation') || this.classList.contains('download')) {
           const findStepName = (el: HTMLElement) => {
             const parent = el.parentElement;
             if (parent) {
