@@ -89,7 +89,6 @@ const getDetailValue = (data: ImageDetailT) => {
     license,
     appVer,
     latestOsSupport = false,
-    securityLevel,
     name,
     srcDownloadUrl,
     binDownloadUrl,

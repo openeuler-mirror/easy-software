@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import { type PropType } from 'vue';
-import { useI18n } from 'vue-i18n';
 import { OTable, OIcon, OPopover, OScroller } from '@opensig/opendesign';
 import type { MoreMessgeT } from '@/@types/app';
 
@@ -26,8 +25,6 @@ defineProps({
     },
   },
 });
-
-const { t } = useI18n();
 </script>
 
 <template>

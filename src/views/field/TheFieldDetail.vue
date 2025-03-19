@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref, onMounted, type PropType, computed, provide, reactive, type Directive } from 'vue';
+import { ref, onMounted, type PropType, computed, provide, reactive } from 'vue';
 import { OTab, OTabPane, OIcon } from '@opensig/opendesign';
 import { useRoute, useRouter } from 'vue-router';
 import { getDetail, getTags, getVer } from '@/api/api-domain';

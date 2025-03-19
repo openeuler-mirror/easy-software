@@ -1,9 +1,8 @@
 <script lang="ts" setup>
-import { ref } from 'vue';
+import { computed } from 'vue';
 import { OBreadcrumb, OBreadcrumbItem } from '@opensig/opendesign';
 import { useLocale } from '@/composables/useLocale';
 import { homeData } from '@/data/home/index';
-import { HomeInfoT } from '@/@types/app';
 import { useI18n } from 'vue-i18n';
 
 const props = defineProps({
@@ -19,12 +18,8 @@ const props = defineProps({
 
 const { locale } = useLocale();
 const { t } = useI18n();
-const breadcrumbInfo = ref({} as HomeInfoT);
-
-homeData.forEach((item) => {
-  if (item.id === props.id) {
-    breadcrumbInfo.value = item;
-  }
+const breadcrumbInfo = computed(() => {
+  return homeData.find((item) => item.id === props.id);
 });
 </script>
 

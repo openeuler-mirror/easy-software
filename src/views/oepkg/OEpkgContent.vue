@@ -145,24 +145,6 @@ const pageSearch = () => {
 
 // ----------- 左侧菜单交互-------------
 // 获取筛选参数列表
-const oepkgColumn = {
-  os: [
-    'openEuler-24.03-LTS-SP1',
-    'openEuler-24.03-LTS',
-    'openEuler-22.03-LTS-SP4',
-    'openEuler-22.03-LTS-SP3',
-    'openEuler-22.03-LTS-SP2',
-    'openEuler-22.03-LTS-SP1',
-    'openEuler-22.03-LTS',
-    'openEuler-20.03-LTS-SP4',
-    'openEuler-20.03-LTS-SP3',
-    'openEuler-20.03-LTS-SP2',
-    'openEuler-20.03-LTS-SP1',
-    'openEuler-20.03-LTS',
-  ],
-  arch: ['x86_64', 'aarch64', 'noarch', 'i686', 's390x'],
-};
-
 const filterOsList = ref<string[]>([]);
 const filterArchList = ref<string[]>([]);
 const filterCategoryList = ref<string[]>([]);
@@ -170,16 +152,17 @@ const isFilterLoading = ref(false);
 
 const queryFilter = () => {
   filterCategoryList.value = [];
-  filterArchList.value = oepkgColumn.arch;
-  filterOsList.value = oepkgColumn.os;
-
+  filterOsList.value = [];
+  filterArchList.value = [];
   getSearchAllColumn({
     name: tabName.value,
-    column: 'category',
+    column: 'os,arch,category',
   })
     .then((res) => {
-      const { category } = res.data;
+      const { os, arch, category } = res.data;
       filterCategoryList.value = category;
+      filterArchList.value = arch;
+      filterOsList.value = os;
       isFilterLoading.value = false;
     })
     .catch(() => {

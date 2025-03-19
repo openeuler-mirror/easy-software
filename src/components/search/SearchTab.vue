@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref, onMounted, watch, nextTick, computed } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 import type { PropType } from 'vue';
 import { OTab, OTabPane } from '@opensig/opendesign';
 import { useI18n } from 'vue-i18n';

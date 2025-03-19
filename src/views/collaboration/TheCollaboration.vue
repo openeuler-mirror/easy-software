@@ -4,10 +4,10 @@ import { OButton, OTag, OLink, OIcon, OPopup, OPopover, useMessage } from '@open
 import { getCollaborationRepos, getRepoSigList } from '@/api/api-collaboration';
 import { useUserInfoStore } from '@/stores/user';
 import ExternalLink from '@/components/ExternalLink.vue';
-import Indicators from '@/components/collaboration/Indicators.vue';
+import CollaborationIndicators from '@/components/collaboration/CollaborationIndicators.vue';
 import StatusFeedback from '@/components/collaboration/StatusFeedback.vue';
 import TableColumnSettings from './TableColumnSettings.vue';
-import Result404 from '@/components/Result404.vue';
+import Error404Result from '@/components/Error404Result.vue';
 import { COUNT_PAGESIZE } from '@/data/query';
 import { type CollaborationColumnsT } from '@/@types/collaboration';
 import xss from 'xss';
@@ -307,7 +307,7 @@ watch(
         </template>
         <TableColumnSettings :options="columns" v-model="checkboxValue" />
       </OPopup>
-      <Indicators v-if="showDlg" @change="showDlg = false" />
+      <CollaborationIndicators v-if="showDlg" @change="showDlg = false" />
     </div>
     <div v-if="!isError" class="platform-main">
       <div class="platform-main-table" :class="reposData.length === 0 ? 'empty' : ''">
@@ -525,11 +525,11 @@ watch(
     </div>
     <!-- 暂无记录 -->
     <template v-if="isError">
-      <Result404>
+      <Error404Result>
         <template #description>
           <p class="text404">暂无记录</p>
         </template>
-      </Result404>
+      </Error404Result>
     </template>
 
     <!-- 跳转外部链接提示 -->

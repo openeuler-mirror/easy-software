@@ -1,7 +1,6 @@
 <script lang="ts" setup>
 import { type PropType } from 'vue';
 import { OTable } from '@opensig/opendesign';
-import { useRoute } from 'vue-router';
 
 interface OptionsT {
   name: string;
@@ -15,7 +14,7 @@ interface EulerverT {
   dockerStr: string;
 }
 
-const props = defineProps({
+defineProps({
   data: {
     type: Array as PropType<EulerverT[]>,
     default: () => [],
@@ -33,8 +32,6 @@ const props = defineProps({
 const emit = defineEmits<{
   (event: 'copy', val: Record<string, any>): void;
 }>();
-
-const route = useRoute();
 
 const columnTags = [
   { label: 'Tag', key: 'appVer' },
