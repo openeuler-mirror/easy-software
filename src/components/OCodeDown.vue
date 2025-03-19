@@ -17,13 +17,13 @@ const props = defineProps({
   verData: {
     type: Object,
     default: () => {
-      return [];
+      return {};
     },
   },
   tagVer: {
     type: Object,
     default: () => {
-      return [];
+      return {};
     },
   },
   type: {

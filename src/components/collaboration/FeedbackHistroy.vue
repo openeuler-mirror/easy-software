@@ -1,7 +1,6 @@
 <script lang="ts" setup>
-import { ref, onMounted, computed, watch, reactive, type ComponentPublicInstance } from 'vue';
-import { onClickOutside } from '@vueuse/core';
-import { ODialog, OIcon, OPopover, OPopup, OTable, OTag } from '@opensig/opendesign';
+import { ref, onMounted, computed, watch, reactive } from 'vue';
+import { ODialog, OTable, OTag } from '@opensig/opendesign';
 import { useLocale } from '@/composables/useLocale';
 import { useUserInfoStore } from '@/stores/user';
 import { getCollaborationApply } from '@/api/api-collaboration';
@@ -12,7 +11,6 @@ import { ElPagination, ElConfigProvider } from 'element-plus';
 import zhCn from 'element-plus/es/locale/lang/zh-cn';
 import English from 'element-plus/es/locale/lang/en';
 
-import IconFilter from '~icons/app/icon-filter.svg';
 import { COUNT_PAGESIZE } from '@/data/query';
 import FilterableTableHeader from '@/components/FilterableTableHeader.vue';
 import { applicationTypeCurrent, applyStatusType } from '@/data/todo';

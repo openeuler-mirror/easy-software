@@ -22,7 +22,7 @@ import { getGlobalFeedbackHistoryList, postGlobalFeedback } from '@/api/api-feed
 import { dayjs } from 'element-plus';
 
 import iconButton from '~icons/app/icon-feedback.svg';
-import Result404 from './Result404.vue';
+import Error404Result from './Error404Result.vue';
 import { useLoginStore } from '@/stores/user';
 import { useI18n } from 'vue-i18n';
 import { doLogin } from '@/shared/login';
@@ -329,14 +329,14 @@ onUnmounted(() => window.sessionStorage.removeItem(STORAGE_KEY));
               </OScroller>
               <div v-else class="empty">暂无反馈信息</div>
             </template>
-            <Result404 v-else>
+            <Error404Result v-else>
               <template #description>
                 <p class="empty-desc">
                   <template v-if="!loginStore.isLogined"> <OLink color="primary" @click="doLogin">登录</OLink>可查看历史反馈信息 </template>
                   <template v-else> 暂无反馈消息 </template>
                 </p>
               </template>
-            </Result404>
+            </Error404Result>
           </div>
           <div class="bottom-link">
             <OLink @click="onClickSwitch">{{ bottomLinkContent }}</OLink>

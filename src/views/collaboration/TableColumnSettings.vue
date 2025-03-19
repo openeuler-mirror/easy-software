@@ -3,7 +3,6 @@ import { computed, type PropType } from 'vue';
 import { useVModel } from '@vueuse/core';
 import { OCheckbox, OCheckboxGroup, OScroller } from '@opensig/opendesign';
 import { type CollaborationColumnsT } from '@/@types/collaboration';
-import xss from 'xss';
 
 const props = defineProps({
   options: {

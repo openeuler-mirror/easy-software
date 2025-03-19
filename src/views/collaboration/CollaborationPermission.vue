@@ -33,7 +33,7 @@ onMounted(() => {
 
 <template>
   <ContentWrapper verticalPadding="40px">
-    <Result404>
+    <Error404Result>
       <template #description>
         <template v-if="userInfoStore.getGiteeId && (!isAdminPer || !isMaintainerPer)">
           <div class="content">您无权限访问协作平台</div>
@@ -45,7 +45,7 @@ onMounted(() => {
           <OButton variant="solid" size="large" color="primary" @click="jumpAccount">前往绑定</OButton>
         </template>
       </template>
-    </Result404>
+    </Error404Result>
   </ContentWrapper>
 </template>
 

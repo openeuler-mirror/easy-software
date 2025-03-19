@@ -11,14 +11,10 @@ import IconCopy from '~icons/app/icon-copy.svg';
 import { useLocale } from '@/composables/useLocale';
 import type { PkgTypeT } from '@/@types/app';
 import { useI18n } from 'vue-i18n';
-import { useRoute } from 'vue-router';
 
 import IconChevronDown from '~icons/app/icon-chevron-down.svg';
 import IconState from '~icons/pkg/icon-state.svg';
 import IconLevel from '~icons/pkg/icon-level.svg';
-import { inject } from 'vue';
-import type { Ref } from 'vue';
-import { pkgIdInjection } from '@/data/injectionKeys';
 
 interface EulerverT {
   pkgId: string;
@@ -57,7 +53,6 @@ const props = defineProps({
   },
 });
 const { t } = useI18n();
-const route = useRoute();
 
 const emit = defineEmits<{
   (event: 'reportAnalytics', data: Record<string, any>): void;
@@ -135,8 +130,6 @@ const copyText = (e: MouseEvent, val: any) => {
     },
   });
 };
-
-const pkgId = inject<Ref<string>>(pkgIdInjection, ref(''));
 
 // ---------------------下载埋点--------------------
 const collectDownloadData = (download_type?: 'binary' | 'source_code' | null, isCopy?: boolean) => {

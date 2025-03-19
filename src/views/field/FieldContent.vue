@@ -11,7 +11,6 @@ import { useI18n } from 'vue-i18n';
 import { getParamsRules } from '@/utils/common';
 import { isValidSearchTabName, isValidSearchKey } from '@/utils/query';
 import { TABNAME_OPTIONS, FLITERMENUOPTIONS, COUNT_PAGESIZE_FIELD } from '@/data/query';
-import { os } from '@/data/filter/';
 
 import FilterCheckbox from '@/components/filter/FilterCheckbox.vue';
 import AppLoading from '@/components/AppLoading.vue';
@@ -75,7 +74,7 @@ const queryAllpkg = () => {
         isSearchError.value = true;
       }
     })
-    .catch((err) => {
+    .catch(() => {
       useViewStore().showNotFound();
       total.value = 0;
       pkgData.value = [];
@@ -110,26 +109,26 @@ const querySearch = () => {
     });
 };
 
-const arch = ['x86_64', 'aarch64', 'noarch', 'riscv64', 'loongarch64'];
-
 // 获取筛选参数列表
 const filterOsList = ref<string[]>([]);
 const filterArchList = ref<string[]>([]);
 const filterCategoryList = ref<string[]>([]);
 const isFilterLoading = ref(false);
 
-filterOsList.value = os;
-filterArchList.value = arch;
 const queryFilter = () => {
   filterCategoryList.value = [];
+  filterOsList.value = [];
+  filterArchList.value = [];
   isFilterLoading.value = true;
   getSearchAllColumn({
     name: 'domain',
-    column: 'category',
+    column: 'os,arch,category',
   })
     .then((res) => {
-      const { arch, category } = res.data;
+      const { os, arch, category } = res.data;
       filterCategoryList.value = category;
+      filterOsList.value = os;
+      filterArchList.value = arch;
       isFilterLoading.value = false;
     })
     .catch(() => {

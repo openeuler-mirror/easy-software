@@ -121,7 +121,7 @@ const queryAllpkg = () => {
         isSearchError.value = true;
       }
     })
-    .catch((err) => {
+    .catch(() => {
       useViewStore().showNotFound();
       total.value = 0;
       pkgData.value = [];
