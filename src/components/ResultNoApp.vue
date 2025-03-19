@@ -5,7 +5,7 @@ import { useRoute } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { GITEE } from '@/data/config';
 import ExternalLink from '@/components/ExternalLink.vue';
-import Result404 from '@/components/Result404.vue';
+import Error404Result from '@/components/Error404Result.vue';
 
 const props = defineProps({
   type: {
@@ -44,13 +44,13 @@ const clickFeedback = () => {
 </script>
 
 <template>
-  <Result404 class="result-tips">
+  <Error404Result class="result-tips">
     <template #description>
       <p class="text">
         {{ t('software.nofoundApp') }} <OLink hover-underline color="primary" @click="clickFeedback">{{ t('software.feedbackPkg.btn') }}</OLink>
       </p>
     </template>
-  </Result404>
+  </Error404Result>
 
   <ExternalLink v-if="showExternalDlg" :href="externalLink" @change="showExternalDlg = false" />
 </template>

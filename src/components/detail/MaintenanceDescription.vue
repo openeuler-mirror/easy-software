@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref, computed } from 'vue';
+import { ref } from 'vue';
 import { OTable, ODialog } from '@opensig/opendesign';
 import { securityTypes } from '@/data/todo/';
 

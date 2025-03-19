@@ -55,7 +55,7 @@ const onExternalDialog = (href: string) => {
   }
 };
 
-const scrollToAnchor = (id: string) => {
+const scrollToAnchor = () => {
   let top = 0;
   if (route.name === 'field-detail') {
     top = document.querySelector('.o-tab-pane-active .feedback')?.offsetTop;

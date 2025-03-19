@@ -1,7 +1,6 @@
 import { OPENEULER } from '@/data/config';
 
 import FieldIcon from '~icons/pkg/apppkg.svg';
-import EpkgIcon from '~icons/pkg/epkg.svg';
 import ImageIcon from '~icons/pkg/image.svg';
 import RpmIcon from '~icons/pkg/rpm.svg';
 import OepkgIcon from '~icons/pkg/oepkg.svg';
@@ -34,13 +33,6 @@ export const homeData = [
     icon: ImageIcon,
     href: '/image',
   },
-  // {
-  //   id: 'epkg',
-  //   name: 'EPKG',
-  //   desc: '一种支持多版本多环节的一次性适配，基于openEuler操作系统预编译的epkg格式的软件包',
-  //   icon: EpkgIcon,
-  //   href: '/epkg',
-  // },
   {
     id: 'oepkg',
     name: 'OEPKG',

@@ -6,7 +6,7 @@ import { useLocale } from '@/composables/useLocale';
 import { approvalColumns, applicationColumns, approvalHistoryColumns } from '@/data/todo';
 import { getCollaborationApply, getTodoRevoke } from '@/api/api-collaboration';
 import { useUserInfoStore } from '@/stores/user';
-import Result404 from '@/components/Result404.vue';
+import Error404Result from '@/components/Error404Result.vue';
 import ApprovalTable from './ApprovalTable.vue';
 import { COUNT_PAGESIZE } from '@/data/query';
 import { getParamsRules } from '@/utils/common';
@@ -92,7 +92,7 @@ const onChange = (type: string) => {
 };
 
 const pageInit = () => {
-  if ((activeName.value === 'application' && isMaintainerPermission.value) || isAdminPermission.value) {
+  if (activeName.value === 'application' && isMaintainerPermission.value) {
     clearFilterParams(applicationFilterParams);
     queryTodoData();
     isNotData.value = true;
@@ -298,11 +298,11 @@ onMounted(() => {
     </div>
     <!-- 暂无记录 -->
     <template v-if="(activeName === 'application' && isError) || (activeName === 'approval' && isError) || (activeName === 'approved' && isError)">
-      <Result404>
+      <Error404Result>
         <template #description>
           <p class="text404">暂无{{ activeName === 'application' ? '申请' : '审批' }}记录</p>
         </template>
-      </Result404>
+      </Error404Result>
     </template>
   </div>
 </template>

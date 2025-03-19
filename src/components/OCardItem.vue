@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { type PropType, ref, onMounted, computed } from 'vue';
+import { type PropType, ref, onMounted } from 'vue';
 import { OCard, OTag, OIcon } from '@opensig/opendesign';
 import type { AppItemT, PkgIdsT, PkgTypeT } from '@/@types/app';
 import { getTagsIcon, xssAllTag } from '@/utils/common';
@@ -12,7 +12,6 @@ import { maintainerDefaults } from '@/data/query';
 import defaultImg from '@/assets/default-logo.png';
 import IconUser from '~icons/app/icon-user.svg';
 import { oaReport, searchReport } from '@/shared/analytics';
-import { dataType } from 'element-plus/es/components/table-v2/src/common.mjs';
 
 const props = defineProps({
   data: {
@@ -38,7 +37,7 @@ const pkgNameConversion = (v: string) => {
 function getQueryStr(params: PkgIdsT) {
   if (Object.entries(params).length > 0) {
     const ids = Object.entries(params)
-      .filter(([key, value]) => value)
+      .filter(([, value]) => value)
       .map(([key, value]) => `${pkgNameConversion(key)}PkgId=${encodeURIComponent(value)}`);
 
     return ids.join('&').replace(/^&/, '');
@@ -50,7 +49,7 @@ function getMaintainersStr(params: PkgIdsT) {
   const line = ' ; ';
   const defaultName = maintainerDefaults.name;
   if (params && Object.entries(params).length > 0) {
-    const maintainers = Object.entries(params).map(([key, value]) => (value ? value : defaultName));
+    const maintainers = Object.entries(params).map(([, value]) => (value ? value : defaultName));
     // 去重
     const uniqueVal = [...new Set(maintainers)];
     return uniqueVal.join(line).replace(/ ; +$/, '');

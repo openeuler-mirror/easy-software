@@ -11,7 +11,6 @@ import { TABNAME_OPTIONS, FLITERMENUOPTIONS, COUNT_PAGESIZE, SORTPARAMS } from '
 import { getParamsRules } from '@/utils/common';
 import { useViewStore } from '@/stores/common';
 import { useSearchStore } from '@/stores/search';
-import { os, arch } from '@/data/filter/';
 
 import FilterCheckbox from '@/components/filter/FilterCheckbox.vue';
 import AppLoading from '@/components/AppLoading.vue';
@@ -118,7 +117,7 @@ const queryAllpkg = () => {
         isSearchError.value = true;
       }
     })
-    .catch((err) => {
+    .catch(() => {
       useViewStore().showNotFound();
       total.value = 0;
       pkgData.value = [];
@@ -146,25 +145,20 @@ const filterArchList = ref<string[]>([]);
 const filterCategoryList = ref<string[]>([]);
 const isFilterLoading = ref(false);
 
-const rpmColumn = {
-  os,
-  arch,
-};
-
 const queryFilter = () => {
   filterOsList.value = [];
   filterArchList.value = [];
   filterCategoryList.value = [];
 
-  filterOsList.value = rpmColumn.os;
-  filterArchList.value = rpmColumn.arch;
   getSearchAllColumn({
     name: tabName.value,
-    column: 'category',
+    column: 'os,arch,category',
   })
     .then((res) => {
-      const { category } = res.data;
+      const { os, arch, category } = res.data;
       filterCategoryList.value = category;
+      filterOsList.value = os;
+      filterArchList.value = arch;
       isFilterLoading.value = false;
     })
     .catch(() => {

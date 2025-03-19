@@ -2,20 +2,20 @@
 import { OButton } from '@opensig/opendesign';
 
 import { useLocale } from '@/composables/useLocale';
-import Result404 from '@/components/Result404.vue';
+import Error404Result from '@/components/Error404Result.vue';
 
 const { locale } = useLocale();
 </script>
 
 <template>
-  <Result404>
+  <Error404Result>
     <template #extra>
       <p class="text404">暂无数据</p>
       <RouterLink :to="`/${locale}/`">
         <OButton variant="solid" color="primary">返回首页</OButton>
       </RouterLink>
     </template>
-  </Result404>
+  </Error404Result>
 </template>
 
 <style lang="scss" scoped>
