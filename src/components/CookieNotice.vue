@@ -329,6 +329,24 @@ watch(
     @include respond-to('<=pad_v') {
       width: 100%;
     }
+
+    --btn-color: var(--o-color-primary1);
+    --btn-color-hover: var(--o-color-white);
+    --btn-color-active: var(--o-color-white);
+
+    --btn-bd-color-hover: var(--o-color-primary1);
+    --btn-bd-color-active: var(--o-color-primary3);
+
+    --btn-bg-color-hover: var(--o-color-primary1);
+    --btn-bg-color-active: var(--o-color-primary3);
+
+    @include hover {
+      background-color: var(--btn-bg-color-hover);
+    }
+
+    &:active {
+      background-color: var(--btn-bg-color-active);
+    }
   }
 
   .o-btn + .o-btn {
@@ -394,6 +412,32 @@ watch(
         margin-top: 12px;
       }
     }
+  }
+}
+</style>
+
+<style lang="scss">
+.cookie-dlg .o-btn {
+  @include respond-to('<=pad_v') {
+    width: 100%;
+  }
+  
+  --btn-color: var(--o-color-primary1);
+  --btn-color-hover: var(--o-color-white);
+  --btn-color-active: var(--o-color-white);
+  
+  --btn-bd-color-hover: var(--o-color-primary1);
+  --btn-bd-color-active: var(--o-color-primary3);
+  
+  --btn-bg-color-hover: var(--o-color-primary1);
+  --btn-bg-color-active: var(--o-color-primary3);
+  
+  @include hover {
+    background-color: var(--btn-bg-color-hover);
+  }
+  
+  &:active {
+    background-color: var(--btn-bg-color-active);
   }
 }
 </style>

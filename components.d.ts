@@ -44,7 +44,6 @@ declare module 'vue' {
     HeaderNav: typeof import('./src/components/header/HeaderNav.vue')['default']
     HeaderTheme: typeof import('./src/components/header/HeaderTheme.vue')['default']
     HomeSkeleton: typeof import('./src/components/skeleton/HomeSkeleton.vue')['default']
-    Indicators: typeof import('./src/components/collaboration/Indicators.vue')['default']
     MaintenanceDescription: typeof import('./src/components/detail/MaintenanceDescription.vue')['default']
     OCardItem: typeof import('./src/components/OCardItem.vue')['default']
     OCardItemSkeleton: typeof import('./src/components/skeleton/OCardItemSkeleton.vue')['default']
@@ -61,8 +60,5 @@ declare module 'vue' {
     SearchTab: typeof import('./src/components/search/SearchTab.vue')['default']
     StatusFeedback: typeof import('./src/components/collaboration/StatusFeedback.vue')['default']
     TableShowOverflowTips: typeof import('./src/components/collaboration/TableShowOverflowTips.vue')['default']
-  }
-  export interface ComponentCustomProperties {
-    vLoading: typeof import('element-plus/es')['ElLoadingDirective']
   }
 }
