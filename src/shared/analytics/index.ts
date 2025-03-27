@@ -4,12 +4,15 @@ import type { Awaitable } from '@vueuse/core';
 import { COOKIE_AGREED_STATUS, useCookieStore } from '@/stores/common';
 import router from '@/router';
 import { useLoginStore } from '@/stores/user';
+import { removeCustomCookie } from '@/utils/cookie';
 
 export const oa = new OpenAnalytics({
   appKey: 'openEuler',
   request: (data) => {
     if (useCookieStore().getUserCookieStatus() !== COOKIE_AGREED_STATUS.ALL_AGREED) {
-      return disableOA();
+      disableOA();
+      removeHM();
+      return;
     }
     reportAnalytics(data);
   },
@@ -60,7 +63,34 @@ export const disableOA = () => {
   });
 };
 
-type Service = 'software' | 'search_software'
+export const removeHM = () => {
+  const scripts = document.querySelectorAll('script.analytics-script');
+  scripts.forEach((script) => {
+    script.remove();
+  });
+  const hm = /^hm/i;
+  document.cookie
+    .split(';')
+    .map((c) => c.trim())
+    .forEach((c) => {
+      const key = decodeURIComponent(c.split('=')[0]);
+      if (hm.test(key)) {
+        removeCustomCookie(key);
+      }
+    });
+  [sessionStorage, localStorage].forEach((storage) => {
+    const keys = [];
+    for (let i = 0; i < storage.length; i++) {
+      const key = storage.key(i)!;
+      if (hm.test(key)) {
+        keys.push(key);
+      }
+    }
+    keys.forEach((key) => storage.removeItem(key));
+  });
+};
+
+type Service = 'software' | 'search_software';
 
 export const getReportFn = ($service: Service = 'software') => {
   return (
