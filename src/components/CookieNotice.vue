@@ -5,7 +5,7 @@ import { type DialogActionT, OButton, ODialog, OIcon, OSwitch, isBoolean } from 
 
 import ContentWrapper from '@/components/ContentWrapper.vue';
 
-import { enableOA, disableOA } from '@/shared/analytics';
+import { enableOA, disableOA, removeHM } from '@/shared/analytics';
 import { setCustomCookie, removeCustomCookie } from '@/utils/cookie';
 import { useCookieStore, COOKIE_AGREED_STATUS, COOKIE_KEY } from '@/stores/common';
 import { useLoginStore } from '@/stores/user';
@@ -64,14 +64,6 @@ const initSensor = () => {
   );
 };
 
-const removeSensor = () => {
-  disableOA();
-  const scripts = document.querySelectorAll('script.analytics-script');
-  scripts.forEach((script) => {
-    script.remove();
-  });
-};
-
 // -------------------- 展示底部提示 --------------------
 const isNoticeVisible = ref(false);
 
@@ -100,7 +92,8 @@ const rejectAll = () => {
   removeCustomCookie(COOKIE_KEY);
   setCustomCookie(COOKIE_KEY, `${COOKIE_AGREED_STATUS.NECCESSARY_AGREED}`, 180, COOKIE_DOMAIN);
   toggleNoticeVisible(false);
-  removeSensor();
+  disableOA();
+  removeHM();
 };
 
 // -------------------- 展示弹出框 --------------------
@@ -170,7 +163,8 @@ onMounted(() => {
     analysisAllowed.value = true;
     initSensor();
   } else {
-    removeSensor();
+    disableOA();
+    removeHM();
   }
 });
 
