@@ -15,9 +15,9 @@ const isAdminPer = computed(() => userInfoStore.platformAdminPermission);
 const isMaintainerPer = computed(() => userInfoStore.platformMaintainerPermission);
 
 // 跳转个人中心绑定账号
-const USER_CENTER = import.meta.env.VITE_LOGIN_URL;
+const USER_CENTER = import.meta.env.VITE_DOMAIN_URL;
 const jumpAccount = () => {
-  windowOpen(USER_CENTER);
+  windowOpen(`${USER_CENTER}/zh/workspace`, '_blank');
 };
 
 onMounted(() => {
