@@ -333,7 +333,6 @@ const onClickLink = (row: any) => {
 }
 
 :deep(.o-table) {
-  --table-cell-height: 62px;
   .label {
     display: flex;
     align-items: center;
@@ -377,8 +376,10 @@ const onClickLink = (row: any) => {
     display: flex;
     align-items: center;
   }
+  &.rpmpkg {
+    --table-cell-height: 62px;
+  }
   &.oepkg {
-    --table-cell-height: auto;
     thead {
       .name {
         width: 200px;
@@ -391,8 +392,19 @@ const onClickLink = (row: any) => {
       }
     }
   }
+  &.condapkg {
+    thead {
+      .name,
+      .version,
+      .os {
+        width: 160px;
+      }
+      .arch {
+        width: 120px;
+      }
+    }
+  }
   &.apppkg {
-    --table-cell-height: auto;
     thead {
       .os {
         width: 180px;
@@ -402,9 +414,6 @@ const onClickLink = (row: any) => {
         width: 100px;
       }
     }
-  }
-  &.appversion {
-    --table-cell-height: auto;
   }
   thead {
     .order {

@@ -255,8 +255,8 @@ const isSecurityIconShow = (v: string) => {
       <p>{{ data.license }}</p>
     </div>
   </AppSection>
-  <AppSection :title="`${data.name}版本支持情况`">
-    <OTable :columns="verColumns" :data="tableAllData" border="all" :cell-span="arraySpanMethod" :small="true">
+  <AppSection v-if="verData.length > 0" :title="`${data.name}版本支持情况`">
+    <OTable class="table-versions" :columns="verColumns" :data="tableAllData" border="all" :cell-span="arraySpanMethod" :small="true">
       <template #td_flags="{ row }">
         <a :href="jumpTo(row.pkgId)" color="primary" rel="noopener noreferrer">
           <OTag v-if="row.os === tagVer[0] && row.arch === tagVer[1]" color="primary" :size="'small'">当前版本</OTag> <span v-else>查看</span>
@@ -363,16 +363,19 @@ const isSecurityIconShow = (v: string) => {
   }
 }
 :deep(.o-table) {
+  --table-edge-padding: var(--table-cell-padding);
+
+  .o-table-wrap {
+    border-bottom: 0 none;
+    tr.last td {
+      border-bottom: var(--table-border);
+    }
+  }
   tbody tr:hover {
     background: none;
   }
   th {
     font-weight: 500;
-  }
-  tr:has(+ .last) {
-    td:first-child {
-      border-bottom: 0 none;
-    }
   }
 }
 

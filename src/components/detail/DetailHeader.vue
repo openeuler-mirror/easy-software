@@ -144,9 +144,12 @@ const scrollToAnchor = () => {
       color: var(--o-color-info1);
       display: flex;
       justify-content: space-between;
+      align-items: flex-start;
     }
     .home-page {
       --link-icon-size: 16px;
+      min-width: 60px;
+      justify-content: flex-end;
       @include tip1;
       :deep(.o-link-label) {
         display: flex;

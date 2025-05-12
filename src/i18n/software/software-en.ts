@@ -9,6 +9,7 @@ export default {
   epkgpkg: 'EPKG',
   epkg: 'EPKG',
   oepkg: 'OEPKG',
+  conda: 'CONDA',
   appversion: 'Upstream',
   filterAll: 'All',
   filterName: 'name',

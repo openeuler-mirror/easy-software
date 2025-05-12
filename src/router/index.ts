@@ -74,6 +74,16 @@ const routes = [
     component: () => import('@/views/image/TheImageDetail.vue'),
   },
   {
+    path: '/zh/conda',
+    name: 'conda',
+    component: () => import('@/views/conda/TheConda.vue'),
+  },
+  {
+    path: '/zh/conda/detail',
+    name: 'conda-detail',
+    component: () => import('@/views/conda/TheCondaDetail.vue'),
+  },
+  {
     path: '/zh/solution/openhpc',
     name: 'openhpc',
     component: () => import('@/views/solution/TheOpenHPC.vue'),

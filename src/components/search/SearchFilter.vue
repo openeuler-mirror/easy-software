@@ -43,13 +43,10 @@ const tabName = ref('all');
 const fliterSelected = ref(defaultValue.value);
 
 const reportAnalytics = (data: Record<string, any>, event = 'click') => {
-  searchReport(
-    event,
-    {
-      module: isPageHome.value ? 'home_page' : 'search_page',
-      ...data,
-    }
-  );
+  searchReport(event, {
+    module: isPageHome.value ? 'home_page' : 'search_page',
+    ...data,
+  });
 };
 
 const changeFilter = (v: string) => {

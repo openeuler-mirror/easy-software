@@ -252,7 +252,7 @@ watch(
       </template>
     </div>
     <div class="pkg-main">
-      <FilterHeader :title="t('upstream.name')" :total="total" />
+      <FilterHeader title="APPVERSION" :total="total" />
       <div v-if="searchOs || isSearch || showSearchFilterTags" class="search-result">
         <p v-if="!isPageSearch" class="text">
           为您找到符合条件的筛选<span class="total">{{ total }}</span
