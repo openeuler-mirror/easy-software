@@ -14,12 +14,12 @@ import { useScreen } from '@/composables/useScreen';
 import { useLocale } from '@/composables/useLocale';
 
 import IconClose from '~icons/app/icon-close.svg';
-import { BAIDU_HM } from '@/data/config';
+import { BAIDU_HM, OPENEULER } from '@/data/config';
 
 const route = useRoute();
 const { t, isZh, locale } = useLocale();
 const { leLaptop, lePadV } = useScreen();
-const aboutCookieUrl = computed(() => `https://www.openeuler.org/${locale.value || 'zh'}/other/cookies/`);
+const aboutCookieUrl = computed(() => `${OPENEULER}/${locale.value || 'zh'}/other/cookies/`);
 const cookieStore = useCookieStore();
 const loginStore = useLoginStore();
 
@@ -415,21 +415,21 @@ watch(
   @include respond-to('<=pad_v') {
     width: 100%;
   }
-  
+
   --btn-color: var(--o-color-primary1);
   --btn-color-hover: var(--o-color-white);
   --btn-color-active: var(--o-color-white);
-  
+
   --btn-bd-color-hover: var(--o-color-primary1);
   --btn-bd-color-active: var(--o-color-primary3);
-  
+
   --btn-bg-color-hover: var(--o-color-primary1);
   --btn-bg-color-active: var(--o-color-primary3);
-  
+
   @include hover {
     background-color: var(--btn-bg-color-hover);
   }
-  
+
   &:active {
     background-color: var(--btn-bg-color-active);
   }

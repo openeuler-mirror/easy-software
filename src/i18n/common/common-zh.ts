@@ -1,4 +1,4 @@
-import { OPENEULER, OPENEULER_STATUS, OPENEULER_CONTACT } from '@/data/config';
+import { OPENEULER, OPENEULER_CONTACT } from '@/data/config';
 
 export default {
   USER_CENTER: '个人中心',
@@ -24,10 +24,6 @@ export default {
       {
         NAME: '法律声明',
         URL: OPENEULER + '/zh/other/legal/',
-      },
-      {
-        NAME: '服务状态',
-        URL: OPENEULER_STATUS,
       },
     ],
     LINKS: [],
