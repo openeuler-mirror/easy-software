@@ -5,6 +5,7 @@ import { windowOpen } from '@/utils/common';
 import { useUserInfoStore } from '@/stores/user';
 import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
+import { OPENEULER } from '@/data/config';
 
 const userInfoStore = useUserInfoStore();
 const router = useRouter();
@@ -15,9 +16,8 @@ const isAdminPer = computed(() => userInfoStore.platformAdminPermission);
 const isMaintainerPer = computed(() => userInfoStore.platformMaintainerPermission);
 
 // 跳转个人中心绑定账号
-const USER_CENTER = import.meta.env.VITE_DOMAIN_URL;
 const jumpAccount = () => {
-  windowOpen(`${USER_CENTER}/zh/workspace`, '_blank');
+  windowOpen(`${OPENEULER}/zh/workspace`, '_blank');
 };
 
 onMounted(() => {

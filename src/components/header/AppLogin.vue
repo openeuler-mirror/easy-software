@@ -5,9 +5,10 @@ import { ODropdown, ODropdownItem, OIcon, OIconLoading } from '@opensig/opendesi
 import { doLogin, logout } from '@/shared/login';
 import { useLoginStore, useUserInfoStore } from '@/stores/user';
 import { windowOpen } from '@/utils/common';
+import { OPENEULER } from '@/data/config';
+
 import LoginIcon from '~icons/app/icon-login.svg';
 
-const USER_CENTER = import.meta.env.VITE_DOMAIN_URL;
 const MESSAGE_CENTER = import.meta.env.VITE_MESSAGE_CENTER_URL;
 
 const { username, photo } = storeToRefs(useUserInfoStore());
@@ -31,7 +32,7 @@ const jumpTo = (v: string) => {
       </div>
       <template #dropdown>
         <ODropdownItem>
-          <div class="header-user-menu-item" @click="jumpTo(`${USER_CENTER}/zh/workspace`)">个人中心</div>
+          <div class="header-user-menu-item" @click="jumpTo(`${OPENEULER}/zh/workspace`)">个人中心</div>
         </ODropdownItem>
         <ODropdownItem>
           <div class="header-user-menu-item" @click="jumpTo(MESSAGE_CENTER)">消息中心</div>
