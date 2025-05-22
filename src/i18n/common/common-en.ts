@@ -1,4 +1,4 @@
-import { OPENEULER_STATUS, OPENEULER_CONTACT } from '@/data/config';
+import { OPENEULER_CONTACT } from '@/data/config';
 
 export default {
   USER_CENTER: 'User Center',
@@ -24,10 +24,6 @@ export default {
       {
         NAME: 'Legal Notice',
         URL: '/other/legal/',
-      },
-      {
-        NAME: 'Service Status',
-        URL: OPENEULER_STATUS,
       },
     ],
     QR_CODE: 'WeChat Subscription',

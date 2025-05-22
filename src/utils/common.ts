@@ -40,7 +40,7 @@ export const formatDateTime = (v: string, isTime?: boolean) => {
 
     return `${year}/${month}/${day}`;
   }
-  return '-'
+  return '-';
 };
 
 /**
@@ -88,8 +88,9 @@ export const getCode = (code: string) => {
 };
 
 // 检查是否是同域名
+const COOKIE_DOMAIN = import.meta.env.VITE_COOKIE_DOMAIN;
 export const checkOriginLink = (path: string) => {
-  return path.includes('openeuler.org');
+  return path.includes(COOKIE_DOMAIN);
 };
 
 /**
@@ -157,10 +158,8 @@ export const getTarget = (data: any, key: any) => {
   return [...map.values()];
 };
 
-
-
 // 输入框文字校验
-export const inputValidator = new RegExp("^[\u4E00-\u9FA5A-Za-z0-9.()$\\-]+$");
+export const inputValidator = new RegExp('^[\u4E00-\u9FA5A-Za-z0-9.()$\\-]+$');
 
 /**
  * 对象转URL参数
@@ -176,19 +175,17 @@ export const generateQuery = (queries: Record<string, any>): string => {
     return arr;
   }, [] as string[]);
   if (parseResultArr?.length) {
-    return `?${parseResultArr.join("&")}`;
+    return `?${parseResultArr.join('&')}`;
   }
   return '';
-}
-
-
+};
 
 /**
  * 获取指定时区偏移量的年份
  * @param {number} offset - 时区偏移量（单位：小时）。例如，UTC+8 时区，传入 8。
  * @returns {number} - 指定时区偏移量对应的年份
  */
-export const getYearByOffset = ()=> {
+export const getYearByOffset = () => {
   // 获取当前时间的 UTC 时间
   const now = new Date();
   const utcTime = new Date(now.getTime() + now.getTimezoneOffset() * 60000);
@@ -197,4 +194,4 @@ export const getYearByOffset = ()=> {
   utcTime.setHours(utcTime.getHours() + 8);
 
   return utcTime.getFullYear();
-}
+};
