@@ -6,7 +6,7 @@ import { OPENEULER, OPENATOM, OPENEULER_CONTACT } from '@/data/config';
 
 import LogoFooter from '@/assets/footer/footer-logo2.png';
 import LogoFooter1 from '@/assets/footer-logo1.png';
-import LogoAtom from '@/assets/footer/atom-logo.svg';
+import LogoAtom from '@/assets/footer/atom-logo.png';
 import FooterBg from '@/assets/footer/footer-bg.png';
 import FooterBgMo from '@/assets/footer/footer-bg-mo.png';
 
@@ -15,6 +15,8 @@ import CodeTitleXzs from '@/assets/footer/img-xzs.png';
 import CodeTitleGzh from '@/assets/footer/img-gzh.png';
 import CodeImgXzs from '@/assets/footer/code-xzs.png';
 import CodeImgZgz from '@/assets/footer/code-zgz.png';
+
+import IconPolice from '@/assets/footer/police.png';
 
 const { t, isZh } = useLocale();
 
@@ -63,14 +65,14 @@ const footLink = computed(() => (isZh.value ? linksData2.zh : linksData2.en));
 // 公众号、小助手
 const footerCodeList = [
   {
-    img: CodeTitleXzs,
-    code: CodeImgXzs,
-    label: t('common.FOOTER.QR_CODE'),
-  },
-  {
     img: CodeTitleGzh,
     code: CodeImgZgz,
     label: t('common.FOOTER.QR_ASSISTANT'),
+  },
+  {
+    img: CodeTitleXzs,
+    code: CodeImgXzs,
+    label: t('common.FOOTER.QR_CODE'),
   },
 ];
 
@@ -78,6 +80,11 @@ const footerCodeList = [
 const footBg = {
   pc: `url(${FooterBg})`,
   mo: `url(${FooterBgMo})`,
+};
+// 备案信息
+const beianInfo = {
+  zh: ['京ICP备2020036654号-1', '京公网安备 11030102011597 号'],
+  en: ['J. ICP B. No. 2020036654-1', 'J.G.W.A.B. No. 11030102011597'],
 };
 </script>
 
@@ -102,11 +109,21 @@ const footBg = {
           <div class="footer-option-item">
             <a v-for="link in footLink" :key="link.URL" class="link" :href="link.URL" target="_blank">{{ link.NAME }}</a>
           </div>
-          <p class="copyright">{{ t('common.FOOTER.COPY_RIGHT', { year: getYearByOffset() }) }}</p>
+
           <p class="license">
             <span>{{ t('common.FOOTER.LICENSED_1') }}</span>
             {{ t('common.FOOTER.LICENSED_2') }}
           </p>
+          <div class="copyright">
+            <p>{{ t('common.FOOTER.COPY_RIGHT', { year: getYearByOffset() }) }}</p>
+            <div class="filing">
+              <a href="https://beian.miit.gov.cn/#/Integrated/index" target="_blank" rel="noopener noreferrer" class="filing-link">{{
+                isZh ? beianInfo.zh[0] : beianInfo.en[0]
+              }}</a>
+              <img :src="IconPolice" class="filing-img" />
+              <p>{{ isZh ? beianInfo.zh[1] : beianInfo.en[1] }}</p>
+            </div>
+          </div>
         </div>
         <div class="footer-right">
           <div v-if="isZh" class="code-box">
@@ -187,12 +204,9 @@ $color: #fff;
   }
   .atom {
     text-align: center;
-    padding: 32px 0 24px;
+    padding: 24px 0 16px;
     position: relative;
     border-bottom: 1px solid rgba(229, 229, 229, 0.12);
-    @media (max-width: 1440px) {
-      padding: 24px 0;
-    }
 
     &-text {
       @include h4;
@@ -200,11 +214,8 @@ $color: #fff;
       color: $color;
     }
     &-logo {
-      height: 48px;
-      margin-top: 16px;
-      @media (max-width: 1100px) {
-        height: 30px;
-      }
+      height: 32px;
+      margin-top: 12px;
     }
   }
 
@@ -214,16 +225,13 @@ $color: #fff;
       background: v-bind('footBg.mo') no-repeat bottom center;
     }
     display: flex;
-    align-items: end;
+    align-items: center;
     justify-content: space-between;
     padding: 18px 0 32px;
     position: relative;
     min-height: 118px;
     @media (max-width: 1436px) {
       padding: 24px 0;
-      flex-direction: column;
-      justify-content: space-between;
-      align-items: center;
     }
   }
   &-logo {
@@ -237,36 +245,40 @@ $color: #fff;
     .show-mo {
       display: none;
     }
-    @media (max-width: 1436px) {
-      text-align: center;
-      margin: 16px 0;
-      .show-pc {
-        display: none;
-      }
-      .show-mo {
-        display: inline-block;
-        height: 20px;
-      }
-    }
   }
 
   .copyright {
     @include tip1;
-    color: $color;
-    margin-top: 16px;
+    color: #fff9;
+    margin-top: 6px;
+    display: flex;
+    gap: 8px;
     @media (max-width: 1436px) {
-      margin-top: 8px;
+      flex-direction: column;
+    }
+
+    .filing {
+      display: flex;
+      gap: 8px;
+      .filing-img {
+        align-self: center;
+        width: 16px;
+        height: 16px;
+      }
+      .filing-link {
+        color: #fff9;
+        &:hover {
+          color: #fff;
+        }
+      }
     }
   }
   .license {
     @include tip1;
     color: $color;
-    margin-top: 16px;
+    margin-top: 6px;
     span {
-      color: #777;
-    }
-    @media (max-width: 1400px) {
-      margin-top: 8px;
+      color: #fff9;
     }
   }
 
@@ -276,20 +288,13 @@ $color: #fff;
       color: $color;
       font-size: var(--o-font_size-tip1);
       display: inline-block;
-      padding: 0 12px;
+      padding: 0 8px;
       border-right: 1px solid $color;
       cursor: pointer;
       line-height: 18px;
       &:last-child {
         border-right: 0;
       }
-      @media (max-width: 1436px) {
-        padding: 0 6px;
-        font-size: var(--o-font_size-tip2);
-      }
-    }
-    @media (max-width: 1436px) {
-      order: -1;
     }
   }
 

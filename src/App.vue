@@ -58,7 +58,7 @@ const { isZh } = useLocale();
   --layout-content-max-width: 1440px;
   --layout-content-padding: 12px;
 
-  --layout-footer-height: 300px;
+  --layout-footer-height: 242px;
 
   --layout-content-banner: 160px;
 
