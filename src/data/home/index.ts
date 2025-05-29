@@ -4,6 +4,7 @@ import FieldIcon from '~icons/pkg/apppkg.svg';
 import ImageIcon from '~icons/pkg/image.svg';
 import RpmIcon from '~icons/pkg/rpm.svg';
 import OepkgIcon from '~icons/pkg/oepkg.svg';
+import CandaIcon from '~icons/pkg/conda.svg';
 
 import openHPC from '@/assets/home/openHPC.png';
 import openStack from '@/assets/home/openstack.png';
@@ -15,7 +16,7 @@ export const homeData = [
   {
     id: 'field',
     name: '领域应用',
-    desc: 'openEuler操作系统支持的软件集合(包括RPM、应用镜像、OEPKG软件包等）',
+    desc: 'openEuler操作系统支持的软件集合(包括RPM、应用镜像、OEPKG、CONDA软件包等）',
     icon: FieldIcon,
     href: '/field',
   },
@@ -39,6 +40,13 @@ export const homeData = [
     desc: 'OEPKG是openEuler第三方扩展软件包',
     icon: OepkgIcon,
     href: '/oepkg',
+  },
+  {
+    id: 'conda',
+    name: 'CONDA',
+    desc: '一系列在openEuler上验证可用的CONDA生态软件包',
+    icon: CandaIcon,
+    href: '/conda',
   },
 ];
 

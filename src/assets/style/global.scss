@@ -20,7 +20,7 @@ html {
     height: 16px;
   }
   > a + a {
-    margin-left: 8px;
+    margin-left: 6px;
   }
   .o-tag {
     cursor: pointer;
@@ -34,6 +34,12 @@ html {
     }
     &.rpm-icon .o-icon {
       color: #00a7b3;
+    }
+    &.oepkg-icon .o-icon {
+      color: #4260c2;
+    }
+    &.conda-icon .o-icon {
+      color: #b1d42a;
     }
     &:hover {
       --tag-bg-color: var(--o-color-control2-light);

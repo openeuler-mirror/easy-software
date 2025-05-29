@@ -42,15 +42,12 @@ const isShow = ref(props.isFeedback);
 const isPageHome = computed(() => route.name === 'home');
 
 const reportAnalytics = (data: Record<string, any>, event = 'click') => {
-  searchReport(
-    event,
-    {
-      module: isPageHome.value ? 'home_page' : 'search_page',
-      content: props.searchValue,
-      ...data,
-      ...(route.query.tab ? { tab: route.query.tab } : {}),
-    }
-  );
+  searchReport(event, {
+    module: isPageHome.value ? 'home_page' : 'search_page',
+    content: props.searchValue,
+    ...data,
+    ...(route.query.tab ? { tab: route.query.tab } : {}),
+  });
 };
 
 const jumpPages = (type: string) => {
@@ -65,7 +62,7 @@ const jumpPages = (type: string) => {
 
 const goDetail = (ev: MouseEvent, key: string, id: string) => {
   const type = getPkgName(key);
-  const pkgName = ['filed', 'rpm', 'epkg', 'image', 'oepkg'];
+  const pkgName = ['filed', 'rpm', 'epkg', 'image', 'oepkg', 'conda'];
   if (pkgName.includes(type)) {
     reportAnalytics({
       type: `suggest_${key}`,

@@ -62,17 +62,22 @@ import EpkgIcon from '~icons/pkg/epkg.svg';
 import ImageIcon from '~icons/pkg/image.svg';
 import RpmIcon from '~icons/pkg/rpm.svg';
 import OepkgIcon from '~icons/pkg/oepkg.svg';
+import CandaIcon from '~icons/pkg/conda.svg';
 
 export const getTagsIcon = (v: string) => {
-  if (v === 'RPM' || v === 'rpmpkg') {
-    return RpmIcon;
-  } else if (v === 'EPKG' || v === 'epkgpkg') {
-    return EpkgIcon;
-  } else if (v === 'IMAGE' || v === 'apppkg') {
-    return ImageIcon;
-  } else if (v === 'OEPKG' || v === 'oepkg') {
-    return OepkgIcon;
-  }
+  const iconMap: Record<string, any> = {
+    RPM: RpmIcon,
+    rpmpkg: RpmIcon,
+    EPKG: EpkgIcon,
+    epkgpkg: EpkgIcon,
+    IMAGE: ImageIcon,
+    apppkg: ImageIcon,
+    OEPKG: OepkgIcon,
+    oepkg: OepkgIcon,
+    CONDA: CandaIcon,
+    conda: CandaIcon
+  };
+  return iconMap[v];
 };
 
 //提取code
@@ -118,25 +123,16 @@ export const getParamsRules = (data: any) => {
 
 // 返回名称参数
 export const getPkgName = (type: string) => {
-  let name = '';
-  switch (type) {
-    case 'apppkg':
-      name = 'image';
-      break;
-    case 'epkgpkg':
-      name = 'epkg';
-      break;
-    case 'rpmpkg':
-      name = 'rpm';
-      break;
-    case 'oepkg':
-      name = 'oepkg';
-      break;
-    case 'all':
-      name = 'filed';
-      break;
-  }
-  return name;
+  const nameMap: Record<string, string> = {
+    apppkg: 'image',
+    epkgpkg: 'epkg',
+    rpmpkg: 'rpm',
+    oepkg: 'oepkg',
+    all: 'filed',
+    condapkg: 'conda',
+    conda: 'conda'
+  };
+  return nameMap[type] || '';
 };
 
 // 是否是搜索页面

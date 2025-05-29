@@ -13,6 +13,7 @@ import EpkgContent from '@/views/epkg/EpkgContent.vue';
 import OepkgContent from '@/views/oepkg/OEpkgContent.vue';
 import ImageContent from '@/views/image/ImageContent.vue';
 import RpmContent from '@/views/package/RpmContent.vue';
+import CondaContent from '@/views/conda/CondaContent.vue';
 import UpstreamContent from '@/views/upstream/UpstreamContent.vue';
 
 const route = useRoute();
@@ -56,11 +57,13 @@ const handleQueryData = () => {
     keywordType.value = FLITERMENUOPTIONS[0].id;
   }
 
-  if (isValidSearchTabName(tab)) {
+  if (isValidSearchTabName(tab) || tab === 'conda') {
     tabName.value = tab as string;
   } else {
     tabName.value = TABNAME_OPTIONS[0];
   }
+  console.log('DATATYPE :>> ', tab);
+
   querySearchCount();
 };
 handleQueryData();
@@ -93,8 +96,10 @@ watch(
       <EpkgContent v-if="tabName === DATATYPE[3]" />
       <!-- OEPKG -->
       <OepkgContent v-if="tabName === DATATYPE[4]" />
+      <!-- CONDA -->
+      <CondaContent v-if="DATATYPE[5].includes(tabName)" />
       <!-- 上游兼容应用全景 -->
-      <UpstreamContent v-if="tabName === DATATYPE[5]" />
+      <UpstreamContent v-if="tabName === DATATYPE[6]" />
     </div>
   </ContentWrapper>
 </template>

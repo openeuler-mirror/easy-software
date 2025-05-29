@@ -26,6 +26,7 @@ import IconEpkg from '~icons/pkg/epkg.svg';
 import IconOEpkg from '~icons/pkg/oepkg.svg';
 import IconImage from '~icons/pkg/image.svg';
 import IconRpm from '~icons/pkg/rpm.svg';
+import IconCanda from '~icons/pkg/conda.svg';
 import { currentFieldDetailTabInjection, pkgIdInjection } from '@/data/injectionKeys';
 import { oaReport } from '@/shared/analytics';
 
@@ -80,19 +81,21 @@ const epkgData = ref();
 const oepkgData = ref();
 const rpmData = ref();
 const imgData = ref();
+const condaData = ref();
 const isLoading = ref(true);
 provide(pkgIdInjection, pkgId);
 provide(currentFieldDetailTabInjection, activeName);
 
 const queryEntity = () => {
   const query = route.query;
-  const { type, appPkgId, epkgPkgId, rpmPkgId, oepkgPkgId } = query;
+  const { type, appPkgId, epkgPkgId, rpmPkgId, oepkgPkgId, condaPkgId } = query;
   getDetail(
     filterEmptyParams({
       appPkgId: (appPkgId as string) || '',
       epkgPkgId: (epkgPkgId as string) || '',
       rpmPkgId: (rpmPkgId as string) || '',
       oepkgPkgId: (oepkgPkgId as string) || '',
+      condaPkgId: (condaPkgId as string) || '',
     })
   )
     .then((res) => {
@@ -105,6 +108,7 @@ const queryEntity = () => {
       rpmData.value = data['RPM'];
       imgData.value = data['IMAGE'];
       oepkgData.value = data['OEPKG'];
+      condaData.value = data['CONDA'];
       appDataName.value = data[data.tags[0]].name;
       pkgId.value = data[data.tags[0]].pkgId;
       if (isValidTags(type)) {
@@ -150,6 +154,11 @@ const onChange = (tab: string, noReport?: boolean) => {
     typePkg.value = 'IMAGE';
     queryVer();
     getDetailValue(imgData.value);
+  } else if (tab === 'CONDA') {
+    tabValue.value = 'condapkg';
+    typePkg.value = 'CONDA';
+    queryVer();
+    getDetailValue(condaData.value);
   } else {
     useViewStore().showNotFound();
   }
@@ -167,7 +176,7 @@ const onChange = (tab: string, noReport?: boolean) => {
 
 const handleQueryData = (tab: string) => {
   const query = route.query;
-  const { appPkgId, rpmPkgId, epkgPkgId, oepkgPkgId } = query;
+  const { appPkgId, rpmPkgId, epkgPkgId, oepkgPkgId, condaPkgId } = query;
   router.push({
     path: `/${locale.value}/field/detail`,
     query: {
@@ -176,6 +185,7 @@ const handleQueryData = (tab: string) => {
       rpmPkgId,
       epkgPkgId,
       oepkgPkgId,
+      condaPkgId,
     },
   });
 };
@@ -273,6 +283,20 @@ const getDetailValue = (data: any) => {
     latestOsSupport.value = data.latestOsSupport === 'true';
     summary.value = data.description;
     appData.value.version = data.appVer;
+
+    moreMessge.value = [];
+  } else if (typePkg.value === 'CONDA') {
+    basicInfo.value = [
+      { name: t('detail.osSupport'), value: data.os },
+      { name: t('detail.arch'), value: data.arch },
+      { name: t('detail.epkgCategory'), value: data.category || '其他' },
+    ];
+
+    latestOsSupport.value = data.latestOsSupport === 'true';
+    summary.value = data.description;
+    appData.value.version = data.appVer;
+    appData.value.size = 0;
+    moreMessge.value = [];
   }
   tagVer.value = [data.osSupport, data.arch];
   maintainer.value = {
@@ -287,6 +311,10 @@ const getDetailValue = (data: any) => {
 
   downloadData.value = mkit(data?.download || '', { isCopy: true, Tag: data.appVer });
   installation.value = mkit(data?.installation || '', { isCopy: true, Tag: data.appVer });
+
+  if (typePkg.value === 'CONDA') {
+    installation.value = mkit(data?.condaUsage || '', { isCopy: true, Tag: data.appVer });
+  }
 
   imageUsage.value = mkit(data?.imageUsage || '', { isCopy: true, Tag: data.appVer });
   appData.value.name = data.name;
@@ -316,6 +344,8 @@ const getTabIcon = (tab: string) => {
     return IconImage;
   } else if (tab === 'OEPKG') {
     return IconOEpkg;
+  } else if (tab === 'CONDA') {
+    return IconCanda;
   }
 };
 
@@ -347,8 +377,8 @@ const onChangeImage = (v: string) => {
 const tagsOptions = computed(() => {
   return {
     name: appData.value.name,
-    os: tagVer.value[0],
-    arch: tagVer.value[1],
+    os: tagVer.value[0] || '',
+    arch: tagVer.value[1] || '',
   };
 });
 
@@ -401,7 +431,8 @@ const onCodeSuccess = () => {
               </DetailInstall>
 
               <!-- 更多信息 -->
-              <template v-if="item !== 'IMAGE'">
+
+              <template v-if="moreMessge.length !== 0">
                 <p class="sp">> {{ t('detail.more') }}</p>
                 <DetailMoreInfo :options="moreMessge" />
               </template>

@@ -94,16 +94,13 @@ const replaceWinUrl = () => {
 const collectDownloadData = (keyword: string) => {
   const { href } = window.location;
   const downloadTime = new Date();
-  searchReport(
-    'search',
-    {
-      origin: href,
-      keyword,
-      filter: 'all',
-      pkg: props.title,
-      downloadTime,
-    }
-  );
+  searchReport('search', {
+    origin: href,
+    keyword,
+    filter: 'all',
+    pkg: props.title,
+    downloadTime,
+  });
 };
 
 const isTimeOrder = ref(false);
@@ -176,6 +173,28 @@ watch(
     }
   }
 );
+
+const getSearchplaceholder = (name: string) => {
+  const placeholder = {
+    CONDA: '软件包名称',
+    OEPKG: '软件包名称',
+    IMAGE: '镜像名称',
+    RPM: '软件包名称',
+    DOMAIN: '相关信息',
+    EPKG: '软件包名称',
+    APPVERSION: '应用名称',
+  };
+  const title = {
+    CONDA: 'CONDA',
+    OEPKG: 'OEPKG',
+    RPM: 'RPM',
+    IMAGE: '应用',
+    EPKG: 'EPKG',
+    DOMAIN: '领域应用',
+    APPVERSION: '',
+  };
+  return `${title[name]}${placeholder[name]}`;
+};
 </script>
 
 <template>
@@ -189,7 +208,7 @@ watch(
       </template>
       <OInput
         v-else
-        :placeholder="`${t('software.filterPleaseEnter[0]')}${title}${t('software.filterPleaseEnter[1]')}`"
+        :placeholder="`${t('software.filterPleaseEnter[0]')}${getSearchplaceholder(title)}`"
         :style="{ width: '348px' }"
         size="large"
         :max-length="100"
