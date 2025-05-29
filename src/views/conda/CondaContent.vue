@@ -1,16 +1,17 @@
 <script setup lang="ts">
 import { ref, watch, computed, onMounted } from 'vue';
-import { ORow, OCol, OTag, OLink, OIcon, isUndefined } from '@opensig/opendesign';
+import { OTag, OLink, OIcon, isUndefined } from '@opensig/opendesign';
+
 import { getSearchData } from '@/api/api-search';
 import { getSearchAllColumn, getSearchAllFiled } from '@/api/api-domain';
 import { useRoute, useRouter } from 'vue-router';
-import { useLocale } from '@/composables/useLocale';
-import { useViewStore } from '@/stores/common';
-import { useSearchStore } from '@/stores/search';
 import { useI18n } from 'vue-i18n';
+import { useLocale } from '@/composables/useLocale';
 import { getParamsRules } from '@/utils/common';
 import { isValidSearchTabName, isValidSearchKey } from '@/utils/query';
-import { TABNAME_OPTIONS, FLITERMENUOPTIONS, COUNT_PAGESIZE_FIELD } from '@/data/query';
+import { TABNAME_OPTIONS, FLITERMENUOPTIONS, COUNT_PAGESIZE, SORTPARAMS } from '@/data/query';
+import { useViewStore } from '@/stores/common';
+import { useSearchStore } from '@/stores/search';
 
 import FilterCheckbox from '@/components/filter/FilterCheckbox.vue';
 import AppLoading from '@/components/AppLoading.vue';
@@ -18,49 +19,92 @@ import IconOs from '~icons/pkg/icon-os.svg';
 import IconArch from '~icons/pkg/icon-arch.svg';
 import IconCategory from '~icons/pkg/icon-category.svg';
 
-const { locale } = useLocale();
 const route = useRoute();
 const router = useRouter();
 const { t } = useI18n();
+const { locale } = useLocale();
 const searchStore = useSearchStore();
 
+// EPKG-表头
+const columns = [
+  { label: t('software.columns.name'), key: 'name', type: 'name' },
+  { label: t('software.columns.version'), key: 'appVer', type: 'version' },
+  { label: t('software.columns.os'), key: 'os', type: 'os' },
+  { label: t('software.columns.arch'), key: 'arch', type: 'arch' },
+  { label: t('software.columns.category'), key: 'category', type: 'category' },
+];
+
+//  ------------  main ------------
+
 const pkgData = ref([]);
-const tabName = ref('all');
+const PAGE_ID = 'CONDA';
+const tabName = ref(TABNAME_OPTIONS[5]);
 const keywordType = ref((route.query.key as string) || '');
 const isLoading = ref(false);
 
 const searchKey = ref((route.query.name as string) || '');
+const timeOrder = ref('');
 const nameOrder = ref('');
 
-const searchOs = ref('');
-const searchArch = ref('');
+const searchOs = ref<string[]>([]);
+const searchArch = ref<string[]>([]);
 const searchCategory = ref<string[]>([]);
+
 const searchParams = computed(() => {
   return {
     keyword: searchKey.value,
     keywordType: keywordType.value,
     pageNum: currentPage.value,
     pageSize: pageSize.value,
-    dataType: tabName.value,
-    os: searchOs.value,
-    arch: searchArch.value,
-    category: searchCategory.value.join(),
+    dataType: 'conda',
+    os: searchOs.value.join(),
+    arch: searchArch.value.join(),
+    timeOrder: timeOrder.value,
     nameOrder: nameOrder.value,
+    category: searchCategory.value.join(),
   };
 });
 
+// es搜索
+const querySearch = () => {
+  // 过滤空参数
+  const newData = getParamsRules(searchParams.value);
+
+  getSearchData(newData)
+    .then((res) => {
+      pkgData.value = res.data.condapkg;
+      total.value = res.data.total;
+      if (searchStore.nameOrder) {
+        searchStore.changeNameOrderCount(total.value);
+      }
+      isLoading.value = false;
+      isSearchDocs.value = true;
+      if (pkgData.value.length === 0) {
+        isSearchError.value = true;
+      }
+    })
+    .catch(() => {
+      isSearchError.value = true;
+      total.value = 0;
+      pkgData.value = [];
+      isLoading.value = false;
+      isSearchDocs.value = false;
+    });
+};
+
+// sql搜索
 const isSearchError = ref(false);
 const isSearchDocs = ref(false);
-// sql搜索
 const queryAllpkg = () => {
   const params = {
-    name: 'domain',
+    name: tabName.value,
     pageNum: currentPage.value,
     pageSize: pageSize.value,
-    os: searchOs.value,
-    arch: searchArch.value,
-    category: searchCategory.value.join(),
+    timeOrder: timeOrder.value,
     nameOrder: nameOrder.value,
+    os: searchOs.value.join(),
+    arch: searchArch.value.join(),
+    category: searchCategory.value.join(),
   };
   // 过滤空参数
   const newData = getParamsRules(params);
@@ -82,46 +126,32 @@ const queryAllpkg = () => {
     });
 };
 
-// es搜索
-const querySearch = () => {
-  // 过滤空参数
-  const newData = getParamsRules(searchParams.value);
-  getSearchData(newData)
-    .then((res) => {
-      pkgData.value = res.data.all;
-      total.value = res.data.total;
-      if (searchStore.nameOrder) {
-        searchStore.changeNameOrderCount(total.value);
-      }
-      isSearchDocs.value = true;
-      if (pkgData.value.length === 0) {
-        isSearchError.value = true;
-      }
-      isLoading.value = false;
-    })
-    .catch(() => {
-      isSearchError.value = true;
-      total.value = 0;
-      pkgData.value = [];
-      isLoading.value = false;
-      isSearchDocs.value = false;
-      isSearchError.value = true;
-    });
+// 判断是走es还是sql
+const pageSearch = () => {
+  isSearchError.value = false;
+  if (tabName.value === TABNAME_OPTIONS[5]) {
+    isLoading.value = true;
+    if (searchKey.value === '') {
+      queryAllpkg();
+    } else {
+      querySearch();
+    }
+  }
 };
 
+// ----------- 左侧菜单交互-------------
 // 获取筛选参数列表
 const filterOsList = ref<string[]>([]);
 const filterArchList = ref<string[]>([]);
 const filterCategoryList = ref<string[]>([]);
 const isFilterLoading = ref(false);
-
 const queryFilter = () => {
   filterCategoryList.value = [];
   filterOsList.value = [];
   filterArchList.value = [];
   isFilterLoading.value = true;
   getSearchAllColumn({
-    name: 'domain',
+    name: tabName.value,
     column: 'os,arch,category',
   })
     .then((res) => {
@@ -136,56 +166,51 @@ const queryFilter = () => {
     });
 };
 
-const handleCloseTag = (type: string, idx?: string | number) => {
-  if (type === 'category') {
-    const numIdx = Number(idx);
-    searchCategory.value.splice(numIdx, 1);
-  } else if (type === 'os') {
-    searchOs.value = '';
+const closeTag = (idx: string | number, type: string) => {
+  if (type === 'os') {
+    searchOs.value.splice(Number(idx), 1);
   } else if (type === 'arch') {
-    searchArch.value = '';
+    searchArch.value.splice(Number(idx), 1);
+  } else if (type === 'category') {
+    searchCategory.value.splice(Number(idx), 1);
   }
 };
 
 // 重置筛选结果
-const isClear = ref(false);
 const resetTag = () => {
-  searchOs.value = '';
-  searchArch.value = '';
+  searchOs.value = [];
+  searchArch.value = [];
   searchCategory.value = [];
   isSearchDocs.value = false;
-  isClear.value = true;
+
+  timeOrder.value = '';
   nameOrder.value = '';
+
   currentPage.value = 1;
 
-  if (route.query.type || route.query.os || route.query.arch) {
+  if (route.query.os || route.query.arch) {
     router.push({
-      path: `/${locale.value}/field`,
+      path: `/${locale.value}/conda`,
     });
   }
 };
 
-// 更新时间、字母排序
-const changeSortValue = (v: string[] | string) => {
+const changeSortBy = (v: string[]) => {
   nameOrder.value = '';
-  currentPage.value = 1;
+  timeOrder.value = '';
   if (Array.isArray(v)) {
-    if (v[0] === 'nameOrder') {
-      nameOrder.value = v[1];
+    if (v[0] === 'time') {
+      timeOrder.value = SORTPARAMS[v[1]];
+    } else if (v[0] === 'name') {
+      nameOrder.value = SORTPARAMS[v[1]];
     }
-  } else {
-    isClear.value = false;
   }
-};
-
-// 清除input数据
-const clearFilterInput = () => {
-  searchKey.value = '';
+  currentPage.value = 1;
 };
 
 // 分页
 const currentPage = ref(1);
-const pageSize = ref(12);
+const pageSize = ref(20);
 const total = ref(0);
 const handleSizeChange = (val: number) => {
   pageSize.value = val;
@@ -193,18 +218,6 @@ const handleSizeChange = (val: number) => {
 };
 const handleCurrentChange = (val: number) => {
   currentPage.value = val;
-};
-
-const pageSearch = () => {
-  isSearchError.value = false;
-  if (tabName.value === 'all') {
-    isLoading.value = true;
-    if (searchKey.value === '') {
-      queryAllpkg();
-    } else {
-      querySearch();
-    }
-  }
 };
 
 // 判断是否是搜索页
@@ -228,9 +241,9 @@ watch(
   { deep: true }
 );
 
-// -------------------- 除分页器相关请求参数变化，发请求获取新数据 --------------------
+// 除分页器相关请求参数变化，发请求获取新数据
 watch(
-  () => [searchCategory.value, searchOs.value, searchArch.value, nameOrder.value],
+  () => [searchCategory.value, searchOs.value, searchArch.value],
   () => {
     currentPage.value = 1;
   },
@@ -240,8 +253,7 @@ watch(
 // -------------------- 监听 url query 变化 触发搜索 ---------------------
 const handleQueryData = () => {
   const query = route.query;
-  const { name, tab, key, os, arch, type } = query;
-
+  const { name, tab, key, os, arch } = query;
   if (!isUndefined(name) && name) {
     searchKey.value = name?.toString();
     currentPage.value = 1;
@@ -253,7 +265,7 @@ const handleQueryData = () => {
   if (isValidSearchTabName(tab) && tab) {
     tabName.value = tab as string;
   } else {
-    tabName.value = TABNAME_OPTIONS[0];
+    tabName.value = TABNAME_OPTIONS[5];
   }
   // 判断key参数
   if (isValidSearchKey(key) && key) {
@@ -262,17 +274,12 @@ const handleQueryData = () => {
     keywordType.value = FLITERMENUOPTIONS[0].id;
   }
 
-  //判断主页领域应用更多跳转
-  if (!isUndefined(type) && type) {
-    searchCategory.value.push(type as string);
-  }
-
   // 首页社区版本跳转
   if (!isUndefined(os) && os) {
-    searchOs.value = os?.toString();
+    searchOs.value.push(os?.toString());
   }
   if (!isUndefined(arch) && arch) {
-    searchArch.value = arch?.toString();
+    searchArch.value.push(arch?.toString());
   }
 };
 
@@ -283,37 +290,27 @@ watch(
   },
   { deep: true }
 );
-
-watch(
-  () => pkgData.value,
-  () => {
-    if (pkgData.value.length > 0) {
-      isSearchError.value = false;
-    }
-  }
-);
 </script>
 
 <template>
   <div class="pkg-wrap" :class="tabName">
-    <div class="filter-sidebar">
+    <div class="filter-sidebar" flex="0 0 25%">
       <template v-if="isFilterLoading"><FilterItemSkeleton v-for="tag in 3" :key="tag" /></template>
       <template v-else>
-        <FilterRadio v-if="filterOsList.length" v-model="searchOs" :options="filterOsList">
+        <FilterCheckbox v-if="filterOsList.length" v-model="searchOs" :options="filterOsList">
           <template #header>
             <div class="filter-title">
               <OIcon><IconOs /></OIcon>{{ t('software.filterSider.os') }}
             </div>
           </template>
-        </FilterRadio>
-
-        <FilterRadio v-if="filterArchList.length" v-model="searchArch" :options="filterArchList">
+        </FilterCheckbox>
+        <FilterCheckbox v-if="filterArchList.length" v-model="searchArch" :options="filterArchList">
           <template #header>
             <div class="filter-title">
               <OIcon><IconArch /></OIcon>{{ t('software.filterSider.arch') }}
             </div>
           </template>
-        </FilterRadio>
+        </FilterCheckbox>
 
         <FilterCheckbox v-if="filterCategoryList.length" v-model="searchCategory" :options="filterCategoryList">
           <template #header>
@@ -326,9 +323,8 @@ watch(
     </div>
 
     <div class="pkg-main">
-      <FilterHeader title="DOMAIN" :type="tabName" @sort="changeSortValue" :is-clear="isClear" :total="total" @clear="clearFilterInput" />
-
-      <div v-if="isSearchDocs || searchOs || searchArch || searchCategory.length > 0" class="search-result">
+      <FilterHeader :title="PAGE_ID" :total="total" />
+      <div v-if="isSearchDocs || searchArch.length > 0 || searchOs.length > 0 || searchCategory.length > 0" class="search-result">
         <p v-if="!isPageSearch" class="text">
           <template v-if="isSearchDocs">
             为您找到<span class="total">{{ total }}</span
@@ -337,34 +333,25 @@ watch(
           >
           <template v-else>
             为您找到符合条件的筛选<span class="total">{{ total }}</span
-            >个
-          </template>
+            >个</template
+          >
         </p>
-        <div v-if="searchOs || searchArch || searchCategory.length > 0" class="search-filter-tags">
-          <OTag v-if="searchOs" closable @Close="handleCloseTag('os')">{{ searchOs }}</OTag>
-          <OTag v-if="searchArch" closable @Close="handleCloseTag('arch')">{{ searchArch }}</OTag>
-          <OTag v-for="(item, index) in searchCategory" :key="item" closable @Close="handleCloseTag('category', index)">{{ item }}</OTag>
-          <OLink color="primary" class="resetting" @click="resetTag">{{ t('software.filterSider.clear') }}</OLink>
+        <div class="search-filter-tags">
+          <OTag v-for="(item, index) in searchOs" :key="item" closable @Close="closeTag(index, 'os')">{{ item }}</OTag>
+          <OTag v-for="(item, index) in searchArch" :key="item" closable @Close="closeTag(index, 'arch')">{{ item }}</OTag>
+          <OTag v-for="(item, index) in searchCategory" :key="item" closable @Close="closeTag(index, 'category')">{{ item }}</OTag>
+
+          <OLink v-if="searchArch.length > 0 || searchOs.length > 0 || searchCategory.length > 0" color="primary" class="resetting" @click="resetTag">{{
+            t('software.filterSider.clear')
+          }}</OLink>
         </div>
       </div>
       <div class="pkg-content" :class="pkgData.length === 0 && isLoading ? 'loading' : ''">
         <AppLoading :loading="isLoading" />
-        <ResultNoApp v-if="isSearchError" type="领域应用" />
+        <ResultNoApp v-if="isSearchError" :type="PAGE_ID" />
         <div v-if="pkgData.length !== 0 && !isSearchError" class="pkg-panel">
-          <ORow gap="32px" flex-wrap="wrap">
-            <template v-if="pkgData.length > 0">
-              <OCol v-for="(subItem, index) in pkgData" :key="index" flex="0 1 33.33%" :laptop="{ flex: '0 1 33.33%' }">
-                <OCardItem :data="subItem" />
-              </OCol>
-            </template>
-            <template v-else>
-              <OCol v-for="index in 12" :key="index" flex="0 1 33.33%" :laptop="{ flex: '0 1 33.33%' }">
-                <OCardItemSkeleton />
-              </OCol>
-            </template>
-          </ORow>
-
-          <div v-if="total > COUNT_PAGESIZE_FIELD[0]" class="pagination-box">
+          <OTableItemNew :data="pkgData" :columns="columns" :type="tabName" @sort="changeSortBy" />
+          <div v-if="total > COUNT_PAGESIZE[0]" class="pagination-box">
             <AppPagination :current="currentPage" :pagesize="pageSize" :total="total" @size-change="handleSizeChange" @current-change="handleCurrentChange" />
           </div>
         </div>
@@ -373,6 +360,6 @@ watch(
   </div>
 </template>
 
-<style scoped lang="scss">
+<style lang="scss" scoped>
 @import '@/assets/style/category/content/index.scss';
 </style>

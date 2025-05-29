@@ -316,7 +316,7 @@ watch(
     </div>
 
     <div class="pkg-main">
-      <FilterHeader title="应用镜像" :total="total" />
+      <FilterHeader title="IMAGE" :total="total" />
       <div v-if="isSearchDocs || filterList.length > 0" class="search-result">
         <p v-if="!isPageSearch" class="text">
           <template v-if="isSearchDocs">

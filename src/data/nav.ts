@@ -48,15 +48,22 @@ export const navs = [
     href: '/oepkg',
   },
   {
+    id: 'conda',
+    label: {
+      zh: 'CONDA',
+      en: 'CONDA',
+    },
+    href: '/conda',
+  },
+  {
     id: 'upstream',
     label: {
-      zh: '上游软件包',
-      en: '上游软件包',
+      zh: '软件版本支持',
+      en: '软件版本支持',
     },
     href: '/upstream',
   },
 ];
-
 
 export const collaborationNav = [
   {
@@ -67,4 +74,4 @@ export const collaborationNav = [
     },
     href: '/collaboration',
   },
-]
+];

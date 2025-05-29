@@ -3,10 +3,10 @@ import i18n from '@/i18n';
 const { t } = i18n.global;
 
 // tags参数
-export const TAGS_OPTIONS = ['RPM', 'IMAGE', 'EPKG', 'OEPKG'];
+export const TAGS_OPTIONS = ['RPM', 'IMAGE', 'EPKG', 'OEPKG', 'CONDA'];
 
 // 搜索tab参数
-export const TABNAME_OPTIONS = ['all', 'rpmpkg', 'apppkg', 'epkgpkg', 'oepkg', 'appversion'];
+export const TABNAME_OPTIONS = ['all', 'rpmpkg', 'apppkg', 'epkgpkg', 'oepkg', 'condapkg', 'appversion'];
 
 // 搜索筛选菜单
 export const FLITERMENUOPTIONS = [
@@ -48,9 +48,7 @@ export const maintainerDefaults = {
   name: 'George.Cao',
   email: 'caozhi1214@qq.com',
   gitee_id: 'georgecao',
-}
-
-
+};
 
 // 协作平台权限 route name
 export const COLLABORATIONPERMISSION = ['todo', 'collaboration', 'todo-detail'];

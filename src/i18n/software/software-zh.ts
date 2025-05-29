@@ -9,6 +9,7 @@ export default {
   epkgpkg: 'EPKG',
   epkg: 'EPKG',
   oepkg: 'OEPKG',
+  conda: 'CONDA',
   appversion: '上游兼容应用全景',
   filterAll: '全部',
   filterName: '按名称',
