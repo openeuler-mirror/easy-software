@@ -50,7 +50,7 @@ const reportAnalytics = (data: Record<string, any>, event = 'click') => {
 };
 
 const changeFilter = (v: string) => {
-  fliterSelected.value = v;
+  defaultValue.value = v;
   if (searchInput.value !== '') {
     replaceWinUrl();
   }
@@ -82,9 +82,9 @@ const replaceWinUrl = () => {
   router.push({
     path: `/${locale.value}/search`,
     query: {
-      name: searchInput.value,
-      tab: tabName.value,
-      key: defaultValue.value,
+      q: searchInput.value,
+      type: tabName.value,
+      sort: defaultValue.value,
     },
   });
 };
@@ -124,7 +124,9 @@ const changeSearchBlur = () => {
     );
   }
   focusInput = null;
-  const name = route.query.name as string;
+
+  const name = route.query?.name ?? route.query?.q ?? '';
+
   if (isPageSearch.value) {
     if (searchInput.value === '' || name !== searchInput.value) {
       searchInput.value = name;
@@ -185,30 +187,31 @@ const isPageHome = ref(false);
 onMounted(() => {
   isPageSearch.value = route.name === 'search';
   isPageHome.value = route.name === 'home';
+  handleQueryData();
 });
 
 // -------------------- 监听 url query 变化 触发搜索 ---------------------
 const handleQueryData = () => {
   const query = route.query;
-  const { name, tab, key } = query;
+  const { name, tab, key, q, sort, type } = query;
 
-  if (!isUndefined(name) && name) {
-    searchInput.value = decodeURIComponent(name as string);
+  if ((!isUndefined(name) && name) || (!isUndefined(q) && q)) {
+    searchInput.value = decodeURIComponent(name ?? q);
   }
+
   // 判断key参数
-  if (isValidSearchKey(key)) {
-    defaultValue.value = key as string;
+  if ((isValidSearchKey(key) && key) || isValidSearchKey(sort)) {
+    defaultValue.value = key ?? sort;
   } else {
     defaultValue.value = FLITERMENUOPTIONS[0].id;
   }
 
-  if (isValidSearchTabName(tab)) {
-    tabName.value = tab as string;
+  if (isValidSearchTabName(tab) || isValidSearchTabName(type)) {
+    tabName.value = tab ?? type;
   } else {
     tabName.value = TABNAME_OPTIONS[0];
   }
 };
-handleQueryData();
 
 watch(
   () => route.query,

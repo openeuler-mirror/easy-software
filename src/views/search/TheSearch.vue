@@ -45,24 +45,24 @@ const querySearchCount = () => {
 // -------------------- 监听 url query 变化 触发搜索 ---------------------
 const handleQueryData = () => {
   const query = route.query;
-  const { name, tab, key } = query;
+  const { name, tab, key, q, sort, type } = query;
 
-  if (!isUndefined(name) && name) {
-    searchKey.value = name as string;
+  if ((!isUndefined(name) && name) || (!isUndefined(q) && q)) {
+    searchKey.value = name ?? q;
   }
+
   // 判断key参数
-  if (isValidSearchKey(key)) {
-    keywordType.value = key as string;
+  if (isValidSearchKey(key) || isValidSearchKey(sort)) {
+    keywordType.value = key ?? sort;
   } else {
     keywordType.value = FLITERMENUOPTIONS[0].id;
   }
 
-  if (isValidSearchTabName(tab) || tab === 'conda') {
-    tabName.value = tab as string;
+  if ((isValidSearchTabName(type) && type) || tab === 'conda') {
+    tabName.value = tab ?? type;
   } else {
     tabName.value = TABNAME_OPTIONS[0];
   }
-  console.log('DATATYPE :>> ', tab);
 
   querySearchCount();
 };

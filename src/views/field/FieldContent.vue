@@ -26,10 +26,10 @@ const searchStore = useSearchStore();
 
 const pkgData = ref([]);
 const tabName = ref('all');
-const keywordType = ref((route.query.key as string) || '');
+const keywordType = ref('');
 const isLoading = ref(false);
 
-const searchKey = ref((route.query.name as string) || '');
+const searchKey = ref('');
 const nameOrder = ref('');
 
 const searchOs = ref('');
@@ -158,7 +158,7 @@ const resetTag = () => {
   nameOrder.value = '';
   currentPage.value = 1;
 
-  if (route.query.type || route.query.os || route.query.arch) {
+  if ((route.query.type || route.query.os || route.query.arch) && !isPageSearch.value) {
     router.push({
       path: `/${locale.value}/field`,
     });
@@ -212,9 +212,9 @@ const isPageSearch = ref(false);
 
 onMounted(() => {
   isPageSearch.value = route.name === 'search';
-  if (isPageSearch.value) {
-    pageSearch();
-  }
+
+  searchKey.value = route.query?.name ?? route.query?.q ?? '';
+  keywordType.value = route.query?.key ?? route.query?.sort ?? '';
 
   queryFilter();
   handleQueryData();
@@ -240,31 +240,34 @@ watch(
 // -------------------- 监听 url query 变化 触发搜索 ---------------------
 const handleQueryData = () => {
   const query = route.query;
-  const { name, tab, key, os, arch, type } = query;
+  const { name, tab, key, os, arch, category, q, sort, type } = query;
 
   if (!isUndefined(name) && name) {
     searchKey.value = name?.toString();
+    currentPage.value = 1;
+  } else if (!isUndefined(q) && q) {
+    searchKey.value = q?.toString();
     currentPage.value = 1;
   } else {
     searchKey.value = '';
     isSearchDocs.value = false;
   }
 
-  if (isValidSearchTabName(tab) && tab) {
-    tabName.value = tab as string;
+  if ((isValidSearchTabName(tab) && tab) || (isValidSearchTabName(type) && type)) {
+    tabName.value = (tab as string) ?? (type as string);
   } else {
     tabName.value = TABNAME_OPTIONS[0];
   }
   // 判断key参数
-  if (isValidSearchKey(key) && key) {
-    keywordType.value = encodeURIComponent(key as string);
+  if ((isValidSearchKey(key) && key) || (isValidSearchKey(sort) && sort)) {
+    keywordType.value = encodeURIComponent((key as string) ?? (sort as string));
   } else {
     keywordType.value = FLITERMENUOPTIONS[0].id;
   }
 
   //判断主页领域应用更多跳转
-  if (!isUndefined(type) && type) {
-    searchCategory.value.push(type as string);
+  if (!isUndefined(category) && category) {
+    searchCategory.value.push(category as string);
   }
 
   // 首页社区版本跳转

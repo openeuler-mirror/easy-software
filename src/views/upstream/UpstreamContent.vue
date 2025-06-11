@@ -35,7 +35,7 @@ const tabName = ref('appversion');
 const nameOrder = ref('');
 const isLoading = ref(false);
 
-const searchKey = ref((route.query.name as string) || '');
+const searchKey = ref('');
 const searchOs = ref('');
 const searchType = ref('');
 const searchStatus = ref<string[]>([]);
@@ -170,6 +170,8 @@ const handleCurrentChange = (val: number) => {
 const isPageSearch = ref(false);
 
 onMounted(() => {
+  searchKey.value = route.query?.name ?? route.query?.q ?? '';
+
   isPageSearch.value = route.name === 'search';
 
   pageSearch();
@@ -208,7 +210,7 @@ watch(
 );
 
 watch(
-  () => route.query.name as string,
+  () => (route.query?.name as string) || (route.query?.q as string),
   (v: string) => {
     if (searchKey.value !== v && v !== undefined) {
       searchKey.value = v;

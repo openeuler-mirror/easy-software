@@ -51,7 +51,7 @@ const emits = defineEmits<{
 
 const searchStore = useSearchStore();
 
-const searchValue = ref(route.query.name as string | '');
+const searchValue = ref('');
 const showPanel = ref(false);
 
 // 搜索
@@ -85,7 +85,7 @@ const replaceWinUrl = () => {
   router.push({
     path: `/${locale.value}/` + (route.name as string),
     query: {
-      name: searchValue.value,
+      q: searchValue.value,
     },
   });
 };
@@ -156,10 +156,12 @@ const clearAll = () => {
 const isPageSearch = ref(false);
 onMounted(() => {
   isPageSearch.value = route.name === 'search';
+
+  searchValue.value = route.query?.name ?? route.query?.q ?? '';
 });
 
 watch(
-  () => route.query.name as string,
+  () => (route.query?.name as string) || (route.query?.q as string),
   (v: string) => {
     searchValue.value = v;
   }

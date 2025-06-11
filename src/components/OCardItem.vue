@@ -128,12 +128,13 @@ const onClickLink = (event: MouseEvent, isTag?: boolean) => {
     reportAnalytics(obj);
     return;
   }
+  const name = route.query?.name ?? route.query?.q ?? '';
   if (isPageSearch.value) {
     reportAnalytics({
       tab: route.query.tab,
       type: 'search_content',
       target: target.textContent,
-      content: route.query.name,
+      content: name,
     });
     return;
   }

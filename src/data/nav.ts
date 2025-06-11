@@ -59,7 +59,7 @@ export const navs = [
     id: 'upstream',
     label: {
       zh: '软件版本支持',
-      en: '软件版本支持',
+      en: 'Upstream',
     },
     href: '/upstream',
   },

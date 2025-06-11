@@ -47,21 +47,25 @@ const onChangeTabs = (v: string) => {
   nameOrderInfo.docCount = -1;
   nameOrderInfo.key = '';
 
-  fliterSelected.value = route.query.key as string;
+  const { key, sort } = route.query;
+
+  fliterSelected.value = key ?? sort ?? '';
   router.push({
     path: `/${locale.value}/search`,
     query: {
-      name: searchKey.value,
-      tab: tabName.value,
-      key: fliterSelected.value,
+      q: searchKey.value,
+      type: tabName.value,
+      sort: fliterSelected.value,
     },
   });
 };
 
 onMounted(() => {
-  searchKey.value = route.query.name as string;
-  tabName.value = route.query?.tab as string;
-  fliterSelected.value = route.query.key as string;
+  const { name, q, tab, key, type, sort } = route.query;
+  searchKey.value = name ?? q ?? '';
+
+  tabName.value = tab ?? type ?? '';
+  fliterSelected.value = key ?? sort ?? '';
 });
 
 watch(
@@ -76,7 +80,7 @@ watch(
 );
 
 watch(
-  () => route.query.name as string,
+  () => (route.query.q as string) || (route.query.name as string),
   (v: string) => {
     searchKey.value = v;
   }

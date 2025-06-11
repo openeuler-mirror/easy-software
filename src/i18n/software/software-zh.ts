@@ -10,6 +10,7 @@ export default {
   epkg: 'EPKG',
   oepkg: 'OEPKG',
   conda: 'CONDA',
+  condapkg: 'CONDA',
   appversion: '软件版本支持',
   filterAll: '全部',
   filterName: '按名称',
