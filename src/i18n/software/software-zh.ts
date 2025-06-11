@@ -10,7 +10,7 @@ export default {
   epkg: 'EPKG',
   oepkg: 'OEPKG',
   conda: 'CONDA',
-  appversion: '上游兼容应用全景',
+  appversion: '软件版本支持',
   filterAll: '全部',
   filterName: '按名称',
   filterSummary: '按概要',
@@ -18,6 +18,7 @@ export default {
   searchPlaceholder: '输入内容进行搜索，多个关键字请用逗号隔开',
   searchPlaceholder1: '搜索',
   searchFilterTips: '为您找到符合条件的筛选{0}个',
+  searcResult: '搜索结果',
 
   viewAll: '显示全部',
   upList: '收起',
