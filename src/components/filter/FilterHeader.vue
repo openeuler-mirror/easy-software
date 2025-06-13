@@ -46,6 +46,7 @@ const { locale } = useLocale();
 
 const emits = defineEmits<{
   (e: 'sort', value: string[] | string): void;
+  (e: 'search', value: string): void;
   (e: 'clear'): void;
 }>();
 
@@ -55,17 +56,16 @@ const searchValue = ref('');
 const showPanel = ref(false);
 
 // 搜索
-const changeSearchInput = (v: string) => {
-  changePkgInput(v);
-  searchValue.value = v;
+const changeSearchInput = () => {
+  changePkgInput();
   replaceWinUrl();
 };
 
-const changePkgInput = (v: string) => {
-  if (v === '') {
+const changePkgInput = () => {
+  if (searchValue.value === '') {
     return;
   }
-  if (v.length > 100) {
+  if (searchValue.value && searchValue.value.length > 100) {
     return msg.danger({
       content: '文字长度不能超过100字符',
     });
@@ -75,15 +75,16 @@ const changePkgInput = (v: string) => {
 const clearSearchData = () => {
   emits('clear');
   router.push({
-    path: `/${locale.value}/` + (route.name as string),
+    query: {
+      q: undefined,
+    },
   });
 };
 
 const replaceWinUrl = () => {
   collectDownloadData(searchValue.value);
-
+  emits('search', searchValue.value);
   router.push({
-    path: `/${locale.value}/` + (route.name as string),
     query: {
       q: searchValue.value,
     },
@@ -217,12 +218,12 @@ const getSearchplaceholder = (name: string) => {
         clearable
         @focus="showPanel = true"
         v-model="searchValue"
-        @press-enter="(v) => changeSearchInput(v)"
-        @input="(v) => changePkgInput(v)"
+        @press-enter="changeSearchInput"
+        @input="changePkgInput"
         @clear="clearSearchData"
       >
         <template #prefix>
-          <OIcon> <IconSearch @click="changeSearchInput(searchValue)" /></OIcon>
+          <OIcon> <IconSearch @click="changeSearchInput" /></OIcon>
         </template>
       </OInput>
     </div>

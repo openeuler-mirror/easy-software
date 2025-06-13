@@ -223,6 +223,14 @@ watch(
     pageSearch();
   }
 );
+
+const changeFilterSearch = (v: string) => {
+  searchKey.value = v;
+};
+
+const clearFilterSearch = () => {
+  searchKey.value = '';
+};
 </script>
 
 <template>
@@ -254,7 +262,7 @@ watch(
       </template>
     </div>
     <div class="pkg-main">
-      <FilterHeader title="APPVERSION" :total="total" />
+      <FilterHeader title="APPVERSION" :total="total" @search="changeFilterSearch" @clear="clearFilterSearch" />
       <div v-if="searchOs || isSearch || showSearchFilterTags" class="search-result">
         <p v-if="!isPageSearch" class="text">
           为您找到符合条件的筛选<span class="total">{{ total }}</span

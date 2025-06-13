@@ -18,6 +18,7 @@ export default {
   filterFile: 'File',
   searchPlaceholder: 'Enter content for search, separate multiple keywords with commas',
   searchPlaceholder1: 'Search',
+  softwareList: 'software List',
 
   viewAll: 'All',
   upList: 'Collapse',

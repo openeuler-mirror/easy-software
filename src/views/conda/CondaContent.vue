@@ -1,17 +1,17 @@
 <script setup lang="ts">
 import { ref, watch, computed, onMounted } from 'vue';
-import { OTag, OLink, OIcon, isUndefined } from '@opensig/opendesign';
-
+import { OTag, OLink, OIcon } from '@opensig/opendesign';
+import { useRouteQuery } from '@/composables/useRouteQuery';
 import { getSearchData } from '@/api/api-search';
 import { getSearchAllColumn, getSearchAllFiled } from '@/api/api-domain';
 import { useRoute, useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { useLocale } from '@/composables/useLocale';
 import { getParamsRules } from '@/utils/common';
-import { isValidSearchTabName, isValidSearchKey } from '@/utils/query';
-import { TABNAME_OPTIONS, FLITERMENUOPTIONS, COUNT_PAGESIZE, SORTPARAMS } from '@/data/query';
+import { PACKAGE_TYPE_MAPPING, COUNT_PAGESIZE, SORTPARAMS } from '@/data/query';
 import { useViewStore } from '@/stores/common';
 import { useSearchStore } from '@/stores/search';
+import { useDebounceFn } from '@vueuse/core';
 
 import FilterCheckbox from '@/components/filter/FilterCheckbox.vue';
 import AppLoading from '@/components/AppLoading.vue';
@@ -24,7 +24,6 @@ const router = useRouter();
 const { t } = useI18n();
 const { locale } = useLocale();
 const searchStore = useSearchStore();
-
 // EPKG-表头
 const columns = [
   { label: t('software.columns.name'), key: 'name', type: 'name' },
@@ -38,7 +37,7 @@ const columns = [
 
 const pkgData = ref([]);
 const PAGE_ID = 'CONDA';
-const tabName = ref(TABNAME_OPTIONS[5]);
+const tabName = ref(PACKAGE_TYPE_MAPPING['conda']);
 const keywordType = ref('');
 const isLoading = ref(false);
 
@@ -123,15 +122,17 @@ const queryAllpkg = () => {
       total.value = 0;
       pkgData.value = [];
       isLoading.value = false;
+      isSearchError.value = true;
     });
 };
 
 // 判断是走es还是sql
 const pageSearch = () => {
   isSearchError.value = false;
-  if (tabName.value === TABNAME_OPTIONS[5]) {
+  if (tabName.value === PACKAGE_TYPE_MAPPING['conda']) {
     isLoading.value = true;
     if (searchKey.value === '') {
+      isSearchDocs.value = false;
       queryAllpkg();
     } else {
       querySearch();
@@ -185,10 +186,11 @@ const resetTag = () => {
 
   timeOrder.value = '';
   nameOrder.value = '';
-
   currentPage.value = 1;
 
-  if ((route.query.os || route.query.arch) && !isPageSearch.value) {
+  const { os, arch } = route.query;
+
+  if ((os || arch) && !isPageSearch.value) {
     router.push({
       path: `/${locale.value}/conda`,
     });
@@ -223,20 +225,42 @@ const handleCurrentChange = (val: number) => {
 // 判断是否是搜索页
 const isPageSearch = ref(false);
 
+// 获取路由参数
+const { routeKey, routeName, routeType, routeOs, routeArch, routeCategory } = useRouteQuery(PACKAGE_TYPE_MAPPING['conda']);
+
+const init = () => {
+  searchKey.value = routeKey.value;
+  keywordType.value = routeType.value;
+  tabName.value = routeName.value;
+  searchOs.value = routeOs.value.length ? routeOs.value : searchOs.value;
+  searchArch.value = routeArch.value.length ? routeArch.value : searchArch.value;
+  searchCategory.value = routeCategory.value.length ? routeCategory.value : searchCategory.value;
+};
+
 onMounted(() => {
   isPageSearch.value = route.name === 'search';
 
-  searchKey.value = route.query?.name ?? route.query?.q ?? '';
-  keywordType.value = route.query?.key ?? route.query?.sort ?? '';
-
+  init();
   queryFilter();
-  handleQueryData();
 });
+
+// 监听领域应用页面搜索，非搜索页面
+watch(
+  () => route.query,
+  () => {
+    init();
+  }
+);
+
+//搜索防抖
+const debouncedFn = useDebounceFn(() => {
+  pageSearch();
+}, 150);
 
 watch(
   () => searchParams.value,
   () => {
-    pageSearch();
+    debouncedFn();
   },
   { deep: true }
 );
@@ -246,53 +270,16 @@ watch(
   () => [searchCategory.value, searchOs.value, searchArch.value],
   () => {
     currentPage.value = 1;
-  },
-  { deep: true }
+  }
 );
 
-// -------------------- 监听 url query 变化 触发搜索 ---------------------
-const handleQueryData = () => {
-  const query = route.query;
-  const { name, tab, key, os, arch, q, sort, type } = query;
-  if (!isUndefined(name) && name) {
-    searchKey.value = name?.toString();
-    currentPage.value = 1;
-  } else if (!isUndefined(q) && q) {
-    searchKey.value = q?.toString();
-    currentPage.value = 1;
-  } else {
-    searchKey.value = '';
-    isSearchDocs.value = false;
-  }
-
-  if ((isValidSearchTabName(tab) && tab) || (isValidSearchTabName(type) && type)) {
-    tabName.value = (tab as string) ?? (type as string);
-  } else {
-    tabName.value = TABNAME_OPTIONS[5];
-  }
-  // 判断key参数
-  if ((isValidSearchKey(key) && key) || (isValidSearchKey(sort) && sort)) {
-    keywordType.value = encodeURIComponent((key as string) ?? (sort as string));
-  } else {
-    keywordType.value = FLITERMENUOPTIONS[0].id;
-  }
-
-  // 首页社区版本跳转
-  if (!isUndefined(os) && os) {
-    searchOs.value.push(os?.toString());
-  }
-  if (!isUndefined(arch) && arch) {
-    searchArch.value.push(arch?.toString());
-  }
+const changeFilterSearch = (v: string) => {
+  searchKey.value = v;
 };
 
-watch(
-  () => route.query,
-  () => {
-    handleQueryData();
-  },
-  { deep: true }
-);
+const clearFilterSearch = () => {
+  searchKey.value = '';
+};
 </script>
 
 <template>
@@ -326,7 +313,7 @@ watch(
     </div>
 
     <div class="pkg-main">
-      <FilterHeader :title="PAGE_ID" :total="total" />
+      <FilterHeader :title="PAGE_ID" :total="total" @search="changeFilterSearch" @clear="clearFilterSearch" />
       <div v-if="isSearchDocs || searchArch.length > 0 || searchOs.length > 0 || searchCategory.length > 0" class="search-result">
         <p v-if="!isPageSearch" class="text">
           <template v-if="isSearchDocs">

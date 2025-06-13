@@ -1,11 +1,11 @@
 <script lang="ts" setup>
 import { ref, watch } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { getSearchCount } from '@/api/api-search';
 import { isUndefined } from '@opensig/opendesign';
 import type { MenuCountT } from '@/@types/search';
 import { isValidSearchTabName, isValidSearchKey } from '@/utils/query';
-import { TABNAME_OPTIONS, FLITERMENUOPTIONS } from '@/data/query';
+import { PACKAGE_TYPE_MAPPING, FLITERMENUOPTIONS } from '@/data/query';
 
 import SearchTab from '@/components/search/SearchTab.vue';
 import AppPkgContent from '@/views/field/FieldContent.vue';
@@ -17,8 +17,7 @@ import CondaContent from '@/views/conda/CondaContent.vue';
 import UpstreamContent from '@/views/upstream/UpstreamContent.vue';
 
 const route = useRoute();
-
-const DATATYPE = TABNAME_OPTIONS;
+const router = useRouter();
 
 const tabName = ref('');
 const menuData = ref<MenuCountT[]>([]);
@@ -34,7 +33,11 @@ const querySearchCount = () => {
   getSearchCount(searchParams)
     .then((res) => {
       if (res.code === 200) {
-        menuData.value = res.data;
+        // 格式化参数 名称保持一致
+        menuData.value = res.data.map((item) => ({
+          ...item,
+          key: PACKAGE_TYPE_MAPPING[item.key as keyof typeof PACKAGE_TYPE_MAPPING] || item.key,
+        }));
       }
     })
     .catch(() => {
@@ -45,36 +48,54 @@ const querySearchCount = () => {
 // -------------------- 监听 url query 变化 触发搜索 ---------------------
 const handleQueryData = () => {
   const query = route.query;
-  const { name, tab, key, q, sort, type } = query;
+  const { q, sort, type } = query;
 
-  if ((!isUndefined(name) && name) || (!isUndefined(q) && q)) {
-    searchKey.value = name ?? q;
+  if (!isUndefined(q) && q) {
+    searchKey.value = q;
   }
 
   // 判断key参数
-  if (isValidSearchKey(key) || isValidSearchKey(sort)) {
-    keywordType.value = key ?? sort;
-  } else {
-    keywordType.value = FLITERMENUOPTIONS[0].id;
-  }
+  keywordType.value = isValidSearchKey(sort) ? sort : FLITERMENUOPTIONS[0].id;
 
-  if ((isValidSearchTabName(type) && type) || tab === 'conda') {
-    tabName.value = tab ?? type;
+  if (isValidSearchTabName(type) && type) {
+    tabName.value = type;
   } else {
-    tabName.value = TABNAME_OPTIONS[0];
+    tabName.value = PACKAGE_TYPE_MAPPING['all'];
   }
 
   querySearchCount();
 };
-handleQueryData();
 
 watch(
   () => route.query,
-  () => {
-    handleQueryData();
+  (newQuery) => {
+    if (newQuery.name && !newQuery.q) {
+      router.replace({
+        path: route.path,
+        query: {
+          q: newQuery.name,
+          type: newQuery.tab ?? newQuery.type,
+          sort: newQuery.key ?? newQuery.sort,
+        },
+      });
+    }
+    if (newQuery.q) {
+      handleQueryData();
+    }
   },
-  { deep: true }
+  { immediate: true }
 );
+
+// 组件映射
+const tabComponent = {
+  [PACKAGE_TYPE_MAPPING['all']]: AppPkgContent,
+  [PACKAGE_TYPE_MAPPING['conda']]: CondaContent,
+  [PACKAGE_TYPE_MAPPING['epkg']]: EpkgContent,
+  [PACKAGE_TYPE_MAPPING['oepkg']]: OepkgContent,
+  [PACKAGE_TYPE_MAPPING['image']]: ImageContent,
+  [PACKAGE_TYPE_MAPPING['rpm']]: RpmContent,
+  [PACKAGE_TYPE_MAPPING['appversion']]: UpstreamContent,
+};
 </script>
 
 <template>
@@ -86,20 +107,7 @@ watch(
   </div>
   <ContentWrapper vertical-padding="40px">
     <div class="tab">
-      <!-- 领域应用 -->
-      <AppPkgContent v-if="tabName === DATATYPE[0]" />
-      <!-- 软件包 -->
-      <RpmContent v-if="tabName === DATATYPE[1]" />
-      <!-- 应用镜像  -->
-      <ImageContent v-if="tabName === DATATYPE[2]" />
-      <!-- EPKG -->
-      <EpkgContent v-if="tabName === DATATYPE[3]" />
-      <!-- OEPKG -->
-      <OepkgContent v-if="tabName === DATATYPE[4]" />
-      <!-- CONDA -->
-      <CondaContent v-if="DATATYPE[5].includes(tabName)" />
-      <!-- 上游兼容应用全景 -->
-      <UpstreamContent v-if="tabName === DATATYPE[6]" />
+      <component v-if="tabName && tabComponent[tabName]" :is="tabComponent[tabName]" />
     </div>
   </ContentWrapper>
 </template>

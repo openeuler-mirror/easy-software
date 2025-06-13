@@ -61,26 +61,24 @@ const onChangeTabs = (v: string) => {
 };
 
 onMounted(() => {
-  const { name, q, tab, key, type, sort } = route.query;
-  searchKey.value = name ?? q ?? '';
-
-  tabName.value = tab ?? type ?? '';
-  fliterSelected.value = key ?? sort ?? '';
+  const { type, q, sort } = route.query;
+  searchKey.value = q;
+  tabName.value = type ?? '';
+  fliterSelected.value = sort ?? '';
 });
 
 watch(
   () => props.menu,
   () => {
-    props.menu.forEach((item) => {
-      if (item.key === tabName.value) {
-        searchCategoryValue.value = item.key;
-      }
-    });
+    const matchedItem = props.menu.find((item) => item.key === tabName.value);
+    if (matchedItem) {
+      searchCategoryValue.value = matchedItem.key;
+    }
   }
 );
 
 watch(
-  () => (route.query.q as string) || (route.query.name as string),
+  () => route.query.q as string,
   (v: string) => {
     searchKey.value = v;
   }
