@@ -75,13 +75,12 @@ export const getTagsIcon = (v: string) => {
     OEPKG: OepkgIcon,
     oepkg: OepkgIcon,
     CONDA: CandaIcon,
-    conda: CandaIcon
+    conda: CandaIcon,
   };
   return iconMap[v];
 };
 
 //提取code
-
 export const getCode = (code: string) => {
   const codeRegex = /<code>(.*?)<\/code>/;
   const match = JSON.stringify(code).match(codeRegex);
@@ -130,64 +129,7 @@ export const getPkgName = (type: string) => {
     oepkg: 'oepkg',
     all: 'filed',
     condapkg: 'conda',
-    conda: 'conda'
+    conda: 'conda',
   };
   return nameMap[type] || '';
-};
-
-// 是否是搜索页面
-import { useRoute } from 'vue-router';
-const route = useRoute();
-export const isSearchPage = () => {
-  return route.name === 'search';
-};
-
-// 去重
-
-export const getTarget = (data: any, key: any) => {
-  const map = new Map();
-  for (const item of data) {
-    if (!map.has(item[key])) {
-      map.set(item[key], item);
-    }
-  }
-  return [...map.values()];
-};
-
-// 输入框文字校验
-export const inputValidator = new RegExp('^[\u4E00-\u9FA5A-Za-z0-9.()$\\-]+$');
-
-/**
- * 对象转URL参数
- * @param queries 要转成query的键值对
- * @returns query字符串，如?key1=value1&key2=value2
- */
-export const generateQuery = (queries: Record<string, any>): string => {
-  const parseResultArr = Object.entries(queries).reduce((arr, [key, value]) => {
-    if (value === undefined || value === null || value === '') {
-      return arr;
-    }
-    arr.push(`${key}=${value}`);
-    return arr;
-  }, [] as string[]);
-  if (parseResultArr?.length) {
-    return `?${parseResultArr.join('&')}`;
-  }
-  return '';
-};
-
-/**
- * 获取指定时区偏移量的年份
- * @param {number} offset - 时区偏移量（单位：小时）。例如，UTC+8 时区，传入 8。
- * @returns {number} - 指定时区偏移量对应的年份
- */
-export const getYearByOffset = () => {
-  // 获取当前时间的 UTC 时间
-  const now = new Date();
-  const utcTime = new Date(now.getTime() + now.getTimezoneOffset() * 60000);
-
-  // 设置偏移
-  utcTime.setHours(utcTime.getHours() + 8);
-
-  return utcTime.getFullYear();
 };

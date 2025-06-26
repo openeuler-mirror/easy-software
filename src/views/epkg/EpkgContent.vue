@@ -9,7 +9,7 @@ import { useI18n } from 'vue-i18n';
 import { useLocale } from '@/composables/useLocale';
 import { getParamsRules } from '@/utils/common';
 import { isValidSearchTabName, isValidSearchKey } from '@/utils/query';
-import { TABNAME_OPTIONS, FLITERMENUOPTIONS, COUNT_PAGESIZE, SORTPARAMS } from '@/data/query';
+import { PACKAGE_TYPE_MAPPING, FLITERMENUOPTIONS, COUNT_PAGESIZE, SORTPARAMS } from '@/data/query';
 import { useViewStore } from '@/stores/common';
 import { useSearchStore } from '@/stores/search';
 
@@ -41,11 +41,11 @@ const columns = [
 
 const pkgData = ref([]);
 
-const tabName = ref(TABNAME_OPTIONS[3]);
-const keywordType = ref((route.query.key as string) || '');
+const tabName = ref(PACKAGE_TYPE_MAPPING['epkg']);
+const keywordType = ref('');
 const isLoading = ref(false);
 
-const searchKey = ref((route.query.name as string) || '');
+const searchKey = ref('');
 const timeOrder = ref('');
 const nameOrder = ref('');
 
@@ -132,7 +132,7 @@ const queryAllpkg = () => {
 // 判断是走es还是sql
 const pageSearch = () => {
   isSearchError.value = false;
-  if (tabName.value === TABNAME_OPTIONS[3]) {
+  if (tabName.value === PACKAGE_TYPE_MAPPING['epkg']) {
     isLoading.value = true;
     if (searchKey.value === '') {
       queryAllpkg();
@@ -189,7 +189,7 @@ const resetTag = () => {
   timeOrder.value = '';
   currentPage.value = 1;
 
-  if (route.query.os || route.query.arch) {
+  if ((route.query.os || route.query.arch) && !isPageSearch.value) {
     router.push({
       path: `/${locale.value}/epkg`,
     });
@@ -225,10 +225,10 @@ const handleCurrentChange = (val: number) => {
 const isPageSearch = ref(false);
 
 onMounted(() => {
+  searchKey.value = route.query?.q ?? '';
+  keywordType.value = route.query?.sort ?? '';
+
   isPageSearch.value = route.name === 'search';
-  if (isPageSearch.value) {
-    pageSearch();
-  }
 
   queryFilter();
   handleQueryData();
@@ -254,23 +254,23 @@ watch(
 // -------------------- 监听 url query 变化 触发搜索 ---------------------
 const handleQueryData = () => {
   const query = route.query;
-  const { name, tab, key, os, arch } = query;
-  if (!isUndefined(name) && name) {
-    searchKey.value = name?.toString();
+  const { os, arch, q, sort, type } = query;
+  if (!isUndefined(q) && q) {
+    searchKey.value = q?.toString();
     currentPage.value = 1;
   } else {
     searchKey.value = '';
     isSearchDocs.value = false;
   }
 
-  if (isValidSearchTabName(tab) && tab) {
-    tabName.value = tab as string;
+  if (isValidSearchTabName(type) && type) {
+    tabName.value = type as string;
   } else {
-    tabName.value = TABNAME_OPTIONS[3];
+    tabName.value = PACKAGE_TYPE_MAPPING['epkg'];
   }
   // 判断key参数
-  if (isValidSearchKey(key) && key) {
-    keywordType.value = encodeURIComponent(key as string);
+  if (isValidSearchKey(sort) && sort) {
+    keywordType.value = encodeURIComponent(sort as string);
   } else {
     keywordType.value = FLITERMENUOPTIONS[0].id;
   }
@@ -291,6 +291,10 @@ watch(
   },
   { deep: true }
 );
+
+const changeFilterSearch = (v: string) => {
+  searchKey.value = v;
+};
 </script>
 
 <template>
@@ -324,7 +328,7 @@ watch(
     </div>
 
     <div class="pkg-main">
-      <FilterHeader title="EPKG" :total="total" />
+      <FilterHeader title="EPKG" :total="total" @search="changeFilterSearch" />
       <div v-if="isSearchDocs || searchArch.length > 0 || searchOs.length > 0 || searchCategory.length > 0" class="search-result">
         <p v-if="!isPageSearch" class="text">
           <template v-if="isSearchDocs">

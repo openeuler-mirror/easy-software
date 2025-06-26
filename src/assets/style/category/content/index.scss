@@ -3,6 +3,12 @@
   display: flex;
   flex-direction: column;
 }
+.page-subtitle {
+  padding-bottom: 24px;
+  color: var(--o-color-info2);
+  text-align: center;
+  @include text1;
+}
 .pkg-wrap {
   display: flex;
   justify-content: space-between;

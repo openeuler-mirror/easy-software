@@ -4,7 +4,7 @@ import { isString } from '@opensig/opendesign';
 import { maintainerDefaults } from '@/data/query';
 import { useRoute } from 'vue-router';
 import { useMarkdown } from '@/composables/useMarkdown';
-import type { AppInfoT, MaintainerT, DetailItemT, MoreMessgeT } from '@/@types/app';
+import type { AppInfoT, MaintainerT, DetailItemT } from '@/@types/app';
 import { useI18n } from 'vue-i18n';
 import { getDetails, getVer } from '@/api/api-domain';
 import { useViewStore } from '@/stores/common';
@@ -26,7 +26,6 @@ const tabValue = ref('condapkg');
 const maintainer = ref<MaintainerT>({ maintainerId: '', maintainerEmail: '', maintainerGiteeId: '' });
 
 const security = ref();
-const moreMessge = ref<MoreMessgeT[]>([]);
 const description = ref();
 const appData = ref<AppInfoT>({
   name: '',

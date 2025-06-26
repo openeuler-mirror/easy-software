@@ -35,7 +35,7 @@ const tabName = ref('appversion');
 const nameOrder = ref('');
 const isLoading = ref(false);
 
-const searchKey = ref((route.query.name as string) || '');
+const searchKey = ref('');
 const searchOs = ref('');
 const searchType = ref('');
 const searchStatus = ref<string[]>([]);
@@ -170,6 +170,8 @@ const handleCurrentChange = (val: number) => {
 const isPageSearch = ref(false);
 
 onMounted(() => {
+  searchKey.value = route.query?.name ?? route.query?.q ?? '';
+
   isPageSearch.value = route.name === 'search';
 
   pageSearch();
@@ -208,7 +210,7 @@ watch(
 );
 
 watch(
-  () => route.query.name as string,
+  () => (route.query?.name as string) || (route.query?.q as string),
   (v: string) => {
     if (searchKey.value !== v && v !== undefined) {
       searchKey.value = v;
@@ -221,6 +223,14 @@ watch(
     pageSearch();
   }
 );
+
+const changeFilterSearch = (v: string) => {
+  searchKey.value = v;
+};
+
+const clearFilterSearch = () => {
+  searchKey.value = '';
+};
 </script>
 
 <template>
@@ -252,7 +262,7 @@ watch(
       </template>
     </div>
     <div class="pkg-main">
-      <FilterHeader title="APPVERSION" :total="total" />
+      <FilterHeader title="APPVERSION" :total="total" @search="changeFilterSearch" @clear="clearFilterSearch" />
       <div v-if="searchOs || isSearch || showSearchFilterTags" class="search-result">
         <p v-if="!isPageSearch" class="text">
           为您找到符合条件的筛选<span class="total">{{ total }}</span

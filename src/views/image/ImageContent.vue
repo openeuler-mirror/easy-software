@@ -1,19 +1,21 @@
 <script lang="ts" setup>
 import { ref, watch, computed, onMounted } from 'vue';
-import { OTag, OLink, OIcon, isUndefined } from '@opensig/opendesign';
+import { OTag, OLink, OIcon, ORow, OCol } from '@opensig/opendesign';
 import { getSearchData } from '@/api/api-search';
 import { useRoute, useRouter } from 'vue-router';
 import { getSearchAllFiled, getSearchAllColumn } from '@/api/api-domain';
 import { useI18n } from 'vue-i18n';
-import { isValidSearchTabName, isValidSearchKey } from '@/utils/query';
-import { TABNAME_OPTIONS, FLITERMENUOPTIONS, COUNT_PAGESIZE, SORTPARAMS } from '@/data/query';
+import { useRouteQuery } from '@/composables/useRouteQuery';
+import { PACKAGE_TYPE_MAPPING, COUNT_PAGESIZE } from '@/data/query';
 import { getParamsRules } from '@/utils/common';
 import { useViewStore } from '@/stores/common';
 import { useSearchStore } from '@/stores/search';
 import { useLocale } from '@/composables/useLocale';
+import { useDebounceFn } from '@vueuse/core';
 
 import FilterCheckbox from '@/components/filter/FilterCheckbox.vue';
 import AppLoading from '@/components/AppLoading.vue';
+import ImageCard from './ImageCard.vue';
 import IconOs from '~icons/pkg/icon-os.svg';
 import IconArch from '~icons/pkg/icon-arch.svg';
 import IconCategory from '~icons/pkg/icon-category.svg';
@@ -24,25 +26,15 @@ const { t } = useI18n();
 const router = useRouter();
 const searchStore = useSearchStore();
 
-// 软件包-表头
-const columns = [
-  { label: t('software.columns.imageName'), key: 'name', type: 'name' },
-  { label: 'Tag', key: 'appVer', type: 'tag' },
-  { label: t('software.columns.os'), key: 'os', type: 'os' },
-  { label: t('software.columns.arch'), key: 'arch', type: 'arch' },
-  { label: t('software.columns.category'), key: 'category', type: 'category' },
-  { label: t('software.columns.operation'), key: 'operation', type: 'operation' },
-];
-
 //  ------------  main ------------
 const pkgData = ref([]);
 
-const tabName = ref(TABNAME_OPTIONS[2]);
+const tabName = ref(PACKAGE_TYPE_MAPPING['apppkg']);
 const nameOrder = ref('');
-const keywordType = ref((route.query.key as string) || '');
+const keywordType = ref('');
 const isLoading = ref(false);
 
-const searchKey = ref((route.query.name as string) || '');
+const searchKey = ref('');
 
 const searchOs = ref<string[]>([]);
 const searchArch = ref<string[]>([]);
@@ -118,15 +110,17 @@ const queryAllpkg = () => {
       total.value = 0;
       pkgData.value = [];
       isLoading.value = false;
+      isSearchError.value = true;
     });
 };
 
 // 判断是走es还是sql
 const pageSearch = () => {
   isSearchError.value = false;
-  if (tabName.value === TABNAME_OPTIONS[2]) {
+  if (tabName.value === PACKAGE_TYPE_MAPPING['apppkg']) {
     isLoading.value = true;
     if (searchKey.value === '') {
+      isSearchDocs.value = false;
       queryAllpkg();
     } else {
       querySearch();
@@ -180,7 +174,9 @@ const resetTag = () => {
   nameOrder.value = '';
   currentPage.value = 1;
 
-  if (route.query.os || route.query.arch) {
+  const { os, arch } = route.query;
+
+  if ((os || arch) && !isPageSearch.value) {
     router.push({
       path: `/${locale.value}/image`,
     });
@@ -191,19 +187,9 @@ const filterList = computed(() => {
   return [...searchArch.value, ...searchOs.value, ...searchCategory.value];
 });
 
-const changeSortBy = (v: string[]) => {
-  nameOrder.value = '';
-  if (Array.isArray(v)) {
-    if (v[0] === 'name') {
-      nameOrder.value = SORTPARAMS[v[1]];
-    }
-  }
-  currentPage.value = 1;
-};
-
 // 分页
 const currentPage = ref(1);
-const pageSize = ref(20);
+const pageSize = ref(12);
 const total = ref(0);
 const handleSizeChange = (val: number) => {
   pageSize.value = val;
@@ -216,19 +202,41 @@ const handleCurrentChange = (val: number) => {
 // 判断是否是搜索页
 const isPageSearch = ref(false);
 
+// 获取路由参数
+const { routeKey, routeName, routeType, routeOs, routeArch, routeCategory } = useRouteQuery(PACKAGE_TYPE_MAPPING['apppkg']);
+
+const init = () => {
+  searchKey.value = routeKey.value;
+  keywordType.value = routeType.value;
+  tabName.value = routeName.value;
+  searchOs.value = routeOs.value.length ? routeOs.value : searchOs.value;
+  searchArch.value = routeArch.value.length ? routeArch.value : searchArch.value;
+  searchCategory.value = routeCategory.value.length ? routeCategory.value : searchCategory.value;
+};
+
 onMounted(() => {
   isPageSearch.value = route.name === 'search';
-  if (isPageSearch.value) {
-    pageSearch();
-  }
+  init();
   queryFilter();
-  handleQueryData();
 });
+
+// 监听领域应用页面搜索，非搜索页面
+watch(
+  () => route.query,
+  () => {
+    init();
+  }
+);
+
+//搜索防抖
+const debouncedFn = useDebounceFn(() => {
+  pageSearch();
+}, 150);
 
 watch(
   () => searchParams.value,
   () => {
-    pageSearch();
+    debouncedFn();
   },
   { deep: true }
 );
@@ -242,46 +250,13 @@ watch(
   { deep: true }
 );
 
-// -------------------- 监听 url query 变化 触发搜索 ---------------------
-const handleQueryData = () => {
-  const query = route.query;
-  const { name, tab, key, os, arch } = query;
-  if (!isUndefined(name) && name) {
-    searchKey.value = name?.toString();
-    currentPage.value = 1;
-  } else {
-    searchKey.value = '';
-    isSearchDocs.value = false;
-  }
-
-  if (isValidSearchTabName(tab) && tab) {
-    tabName.value = tab as string;
-  } else {
-    tabName.value = TABNAME_OPTIONS[2];
-  }
-  // 判断key参数
-  if (isValidSearchKey(key) && key) {
-    keywordType.value = encodeURIComponent(key as string);
-  } else {
-    keywordType.value = FLITERMENUOPTIONS[0].id;
-  }
-
-  // 首页社区版本跳转
-  if (!isUndefined(os) && os) {
-    searchOs.value.push(os?.toString());
-  }
-  if (!isUndefined(arch) && arch) {
-    searchArch.value.push(arch?.toString());
-  }
+const changeFilterSearch = (v: string) => {
+  searchKey.value = v;
 };
 
-watch(
-  () => route.query,
-  () => {
-    handleQueryData();
-  },
-  { deep: true }
-);
+const clearFilterSearch = () => {
+  searchKey.value = '';
+};
 </script>
 
 <template>
@@ -316,7 +291,7 @@ watch(
     </div>
 
     <div class="pkg-main">
-      <FilterHeader title="IMAGE" :total="total" />
+      <FilterHeader title="IMAGE" :total="total" @search="changeFilterSearch" @clear="clearFilterSearch" />
       <div v-if="isSearchDocs || filterList.length > 0" class="search-result">
         <p v-if="!isPageSearch" class="text">
           <template v-if="isSearchDocs">
@@ -336,11 +311,16 @@ watch(
           <OLink color="primary" class="resetting" @click="resetTag">{{ t('software.filterSider.clear') }}</OLink>
         </div>
       </div>
-      <div class="pkg-content" :class="pkgData.length === 0 && isLoading ? 'loading' : ''">
+      <div class="pkg-content" :class="pkgData.length === 0 && !isSearchError ? 'loading' : ''">
         <AppLoading :loading="isLoading" />
         <ResultNoApp v-if="isSearchError" type="应用镜像" />
         <div v-if="pkgData.length !== 0 && !isSearchError" class="pkg-panel">
-          <OTableItemNew :data="pkgData" :columns="columns" :type="tabName" @sort="changeSortBy" />
+          <ORow gap="32px" flex-wrap="wrap">
+            <OCol v-for="(subItem, index) in pkgData" :key="index" flex="0 1 33.33%" :laptop="{ flex: '0 1 33.33%' }">
+              <ImageCard :data="subItem" />
+            </OCol>
+          </ORow>
+
           <div v-if="total > COUNT_PAGESIZE[0]" class="pagination-box">
             <AppPagination :current="currentPage" :pagesize="pageSize" :total="total" @size-change="handleSizeChange" @current-change="handleCurrentChange" />
           </div>

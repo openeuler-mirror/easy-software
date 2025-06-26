@@ -29,7 +29,7 @@ const jumpTo = (name: string) => {
   router.push({
     path: `/${locale.value}/field`,
     query: {
-      type: name,
+      category: name,
     },
   });
 };

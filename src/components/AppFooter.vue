@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { useLocale } from '@/composables/useLocale';
-import { getYearByOffset } from '@/utils/common';
 import { OPENEULER, OPENATOM, OPENEULER_CONTACT } from '@/data/config';
 
 import LogoFooter from '@/assets/footer/footer-logo2.png';
@@ -85,6 +84,17 @@ const footBg = {
 const beianInfo = {
   zh: ['京ICP备2020036654号-1', '京公网安备 11030102011597 号'],
   en: ['J. ICP B. No. 2020036654-1', 'J.G.W.A.B. No. 11030102011597'],
+};
+
+const getYearByOffset = () => {
+  // 获取当前时间的 UTC 时间
+  const now = new Date();
+  const utcTime = new Date(now.getTime() + now.getTimezoneOffset() * 60000);
+
+  // 设置偏移
+  utcTime.setHours(utcTime.getHours() + 8);
+
+  return utcTime.getFullYear();
 };
 </script>
 

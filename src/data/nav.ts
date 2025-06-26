@@ -16,50 +16,18 @@ export const navs = [
     href: '/field',
   },
   {
-    id: 'rpm',
+    id: 'list',
     label: {
-      zh: 'RPM',
-      en: 'RPM',
+      zh: '软件列表',
+      en: '软件列表',
     },
     href: '/rpm',
-  },
-  {
-    id: 'image',
-    label: {
-      zh: '应用镜像',
-      en: 'Image',
-    },
-    href: '/image',
-  },
-  // {
-  //   id: 'epkg',
-  //   label: {
-  //     zh: 'EPKG',
-  //     en: 'EPKG',
-  //   },
-  //   href: '/epkg',
-  // },
-  {
-    id: 'oepkg',
-    label: {
-      zh: 'OEPKG',
-      en: 'OEPKG',
-    },
-    href: '/oepkg',
-  },
-  {
-    id: 'conda',
-    label: {
-      zh: 'CONDA',
-      en: 'CONDA',
-    },
-    href: '/conda',
   },
   {
     id: 'upstream',
     label: {
       zh: '软件版本支持',
-      en: '软件版本支持',
+      en: 'Upstream',
     },
     href: '/upstream',
   },

@@ -6,7 +6,19 @@ const { t } = i18n.global;
 export const TAGS_OPTIONS = ['RPM', 'IMAGE', 'EPKG', 'OEPKG', 'CONDA'];
 
 // 搜索tab参数
-export const TABNAME_OPTIONS = ['all', 'rpmpkg', 'apppkg', 'epkgpkg', 'oepkg', 'condapkg', 'appversion'];
+export const PACKAGE_TYPE_MAPPING = {
+  all: 'all',
+  rpmpkg: 'rpmpkg',
+  rpm: 'rpmpkg',
+  apppkg: 'apppkg',
+  image: 'apppkg',
+  epkgpkg: 'epkgpkg',
+  epkg: 'epkgpkg',
+  oepkg: 'oepkg',
+  condapkg: 'condapkg',
+  conda: 'condapkg',
+  appversion: 'appversion',
+} as const;
 
 // 搜索筛选菜单
 export const FLITERMENUOPTIONS = [
