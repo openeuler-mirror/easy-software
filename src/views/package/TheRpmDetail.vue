@@ -8,7 +8,7 @@ import type { AppInfoT, MaintainerT, DetailItemT, MoreMessgeT } from '@/@types/a
 import { getDetails, getVer } from '@/api/api-domain';
 import { useViewStore } from '@/stores/common';
 import { useI18n } from 'vue-i18n';
-import { TABNAME_OPTIONS } from '@/data/query';
+import { PACKAGE_TYPE_MAPPING } from '@/data/query';
 
 import DetailBasicInfo from '@/components/detail/DetailBasicInfo.vue';
 import AppFeedback from '@/components/AppFeedback.vue';
@@ -23,7 +23,7 @@ import useDetailPageAnalytics from '@/composables/useDetailPageAnalytics';
 const { t } = useI18n();
 const route = useRoute();
 const { mkit } = useMarkdown();
-const tabValue = ref(TABNAME_OPTIONS[1]);
+const tabValue = ref(PACKAGE_TYPE_MAPPING['rpmpkg']);
 const basicInfo = ref<DetailItemT[]>([]);
 const installation = ref('');
 const downloadData = ref('');

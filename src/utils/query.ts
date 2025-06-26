@@ -1,18 +1,6 @@
-import { TAGS_OPTIONS, TABNAME_OPTIONS, FLITERMENUOPTIONS } from '@/data/query';
+import { PACKAGE_TYPE_MAPPING, FLITERMENUOPTIONS } from '@/data/query';
 
 import { isString } from '@opensig/opendesign';
-
-/**
- * 判断 tags 参数是否有效
- * @param {unknown} val 待判断 tags 参数
- * @returns {(boolean|Object)} 有效返回对应的 tags 对象，无效返回 false
- */
-export function isValidTags(val: unknown) {
-  if (!isString(val)) {
-    return false;
-  }
-  return TAGS_OPTIONS.find((option: string) => option === val);
-}
 
 /**
  * 判断搜索 tab 参数是否有效
@@ -23,7 +11,7 @@ export function isValidSearchTabName(val: unknown) {
   if (!isString(val)) {
     return false;
   }
-  return TABNAME_OPTIONS.find((option: string) => option === val);
+  return PACKAGE_TYPE_MAPPING[val as keyof typeof PACKAGE_TYPE_MAPPING] || false;
 }
 
 /**

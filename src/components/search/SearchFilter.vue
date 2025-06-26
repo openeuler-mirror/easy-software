@@ -1,8 +1,7 @@
 <script lang="ts" setup>
 import { ref, watch, onMounted } from 'vue';
-import { OSelect, OOption, OInput, OIcon, vLoading, useMessage, isUndefined, ODivider } from '@opensig/opendesign';
+import { OSelect, OOption, OInput, OIcon, vLoading, useMessage, ODivider } from '@opensig/opendesign';
 import { useDebounceFn } from '@vueuse/core';
-import { isValidSearchTabName, isValidSearchKey } from '@/utils/query';
 import { useRouter, useRoute } from 'vue-router';
 import { getSearchDataAll } from '@/api/api-search';
 import type { RecommendItemT } from '@/@types/search';
@@ -10,8 +9,8 @@ import { onClickOutside } from '@vueuse/core';
 import { useLocale } from '@/composables/useLocale';
 import useSearchHistory from '@/composables/useSearchHistory';
 import { useI18n } from 'vue-i18n';
-import { TABNAME_OPTIONS, FLITERMENUOPTIONS } from '@/data/query';
-
+import { PACKAGE_TYPE_MAPPING, FLITERMENUOPTIONS } from '@/data/query';
+import { useRouteQuery } from '@/composables/useRouteQuery';
 import SearchRecommend from '@/components/search/SearchRecommend.vue';
 
 import IconSearch from '~icons/app/icon-search.svg';
@@ -50,29 +49,28 @@ const reportAnalytics = (data: Record<string, any>, event = 'click') => {
 };
 
 const changeFilter = (v: string) => {
-  fliterSelected.value = v;
+  defaultValue.value = v;
   if (searchInput.value !== '') {
     replaceWinUrl();
   }
 };
 
 // 搜索框事件
-const changeSearchInput = (v: string) => {
-  if (v === '') {
+const changeSearchInput = () => {
+  if (searchInput.value === '') {
     return;
   }
-  if (v.length > 100) {
+  if (searchInput.value.length > 100) {
     return msg.danger({
       content: '文字长度不能超过100字符',
     });
   }
   reportAnalytics({
     type: 'search',
-    content: v,
+    content: searchInput.value,
   });
   isLoading.value = false;
   isFocus.value = false;
-  searchInput.value = v;
   replaceWinUrl();
 };
 
@@ -82,9 +80,9 @@ const replaceWinUrl = () => {
   router.push({
     path: `/${locale.value}/search`,
     query: {
-      name: searchInput.value,
-      tab: tabName.value,
-      key: defaultValue.value,
+      q: searchInput.value,
+      type: tabName.value,
+      sort: defaultValue.value,
     },
   });
 };
@@ -124,7 +122,9 @@ const changeSearchBlur = () => {
     );
   }
   focusInput = null;
-  const name = route.query.name as string;
+
+  const name = route.query?.name ?? route.query?.q ?? '';
+
   if (isPageSearch.value) {
     if (searchInput.value === '' || name !== searchInput.value) {
       searchInput.value = name;
@@ -182,38 +182,25 @@ const trottleSearch = (v: string) => {
 const isPageSearch = ref(false);
 const isPageHome = ref(false);
 
+// 获取路由参数
+const { routeKey, routeName, routeType } = useRouteQuery(PACKAGE_TYPE_MAPPING['all']);
+
+const init = () => {
+  searchInput.value = routeKey.value;
+  defaultValue.value = routeType.value;
+  tabName.value = routeName.value;
+};
+
 onMounted(() => {
   isPageSearch.value = route.name === 'search';
   isPageHome.value = route.name === 'home';
+  init();
 });
-
-// -------------------- 监听 url query 变化 触发搜索 ---------------------
-const handleQueryData = () => {
-  const query = route.query;
-  const { name, tab, key } = query;
-
-  if (!isUndefined(name) && name) {
-    searchInput.value = decodeURIComponent(name as string);
-  }
-  // 判断key参数
-  if (isValidSearchKey(key)) {
-    defaultValue.value = key as string;
-  } else {
-    defaultValue.value = FLITERMENUOPTIONS[0].id;
-  }
-
-  if (isValidSearchTabName(tab)) {
-    tabName.value = tab as string;
-  } else {
-    tabName.value = TABNAME_OPTIONS[0];
-  }
-};
-handleQueryData();
 
 watch(
   () => route.query,
   () => {
-    handleQueryData();
+    init();
     isPageHome.value = route.name === 'home';
   },
   { deep: true }
@@ -244,7 +231,7 @@ watch(
           clearable
           class="search-input"
           :max-length="100"
-          @press-enter="(v) => changeSearchInput(v)"
+          @press-enter="changeSearchInput"
           @input="trottleSearch"
           @clear="clearInput"
           @focus="changeSearchFocus(true)"

@@ -9,7 +9,6 @@
   </div>
 </template>
 <script setup lang="ts">
-import { getTarget } from '@/utils/common';
 import { OSelect, OOption } from '@opensig/opendesign';
 import { useLocale } from '@/composables/useLocale';
 import { ref } from 'vue';
@@ -42,6 +41,16 @@ const jumpTo = (id: any) => {
     const newHref = `/${locale.value}/${detailType}/detail?pkgId=${encodeURIComponent(id)}`;
     window.location.href = newHref;
   }
+};
+
+const getTarget = (data: any, key: any) => {
+  const map = new Map();
+  for (const item of data) {
+    if (!map.has(item[key])) {
+      map.set(item[key], item);
+    }
+  }
+  return [...map.values()];
 };
 </script>
 <style scoped lang="scss">

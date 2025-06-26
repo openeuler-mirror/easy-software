@@ -46,7 +46,7 @@ const reportAnalytics = (data: Record<string, any>, event = 'click') => {
     module: isPageHome.value ? 'home_page' : 'search_page',
     content: props.searchValue,
     ...data,
-    ...(route.query.tab ? { tab: route.query.tab } : {}),
+    ...(route.query.type ? { type: route.query.type } : {}),
   });
 };
 
@@ -56,7 +56,7 @@ const jumpPages = (type: string) => {
   });
   router.push({
     path: `/${locale.value}/${getPkgName(type)}`,
-    query: { name: props.searchValue },
+    query: { q: props.searchValue },
   });
 };
 
@@ -87,7 +87,7 @@ const goSearch = (name: string, isHistory?: boolean) => {
   }
   router.push({
     path: `/${locale.value}/search`,
-    query: { name: `${xssAllTag(name)}`, tab: 'all', key: props.filterValue },
+    query: { q: `${xssAllTag(name)}`, type: 'all', sort: props.filterValue },
   });
 };
 

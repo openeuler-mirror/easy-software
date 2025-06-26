@@ -36,8 +36,14 @@ const onMouseLeave = () => {
 };
 
 // -------------------- 选中事件 --------------------
+/** 软件列表 */
+const softwareList = ['rpm', 'image', 'oepkg', 'conda'];
 const selectedIndex = computed(() => {
-  return props.options.findIndex((item) => route.name?.toString().startsWith(item.id));
+  let name = route.name?.toString();
+  if (softwareList.includes(name)) {
+    name = 'list';
+  }
+  return props.options.findIndex((item) => name.startsWith(item.id));
 });
 
 // 导航跳转

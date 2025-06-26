@@ -1,14 +1,22 @@
 <script setup lang="ts">
+import { ref } from 'vue';
 import AppBanner from '@/components/AppBanner.vue';
 import OEpkgContent from './OEpkgContent.vue';
-import { homeData } from '@/data/home/index';
 import bannerImg from '@/assets/banner/banner1.jpg';
 
-const bannerInfo = homeData[3];
+import NavTab from '@/components/NavTab.vue';
+import { useI18n } from 'vue-i18n';
+const { t } = useI18n();
+
+const selected = ref('oepkg');
 </script>
 <template>
-  <AppBanner :title="bannerInfo.name" :background-image="bannerImg" :subtitle="bannerInfo.desc" />
-  <ContentWrapper :vertical-padding="['40px', '72px']" class="pkg-content-wrap">
+  <AppBanner :title="t('software.softwareList')" :background-image="bannerImg">
+    <template #tabs>
+      <NavTab v-model="selected" />
+    </template>
+  </AppBanner>
+  <ContentWrapper :vertical-padding="['32px', '72px']" class="pkg-content-wrap">
     <OEpkgContent />
   </ContentWrapper>
 </template>

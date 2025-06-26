@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import { OLink } from '@opensig/opendesign';
 import { useRoute } from 'vue-router';
 import { useI18n } from 'vue-i18n';
@@ -17,7 +17,7 @@ const props = defineProps({
 const route = useRoute();
 const { t } = useI18n();
 
-const searchVal = ref(decodeURIComponent(route.query.name as string));
+const searchVal = ref('');
 
 // 一键反馈
 const getIssueTemplate = () => {
@@ -41,6 +41,10 @@ const clickFeedback = () => {
   externalLink.value = decodeURIComponent(issueUrl.value);
   showExternalDlg.value = true;
 };
+
+onMounted(() => {
+  searchVal.value = decodeURIComponent(route.query?.name ?? route.query?.q ?? '');
+});
 </script>
 
 <template>

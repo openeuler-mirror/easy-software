@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, watch, computed, onMounted } from 'vue';
-import { ORow, OCol, OTag, OLink, OIcon, isUndefined } from '@opensig/opendesign';
+import { ORow, OCol, OTag, OLink, OIcon } from '@opensig/opendesign';
+import { useRouteQuery } from '@/composables/useRouteQuery';
 import { getSearchData } from '@/api/api-search';
 import { getSearchAllColumn, getSearchAllFiled } from '@/api/api-domain';
 import { useRoute, useRouter } from 'vue-router';
@@ -9,11 +10,12 @@ import { useViewStore } from '@/stores/common';
 import { useSearchStore } from '@/stores/search';
 import { useI18n } from 'vue-i18n';
 import { getParamsRules } from '@/utils/common';
-import { isValidSearchTabName, isValidSearchKey } from '@/utils/query';
-import { TABNAME_OPTIONS, FLITERMENUOPTIONS, COUNT_PAGESIZE_FIELD } from '@/data/query';
+import { PACKAGE_TYPE_MAPPING, COUNT_PAGESIZE_FIELD } from '@/data/query';
+import { useDebounceFn } from '@vueuse/core';
 
 import FilterCheckbox from '@/components/filter/FilterCheckbox.vue';
 import AppLoading from '@/components/AppLoading.vue';
+
 import IconOs from '~icons/pkg/icon-os.svg';
 import IconArch from '~icons/pkg/icon-arch.svg';
 import IconCategory from '~icons/pkg/icon-category.svg';
@@ -25,11 +27,11 @@ const { t } = useI18n();
 const searchStore = useSearchStore();
 
 const pkgData = ref([]);
-const tabName = ref('all');
-const keywordType = ref((route.query.key as string) || '');
+const tabName = ref(PACKAGE_TYPE_MAPPING['all']);
+const keywordType = ref('');
 const isLoading = ref(false);
 
-const searchKey = ref((route.query.name as string) || '');
+const searchKey = ref('');
 const nameOrder = ref('');
 
 const searchOs = ref('');
@@ -64,7 +66,6 @@ const queryAllpkg = () => {
   };
   // 过滤空参数
   const newData = getParamsRules(params);
-
   getSearchAllFiled(newData)
     .then((res) => {
       pkgData.value = res.data.list;
@@ -78,6 +79,7 @@ const queryAllpkg = () => {
       useViewStore().showNotFound();
       total.value = 0;
       pkgData.value = [];
+      isSearchError.value = true;
       isLoading.value = false;
     });
 };
@@ -94,13 +96,13 @@ const querySearch = () => {
         searchStore.changeNameOrderCount(total.value);
       }
       isSearchDocs.value = true;
+
       if (pkgData.value.length === 0) {
         isSearchError.value = true;
       }
       isLoading.value = false;
     })
     .catch(() => {
-      isSearchError.value = true;
       total.value = 0;
       pkgData.value = [];
       isLoading.value = false;
@@ -158,7 +160,9 @@ const resetTag = () => {
   nameOrder.value = '';
   currentPage.value = 1;
 
-  if (route.query.type || route.query.os || route.query.arch) {
+  const { category, os, arch } = route.query;
+
+  if ((category || os || arch) && !isPageSearch.value) {
     router.push({
       path: `/${locale.value}/field`,
     });
@@ -181,6 +185,7 @@ const changeSortValue = (v: string[] | string) => {
 // 清除input数据
 const clearFilterInput = () => {
   searchKey.value = '';
+  isPageSearch.value = true;
 };
 
 // 分页
@@ -197,9 +202,11 @@ const handleCurrentChange = (val: number) => {
 
 const pageSearch = () => {
   isSearchError.value = false;
-  if (tabName.value === 'all') {
+
+  if (tabName.value === PACKAGE_TYPE_MAPPING['all']) {
     isLoading.value = true;
     if (searchKey.value === '') {
+      isSearchDocs.value = false;
       queryAllpkg();
     } else {
       querySearch();
@@ -210,20 +217,41 @@ const pageSearch = () => {
 // 判断是否是搜索页
 const isPageSearch = ref(false);
 
+// 获取路由参数
+const { routeKey, routeName, routeType, routeOs, routeArch, routeCategory } = useRouteQuery(PACKAGE_TYPE_MAPPING['all']);
+
+const init = () => {
+  searchKey.value = routeKey.value;
+  keywordType.value = routeType.value;
+  tabName.value = routeName.value;
+  searchOs.value = routeOs.value.length ? routeOs.value : searchOs.value;
+  searchArch.value = routeArch.value.length ? routeArch.value : searchArch.value;
+  searchCategory.value = routeCategory.value.length ? routeCategory.value : searchCategory.value;
+};
+
 onMounted(() => {
   isPageSearch.value = route.name === 'search';
-  if (isPageSearch.value) {
-    pageSearch();
-  }
-
+  init();
   queryFilter();
-  handleQueryData();
 });
+
+// 监听领域应用页面搜索，非搜索页面
+watch(
+  () => route.query,
+  () => {
+    init();
+  }
+);
+
+//搜索防抖
+const debouncedFn = useDebounceFn(() => {
+  pageSearch();
+}, 150);
 
 watch(
   () => searchParams.value,
   () => {
-    pageSearch();
+    debouncedFn();
   },
   { deep: true }
 );
@@ -237,61 +265,9 @@ watch(
   { deep: true }
 );
 
-// -------------------- 监听 url query 变化 触发搜索 ---------------------
-const handleQueryData = () => {
-  const query = route.query;
-  const { name, tab, key, os, arch, type } = query;
-
-  if (!isUndefined(name) && name) {
-    searchKey.value = name?.toString();
-    currentPage.value = 1;
-  } else {
-    searchKey.value = '';
-    isSearchDocs.value = false;
-  }
-
-  if (isValidSearchTabName(tab) && tab) {
-    tabName.value = tab as string;
-  } else {
-    tabName.value = TABNAME_OPTIONS[0];
-  }
-  // 判断key参数
-  if (isValidSearchKey(key) && key) {
-    keywordType.value = encodeURIComponent(key as string);
-  } else {
-    keywordType.value = FLITERMENUOPTIONS[0].id;
-  }
-
-  //判断主页领域应用更多跳转
-  if (!isUndefined(type) && type) {
-    searchCategory.value.push(type as string);
-  }
-
-  // 首页社区版本跳转
-  if (!isUndefined(os) && os) {
-    searchOs.value = os?.toString();
-  }
-  if (!isUndefined(arch) && arch) {
-    searchArch.value = arch?.toString();
-  }
+const changeFilterSearch = (v: string) => {
+  searchKey.value = v;
 };
-
-watch(
-  () => route.query,
-  () => {
-    handleQueryData();
-  },
-  { deep: true }
-);
-
-watch(
-  () => pkgData.value,
-  () => {
-    if (pkgData.value.length > 0) {
-      isSearchError.value = false;
-    }
-  }
-);
 </script>
 
 <template>
@@ -326,7 +302,15 @@ watch(
     </div>
 
     <div class="pkg-main">
-      <FilterHeader title="DOMAIN" :type="tabName" @sort="changeSortValue" :is-clear="isClear" :total="total" @clear="clearFilterInput" />
+      <FilterHeader
+        title="DOMAIN"
+        :type="tabName"
+        @sort="changeSortValue"
+        :is-clear="isClear"
+        :total="total"
+        @clear="clearFilterInput"
+        @search="changeFilterSearch"
+      />
 
       <div v-if="isSearchDocs || searchOs || searchArch || searchCategory.length > 0" class="search-result">
         <p v-if="!isPageSearch" class="text">

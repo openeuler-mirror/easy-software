@@ -18,6 +18,10 @@ const routes = [
     redirect: '/zh',
   },
   {
+    path: '/en',
+    redirect: '/zh',
+  },
+  {
     path: '/zh',
     name: 'home',
     component: () => import('@/views/home/TheHome.vue'),

@@ -1,18 +1,16 @@
 <script lang="ts" setup>
 import { ref, onMounted, type PropType, computed, provide, reactive } from 'vue';
-import { OTab, OTabPane, OIcon } from '@opensig/opendesign';
+import { OTab, OTabPane, OIcon, isString } from '@opensig/opendesign';
 import { useRoute, useRouter } from 'vue-router';
 import { getDetail, getTags, getVer } from '@/api/api-domain';
 import { useMarkdown } from '@/composables/useMarkdown';
 import type { AppInfoT, MaintainerT, DetailItemT, MoreMessgeT, PkgTypeT } from '@/@types/app';
 import { maintainerDefaults } from '@/data/query';
-import { isValidTags } from '@/utils/query';
 import { tagList } from '@/data/detail/index';
 import { useI18n } from 'vue-i18n';
 import { useLocale } from '@/composables/useLocale';
 import { useViewStore } from '@/stores/common';
-import type { ParamsKeyT } from '@/@types/detail';
-import { getCode } from '@/utils/common';
+import { getCode, getParamsRules } from '@/utils/common';
 import useDetailPageAnalytics from '@/composables/useDetailPageAnalytics';
 
 import AppFeedback from '@/components/AppFeedback.vue';
@@ -59,17 +57,12 @@ const appData = ref<AppInfoT>({
   security: '',
 });
 
-// 过滤空参数
-const filterEmptyParams = (data: any) => {
-  const newData = {} as any;
-  Object.keys(data).forEach((key) => {
-    const value = data[key as keyof ParamsKeyT];
-    if (value) {
-      newData[key] = value;
-    }
-  });
-  return newData;
-};
+function isValidTags(val: unknown) {
+  if (!isString(val)) {
+    return false;
+  }
+  return TAGS_OPTIONS.find((option: string) => option === val);
+}
 
 // 获取tab分类
 const tabList = ref([] as PropType<PkgTypeT>);
@@ -89,15 +82,18 @@ provide(currentFieldDetailTabInjection, activeName);
 const queryEntity = () => {
   const query = route.query;
   const { type, appPkgId, epkgPkgId, rpmPkgId, oepkgPkgId, condaPkgId } = query;
-  getDetail(
-    filterEmptyParams({
-      appPkgId: (appPkgId as string) || '',
-      epkgPkgId: (epkgPkgId as string) || '',
-      rpmPkgId: (rpmPkgId as string) || '',
-      oepkgPkgId: (oepkgPkgId as string) || '',
-      condaPkgId: (condaPkgId as string) || '',
-    })
-  )
+
+  const params = {
+    appPkgId: (appPkgId as string) || '',
+    epkgPkgId: (epkgPkgId as string) || '',
+    rpmPkgId: (rpmPkgId as string) || '',
+    oepkgPkgId: (oepkgPkgId as string) || '',
+    condaPkgId: (condaPkgId as string) || '',
+  };
+
+  const newData = getParamsRules(params);
+
+  getDetail(newData)
     .then((res) => {
       const data = res.data;
       tabList.value = data.tags;

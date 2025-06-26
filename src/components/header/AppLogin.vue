@@ -72,6 +72,7 @@ const jumpTo = (v: string) => {
 
 .login-btn {
   color: var(--o-color-info1);
+  width: 20px;
   cursor: pointer;
 }
 </style>

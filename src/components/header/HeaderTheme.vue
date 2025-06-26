@@ -24,12 +24,11 @@ const { changeTheme, isLight, isDark } = useTheme();
   height: 100%;
   display: flex;
   align-items: center;
-  width: 24px;
 }
 
 .theme-icon {
   color: var(--o-color-info1);
-  width: 24px;
+  width: 20px;
   cursor: pointer;
 }
 </style>

@@ -10,6 +10,7 @@ export default {
   epkg: 'EPKG',
   oepkg: 'OEPKG',
   conda: 'CONDA',
+  condapkg: 'CONDA',
   appversion: '软件版本支持',
   filterAll: '全部',
   filterName: '按名称',
@@ -19,6 +20,7 @@ export default {
   searchPlaceholder1: '搜索',
   searchFilterTips: '为您找到符合条件的筛选{0}个',
   searcResult: '搜索结果',
+  softwareList: '软件列表',
 
   viewAll: '显示全部',
   upList: '收起',

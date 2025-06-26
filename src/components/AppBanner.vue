@@ -62,6 +62,9 @@ defineExpose({
       <div v-if="$slots.operate" class="banner-operate">
         <slot name="operate"></slot>
       </div>
+      <div v-if="$slots.tabs">
+        <slot name="tabs"></slot>
+      </div>
     </div>
   </div>
 </template>
@@ -95,7 +98,8 @@ defineExpose({
   padding: 0 var(--layout-content-padding);
   display: flex;
   justify-content: space-between;
-  height: 160px;
+  min-height: 140px;
+  flex-direction: column;
   .banner-text {
     display: flex;
     flex-direction: column;
@@ -185,15 +189,6 @@ defineExpose({
   to {
     transform: translateY(0);
     opacity: 1;
-  }
-}
-
-.banner-text {
-  .banner-title {
-    animation: fade-up var(--o-duration-l) var(--o-easing-standard-in);
-  }
-  .banner-subtitle {
-    animation: fade-up 800ms var(--o-easing-standard-in);
   }
 }
 </style>
