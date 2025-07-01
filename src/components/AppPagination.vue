@@ -1,11 +1,8 @@
 <script lang="ts" setup>
-import { ref, onMounted } from 'vue';
-import { useLocale } from '@/composables/useLocale';
+import { computed } from 'vue';
+import { OPagination } from '@opensig/opendesign';
 import { useRoute } from 'vue-router';
-import { ElPagination, ElConfigProvider } from 'element-plus';
 import { COUNT_PAGESIZE, COUNT_PAGESIZE_FIELD } from '@/data/query';
-import zhCn from 'element-plus/es/locale/lang/zh-cn';
-import English from 'element-plus/es/locale/lang/en';
 
 defineProps({
   current: {
@@ -24,35 +21,18 @@ defineProps({
 const route = useRoute();
 
 const emit = defineEmits(['size-change', 'current-change']);
-const { isZh } = useLocale();
 
-const handleSizeChange = (val: number) => {
-  emit('size-change', val);
-};
-const handleCurrentChange = (val: number) => {
-  emit('current-change', val);
+const onChange = (newValue: { page: number; pageSize: number }) => {
+  emit('size-change', newValue.pageSize);
+  emit('current-change', newValue.page);
 };
 
-const isFieldPage = ref(false);
-
-onMounted(() => {
-  isFieldPage.value = route.name === 'field' || route.query?.tab === 'all' || route.name === 'image';
-});
+// 如果是领域应用 分页数量为12条，否则为20条
+const pageSizes = computed(() => (route.name === 'field' || route.name === 'image' || route.query?.tab === 'all' ? COUNT_PAGESIZE_FIELD : COUNT_PAGESIZE));
 </script>
 
 <template>
-  <el-config-provider :locale="isZh ? zhCn : English">
-    <el-pagination
-      :current-page="current"
-      :page-size="pagesize"
-      background
-      layout="total ,sizes, prev, pager, next, jumper"
-      :total="total"
-      :page-sizes="isFieldPage ? COUNT_PAGESIZE_FIELD : COUNT_PAGESIZE"
-      @size-change="handleSizeChange"
-      @current-change="handleCurrentChange"
-    />
-  </el-config-provider>
+  <OPagination :page="current" round="4px" variant="outline" :pageSize="pagesize" :total="total" show-total @change="onChange" :page-sizes="pageSizes" />
 </template>
 
 <style lang="scss" scoped></style>

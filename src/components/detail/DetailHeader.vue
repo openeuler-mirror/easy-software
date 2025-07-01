@@ -74,15 +74,7 @@ const scrollToAnchor = () => {
       <div class="box">
         <p class="title">
           {{ data.name }}
-          <OLink
-            v-if="data.repository"
-            class="home-page"
-            color="primary"
-            hover-underline
-            @click="onExternalDialog(data.repository)"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
+          <OLink v-if="data.repository" class="home-page" color="primary" @click="onExternalDialog(data.repository)" target="_blank" rel="noopener noreferrer">
             <OIcon><IconOutlink /></OIcon>
             主页
           </OLink>
@@ -163,7 +155,7 @@ const scrollToAnchor = () => {
     .scroll-box {
       position: absolute;
       bottom: 0px;
-      :deep(.o-link-label) {
+      :deep(.o-link-main) {
         display: flex;
         align-items: center;
       }

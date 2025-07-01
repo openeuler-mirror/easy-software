@@ -58,7 +58,10 @@ const showMore = () => {
           </div>
         </template>
         <template v-else-if="item.name === t('detail.source')"> EPOL </template>
-        <template v-else> {{ item.value }}</template>
+        <template v-else>
+          <template v-if="item.value">{{ item.value }}</template>
+          <template v-else>-</template>
+        </template>
       </div>
     </div>
   </div>

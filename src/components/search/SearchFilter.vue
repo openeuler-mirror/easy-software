@@ -154,6 +154,7 @@ const queryDocsAll = () => {
         isNoFound.value = true;
         recommendList.value = [];
       }
+      isFocus.value = true;
       isLoading.value = false;
     })
     .catch(() => {
@@ -226,7 +227,6 @@ watch(
         <OInput
           v-model="searchInput"
           :placeholder="isHeader ? t('software.searchPlaceholder1') : t('software.searchPlaceholder')"
-          variant="solid"
           round="0"
           clearable
           class="search-input"
@@ -274,6 +274,14 @@ watch(
     :deep(.search-input) {
       height: var(--search-height);
     }
+  }
+  :deep(.search-input) {
+    --_box-bd: none;
+    --_box-bg-color: none;
+    --_box-bg-color-focus: none;
+    --_box-bd-color-focus: none;
+    --_box-bd-color-hover: none;
+    --_box-bg-color-hover: none;
   }
 
   &.header-show {

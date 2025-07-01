@@ -51,7 +51,7 @@ onMounted(() => {
   <Error404Result class="result-tips">
     <template #description>
       <p class="text">
-        {{ t('software.nofoundApp') }} <OLink hover-underline color="primary" @click="clickFeedback">{{ t('software.feedbackPkg.btn') }}</OLink>
+        {{ t('software.nofoundApp') }} <OLink color="primary" @click="clickFeedback">{{ t('software.feedbackPkg.btn') }}</OLink>
       </p>
     </template>
   </Error404Result>
