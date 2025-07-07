@@ -11,6 +11,7 @@ import useSearchHistory from '@/composables/useSearchHistory';
 import { useI18n } from 'vue-i18n';
 import { PACKAGE_TYPE_MAPPING, FLITERMENUOPTIONS } from '@/data/query';
 import { useRouteQuery } from '@/composables/useRouteQuery';
+import { pkgSortMap } from '@/utils/common';
 import SearchRecommend from '@/components/search/SearchRecommend.vue';
 
 import IconSearch from '~icons/app/icon-search.svg';
@@ -149,7 +150,7 @@ const queryDocsAll = () => {
   getSearchDataAll(params)
     .then((res) => {
       if (res.data.length) {
-        recommendList.value = res.data;
+        recommendList.value = res.data.sort((a, b) => pkgSortMap[a.key] - pkgSortMap[b.key]);
       } else {
         isNoFound.value = true;
         recommendList.value = [];

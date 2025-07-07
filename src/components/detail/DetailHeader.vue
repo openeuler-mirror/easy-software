@@ -143,7 +143,10 @@ const scrollToAnchor = () => {
       min-width: 60px;
       justify-content: flex-end;
       @include tip1;
-      :deep(.o-link-label) {
+    }
+    :deep(.o-link) {
+      .o-link-label,
+      .o-link-main {
         display: flex;
         align-items: center;
         svg {
