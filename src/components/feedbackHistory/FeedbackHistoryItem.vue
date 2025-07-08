@@ -46,7 +46,7 @@ const tagColor = (tag: string) => {
         <OIcon class="icon-user"><IconUser /></OIcon>
         <span>{{ feedback.user_login }}</span>
       </div>
-      <OLink @click="$emit('goToUrl', feedback.url)" class="out-link" color="primary" hover-underline target="_blank" rel="noopener noreferrer">
+      <OLink @click="$emit('goToUrl', feedback.url)" class="out-link" color="primary" target="_blank" rel="noopener noreferrer">
         查看详情
         <OIcon class="icon"><IconOutlink /></OIcon>
       </OLink>

@@ -262,6 +262,10 @@ const isSecurityIconShow = (v: string) => {
           <OTag v-if="row.os === tagVer[0] && row.arch === tagVer[1]" color="primary" :size="'small'">当前版本</OTag> <span v-else>查看</span>
         </a>
       </template>
+      <template #td_arch="{ row }">
+        <template v-if="row.arch">{{ row.arch }}</template>
+        <template v-else>-</template>
+      </template>
     </OTable>
     <p v-if="tableAllData.length >= tableLen" class="view-all">
       <OLink color="primary" :class="isToggle ? 'up' : 'down'" @click="showMore" size="small">

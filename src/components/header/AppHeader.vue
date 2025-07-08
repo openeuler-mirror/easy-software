@@ -161,6 +161,12 @@ watch(
 
     .o-input {
       --input-height: var(--search-height);
+      --_box-bd: none;
+      --_box-bg-color: none;
+      --_box-bg-color-focus: none;
+      --_box-bd-color-focus: none;
+      --_box-bd-color-hover: none;
+      --_box-bg-color-hover: none;
     }
     .o-select {
       --select-height: var(--search-height);

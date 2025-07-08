@@ -98,3 +98,37 @@ html {
     }
   }
 }
+
+// 排序箭头
+.sort-icon {
+  display: inline-block;
+  height: 12px;
+  width: 8px;
+  position: relative;
+  margin-left: 8px;
+  color: var(--o-color-control1);
+
+  &:after,
+  &:before {
+    content: '';
+    position: absolute;
+    border: 6px solid transparent;
+    border-width: 5px 4px;
+    left: 0;
+    color: #a0a2a8;
+  }
+
+  &:before {
+    border-bottom-color: currentColor;
+    top: -5px;
+  }
+
+  &:after {
+    border-top-color: currentColor;
+    top: 7px;
+  }
+  &.asc:before,
+  &.desc:after {
+    color: var(--o-color-info1);
+  }
+}

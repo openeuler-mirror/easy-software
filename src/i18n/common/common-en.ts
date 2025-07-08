@@ -5,7 +5,8 @@ export default {
   LOGOUT: 'Logout',
   lang: 'English',
   FOOTER: {
-    ATOM_TEXT: 'openEuler is an open source project incubated and operated by the OpenAtom Foundation.',
+    ATOM_TEXT:
+      'openEuler, an open source OS incubated by the OpenAtom Foundation for digital infrastructure in server, cloud, edge, embedded scenarios, across Arm, x86, RISC-V, LoongArch, PowerPC, and SW-64 architectures.',
     ATOM_PC: '/atom-pc.png',
     ATOM_MO: '/atom-mo.png',
     MAIL: OPENEULER_CONTACT,

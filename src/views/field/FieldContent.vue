@@ -10,7 +10,7 @@ import { useViewStore } from '@/stores/common';
 import { useSearchStore } from '@/stores/search';
 import { useI18n } from 'vue-i18n';
 import { getParamsRules } from '@/utils/common';
-import { PACKAGE_TYPE_MAPPING, COUNT_PAGESIZE_FIELD } from '@/data/query';
+import { PACKAGE_TYPE_MAPPING, COUNT_PAGESIZE_FIELD, SORTPARAMS } from '@/data/query';
 import { useDebounceFn } from '@vueuse/core';
 
 import FilterCheckbox from '@/components/filter/FilterCheckbox.vue';
@@ -174,8 +174,8 @@ const changeSortValue = (v: string[] | string) => {
   nameOrder.value = '';
   currentPage.value = 1;
   if (Array.isArray(v)) {
-    if (v[0] === 'nameOrder') {
-      nameOrder.value = v[1];
+    if (v[0] === 'name') {
+      nameOrder.value = SORTPARAMS[v[1]];
     }
   } else {
     isClear.value = false;

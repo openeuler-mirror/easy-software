@@ -11,6 +11,7 @@ import useSearchHistory from '@/composables/useSearchHistory';
 import { useI18n } from 'vue-i18n';
 import { PACKAGE_TYPE_MAPPING, FLITERMENUOPTIONS } from '@/data/query';
 import { useRouteQuery } from '@/composables/useRouteQuery';
+import { pkgSortMap } from '@/utils/common';
 import SearchRecommend from '@/components/search/SearchRecommend.vue';
 
 import IconSearch from '~icons/app/icon-search.svg';
@@ -149,11 +150,12 @@ const queryDocsAll = () => {
   getSearchDataAll(params)
     .then((res) => {
       if (res.data.length) {
-        recommendList.value = res.data;
+        recommendList.value = res.data.sort((a, b) => pkgSortMap[a.key] - pkgSortMap[b.key]);
       } else {
         isNoFound.value = true;
         recommendList.value = [];
       }
+      isFocus.value = true;
       isLoading.value = false;
     })
     .catch(() => {
@@ -226,7 +228,6 @@ watch(
         <OInput
           v-model="searchInput"
           :placeholder="isHeader ? t('software.searchPlaceholder1') : t('software.searchPlaceholder')"
-          variant="solid"
           round="0"
           clearable
           class="search-input"
@@ -274,6 +275,14 @@ watch(
     :deep(.search-input) {
       height: var(--search-height);
     }
+  }
+  :deep(.search-input) {
+    --_box-bd: none;
+    --_box-bg-color: none;
+    --_box-bg-color-focus: none;
+    --_box-bd-color-focus: none;
+    --_box-bd-color-hover: none;
+    --_box-bg-color-hover: none;
   }
 
   &.header-show {

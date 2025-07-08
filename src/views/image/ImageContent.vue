@@ -6,7 +6,7 @@ import { useRoute, useRouter } from 'vue-router';
 import { getSearchAllFiled, getSearchAllColumn } from '@/api/api-domain';
 import { useI18n } from 'vue-i18n';
 import { useRouteQuery } from '@/composables/useRouteQuery';
-import { PACKAGE_TYPE_MAPPING, COUNT_PAGESIZE } from '@/data/query';
+import { PACKAGE_TYPE_MAPPING, COUNT_PAGESIZE, SORTPARAMS } from '@/data/query';
 import { getParamsRules } from '@/utils/common';
 import { useViewStore } from '@/stores/common';
 import { useSearchStore } from '@/stores/search';
@@ -166,6 +166,7 @@ const closeTag = (idx: string | number, type: string) => {
 };
 
 // 重置筛选结果
+const isClear = ref(false);
 const resetTag = () => {
   searchArch.value = [];
   searchOs.value = [];
@@ -173,6 +174,7 @@ const resetTag = () => {
   isSearchDocs.value = false;
   nameOrder.value = '';
   currentPage.value = 1;
+  isClear.value = true;
 
   const { os, arch } = route.query;
 
@@ -180,6 +182,19 @@ const resetTag = () => {
     router.push({
       path: `/${locale.value}/image`,
     });
+  }
+};
+
+// 更新时间、字母排序
+const changeSortValue = (v: string[] | string) => {
+  nameOrder.value = '';
+  currentPage.value = 1;
+  if (Array.isArray(v)) {
+    if (v[0] === 'name') {
+      nameOrder.value = SORTPARAMS[v[1]];
+    }
+  } else {
+    isClear.value = false;
   }
 };
 
@@ -291,7 +306,15 @@ const clearFilterSearch = () => {
     </div>
 
     <div class="pkg-main">
-      <FilterHeader title="IMAGE" :total="total" @search="changeFilterSearch" @clear="clearFilterSearch" />
+      <FilterHeader
+        title="IMAGE"
+        :total="total"
+        @sort="changeSortValue"
+        :is-clear="isClear"
+        type="all"
+        @search="changeFilterSearch"
+        @clear="clearFilterSearch"
+      />
       <div v-if="isSearchDocs || filterList.length > 0" class="search-result">
         <p v-if="!isPageSearch" class="text">
           <template v-if="isSearchDocs">

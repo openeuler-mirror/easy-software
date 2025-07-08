@@ -319,7 +319,7 @@ onUnmounted(() => window.sessionStorage.removeItem(STORAGE_KEY));
                         <OTag class="tag" :color="tagColor(item.issue_customize_state)" size="small">{{ item.issue_customize_state }}</OTag>
                       </span>
                     </p>
-                    <OLink class="out-link" :href="item.url" color="primary" hover-underline target="_blank" rel="noopener noreferrer">
+                    <OLink class="out-link" :href="item.url" color="primary" target="_blank" rel="noopener noreferrer">
                       查看详情
                       <OIcon><IconOutlink /></OIcon>
                     </OLink>

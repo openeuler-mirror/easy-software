@@ -126,7 +126,7 @@ const revoke = () => {
   <div class="table-main" :class="type">
     <el-table :data="data" border empty-text="暂无数据" style="width: 100%">
       <el-table-column
-        v-for="(item) in columns"
+        v-for="item in columns"
         :key="item.key"
         :fixed="item.fixed ?? false"
         :prop="item.key"
@@ -211,12 +211,12 @@ const revoke = () => {
           <template v-if="item.key === 'operation'">
             <template v-if="type === 'application'">
               <div class="oper-box">
-                <OLink color="primary" hover-underline @click="jumpTo(row.applyIdString)">申请详情</OLink>
-                <OLink color="danger" v-if="row.applyStatus === 'OPEN'" hover-underline @click="revokeApplication(row.applyIdString)">撤销申请</OLink>
+                <OLink color="primary" @click="jumpTo(row.applyIdString)">申请详情</OLink>
+                <OLink color="danger" v-if="row.applyStatus === 'OPEN'" @click="revokeApplication(row.applyIdString)">撤销申请</OLink>
               </div>
             </template>
             <template v-else>
-              <OLink color="primary" hover-underline @click="jumpTo(row.applyIdString)">{{ type === 'approval' ? '审批' : '审批详情' }}</OLink>
+              <OLink color="primary" @click="jumpTo(row.applyIdString)">{{ type === 'approval' ? '审批' : '审批详情' }}</OLink>
             </template>
           </template>
         </template>

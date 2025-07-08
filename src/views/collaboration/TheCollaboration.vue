@@ -429,7 +429,7 @@ watch(
                     <template #default="{ row }">
                       <template v-if="subItem.key === 'versionStatus'">
                         <template v-if="subItem.key === 'versionStatus' && row.versionDetailUrl">
-                          <OLink color="primary" class="link-external" hover-underline @click="changeExternalDialog(row.versionDetailUrl)">
+                          <OLink color="primary" class="link-external" @click="changeExternalDialog(row.versionDetailUrl)">
                             <span class="text">{{ row.versionStatus }} </span> <OIcon><IconOutlink /></OIcon>
                           </OLink>
                         </template>
@@ -465,23 +465,23 @@ watch(
                 </template>
                 <template v-else>
                   <template v-if="item.key === 'repo'">
-                    <OLink color="primary" class="link-external" hover-underline @click="changeExternalDialog(SRCOPENEULER + row.repo)">
+                    <OLink color="primary" class="link-external" @click="changeExternalDialog(SRCOPENEULER + row.repo)">
                       <span class="text">{{ row[item.key] }} </span> <OIcon><IconOutlink /></OIcon>
                     </OLink>
                   </template>
                   <template v-else-if="item.key === 'prStatus' || item.key === 'cveStatus' || item.key === 'issueStatus'">
                     <template v-if="item.key === 'cveStatus' && row.cveDetailUrl">
-                      <OLink color="primary" class="link-external" hover-underline @click="changeExternalDialog(row.cveDetailUrl)">
+                      <OLink color="primary" class="link-external" @click="changeExternalDialog(row.cveDetailUrl)">
                         <span class="text">{{ row[item.key] }} </span> <OIcon><IconOutlink /></OIcon>
                       </OLink>
                     </template>
                     <template v-else-if="item.key === 'prStatus' && row.prDetailUrl">
-                      <OLink color="primary" class="link-external" hover-underline @click="changeExternalDialog(row.prDetailUrl)">
+                      <OLink color="primary" class="link-external" @click="changeExternalDialog(row.prDetailUrl)">
                         <span class="text">{{ row[item.key] }} </span> <OIcon><IconOutlink /></OIcon>
                       </OLink>
                     </template>
                     <template v-else-if="item.key === 'issueStatus' && row.issueDetailUrl">
-                      <OLink color="primary" class="link-external" hover-underline @click="changeExternalDialog(row.issueDetailUrl)">
+                      <OLink color="primary" class="link-external" @click="changeExternalDialog(row.issueDetailUrl)">
                         <span class="text">{{ row[item.key] }} </span> <OIcon><IconOutlink /></OIcon>
                       </OLink>
                     </template>
@@ -505,8 +505,8 @@ watch(
 
                   <template v-else-if="item.key === 'operation'">
                     <div class="operation-box">
-                      <OLink color="primary" hover-underline @click="changeFeedback(row.repo)">反馈</OLink>
-                      <OLink color="primary" hover-underline @click="changeFeedbackHistory(row.repo)">历史</OLink>
+                      <OLink color="primary" @click="changeFeedback(row.repo)">反馈</OLink>
+                      <OLink color="primary" @click="changeFeedbackHistory(row.repo)">历史</OLink>
                     </div>
                   </template>
                   <template v-else>

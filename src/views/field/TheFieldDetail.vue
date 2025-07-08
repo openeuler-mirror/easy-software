@@ -10,7 +10,7 @@ import { tagList } from '@/data/detail/index';
 import { useI18n } from 'vue-i18n';
 import { useLocale } from '@/composables/useLocale';
 import { useViewStore } from '@/stores/common';
-import { getCode, getParamsRules } from '@/utils/common';
+import { getCode, getParamsRules, pkgSortMap } from '@/utils/common';
 import useDetailPageAnalytics from '@/composables/useDetailPageAnalytics';
 
 import AppFeedback from '@/components/AppFeedback.vue';
@@ -96,7 +96,8 @@ const queryEntity = () => {
   getDetail(newData)
     .then((res) => {
       const data = res.data;
-      tabList.value = data.tags;
+      tabList.value = data.tags.sort((a, b) => pkgSortMap[a] - pkgSortMap[b]);
+
       for (const tag of data.tags) {
         srcRepos[tag] = data[tag].srcRepo;
       }
