@@ -1,14 +1,10 @@
 <script lang="ts" setup>
 import { onMounted, ref, watch } from 'vue';
 import { OLink, OInput, useMessage, OIcon } from '@opensig/opendesign';
-import { useLocale } from '@/composables/useLocale';
 import { useI18n } from 'vue-i18n';
 import { useRouter, useRoute } from 'vue-router';
-import type { SorT } from '@/@types/type-sort';
+import { SORTPARAMS } from '@/data/query';
 import { useSearchStore } from '@/stores/search';
-
-import IconTimeOrder from '~icons/app/icon-time-order.svg';
-
 import IconSearch from '~icons/app/icon-search.svg';
 import { searchReport } from '@/shared/analytics';
 
@@ -42,7 +38,6 @@ const msg = useMessage();
 const router = useRouter();
 const route = useRoute();
 const { t } = useI18n();
-const { locale } = useLocale();
 
 const emits = defineEmits<{
   (e: 'sort', value: string[] | string): void;
@@ -104,52 +99,34 @@ const collectDownloadData = (keyword: string) => {
   });
 };
 
-const isTimeOrder = ref(false);
-const isNameOrder = ref(false);
+// 排序事件
+const timeIndex = ref(0);
+const nameIndex = ref(0);
+const changeSortBy = (type: string) => {
+  const updateIndex = (index) => {
+    if (index.value >= 2) {
+      index.value = 0;
+    } else {
+      index.value++;
+    }
+  };
 
-const changeSortBy = (type: string, name: string) => {
-  let v: SorT = '';
-  clearSvgFill();
-
-  const path = document.querySelector(`.filter-sort.${name} svg`);
-
-  if (type === 'timeOrder') {
-    isNameOrder.value = false;
-    activeIndex.value = 0;
-    isTimeOrder.value = !isTimeOrder.value;
-    v = isTimeOrder.value ? 'asc' : 'desc';
-    path?.children[isTimeOrder.value ? 1 : 0].setAttribute('fill', 'var(--o-color-info1)');
-
-    searchStore.changeNameOrderState(false);
-  } else if (type === 'nameOrder') {
-    isTimeOrder.value = false;
-    activeIndex.value = 1;
-    isNameOrder.value = !isNameOrder.value;
-    v = isNameOrder.value ? 'asc' : 'desc';
-    path?.children[isNameOrder.value ? 1 : 0].setAttribute('fill', 'var(--o-color-info1)');
-    // 修改状态
-    searchStore.changeNameOrderState(true);
+  if (type === 'name') {
+    updateIndex(nameIndex);
+    emits('sort', ['name', nameIndex.value]);
+  } else if (type === 'time') {
+    updateIndex(timeIndex);
+    emits('sort', ['time', timeIndex.value]);
+  } else {
+    return;
   }
-  emits('sort', [type, v]);
-};
-
-// 重置svg颜色
-const clearSvgFill = () => {
-  const path = document.querySelectorAll(`.filter-sort svg`);
-  path.forEach((item) => {
-    item?.children[0].removeAttribute('fill');
-    item?.children[1].removeAttribute('fill');
-  });
 };
 
 // 清除筛选数据
-// activeIndex -1清除全部 0最新排序、1首字母排序
-const activeIndex = ref(-1);
 const clearAll = () => {
-  isTimeOrder.value = false;
-  isNameOrder.value = false;
-  activeIndex.value = -1;
-  clearSvgFill();
+  timeIndex.value = 0;
+  nameIndex.value = 0;
+
   searchStore.changeNameOrderState(false);
   emits('sort', '');
 };
@@ -214,6 +191,7 @@ const getSearchplaceholder = (name: string) => {
         :placeholder="`${t('software.filterPleaseEnter[0]')}${getSearchplaceholder(title)}`"
         :style="{ width: '348px' }"
         size="large"
+        round="4px"
         :max-length="100"
         clearable
         @focus="showPanel = true"
@@ -228,22 +206,18 @@ const getSearchplaceholder = (name: string) => {
       </OInput>
     </div>
     <div v-if="type === 'all'" class="search-right">
-      <OLink @click="clearAll()" class="filter-sort" :class="{ active: activeIndex === -1 }">
+      <OLink @click="clearAll()" class="filter-sort">
         {{ t('software.sortTitle') }}
       </OLink>
       <template v-if="isTime">
-        <OLink @click="changeSortBy('timeOrder', 'time')" class="filter-sort time" :class="{ active: activeIndex === 0 }">
+        <OLink @click="changeSortBy('time')" class="filter-sort time">
           {{ t('software.timeOrder') }}
-          <template #suffix
-            ><OIcon><IconTimeOrder /></OIcon
-          ></template>
+          <span class="sort-icon" :class="SORTPARAMS[timeIndex]"></span>
         </OLink>
       </template>
-      <OLink @click="changeSortBy('nameOrder', 'name')" class="filter-sort name" :class="{ active: activeIndex === 1 }">
+      <OLink @click="changeSortBy('name')" class="filter-sort name">
         {{ t('software.nameOrder') }}
-        <template #suffix
-          ><OIcon><IconTimeOrder /></OIcon
-        ></template>
+        <span class="sort-icon" :class="SORTPARAMS[nameIndex]"></span>
       </OLink>
     </div>
   </div>

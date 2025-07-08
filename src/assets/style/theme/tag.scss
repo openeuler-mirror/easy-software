@@ -3,4 +3,7 @@
   &.o-tag-small {
     --tag-padding: 0 4px;
   }
+  &.o-tag-outline{
+    --tag-bd-color: var(--o-color-control1-light);  
+  }
 }

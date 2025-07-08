@@ -170,16 +170,16 @@ const onClickLink = (row: any) => {
 <template>
   <div class="table-main">
     <OTable :columns="columns" :data="data" :loading="loading" :small="true" border="row-frame" :class="type">
-      <template #head="{ columns }">
+      <template #header="{ columns }">
         <th v-for="item in columns" :key="item.type" :class="item.type">
           <template v-if="item.key === 'name' || item.key === 'rpmUpdateAt'">
             <div v-if="item.key === 'name'" @click="changeSortBy('name')" class="thead-th sort">
               {{ item.label }}
-              <span class="order" :class="SORTPARAMS[nameIndex]"></span>
+              <span class="sort-icon" :class="SORTPARAMS[nameIndex]"></span>
             </div>
             <div v-if="item.key === 'rpmUpdateAt'" @click="changeSortBy(item.key)" class="thead-th sort">
               {{ item.label }}
-              <span class="order" :class="SORTPARAMS[timeIndex]"></span>
+              <span class="sort-icon" :class="SORTPARAMS[timeIndex]"></span>
             </div>
           </template>
           <div v-else class="thead-th">{{ item.label }}</div>
@@ -249,11 +249,11 @@ const onClickLink = (row: any) => {
       <template #td_operation="{ row }">
         <!-- 应用镜像 -->
         <template v-if="type === 'apppkg'">
-          <OLink color="primary" hover-underline @click="openDownloadDialog(row)">{{ t('software.columns.download') }}</OLink>
+          <OLink color="primary" @click="openDownloadDialog(row)">{{ t('software.columns.download') }}</OLink>
         </template>
         <template v-else>
           <span>
-            <OLink v-if="row.binDownloadUrl" @click="onExternalDialog(row)" color="primary" hover-underline>{{ t('software.columns.download') }}</OLink>
+            <OLink v-if="row.binDownloadUrl" @click="onExternalDialog(row)" color="primary">{{ t('software.columns.download') }}</OLink>
           </span>
         </template>
       </template>
@@ -333,6 +333,15 @@ const onClickLink = (row: any) => {
 }
 
 :deep(.o-table) {
+  --table-edge-padding: 24px;
+  td:first-child,
+  th:first-child {
+    padding-left: var(--table-edge-padding);
+  }
+  td:last-child,
+  th:last-child {
+    padding-left: var(--table-edge-padding);
+  }
   .label {
     display: flex;
     align-items: center;

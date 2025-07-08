@@ -1,8 +1,8 @@
 <script lang="ts" setup>
-import { type PropType, ref, onMounted } from 'vue';
+import { type PropType, ref, onMounted, computed } from 'vue';
 import { OCard, OTag, OIcon } from '@opensig/opendesign';
 import type { AppItemT, PkgIdsT, PkgTypeT } from '@/@types/app';
-import { getTagsIcon, xssAllTag } from '@/utils/common';
+import { getTagsIcon, xssAllTag, pkgSortMap } from '@/utils/common';
 import { useLocale } from '@/composables/useLocale';
 import { useI18n } from 'vue-i18n';
 import { useRoute } from 'vue-router';
@@ -27,6 +27,14 @@ const route = useRoute();
 const { locale } = useLocale();
 const { t } = useI18n();
 const { isDark } = useTheme();
+
+// 获取排序后的tags
+const getTagsOrder = computed(() => {
+  if (props.data?.tags) {
+    return props.data?.tags.slice().sort((a, b) => pkgSortMap[a] - pkgSortMap[b]);
+  }
+  return [];
+});
 
 // 名称转换
 const pkgNameConversion = (v: string) => {
@@ -171,8 +179,8 @@ const onClickLink = (event: MouseEvent, isTag?: boolean) => {
       </div>
       <p v-if="data.os" class="pkg-os">{{ data.os }}</p>
       <div class="pkg-box">
-        <div v-if="data.tags && data.tags.length > 0" class="tags-box">
-          <a :href="jumpTo(data.pkgIds, tag)" v-for="tag in data.tags" :key="tag" @click="onClickLink($event, true)" target="_blank" rel="noopener">
+        <div v-if="getTagsOrder.length > 0" class="tags-box">
+          <a :href="jumpTo(data.pkgIds, tag)" v-for="tag in getTagsOrder" :key="tag" @click="onClickLink($event, true)" target="_blank" rel="noopener">
             <OTag style="--o-icon_size_control-xs: 0" variant="outline" :class="`${tag.toLocaleLowerCase()}-icon`">
               <template #icon>
                 <OIcon><component :is="getTagsIcon(tag)" /></OIcon>

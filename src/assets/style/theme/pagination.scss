@@ -1,0 +1,13 @@
+.o-pagination {
+  --pagination-item-bg-color: var(--o-color-fill2);
+  --pagination-item-bg-color-current: var(--o-color-primary1);
+  --pagination-item-color-current: var(--o-color-white);
+  // 鼠标划过时颜色
+  --pagination-item-bg-color-hover: var(--o-color-primary2);
+  --pagination-item-color-hover: var(--o-color-white);
+
+  .o-pagination-item {
+    width: auto;
+    min-width: var(--pagination-item-size);
+  }
+}

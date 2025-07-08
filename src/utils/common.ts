@@ -133,3 +133,15 @@ export const getPkgName = (type: string) => {
   };
   return nameMap[type] || '';
 };
+
+// 定义期望顺序的映射对象
+export const pkgSortMap = {
+  RPM: 1,
+  rpmpkg: 1,
+  IMAGE: 2,
+  apppkg: 2,
+  OEPKG: 3,
+  oepkg: 3,
+  CONDA: 4,
+  conda: 4,
+};
