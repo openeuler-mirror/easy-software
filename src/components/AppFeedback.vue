@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { ref } from 'vue';
-import { ORate, OTextarea, useMessage, OIcon, OButton, ODivider, OPopover } from '@opensig/opendesign';
+import { OTextarea, useMessage, OIcon, OButton, ODivider, OPopover } from '@opensig/opendesign';
 import { GITEE } from '@/data/config';
 import { useI18n } from 'vue-i18n';
 import { OPENEULER_FORUM } from '@/data/config';
@@ -13,6 +13,7 @@ import AppSection from '@/components/AppSection.vue';
 import IconHelpTips from '~icons/app/icon-help.svg';
 import FeedbackHistory from '@/components/feedbackHistory/FeedbackHistory.vue';
 import { useDebounceFn } from '@vueuse/core';
+import ScoreSlider from './globalFeedback/ScoreSlider.vue';
 
 const props = defineProps({
   name: {
@@ -197,7 +198,7 @@ const onChangeHistoryCategory = (val: string) => {
   <AppSection :title="t('software.feedbackTitle')" class="feedback">
     <div class="feedback-content">
       <div class="rate-box">
-        <ORate @change="onRateChange" v-model="rateVal" color="danger" size="large" />
+        <ScoreSlider @change="onRateChange" v-model="rateVal" />
       </div>
       <div class="feedback-from">
         <OTextarea
@@ -241,6 +242,12 @@ const onChangeHistoryCategory = (val: string) => {
 </template>
 
 <style lang="scss" scoped>
+.feedback :deep(.title-bar) {
+  margin-bottom: 0;
+}
+.rate-box {
+  padding-bottom: 20px
+}
 .popover-content {
   @include text1;
 }
