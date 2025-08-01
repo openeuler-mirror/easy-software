@@ -1,10 +1,9 @@
 <script lang="ts" setup>
-import { ref, onMounted, provide } from 'vue';
-import { isString } from '@opensig/opendesign';
+import { ref, onMounted, provide, computed } from 'vue';
+import { isString, OTag } from '@opensig/opendesign';
 import { maintainerDefaults } from '@/data/query';
 import { useRoute } from 'vue-router';
-import { useMarkdown } from '@/composables/useMarkdown';
-import type { AppInfoT, MaintainerT, DetailItemT, MoreMessgeT } from '@/@types/app';
+import type { MaintainerT, DetailItemT, MoreMessgeT } from '@/@types/app';
 import { useI18n } from 'vue-i18n';
 import { getDetails, getVer } from '@/api/api-domain';
 import { useViewStore } from '@/stores/common';
@@ -12,36 +11,20 @@ import AppFeedback from '@/components/AppFeedback.vue';
 import DetailHead from '@/components/detail/DetailHeader.vue';
 import DetailAside from '@/components/detail/DetailAside.vue';
 
-import defaultImg from '@/assets/default-logo.png';
 import { pkgIdInjection } from '@/data/injectionKeys';
 import useDetailPageAnalytics from '@/composables/useDetailPageAnalytics';
 
 const route = useRoute();
-const { mkit } = useMarkdown();
 const { t } = useI18n();
 
-const basicInfo = ref<DetailItemT[]>([]);
-const installation = ref('');
 const tabValue = ref('oepkg');
-const downloadData = ref('');
+const basicInfo = ref<DetailItemT[]>([]);
+
 const maintainer = ref<MaintainerT>({ maintainerId: '', maintainerEmail: '', maintainerGiteeId: '' });
-const upStream = ref();
-const security = ref();
 const moreMessge = ref<MoreMessgeT[]>([]);
-const description = ref();
-const appData = ref<AppInfoT>({
-  name: '',
-  cover: '',
-  license: '',
-  version: '',
-  repository: '',
-  size: '',
-  source_code: '',
-  bin_code: '',
-  security: '',
-});
-const srcRepo = ref('');
-const { reportAnalytics, goFeedback, vCopyInstallation, reportFeedback } = useDetailPageAnalytics(appData, basicInfo, 'OEPKG');
+const appData = ref({});
+
+const { reportAnalytics, goFeedback, reportFeedback } = useDetailPageAnalytics(appData, basicInfo, 'OEPKG');
 
 const isLoading = ref(true);
 
@@ -51,7 +34,7 @@ const queryPkg = () => {
     getDetails(tabValue.value, pkgId.value)
       .then((res) => {
         const data = res.data.list[0];
-        srcRepo.value = data.srcRepo;
+        appData.value = data;
         getDetailValue(data);
         isLoading.value = false;
       })
@@ -74,27 +57,15 @@ if (isString(route.query?.pkgId)) {
 onMounted(() => {
   queryPkg();
 });
-const summary = ref();
-const license = ref();
+
 const tagVer = ref();
+
 const getDetailValue = (data: any) => {
-  try {
-    const basic = [
-      { name: '详细描述', value: data?.description },
-      { name: '版本支持情况', value: data.osSupport },
-      { name: '架构', value: data.arch },
-      { name: '软件包分类', value: data.category || '其他' },
-    ];
-    // 过滤空数据
-    basic.forEach((item) => {
-      if (item.value.length > 0) {
-        basicInfo.value.push(item);
-      }
-    });
-  } catch (res) {
-    basicInfo.value = [];
-  }
-  summary.value = data.summary;
+  basicInfo.value = [
+    { name: '版本支持情况', value: data.osSupport },
+    { name: '架构', value: data.arch },
+    { name: '软件包分类', value: data.category || '其他' },
+  ];
 
   const newData = [
     { name: 'Requires', value: JSON.parse(data?.requires || []) },
@@ -108,37 +79,56 @@ const getDetailValue = (data: any) => {
     }
   });
 
-  appData.value.size = data.rpmSize;
   tagVer.value = [data.osSupport, data.arch];
+  // 维护者信息
   maintainer.value = {
     maintainerId: data?.maintainerId || maintainerDefaults.name,
     maintainerEmail: data?.maintainerEmail || maintainerDefaults.email,
     maintainerGiteeId: data?.maintainerGiteeId || maintainerDefaults.gitee_id,
   };
-  appData.value.version = data?.version;
-  license.value = data.license;
-  upStream.value = data?.upStream;
-  security.value = data?.securityLevel;
-  description.value = data?.description;
-  downloadData.value = mkit(data?.download || '', { isCopy: true, Tag: data.appVer });
-  installation.value = mkit(data?.installation || '', { isCopy: true, Tag: data.appVer });
-  appData.value.name = data.name;
-  appData.value.source_code = data.srcDownloadUrl;
-  appData.value.bin_code = data.binDownloadUrl;
-  appData.value.cover = data?.iconUrl || defaultImg;
-  appData.value.repository = data.srcRepo;
-  appData.value.security = data.security;
-  queryVer();
+
+  if (data.name) {
+    queryVer(data.name);
+  }
 };
 
+provide('BASE_INFO', basicInfo);
+
+// 安装指引
+const installTabs = computed(() => {
+  return [
+    {
+      name: '在线安装',
+      type: 'online',
+      tag: appData.value.appVer,
+      installation: appData.value.installation,
+    },
+    {
+      name: '下载安装',
+      type: 'download',
+      size: appData.value.rpmSize,
+      children: [
+        {
+          href: appData.value.binDownloadUrl,
+          type: 'binary',
+          label: '源码包下载',
+        },
+        {
+          href: appData.value.srcDownloadUrl,
+          type: 'source_code',
+          label: '二进制包下载',
+        },
+      ],
+    },
+  ];
+});
+
 //获取支持
-const verData = ref();
-const queryVer = () => {
-  if (appData.value.name) {
-    getVer(tabValue.value, encodeURIComponent(appData.value.name)).then((res) => {
-      verData.value = res.data.list;
-    });
-  }
+const versionSupportData = ref();
+const queryVer = (name: string) => {
+  getVer(tabValue.value, encodeURIComponent(name)).then((res) => {
+    versionSupportData.value = res.data.list;
+  });
 };
 </script>
 
@@ -148,23 +138,19 @@ const queryVer = () => {
     <template v-else>
       <!-- 锚点 -->
       <AppBreadcrumb id="oepkg" :name="appData.name" />
-
-      <DetailHead @go-feedback="goFeedback" :data="appData" :basicInfo="summary" :maintainer="maintainer" />
+      <!-- 头部信息 -->
+      <DetailHead @go-feedback="goFeedback" :data="appData" />
 
       <div class="detail-row">
         <div class="detail-row-main">
-          <AppSection :title="`> ${t('detail.information')}`">
-            <template #append>
-              <span v-if="appData.version" class="ver">{{ t('detail.number') }}: {{ appData.version }}</span>
-            </template>
-            <!-- 基本信息 -->
-            <DetailBasicInfo :options="basicInfo" />
+          <AppSection :line="false">
+            <div v-if="appData.version" class="version-title">
+              <h2>{{ appData.version }}</h2>
+              <OTag v-if="appData.isLatestAppVer" color="success">最新版本</OTag>
+            </div>
 
             <!-- 安装指引 -->
-            <DetailInstall :title="`> ${t('detail.installation')}`">
-              <div v-if="downloadData" v-dompurify-html="downloadData" v-copy-code="true" class="markdown-body download"></div>
-              <div v-if="installation" v-copy-installation v-dompurify-html="installation" v-copy-code="true" class="markdown-body installation"></div>
-            </DetailInstall>
+            <DetailInstall :title="`> ${t('detail.installation')}`" :options="installTabs" @report-analytics="reportAnalytics" />
 
             <!-- 更多信息 -->
             <p class="sp">> {{ t('detail.more') }}</p>
@@ -182,7 +168,7 @@ const queryVer = () => {
           />
         </div>
         <div class="detail-row-side">
-          <DetailAside @report-analytics="reportAnalytics" :data="appData" :ver-data="verData" :license="license" :tagVer="tagVer" :type="'OEPKG'" />
+          <DetailAside :data="appData" :ver-data="versionSupportData" :tagVer="tagVer" :maintainer="maintainer" :type="'OEPKG'" />
         </div></div
     ></template>
   </ContentWrapper>

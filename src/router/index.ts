@@ -22,6 +22,12 @@ const routes = [
     redirect: '/zh',
   },
   {
+    path: '/en/:path*',
+    redirect: (to) => {
+      return `/zh${to.path.replace(/^\/en/, '')}`;
+    },
+  },
+  {
     path: '/zh',
     name: 'home',
     component: () => import('@/views/home/TheHome.vue'),

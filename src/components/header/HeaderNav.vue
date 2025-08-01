@@ -40,6 +40,11 @@ const onMouseLeave = () => {
 const softwareList = ['rpm', 'image', 'oepkg', 'conda'];
 const selectedIndex = computed(() => {
   let name = route.name?.toString();
+  // 判断是否是详情页
+  if (name?.includes('-detail')) {
+    name = name?.split('-')[0];
+  }
+
   if (softwareList.includes(name)) {
     name = 'list';
   }

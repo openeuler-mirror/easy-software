@@ -188,7 +188,7 @@ watch(
   position: fixed;
   top: 0;
   left: 0;
-  z-index: 1010;
+  z-index: 999;
   background: var(--o-color-fill2);
   box-shadow: var(--o-shadow-1);
   min-width: 1440px;

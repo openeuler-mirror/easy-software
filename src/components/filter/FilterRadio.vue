@@ -21,7 +21,7 @@ const actualOptions = computed(() => {
     return [];
   }
   return props.options.map((option) => {
-    if (typeof option ==='string') {
+    if (typeof option === 'string') {
       return { label: option, value: option };
     }
     return option;

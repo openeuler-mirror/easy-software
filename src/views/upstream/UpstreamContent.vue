@@ -6,7 +6,6 @@ import { useRoute } from 'vue-router';
 import { getParamsRules, checkOriginLink, windowOpen } from '@/utils/common';
 
 import { getUpstreamColumn, getUpstream } from '@/api/api-upstream';
-import { getSearchData } from '@/api/api-search';
 import { useViewStore } from '@/stores/common';
 import { COUNT_PAGESIZE, SORTPARAMS } from '@/data/query';
 
@@ -23,12 +22,12 @@ const { t } = useI18n();
 
 // 软件包-表头
 const columns = [
-  { label: t('upstream.name'), key: 'name', style: 'width:22%', type: 'name' },
-  { label: t('upstream.version'), key: 'upstreamVersion', style: 'width:12%', type: 'upstreamVersion' },
-  { label: t('upstream.compatibility'), key: 'openeulerVersion', style: 'width:12%', type: 'openeulerVersion' },
-  { label: t('upstream.eulerOsVersion'), key: 'eulerOsVersion', style: 'width:16%', type: 'eulerOsVersion' },
-  { label: t('upstream.type'), key: 'type', style: 'width:12%', type: 'type' },
-  { label: t('upstream.state'), key: 'status', style: 'width:8%', type: 'status' },
+  { label: t('upstream.name'), key: 'name', style: 'width:18%', type: 'name' },
+  { label: t('upstream.version'), key: 'upstreamVersion', style: 'width:15%', type: 'upstreamVersion' },
+  { label: t('upstream.compatibility'), key: 'openeulerVersion', style: 'width:15%', type: 'openeulerVersion' },
+  { label: t('upstream.eulerOsVersion'), key: 'eulerOsVersion', style: 'width:18%', type: 'eulerOsVersion' },
+  { label: t('upstream.type'), key: 'type', style: 'width:10%', type: 'type' },
+  { label: t('upstream.state'), key: 'status', style: 'width:6%', type: 'status' },
 ];
 
 //  ------------  main ------------
@@ -62,6 +61,7 @@ const processItem = (item): any[] => {
 
 const queryAppVersion = () => {
   const params = {
+    name: searchKey.value,
     eulerOsVersion: searchOs.value,
     type: searchType.value,
     status: searchStatus.value.join(),
@@ -69,7 +69,6 @@ const queryAppVersion = () => {
     nameOrder: nameOrder.value,
     pageSize: pageSize.value,
   };
-  console.log(params);
   // 过滤空参数
   const newData = getParamsRules(params);
 
@@ -95,42 +94,9 @@ const queryAppVersion = () => {
     });
 };
 
-const searchParams = computed(() => {
-  return {
-    keyword: searchKey.value,
-    pageNum: currentPage.value,
-    pageSize: pageSize.value,
-    dataType: 'appversion',
-    eulerOsVersion: searchOs.value,
-    type: searchType.value,
-    status: searchStatus.value.join(),
-    nameOrder: nameOrder.value,
-  };
-});
-
 // es搜索
 const isSearchError = ref(false);
 const isSearch = ref(false);
-const querySearch = () => {
-  // 过滤空参数
-  const newData = getParamsRules(searchParams.value);
-
-  getSearchData(newData)
-    .then((res) => {
-      appData.value = res.data.appversion;
-      total.value = res.data.total;
-      isLoading.value = false;
-      isSearch.value = true;
-      if (appData.value.length === 0) {
-        isSearchError.value = true;
-      }
-    })
-    .catch(() => {
-      isSearchError.value = true;
-      appData.value = [];
-      isLoading.value = false;
-    });
-};
 
 // ----------- 左侧菜单交互-------------
 // 获取筛选参数列表
@@ -211,11 +177,7 @@ const pageSearch = () => {
   isSearchError.value = false;
   if (tabName.value === 'appversion') {
     isLoading.value = true;
-    if (searchKey.value === '') {
-      queryAppVersion();
-    } else {
-      querySearch();
-    }
+    queryAppVersion();
   }
 };
 
@@ -282,7 +244,7 @@ const calculateSpanInfo = () => {
   appData.value.forEach((row, index) => {
     const len = row.applicationVersions.length;
     if (len > 1) {
-      const current = `${row.name}-${row.upstreamVersion}`;
+      const current = `${row.name.toLocaleLowerCase()}-${row.upstreamVersion}`;
       if (!recordRowKey.has(current)) {
         recordRowKey.set(current, index);
       }
@@ -295,7 +257,7 @@ const cellSpanFn = (rowIndex: number, colIdx: number, row: any, column: any) => 
   const key = column.key;
   const len = row.applicationVersions.length;
   if (spanRow.includes(key) && len > 1) {
-    const current = `${row.name}-${row.upstreamVersion}`;
+    const current = `${row.name.toLocaleLowerCase()}-${row.upstreamVersion}`;
     const startIndex = recordRowKey.get(current);
 
     if (startIndex === rowIndex) {
@@ -394,11 +356,10 @@ const joinUrl = (item) => {
               <template v-else>-</template>
             </template>
             <template #td_openeulerVersion="{ row }">
-              <OLink v-if="row.openeulerVersion" target="_blank" :href="joinUrl(row)" color="primary">{{ row.openeulerVersion }}</OLink>
+              <OLink v-if="row.pkgId" target="_blank" :href="joinUrl(row)" color="primary">{{ row.openeulerVersion }}</OLink>
+              <template v-else-if="row.openeulerVersion">{{ row.openeulerVersion }}</template>
               <template v-else>-</template>
             </template>
-
-            eulerOsVersion
 
             <template #td_status="{ row }">
               <OTag v-if="row.status" class="app-tag" :class="row.status.toLocaleLowerCase()">{{ row.status }} </OTag>
@@ -443,12 +404,8 @@ const joinUrl = (item) => {
 }
 
 :deep(.o-table) {
-  // 当一行有 5 个 td 时，为前两个 td 添加边框
-  // td:nth-child(-n + 2):nth-last-child(5),
-  // td:nth-child(-n + 2):nth-last-child(5) ~ td:nth-child(2) {
-  //   border-right: var(--table-border);
-  // }
   --table-row-hover: transparent;
+
   .thead-th {
     display: flex;
     align-items: center;
