@@ -1,15 +1,13 @@
 <script setup lang="ts">
-import { ref, computed, onUnmounted, onMounted, watch } from 'vue';
+import { ref, computed, onUnmounted, onMounted, watch, type CSSProperties } from 'vue';
 import {
   OButton,
   ODivider,
   OIcon,
-  OIconClose,
   OLink,
   OOption,
   OPopover,
   OPopup,
-  ORate,
   OScroller,
   OSelect,
   OTag,
@@ -21,16 +19,18 @@ import type { FeedbackHistoryT } from '@/@types/feedback';
 import { getGlobalFeedbackHistoryList, postGlobalFeedback } from '@/api/api-feedback';
 import { dayjs } from 'element-plus';
 
-import iconButton from '~icons/app/icon-feedback.svg';
-import Error404Result from './Error404Result.vue';
+import IconClose from '~icons/app/icon-close.svg';
+import Error404Result from '@/components/Error404Result.vue';
 import { useLoginStore } from '@/stores/user';
 import { useI18n } from 'vue-i18n';
 import { doLogin } from '@/shared/login';
 import IconLoading from '~icons/app/icon-loading.svg';
-import IconHelp from '~icons/app/icon-help.svg';
+import IconHelp from '~icons/app/icon-question.svg';
+import IconSmile from '~icons/app/icon-smile.svg';
 import { useRoute } from 'vue-router';
-import { onClickOutside, useDebounceFn } from '@vueuse/core';
+import { createReusableTemplate, onClickOutside, useDebounceFn } from '@vueuse/core';
 import { oaReport } from '@/shared/analytics';
+import ScoreSlider from './ScoreSlider.vue';
 
 const FEEDBACK_REGEXP = /(.*?)4. 【用户名】.*$/;
 const REPLACE_REGEXP = /\r|\n/g;
@@ -51,13 +51,27 @@ const isDetailPage = computed(() => {
 });
 
 const isShowingFeedbackList = ref(false);
-const feedbackTitle = computed(() => (isShowingFeedbackList.value ? '历史反馈信息' : '反馈'));
 const bottomLinkContent = computed(() => (isShowingFeedbackList.value ? '提交反馈' : '查看历史反馈信息'));
-
 const rateVal = ref(0);
 const feedbackContent = ref('');
-
 const popupVisible = ref(false);
+
+const feedbackBtnColor = computed<CSSProperties>(() => {
+  if (popupVisible.value) {
+    return { color: 'var(--o-color-primary1)' };
+  }
+  return {};
+})
+
+const placeholder = computed(() => {
+  if (rateVal.value < 7) {
+    return '请输入您不太满意的原因';
+  } else if (rateVal.value < 9) {
+    return '改进哪些方面会让您更满意？';
+  } else {
+    return '请输入您满意的原因';
+  }
+});
 
 const reportAnalytics = (data: Record<string, any>, event = 'click') => {
   oaReport(event, {
@@ -136,21 +150,19 @@ const vMounted = {
 
 let canvasCtx: CanvasRenderingContext2D;
 // 计算文本长度，决定是否显示省略号
-const vCalcTextLength = {
-  mounted(el: HTMLParagraphElement) {
-    const text = el.childNodes[0]?.textContent as string;
-    if (!canvasCtx) {
-      canvasCtx = document.createElement('canvas').getContext('2d') as CanvasRenderingContext2D;
-      canvasCtx.font = window.getComputedStyle(el).getPropertyValue('font');
-    }
-    const textLen = canvasCtx.measureText(text).width;
-    const containerWidth = el.getBoundingClientRect().width;
-    const tagWidth = el.querySelector('.o-tag')?.getBoundingClientRect().width as number;
-    if (textLen >= containerWidth * 4 - tagWidth) {
-      (el.querySelector('.dots-tag') as HTMLSpanElement).style.position = 'absolute';
-      (el.querySelector('.dots') as HTMLSpanElement).style.display = 'inline-block';
-    }
-  },
+const vCalcTextLength = (el: HTMLElement) => {
+  const text = el.childNodes[0]?.textContent as string;
+  if (!canvasCtx) {
+    canvasCtx = document.createElement('canvas').getContext('2d')!;
+    canvasCtx.font = window.getComputedStyle(el).getPropertyValue('font');
+  }
+  const textLen = canvasCtx.measureText(text).width;
+  const containerWidth = el.getBoundingClientRect().width;
+  const tagWidth = el.querySelector('.o-tag')?.getBoundingClientRect().width as number;
+  if (textLen >= containerWidth * 4 - tagWidth) {
+    (el.querySelector('.dots-tag') as HTMLSpanElement).style.position = 'absolute';
+    (el.querySelector('.dots') as HTMLSpanElement).style.display = 'inline-block';
+  }
 };
 
 const feedbacks = ref<FeedbackHistoryT[]>([]);
@@ -210,12 +222,14 @@ const onClickSwitch = async () => {
   }
 };
 
-const postFeedback = () => {
-  if (!loginStore.isLogined) {
-    window.sessionStorage.setItem(STORAGE_KEY, JSON.stringify({ rate: rateVal.value ?? 0, content: feedbackContent.value ?? '' }));
-    doLogin();
-    return;
+const goToLogin = () => {
+  if (rateVal.value && feedbackContent.value.trim()) {
+    window.sessionStorage.setItem(STORAGE_KEY, JSON.stringify({ rate: rateVal.value, content: feedbackContent.value }));
   }
+  doLogin();
+}
+
+const postFeedback = () => {
   if (!rateVal.value) {
     return message.warning({
       content: t('software.feedbackMessage[1]'),
@@ -247,43 +261,55 @@ const onClick = () => {
 };
 
 onUnmounted(() => window.sessionStorage.removeItem(STORAGE_KEY));
+
+const [DefinePopupHint, ReuseablePopupHint] = createReusableTemplate();
 </script>
 
 <template>
+  <DefinePopupHint>
+    <OPopover :wrapper="popupBodyRef">
+      <template #target>
+        <OIcon class="help-icon"><IconHelp /></OIcon>
+      </template>
+      <p style="max-width: 170px; word-break: break-all">历史反馈信息内容更新有延迟，请耐心等待</p>
+    </OPopover>
+  </DefinePopupHint>
+
   <Teleport to="body">
     <div
       class="global-feedback-btn"
       v-if="!isDetailPage"
       @click="onClick"
-      :style="{ color: popupVisible ? 'var(--o-color-primary1)' : 'var(--o-color-control3)' }"
+      :style="feedbackBtnColor"
     >
-      <iconButton />
+      <IconSmile />
       <div class="popup-target" ref="popupTargetRef"></div>
       <OPopup :target="popupTargetRef" v-model:visible="popupVisible" body-class="global-feedback-popup" trigger="none" position="lb">
         <div ref="popupBodyRef" class="global-feedback">
-          <OIconClose class="close-icon" @click="onClickCloseIcon" />
-          <p class="title">
-            {{ feedbackTitle }}
-            <OPopover>
-              <template #target>
-                <OIcon v-show="isShowingFeedbackList" class="help-icon"><IconHelp /></OIcon>
-              </template>
-              <p style="max-width: 170px; word-break: break-all">历史反馈信息内容更新有延迟，请耐心等待</p>
-            </OPopover>
-          </p>
+          <OIcon class="close-icon">
+            <IconClose @click="onClickCloseIcon" />
+          </OIcon>
+          <div class="title">
+            <span v-if="!isShowingFeedbackList">
+              您对
+              <span class="title-name">软件中心</span>
+              的整体满意度如何？
+            </span>
+            <template v-else>历史反馈信息<ReuseablePopupHint /></template>
+          </div>
           <template v-if="!isShowingFeedbackList">
-            <ORate v-model="rateVal" @change="onRateChange" color="danger" style="margin-top: 16px" />
+            <ScoreSlider v-model="rateVal" :show-desc="true" @change="onRateChange" />
             <OTextarea
               @input="onInput"
               v-model="feedbackContent"
-              placeholder="请输入您的反馈"
+              :placeholder="placeholder"
               :max-length="500"
               resize="none"
               clearable
               style="margin-top: 16px; width: 300px; height: 88px"
               :inputOnOutlimit="false"
             />
-            <OButton class="button" color="primary" variant="solid" round="pill" @click="postFeedback">提交反馈</OButton>
+            <OButton class="button" color="primary" variant="solid" round="pill" @click="postFeedback">提交</OButton>
           </template>
           <div ref="feedbackListRef" class="feedback-list" v-else>
             <div class="mask" v-if="loading">
@@ -339,7 +365,14 @@ onUnmounted(() => window.sessionStorage.removeItem(STORAGE_KEY));
             </Error404Result>
           </div>
           <div class="bottom-link">
-            <OLink @click="onClickSwitch">{{ bottomLinkContent }}</OLink>
+            <OLink v-if="loginStore.isLogined" @click="onClickSwitch">{{ bottomLinkContent }}</OLink>
+            <template v-else>
+              <OLink @click="goToLogin" style="margin-right: 4px;" color="primary">
+                登录
+              </OLink>
+              查看历史反馈信息
+              <ReuseablePopupHint />
+            </template>
           </div>
         </div>
       </OPopup>
@@ -364,6 +397,7 @@ onUnmounted(() => window.sessionStorage.removeItem(STORAGE_KEY));
   align-items: center;
   box-shadow: var(--o-shadow-3);
   z-index: 1000;
+  border-radius: 4px;
 
   cursor: pointer;
   position: fixed;
@@ -380,6 +414,11 @@ onUnmounted(() => window.sessionStorage.removeItem(STORAGE_KEY));
     height: 1px;
     background-color: transparent;
   }
+
+  color: var(--o-color-control3);
+  @include hover {
+    color: var(--o-color-primary1);
+  }
 }
 
 .global-feedback {
@@ -393,6 +432,23 @@ onUnmounted(() => window.sessionStorage.removeItem(STORAGE_KEY));
   padding-bottom: 0;
   color: var(--o-color-info2);
   border: none;
+  border-radius: 4px;
+
+  .help-icon {
+    margin-left: 10px;
+    font-size: 20px;
+    cursor: pointer;
+    color: var(--o-color-control3);
+
+    @include hover {
+      color: var(--o-color-primary1);
+    }
+
+    svg {
+      width: 1em;
+      height: 1em;
+    }
+  }
 
   .title {
     font-weight: 500;
@@ -400,17 +456,28 @@ onUnmounted(() => window.sessionStorage.removeItem(STORAGE_KEY));
     align-items: center;
     @include tip1;
 
-    .help-icon {
-      width: 16px;
-      margin-left: 10px;
+    .title-name {
+      font-weight: 600;
     }
   }
 
   .close-icon {
     position: absolute;
-    top: 12px;
+    top: 8px;
     right: 12px;
     cursor: pointer;
+    transition: all var(--o-duration-m1) var(--o-easing-standard-in);
+    font-size: 20px;
+
+    svg {
+      width: 1em;
+      height: 1em;
+    }
+
+    @include hover {
+      transform: rotate(180deg);
+      color: var(--o-color-primary1);
+    }
   }
 
   .bottom-link {
@@ -496,13 +563,14 @@ onUnmounted(() => window.sessionStorage.removeItem(STORAGE_KEY));
         flex-shrink: 0;
         @include tip1;
 
-        :deep(.o-link-label) {
+        :deep(.o-link-main) {
           display: flex;
           align-items: center;
           gap: 8px;
 
           svg {
-            width: 16px;
+            width: 1em;
+            height: 1em;
             margin-right: 4px;
           }
         }
