@@ -22,9 +22,13 @@ const route = useRoute();
 
 const emit = defineEmits(['size-change', 'current-change']);
 
-const onChange = (newValue: { page: number; pageSize: number }) => {
-  emit('size-change', newValue.pageSize);
-  emit('current-change', newValue.page);
+const onChange = (newValue: { page: number; pageSize: number }, oldValue: { page: number; pageSize: number }) => {
+  if (newValue.pageSize !== oldValue.pageSize) {
+    emit('size-change', newValue.pageSize);
+  }
+  if (newValue.page !== oldValue.page) {
+    emit('current-change', newValue.page);
+  }
 };
 
 // 如果是领域应用 分页数量为12条，否则为20条

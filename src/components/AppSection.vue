@@ -4,12 +4,16 @@ defineProps({
     type: String,
     default: '',
   },
+  line: {
+    type: Boolean,
+    default: true,
+  },
 });
 </script>
 
 <template>
   <div class="app-section">
-    <div v-if="title" class="title-bar">
+    <div v-if="title" class="title-bar" :class="{ line: line }">
       <h3>{{ title }}</h3>
       <slot name="append"></slot>
     </div>
@@ -20,7 +24,12 @@ defineProps({
 <style lang="scss" scoped>
 .detail-row-side {
   .title-bar {
-    margin-bottom: 16px !important;
+    margin-bottom: 24px !important;
+
+    &.line {
+      border-bottom: 1px solid var(--o-color-control4);
+      padding-bottom: 24px;
+    }
   }
 }
 .app-section {

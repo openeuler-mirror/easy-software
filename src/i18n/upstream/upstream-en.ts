@@ -3,4 +3,6 @@ export default {
   version: '上游最新版本',
   systemVersion: '兼容版本',
   architecture: '状态',
+  type: '类型',
+  eulerOsVersion: 'openEuler版本',
 };

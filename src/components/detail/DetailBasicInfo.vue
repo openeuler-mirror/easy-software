@@ -1,17 +1,9 @@
 <script lang="ts" setup>
-import { ref, type PropType } from 'vue';
+import { ref, inject } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { OLink, OIcon } from '@opensig/opendesign';
-import type { DetailItemT } from '@/@types/app';
 
 import IconChevronDown from '~icons/app/icon-chevron-down.svg';
-
-defineProps({
-  options: {
-    type: Array as PropType<Array<DetailItemT>>,
-    required: true,
-  },
-});
 
 const { t } = useI18n();
 
@@ -32,11 +24,12 @@ const descSummary = (v: string) => {
 const showMore = () => {
   isToggle.value = !isToggle.value;
 };
+const injectBasicInfo = inject('BASE_INFO');
 </script>
 
 <template>
   <div class="basic-info">
-    <div v-for="item in options" :key="item.name" class="basic-info-item">
+    <div v-for="item in injectBasicInfo" :key="item.name" class="basic-info-item">
       <span class="label">{{ item.name }}</span>
       <div class="basic-item-box">
         <template v-if="item.name === t('detail.warehouse')">

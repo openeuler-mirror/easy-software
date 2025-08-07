@@ -333,14 +333,14 @@ const onClickLink = (row: any) => {
 }
 
 :deep(.o-table) {
-  --table-edge-padding: 24px;
+  --table-edge-padding: 16px;
   td:first-child,
   th:first-child {
     padding-left: var(--table-edge-padding);
   }
   td:last-child,
   th:last-child {
-    padding-left: var(--table-edge-padding);
+    padding-right: var(--table-edge-padding);
   }
   .label {
     display: flex;

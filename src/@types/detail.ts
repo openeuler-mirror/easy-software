@@ -77,3 +77,10 @@ export interface ParamsKeyT {
   epkgPkgId: string | null;
   rpmPkgId: string | null;
 }
+
+export interface ImageTagsT {
+  appVer: string;
+  arch: string;
+  dockerStr: string;
+  pkgId: string;
+}

@@ -1,7 +1,7 @@
 // 应用镜像tab分类
 export const tagList = [
-  { lable: '概览', value: 'overview' },
-  { lable: 'Tags', value: 'tags' },
+  { lable: '使用描述', value: 'overview' },
+  { lable: '版本信息', value: 'tags' },
 ];
 
 // RPM更多信息表头

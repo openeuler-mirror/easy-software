@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref, type PropType } from 'vue';
+import { ref } from 'vue';
 import { OLink, OIcon } from '@opensig/opendesign';
 import { checkOriginLink, windowOpen } from '@/utils/common';
 import { scrollToTop } from '@/utils/common';
@@ -7,11 +7,7 @@ import { useRoute } from 'vue-router';
 import { useTheme } from '@/composables/useTheme';
 import ExternalLink from '@/components/ExternalLink.vue';
 
-import type { MaintainerT } from '@/@types/app';
-import { GITEE } from '@/data/config';
-
-import IconEmail from '~icons/pkg/email.svg';
-import IconGitee from '~icons/pkg/gitee.svg';
+import defaultImg from '@/assets/default-logo.png';
 import IconOutlink from '~icons/pkg/icon-outlink.svg';
 import IconHelp from '~icons/pkg/icon-help.svg';
 
@@ -23,17 +19,6 @@ defineProps({
     type: Object,
     default: () => {
       return {};
-    },
-  },
-  maintainer: {
-    type: Object as PropType<MaintainerT>,
-    default: () => {
-      return {};
-    },
-  },
-  basicInfo: {
-    default: () => {
-      return '';
     },
   },
 });
@@ -70,7 +55,7 @@ const scrollToAnchor = () => {
 <template>
   <div class="domain-head">
     <div class="left">
-      <div class="cover" :style="{ 'background-image': `url(${isDark ? coverBgDark : coverBg})` }"><img :src="data.cover" alt="" /></div>
+      <div class="cover" :style="{ 'background-image': `url(${isDark ? coverBgDark : coverBg})` }"><img :src="data.cover || defaultImg" alt="" /></div>
       <div class="box">
         <p class="title">
           {{ data.name }}
@@ -79,28 +64,11 @@ const scrollToAnchor = () => {
             主页
           </OLink>
         </p>
-        <p v-if="basicInfo" class="detail">{{ basicInfo }}</p>
-        <OLink size="small" class="scroll-box" @click="scrollToAnchor('feed')">
+        <p v-if="data.description" class="detail">{{ data.description }}</p>
+        <OLink size="small" class="scroll-box" @click="scrollToAnchor()">
           <OIcon><IconHelp /></OIcon>我要反馈
         </OLink>
       </div>
-    </div>
-
-    <div class="right">
-      <p class="sp">维护者信息</p>
-      <p v-if="maintainer.maintainerId" class="title">维护者：{{ maintainer.maintainerId }}</p>
-      <p v-if="maintainer.maintainerEmail" class="text">
-        <a class="email" :href="`mailto:${maintainer.maintainerEmail}`">
-          <OIcon class="icon-img"><IconEmail /></OIcon>
-          <span>{{ maintainer.maintainerEmail }}</span>
-        </a>
-      </p>
-      <p v-if="maintainer.maintainerGiteeId" class="text">
-        <a class="gitee" @click="onExternalDialog(`${GITEE}/${maintainer.maintainerGiteeId}`)">
-          <OIcon class="icon-img"><IconGitee /></OIcon>
-          <span>{{ `${GITEE}/${maintainer.maintainerGiteeId}` }}</span>
-        </a>
-      </p>
     </div>
   </div>
   <!-- 跳转外部链接提示 -->
@@ -122,9 +90,6 @@ const scrollToAnchor = () => {
   display: flex;
   .left {
     display: flex;
-    width: 70%;
-    border-right: 1px solid var(--o-color-control4);
-    padding-right: 64px;
     .box {
       margin-left: 32px;
       flex: 1;
@@ -135,13 +100,11 @@ const scrollToAnchor = () => {
       font-weight: 500;
       color: var(--o-color-info1);
       display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
+      align-items: center;
     }
     .home-page {
       --link-icon-size: 16px;
-      min-width: 60px;
-      justify-content: flex-end;
+      margin-left: 16px;
       @include tip1;
     }
     :deep(.o-link) {
@@ -167,38 +130,6 @@ const scrollToAnchor = () => {
         height: 16px;
         margin-right: 4px;
       }
-    }
-  }
-  .right {
-    margin-left: 40px;
-    flex: 1;
-    img {
-      width: 24px;
-    }
-    .text {
-      margin-top: 8px;
-      @include text1;
-
-      a {
-        display: flex;
-        align-items: center;
-        .icon-img {
-          margin-right: 8px;
-          color: var(--o-color-info1);
-        }
-      }
-    }
-
-    .title {
-      @include text1;
-      color: var(--o-color-info2);
-      margin: 24px 0px 16px 0px;
-    }
-    .sp {
-      font-size: 22px;
-      line-height: 30px;
-      font-weight: 500;
-      color: var(--o-color-info1);
     }
   }
 

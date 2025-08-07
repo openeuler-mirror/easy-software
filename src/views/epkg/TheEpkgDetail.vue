@@ -1,23 +1,19 @@
 <script lang="ts" setup>
-import { ref, onMounted, provide } from 'vue';
-import { isString } from '@opensig/opendesign';
+import { ref, onMounted, provide, computed } from 'vue';
+import { isString, OTag } from '@opensig/opendesign';
 import { maintainerDefaults } from '@/data/query';
 import { useRoute } from 'vue-router';
-import { useMarkdown } from '@/composables/useMarkdown';
-import type { AppInfoT, MaintainerT, DetailItemT, MoreMessgeT } from '@/@types/app';
+import type { MaintainerT, DetailItemT, MoreMessgeT } from '@/@types/app';
 import { useI18n } from 'vue-i18n';
 import { getDetails, getVer } from '@/api/api-domain';
 import { useViewStore } from '@/stores/common';
 import AppFeedback from '@/components/AppFeedback.vue';
 import DetailHead from '@/components/detail/DetailHeader.vue';
 import DetailAside from '@/components/detail/DetailAside.vue';
-import DetailInstall from '@/components/detail/DetailInstall.vue';
 
-import defaultImg from '@/assets/default-logo.png';
 import { pkgIdInjection } from '@/data/injectionKeys';
 
 const route = useRoute();
-const { mkit } = useMarkdown();
 const { t } = useI18n();
 
 const basicInfo = ref<DetailItemT[]>([]);
@@ -26,22 +22,8 @@ const tabValue = ref('epkgpkg');
 const downloadData = ref('');
 const files = ref([]);
 const maintainer = ref<MaintainerT>({ maintainerId: '', maintainerEmail: '', maintainerGiteeId: '' });
-const upStream = ref();
-const security = ref();
 const moreMessge = ref<MoreMessgeT[]>([]);
-const description = ref();
-const appData = ref<AppInfoT>({
-  name: '',
-  cover: '',
-  license: '',
-  version: '',
-  repository: '',
-  size: '',
-  source_code: '',
-  bin_code: '',
-  security: '',
-});
-const srcRepo = ref('');
+const appData = ref({});
 
 const isLoading = ref(true);
 
@@ -51,7 +33,7 @@ const queryPkg = () => {
     getDetails(tabValue.value, pkgId.value)
       .then((res) => {
         const data = res.data.list[0];
-        srcRepo.value = data.srcRepo;
+        appData.value = data;
         getDetailValue(data);
         isLoading.value = false;
       })
@@ -74,12 +56,10 @@ if (isString(route.query?.pkgId)) {
 onMounted(() => {
   queryPkg();
 });
-const summary = ref();
 const tagVer = ref();
 const getDetailValue = (data: any) => {
   try {
     basicInfo.value = [
-      { name: t('detail.description'), value: data?.description },
       { name: t('detail.osSupport'), value: data.osSupport },
       { name: t('detail.arch'), value: data.arch },
       { name: t('detail.epkgCategory'), value: data.epkgCategory || '其他' },
@@ -90,7 +70,6 @@ const getDetailValue = (data: any) => {
     basicInfo.value = [];
   }
   files.value = JSON.parse(data?.files);
-  summary.value = data.summary;
 
   const newData = [
     { name: 'Requires', value: JSON.parse(data?.requires || []) },
@@ -104,7 +83,6 @@ const getDetailValue = (data: any) => {
     }
   });
 
-  appData.value.size = data.epkgSize;
   tagVer.value = [data.osSupport, data.arch];
 
   maintainer.value = {
@@ -113,19 +91,9 @@ const getDetailValue = (data: any) => {
     maintainerGiteeId: data?.maintainerGiteeId || maintainerDefaults.gitee_id,
   };
 
-  upStream.value = data?.upStream;
-  security.value = data?.securityLevel;
-  description.value = data?.description;
   downloadData.value = mkit(data?.download || '', { isCopy: true, Tag: data.appVer });
   installation.value = mkit(data?.installation || '', { isCopy: true, Tag: data.appVer });
-  appData.value.name = data.name;
-  appData.value.source_code = data.srcDownloadUrl;
-  appData.value.bin_code = data.binDownloadUrl;
-  appData.value.cover = data?.iconUrl || defaultImg;
-  appData.value.repository = data.srcRepo;
-  appData.value.version = data.version;
-  appData.value.license = data.license;
-  appData.value.security = data.security;
+
   queryVer();
 };
 
@@ -138,6 +106,37 @@ const queryVer = () => {
     });
   }
 };
+
+provide('BASE_INFO', basicInfo);
+
+// 安装指引
+const installTabs = computed(() => {
+  return [
+    {
+      name: '在线安装',
+      type: 'online',
+      tag: appData.value.appVer,
+      installation: appData.value.installation,
+    },
+    {
+      name: '下载安装',
+      type: 'download',
+      size: appData.value.rpmSize,
+      children: [
+        {
+          href: appData.value.binDownloadUrl,
+          type: 'binary',
+          label: '源码包下载',
+        },
+        {
+          href: appData.value.srcDownloadUrl,
+          type: 'source_code',
+          label: '二进制包下载',
+        },
+      ],
+    },
+  ];
+});
 </script>
 
 <template>
@@ -147,21 +146,18 @@ const queryVer = () => {
       <!-- 锚点 -->
       <AppBreadcrumb id="epkg" :name="appData.name" />
       <!-- 头部信息 -->
-      <DetailHead :data="appData" :basicInfo="summary" :maintainer="maintainer" />
+      <DetailHead :data="appData" />
 
       <div class="detail-row">
         <div class="detail-row-main">
-          <AppSection :title="`> ${t('detail.information')}`">
-            <template #append>
-              <span v-if="appData.version" class="ver">{{ t('detail.number') }}:{{ appData.version }}</span>
-            </template>
-            <!-- 基本信息 -->
-            <DetailBasicInfo :options="basicInfo" />
+          <AppSection>
+            <div v-if="appData.version" class="version-title">
+              <h2>{{ appData.version }}</h2>
+              <OTag color="success">最新版本</OTag>
+            </div>
+
             <!-- 安装指引 -->
-            <DetailInstall :title="`> ${t('detail.installation')}`">
-              <div v-if="downloadData" v-dompurify-html="downloadData" v-copy-code="true" class="markdown-body download"></div>
-              <div v-if="installation" v-dompurify-html="installation" v-copy-code="true" class="markdown-body installation"></div>
-            </DetailInstall>
+            <DetailInstall :title="`> ${t('detail.installation')}`" :options="installTabs" />
 
             <!-- 更多信息 -->
             <p class="sp">> {{ t('detail.more') }}</p>
