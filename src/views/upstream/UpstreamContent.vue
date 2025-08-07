@@ -405,6 +405,8 @@ const joinUrl = (item) => {
 
 :deep(.o-table) {
   --table-row-hover: transparent;
+  --table-head-cell-padding: 8px 16px;
+  --table-cell-padding: 8px 16px;
 
   .thead-th {
     display: flex;
