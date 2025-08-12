@@ -55,7 +55,7 @@ const scrollToAnchor = () => {
 <template>
   <div class="domain-head">
     <div class="left">
-      <div class="cover" :style="{ 'background-image': `url(${isDark ? coverBgDark : coverBg})` }"><img :src="data.cover || defaultImg" alt="" /></div>
+      <div class="cover" :style="{ 'background-image': `url(${isDark ? coverBgDark : coverBg})` }"><img :src="data.iconUrl || defaultImg" alt="" /></div>
       <div class="box">
         <p class="title">
           {{ data.name }}
