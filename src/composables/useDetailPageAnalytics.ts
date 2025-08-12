@@ -1,8 +1,8 @@
-import type { AppInfoT, DetailItemT } from '@/@types/app';
+import type { DetailItemT } from '@/@types/app';
 import { oaReport } from '@/shared/analytics';
 import { computed, unref, type Directive, type MaybeRef, type Ref } from 'vue';
 
-const useDetailPageAnalytics = (appData: Ref<AppInfoT>, basicInfo: Ref<DetailItemT[]>, tab?: MaybeRef<string>) => {
+const useDetailPageAnalytics = (appData: Ref<any>, basicInfo: Ref<DetailItemT[]>, tab?: MaybeRef<string>) => {
   const archAndOs = computed(() => ({
     architecture: basicInfo.value.find((item) => item.name === '架构')?.value,
     os_version: basicInfo.value.find((item) => item.name === '版本支持情况')?.value,

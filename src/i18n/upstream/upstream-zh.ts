@@ -4,4 +4,6 @@ export default {
   version: '上游最新版本',
   compatibility: '兼容版本',
   state: '状态',
+  type: '类型',
+  eulerOsVersion: 'openEuler版本',
 };

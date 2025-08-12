@@ -1,6 +1,6 @@
 @use '../mixin/font.scss' as *;
 .o-table {
-  --table-edge-padding: 24px;
+  --table-edge-padding: 16px;
   --table-cell-padding: 16px 10px;
   --table-head-cell-padding: 12px 10px;
   --table-head-bg: var(--o-color-control3-light);
@@ -34,7 +34,7 @@
   }
   &.o-table-small {
     --table-cell-height: auto;
-    --table-edge-padding: 24px;
+    --table-edge-padding: 16px;
     --table-cell-padding: 8px;
     --table-head-cell-padding: 8px;
     td,

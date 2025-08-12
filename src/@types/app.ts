@@ -29,9 +29,10 @@ export interface AppInfoT {
   version: string;
   repository: string;
   size: string | null;
-  source_code: string;
-  bin_code: string;
+  srcDownloadUrl: string;
+  binDownloadUrl: string;
   security?: string;
+  description?: string;
 }
 
 export interface MaintainerT {
@@ -66,4 +67,4 @@ export interface MoreMessgeItemT {
   epoch: string;
 }
 
-export type PkgTypeT = 'RPM' | 'IMAGE' | 'EPKG' | 'OEPKG';
+export type PkgTypeT = 'RPM' | 'IMAGE' | 'EPKG' | 'OEPKG' | 'CONDA';

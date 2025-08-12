@@ -1,20 +1,23 @@
 <script lang="ts" setup>
-import { OTable, useMessage, OButton, OTag, OIcon, OLink } from '@opensig/opendesign';
-import OCodeCopy from '@/components/OCodeCopy.vue';
+import { OTable, OTag, OIcon, OLink } from '@opensig/opendesign';
+
 import { ref, computed, watch, type PropType } from 'vue';
 import ExternalLink from '@/components/ExternalLink.vue';
 import MaintenanceDescription from '@/components/detail/MaintenanceDescription.vue';
-import { useClipboard } from '@/composables/useClipboard';
-import { getCode } from '@/utils/common';
+import DetailBasicInfo from '@/components/detail/DetailBasicInfo.vue';
+import { checkOriginLink, windowOpen } from '@/utils/common';
+import type { MaintainerT } from '@/@types/app';
 import { verColumns } from '@/data/detail/index';
-import IconCopy from '~icons/app/icon-copy.svg';
 import { useLocale } from '@/composables/useLocale';
 import type { PkgTypeT } from '@/@types/app';
 import { useI18n } from 'vue-i18n';
+import { GITEE } from '@/data/config';
 
 import IconChevronDown from '~icons/app/icon-chevron-down.svg';
 import IconState from '~icons/pkg/icon-state.svg';
 import IconLevel from '~icons/pkg/icon-level.svg';
+import IconEmail from '~icons/pkg/email.svg';
+import IconGitee from '~icons/pkg/gitee.svg';
 
 interface EulerverT {
   pkgId: string;
@@ -35,11 +38,6 @@ const props = defineProps({
       return 'RPM';
     },
   },
-  downloadData: {
-    default: () => {
-      return '';
-    },
-  },
   verData: {
     type: Array as PropType<EulerverT[]>,
     default: () => {
@@ -51,95 +49,24 @@ const props = defineProps({
       return [];
     },
   },
+  maintainer: {
+    type: Object as PropType<MaintainerT>,
+    default: () => {
+      return {};
+    },
+  },
 });
 const { t } = useI18n();
 
-const emit = defineEmits<{
-  (event: 'reportAnalytics', data: Record<string, any>): void;
-}>();
-
-const tableData = ref([
-  {
-    name: '二进制包下载',
-    download: computed(() => props.data.bin_code),
-  },
-  {
-    name: '源码包下载',
-    download: computed(() => props.data.source_code),
-  },
-]);
 const showExternalDlg = ref(false);
 const externalLink = ref('');
 const onExternalDialog = (href: string) => {
   externalLink.value = href;
-
-  collectDownloadData(href === props.data.bin_code ? 'binary' : 'source_code');
-  showExternalDlg.value = true;
-};
-const show = ref(true);
-const showTable = () => {
-  if (!props.data.bin_code && !props.data.source_code) {
-    tableData.value = [];
-    show.value = false;
-  } else if (!props.data.bin_code) {
-    tableData.value = [
-      {
-        name: '源码包下载',
-        download: computed(() => props.data.source_code),
-      },
-    ];
-    show.value = true;
-  } else if (!props.data.source_code) {
-    tableData.value = [
-      {
-        name: '二进制包下载',
-        download: computed(() => props.data.bin_code),
-      },
-    ];
-    show.value = true;
+  if (checkOriginLink(href)) {
+    windowOpen(href, '_blank');
   } else {
-    tableData.value = [
-      {
-        name: '二进制包下载',
-        download: computed(() => props.data.bin_code),
-      },
-      {
-        name: '源码包下载',
-        download: computed(() => props.data.source_code),
-      },
-    ];
-    show.value = true;
+    showExternalDlg.value = true;
   }
-};
-watch(
-  () => props.data.bin_code,
-  () => showTable()
-);
-showTable();
-
-const message = useMessage();
-const copyText = (e: MouseEvent, val: any) => {
-  useClipboard({
-    text: val,
-    target: e,
-    success: () => {
-      collectDownloadData(val === props.data.bin_code ? 'binary' : 'source_code', true);
-      message.success({
-        content: '复制成功',
-      });
-    },
-  });
-};
-
-// ---------------------下载埋点--------------------
-const collectDownloadData = (download_type?: 'binary' | 'source_code' | null, isCopy?: boolean) => {
-  const data: Record<string, string> = {
-    type: isCopy ? 'copy_url' : 'download',
-  };
-  if (download_type) {
-    data.download_type = download_type;
-  }
-  emit('reportAnalytics', data);
 };
 
 // ---------------------版本支持情况--------------------
@@ -149,6 +76,7 @@ interface ColumnT {
   key: string;
   label: string;
 }
+
 //版本支持情况合并单元格
 const arraySpanMethod = (rowIndex: number, colIdx: number, row: EulerverT, column: ColumnT) => {
   const fields = ['os'];
@@ -208,11 +136,6 @@ watch(
   }
 );
 
-// 应用镜像埋点
-const onCodeSuccess = () => {
-  collectDownloadData(null, true);
-};
-
 const isSecurityShow = ref(false);
 // 是否显示图标
 const isSecurityIconShow = (v: string) => {
@@ -221,20 +144,29 @@ const isSecurityIconShow = (v: string) => {
 </script>
 
 <template>
-  <AppSection :title="type === 'IMAGE' ? '获取应用镜像' : `${type}下载安装`" v-if="type === 'IMAGE' || data.size !== 0">
-    <div class="detail">
-      <p class="title" v-if="type !== 'IMAGE'">软件包大小：{{ data.size }}</p>
-    </div>
-    <OCodeCopy :code="getCode(downloadData)" v-if="type === 'IMAGE' && downloadData" @success="onCodeSuccess" />
-    <div v-if="type !== 'IMAGE' && show">
-      <div v-for="item in tableData" :key="item.name" class="bt">
-        <OButton variant="solid" class="obtn" size="large" @click="onExternalDialog(item.download)">{{ item.name }}</OButton>
-        <p @click="copyText($event, item.download)" class="copy-icon">
-          <OIcon><IconCopy /></OIcon>
-        </p>
-      </div>
+  <!-- 维护者信息 -->
+  <AppSection title="维护者信息">
+    <div class="maintainer-box">
+      <p v-if="maintainer.maintainerId" class="title">维护者：{{ maintainer.maintainerId }}</p>
+      <p v-if="maintainer.maintainerEmail" class="text">
+        <a class="email" :href="`mailto:${maintainer.maintainerEmail}`">
+          <OIcon class="icon-img"><IconEmail /></OIcon>
+          <span>{{ maintainer.maintainerEmail }}</span>
+        </a>
+      </p>
+      <p v-if="maintainer.maintainerGiteeId" class="text">
+        <a class="gitee" @click="onExternalDialog(`${GITEE}/${maintainer.maintainerGiteeId}`)">
+          <OIcon class="icon-img"><IconGitee /></OIcon>
+          <span>{{ `${GITEE}/${maintainer.maintainerGiteeId}` }}</span>
+        </a>
+      </p>
     </div>
   </AppSection>
+  <!-- 软件合规 -->
+  <AppSection title="基础信息">
+    <DetailBasicInfo />
+  </AppSection>
+  <!-- 软件分级 -->
   <AppSection title="软件分级" v-if="data.security">
     <template #append>
       <div @click="isSecurityShow = true" class="security-info">
@@ -249,13 +181,15 @@ const isSecurityIconShow = (v: string) => {
     </div>
     <MaintenanceDescription v-if="isSecurityShow" @change="isSecurityShow = false" />
   </AppSection>
+  <!-- 软件合规 -->
   <AppSection title="软件合规" v-if="data.license">
     <div class="license">
       <p>License</p>
       <p>{{ data.license }}</p>
     </div>
   </AppSection>
-  <AppSection v-if="verData.length > 0" :title="`${data.name}版本支持情况`">
+  <!-- 版本支持情况 -->
+  <AppSection v-if="verData.length > 0 && type !== 'IMAGE'" :line="false" :title="`${data.name}版本支持情况`">
     <OTable class="table-versions" :columns="verColumns" :data="tableAllData" border="all" :cell-span="arraySpanMethod" :small="true">
       <template #td_flags="{ row }">
         <a :href="jumpTo(row.pkgId)" color="primary" rel="noopener noreferrer">
@@ -276,11 +210,30 @@ const isSecurityIconShow = (v: string) => {
       </OLink>
     </p>
   </AppSection>
-
+  <!-- 外链确认 -->
   <ExternalLink v-if="showExternalDlg" :href="externalLink" @change="showExternalDlg = false" />
 </template>
 
 <style lang="scss" scoped>
+.maintainer-box {
+  p {
+    display: flex;
+    align-items: center;
+    color: var(--o-color-info1);
+  }
+  .title {
+    margin-bottom: 16px;
+  }
+  .text {
+    margin-top: 8px;
+    a {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+  }
+}
+
 .level-info {
   display: flex;
   align-items: center;
@@ -308,7 +261,7 @@ const isSecurityIconShow = (v: string) => {
   }
 }
 .app-section {
-  padding: 32px 40px;
+  padding: 32px;
 }
 .view-all {
   text-align: center;
@@ -356,8 +309,6 @@ const isSecurityIconShow = (v: string) => {
   }
 }
 .license {
-  border-top: 1px solid var(--o-color-control4);
-  padding-top: 25px;
   width: 100%;
   display: flex;
   justify-content: space-between;
@@ -380,17 +331,6 @@ const isSecurityIconShow = (v: string) => {
   }
   th {
     font-weight: 500;
-  }
-}
-
-.obtn {
-  border-radius: 4px;
-  background: var(--o-color-control2-light);
-  border: none;
-  transition: none;
-  --btn-color: var(--o-color-info1);
-  &:hover {
-    background: var(--o-color-control3-light);
   }
 }
 </style>

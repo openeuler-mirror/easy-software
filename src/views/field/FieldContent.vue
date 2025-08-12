@@ -66,6 +66,7 @@ const queryAllpkg = () => {
   };
   // 过滤空参数
   const newData = getParamsRules(params);
+  console.log(newData);
   getSearchAllFiled(newData)
     .then((res) => {
       pkgData.value = res.data.list;
@@ -224,8 +225,9 @@ const init = () => {
   searchKey.value = routeKey.value;
   keywordType.value = routeType.value;
   tabName.value = routeName.value;
-  searchOs.value = routeOs.value.length ? routeOs.value : searchOs.value;
-  searchArch.value = routeArch.value.length ? routeArch.value : searchArch.value;
+  searchOs.value = routeOs.value.length ? routeOs.value.join('') : searchOs.value;
+
+  searchArch.value = routeArch.value.length ? routeArch.value.join('') : searchArch.value;
   searchCategory.value = routeCategory.value.length ? routeCategory.value : searchCategory.value;
 };
 

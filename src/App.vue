@@ -11,7 +11,7 @@ import { useLocale } from '@/composables/useLocale';
 
 import AppHeader from '@/components/header/AppHeader.vue';
 import AppFooter from '@/components/AppFooter.vue';
-import GlobalFeedback from './components/GlobalFeedback.vue';
+import GlobalFeedback from '@/components/globalFeedback/GlobalFeedback.vue';
 import CookieNotice from './components/CookieNotice.vue';
 
 const langStore = useLangStore();

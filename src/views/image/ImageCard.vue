@@ -1,12 +1,13 @@
 <script lang="ts" setup>
 import { type PropType, ref, onMounted } from 'vue';
-import { OCard, OTag } from '@opensig/opendesign';
+import { OCard, OTag, OIcon } from '@opensig/opendesign';
 import type { AppItemT, PkgIdsT } from '@/@types/app';
 import { useRoute } from 'vue-router';
 import { useTheme } from '@/composables/useTheme';
 
 import defaultImg from '@/assets/default-logo.png';
 import { oaReport, searchReport } from '@/shared/analytics';
+import IconCategory from '~icons/pkg/icon-category.svg';
 
 const props = defineProps({
   data: {
@@ -108,11 +109,11 @@ const onClickLink = (event: MouseEvent) => {
         <div class="pkg-icon"><img :src="data.iconUrl || defaultImg" class="icon" :class="{ 'default-img': !data.iconUrl }" /></div>
       </div>
       <div class="pkg-box">
-        <p v-if="data.imageTags" v-dompurify-html="data.imageTags" class="desc" :class="{ dark: isDark }"></p>
         <p v-if="data.description" v-dompurify-html="data.description" class="desc" :class="{ dark: isDark }"></p>
-        <p v-if="data.category" class="category"><span class="label">领域</span>{{ data.category }}</p>
-        <p v-if="data.arch" class="arch">
-          <span class="label">架构</span><OTag variant="outline">{{ data.arch }}</OTag>
+        <p v-if="data.category" class="category">
+          <OTag variant="outline">
+            <OIcon><IconCategory /></OIcon>{{ data.category }}
+          </OTag>
         </p>
       </div>
     </template>
@@ -166,17 +167,25 @@ const onClickLink = (event: MouseEvent) => {
     justify-content: space-between;
     .desc {
       margin-bottom: 12px;
+      -webkit-line-clamp: 3;
+      height: 72px;
     }
-    .category,
-    .arch {
+    .category {
       margin-top: 6px;
       color: var(--o-color-info2);
-      display: flex;
-      align-items: center;
+
       @include tip1;
-      .label {
-        width: 60px;
-        color: var(--o-color-info3);
+      .o-tag-label {
+        display: flex;
+        align-items: center;
+        .o-icon {
+          font-size: 16px;
+          margin-right: 4px;
+          svg {
+            width: 16px;
+            height: 16px;
+          }
+        }
       }
     }
   }
