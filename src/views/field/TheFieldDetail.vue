@@ -46,7 +46,7 @@ const moreMessge = ref<MoreMessgeT[]>([]);
 
 const appData = ref<AppInfoT>({
   name: '',
-  cover: '',
+  iconUrl: '',
   license: '',
   version: '',
   repository: '',
@@ -276,7 +276,7 @@ const getDetailValue = (data: any) => {
   appData.value.name = data.name;
   appData.value.srcDownloadUrl = data.srcDownloadUrl;
   appData.value.binDownloadUrl = data.binDownloadUrl;
-  appData.value.cover = data?.iconUrl || defaultImg;
+  appData.value.iconUrl = data?.iconUrl || defaultImg;
   appData.value.repository = data.srcRepo;
   appData.value.license = data.license;
   appData.value.security = data.security;
