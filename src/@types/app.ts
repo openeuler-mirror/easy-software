@@ -24,7 +24,7 @@ export interface AppT {
 
 export interface AppInfoT {
   name: string;
-  cover: string;
+  iconUrl: string;
   license: string;
   version: string;
   repository: string;
