@@ -84,7 +84,7 @@ const getDetailValue = (data: any) => {
   maintainer.value = {
     maintainerId: data?.maintainerId || maintainerDefaults.name,
     maintainerEmail: data?.maintainerEmail || maintainerDefaults.email,
-    maintainerGiteeId: data?.maintainerGiteeId || maintainerDefaults.gitee_id,
+    maintainerGiteeId: data?.maintainerGiteeId || maintainerDefaults.id,
   };
 
   if (data.name) {

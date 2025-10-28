@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { ref } from 'vue';
 import { OTextarea, useMessage, OIcon, OButton, ODivider, OPopover } from '@opensig/opendesign';
-import { GITEE } from '@/data/config';
+import { ATOMGIT } from '@/data/config';
 import { useI18n } from 'vue-i18n';
 import { OPENEULER_FORUM } from '@/data/config';
 import { postFeedback } from '@/api/api-feedback';
@@ -140,7 +140,7 @@ const issueUrl = ref();
 
 const getIssueUrl = () => {
   const desc = encodeURIComponent(getIssueTemplate());
-  issueUrl.value = `${GITEE}/openeuler/easy-software/issues/new?issue%5Bassignee_id%5D=0&issue%5Bmilestone_id%5D=0&title=【EasySoftware】【${props.type}】${props.name}-${props.version}&description=${desc}`;
+  issueUrl.value = `${ATOMGIT}/openeuler/easy-software/issues/new?issue%5Bassignee_id%5D=0&issue%5Bmilestone_id%5D=0&title=【EasySoftware】【${props.type}】${props.name}-${props.version}&body=${desc}`;
 };
 
 let clearDataAfterJump = false;
@@ -246,7 +246,7 @@ const onChangeHistoryCategory = (val: string) => {
   margin-bottom: 0;
 }
 .rate-box {
-  padding-bottom: 20px
+  padding-bottom: 20px;
 }
 .popover-content {
   @include text1;

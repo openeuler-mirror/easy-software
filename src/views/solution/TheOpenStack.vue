@@ -6,7 +6,7 @@ import ContentWrapper from '@/components/ContentWrapper.vue';
 import ExternalLink from '@/components/ExternalLink.vue';
 import bannerImg from '@/assets/banner/banner1.jpg';
 import OpenStack from '@/data/solution/openstack';
-import { GITEE, OPENEULER } from '@/data/config';
+import { ATOMGIT, OPENEULER } from '@/data/config';
 import { checkOriginLink, windowOpen } from '@/utils/common';
 import { useTheme } from '@/composables/useTheme';
 
@@ -26,15 +26,15 @@ const solutionInfo = {
 const advTxt = [
   {
     name: '如流量分散特性',
-    href: `${GITEE}/openeuler/openstack/blob/master/docs/spec/distributed-traffic.md`,
+    href: `${ATOMGIT}/openeuler/openstack/blob/master/docs/spec/distributed-traffic.md`,
   },
   {
     name: '支持generic vDPA',
-    href: `${GITEE}/openeuler/openstack-plugin/tree/train/`,
+    href: `${ATOMGIT}/openeuler/openstack-plugin/tree/train/`,
   },
   {
     name: 'gostone',
-    href: `${GITEE}/openeuler/gostone`,
+    href: `${ATOMGIT}/openeuler/gostone`,
   },
 ];
 

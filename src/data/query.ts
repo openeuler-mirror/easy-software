@@ -59,7 +59,7 @@ export const COUNT_PAGESIZE_FIELD = [12, 24, 48, 96];
 export const maintainerDefaults = {
   name: 'George.Cao',
   email: 'caozhi1214@qq.com',
-  gitee_id: 'georgecao',
+  id: 'georgecao',
 };
 
 // 协作平台权限 route name

@@ -3,7 +3,7 @@ import { ref, onMounted } from 'vue';
 import { OLink } from '@opensig/opendesign';
 import { useRoute } from 'vue-router';
 import { useI18n } from 'vue-i18n';
-import { GITEE } from '@/data/config';
+import { ATOMGIT } from '@/data/config';
 import ExternalLink from '@/components/ExternalLink.vue';
 import Error404Result from '@/components/Error404Result.vue';
 
@@ -31,7 +31,7 @@ const getIssueTemplate = () => {
 const issueUrl = ref();
 const getIssueUrl = () => {
   const desc = encodeURIComponent(getIssueTemplate());
-  issueUrl.value = `${GITEE}/openeuler/easy-software/issues/new?issue%5Bassignee_id%5D=0&issue%5Bmilestone_id%5D=0&title=【搜索】-${props.type}-${searchVal.value}&description=${desc}`;
+  issueUrl.value = `${ATOMGIT}/openeuler/easy-software/issues/new?issue%5Bassignee_id%5D=0&issue%5Bmilestone_id%5D=0&title=【搜索】-${props.type}-${searchVal.value}&body=${desc}`;
 };
 
 const showExternalDlg = ref(false);

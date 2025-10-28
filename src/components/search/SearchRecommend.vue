@@ -5,7 +5,7 @@ import type { RecommendItemT } from '@/@types/search';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
 import { getTagsIcon, xssAllTag, getPkgName } from '@/utils/common';
-import { GITEE } from '@/data/config';
+import { ATOMGIT } from '@/data/config';
 import ExternalLink from '@/components/ExternalLink.vue';
 
 import { useLocale } from '@/composables/useLocale';
@@ -104,7 +104,7 @@ const issueUrl = ref();
 
 const getIssueUrl = () => {
   const desc = encodeURIComponent(getIssueTemplate());
-  issueUrl.value = `${GITEE}/openeuler/easy-software/issues/new?issue%5Bassignee_id%5D=0&issue%5Bmilestone_id%5D=0&title=【搜索】-${props.searchValue}&description=${desc}`;
+  issueUrl.value = `${ATOMGIT}/openeuler/easy-software/issues/new?issue%5Bassignee_id%5D=0&issue%5Bmilestone_id%5D=0&title=【搜索】-${props.searchValue}&body=${desc}`;
 };
 
 const showExternalDlg = ref(false);

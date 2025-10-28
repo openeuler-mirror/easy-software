@@ -11,7 +11,7 @@ import { verColumns } from '@/data/detail/index';
 import { useLocale } from '@/composables/useLocale';
 import type { PkgTypeT } from '@/@types/app';
 import { useI18n } from 'vue-i18n';
-import { GITEE } from '@/data/config';
+import { ATOMGIT, GITEE } from '@/data/config';
 
 import IconChevronDown from '~icons/app/icon-chevron-down.svg';
 import IconState from '~icons/pkg/icon-state.svg';
@@ -155,7 +155,7 @@ const isSecurityIconShow = (v: string) => {
         </a>
       </p>
       <p v-if="maintainer.maintainerGiteeId" class="text">
-        <a class="gitee" @click="onExternalDialog(`${GITEE}/${maintainer.maintainerGiteeId}`)">
+        <a class="warehouse" @click="onExternalDialog(`${GITEE}/${maintainer.maintainerGiteeId}`)">
           <OIcon class="icon-img"><IconGitee /></OIcon>
           <span>{{ `${GITEE}/${maintainer.maintainerGiteeId}` }}</span>
         </a>
