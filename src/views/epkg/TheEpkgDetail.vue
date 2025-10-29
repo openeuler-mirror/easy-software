@@ -124,13 +124,13 @@ const installTabs = computed(() => {
       size: appData.value.rpmSize,
       children: [
         {
-          href: appData.value.binDownloadUrl,
-          type: 'binary',
+          href: appData.value.srcDownloadUrl,
+          type: 'source_code',
           label: '源码包下载',
         },
         {
-          href: appData.value.srcDownloadUrl,
-          type: 'source_code',
+          href: appData.value.binDownloadUrl,
+          type: 'binary',
           label: '二进制包下载',
         },
       ],
