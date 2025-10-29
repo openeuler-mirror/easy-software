@@ -226,6 +226,8 @@ const getDetailValue = (data: any) => {
       { name: '所属仓库', value: JSON.parse(data?.repo).url, type: JSON.parse(data?.repo).type },
       { name: 'Repo源', value: JSON.parse(data?.repoType).url, type: JSON.parse(data?.repoType).type },
     ];
+
+    appData.value.size = data.rpmSize || 0;
   } else if (typePkg.value === 'EPKG') {
     basicInfo.value = [
       { name: '版本支持情况', value: data.osSupport },
@@ -234,12 +236,14 @@ const getDetailValue = (data: any) => {
       { name: '所属仓库', value: JSON.parse(data?.repo).url, type: JSON.parse(data?.repo).type },
       { name: 'Repo源', value: JSON.parse(data?.repoType).url, type: JSON.parse(data?.repoType).type },
     ];
+    appData.value.size = data.size || 0;
   } else if (typePkg.value === 'OEPKG') {
     basicInfo.value = [
       { name: '版本支持情况', value: data.osSupport },
       { name: '架构', value: data.arch },
       { name: '软件包分类', value: data.category || '其他' },
     ];
+    appData.value.size = data.rpmSize || 0;
   } else if (typePkg.value === 'IMAGE') {
     basicInfo.value = [
       { name: '版本支持情况', value: data.osSupport },
@@ -375,7 +379,7 @@ provide('BASE_INFO', basicInfo);
 
 // 安装指引
 const installTabs = computed(() => {
-  return [
+  let options = [
     {
       name: '在线安装',
       type: 'online',
@@ -385,21 +389,27 @@ const installTabs = computed(() => {
     {
       name: '下载安装',
       type: 'download',
-      size: appData.value.rpmSize,
+      size: appData.value.size,
       children: [
-        {
-          href: appData.value.binDownloadUrl,
-          type: 'binary',
-          label: '源码包下载',
-        },
         {
           href: appData.value.srcDownloadUrl,
           type: 'source_code',
+          label: '源码包下载',
+        },
+        {
+          href: appData.value.binDownloadUrl,
+          type: 'binary',
           label: '二进制包下载',
         },
       ],
     },
   ];
+
+  if (typePkg.value === 'CONDA') {
+    options.splice(1, 1);
+  }
+
+  return options;
 });
 </script>
 <template>

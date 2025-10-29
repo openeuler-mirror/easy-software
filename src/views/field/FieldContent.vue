@@ -66,7 +66,6 @@ const queryAllpkg = () => {
   };
   // 过滤空参数
   const newData = getParamsRules(params);
-  console.log(newData);
   getSearchAllFiled(newData)
     .then((res) => {
       pkgData.value = res.data.list;
