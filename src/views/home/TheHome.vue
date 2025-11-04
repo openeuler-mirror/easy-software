@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { OAnchor, OAnchorItem, OCard } from '@opensig/opendesign';
+import { OAnchor, OAnchorItem, OCard, ORow, OCol } from '@opensig/opendesign';
 import { ref, onMounted, onUnmounted } from 'vue';
 import { getSearchAllFiled } from '@/api/api-domain';
 import type { AppT } from '@/@types/app';
@@ -45,9 +45,9 @@ const onScroll = (e: Event) => {
   const targetDom = document.querySelector('#all');
 
   if (scrollTop >= (targetDom as HTMLElement)?.offsetTop) {
-    headDom.classList.add('search-show');
+    headDom?.classList.add('search-show');
   } else {
-    headDom.classList.remove('search-show');
+    headDom?.classList.remove('search-show');
   }
 };
 
@@ -57,7 +57,9 @@ onMounted(() => {
 });
 
 onUnmounted(() => {
-  headDom.classList.remove('search-show');
+  if (headDom) {
+    headDom.classList.remove('search-show');
+  }
   oscrollDom?.removeEventListener('scroll', onScroll);
 });
 </script>
@@ -91,19 +93,12 @@ onUnmounted(() => {
               <h2>解决方案</h2>
               <p class="text">通过提供一系列软件工具和技术方案，提供高效、稳定和可扩展的软件产品和服务</p>
             </div>
-            <div class="solution-content">
-              <OCard
-                v-for="item in solutionData"
-                :key="item.title"
-                class="solution-item"
-                :href="`/${locale}` + item.href"
-                :cover="item.img"
-                :cover-ratio="1 / 1"
-                :title="item.title"
-                :detail="item.desc"
-                layout="h"
-              />
-            </div>
+
+            <ORow gap="32px" flex-wrap="wrap">
+              <OCol v-for="item in solutionData" :key="item.title" flex="0 1 33%" :laptop="{ flex: '0 1 33%' }">
+                <OCard class="solution-item" :href="`/${locale}` + item.href" :cover="item.img" :title="item.title" :detail="item.desc" />
+              </OCol>
+            </ORow>
           </div>
 
           <div id="version" class="domain-news">
@@ -160,22 +155,21 @@ onUnmounted(() => {
 .domain-news {
   margin-top: 64px;
 }
-.solution-content {
-  display: flex;
-  justify-content: space-between;
-  .solution-item {
-    height: 260px;
-    flex: 1;
-    &:hover {
-      h3 {
-        color: var(--o-color-primary1);
-      }
-    }
-    --card-h-cover-width: 260px;
-    --card-main-padding: 40px 32px;
+
+:deep(.o-card.solution-item) {
+  --card-footer-gap: 16px;
+  .o-card-cover {
+    --card-cover-padding: 0;
   }
-  .solution-item + .solution-item {
-    margin-left: 32px;
+  &:hover {
+    .o-card-title {
+      color: var(--o-color-primary1);
+    }
+  }
+  .o-figure {
+    img {
+      height: 270px;
+    }
   }
 }
 </style>
