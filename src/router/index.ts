@@ -142,6 +142,14 @@ const routes = [
     },
   },
   {
+    path: '/zh/solution/opea',
+    name: 'opea',
+    component: () => import('@/views/solution/TheOPEA.vue'),
+    meta: {
+      title: `OPEA | ${TITLE}`,
+    },
+  },
+  {
     path: '/zh/solution/openhpc',
     name: 'openhpc',
     component: () => import('@/views/solution/TheOpenHPC.vue'),

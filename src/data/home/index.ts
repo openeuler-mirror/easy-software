@@ -6,8 +6,9 @@ import RpmIcon from '~icons/pkg/rpm.svg';
 import OepkgIcon from '~icons/pkg/oepkg.svg';
 import CandaIcon from '~icons/pkg/conda.svg';
 
-import openHPC from '@/assets/home/openHPC.png';
-import openStack from '@/assets/home/openstack.png';
+import openHPC from '@/assets/home/openHPC.jpg';
+import openStack from '@/assets/home/openstack.jpg';
+import opea from '@/assets/home/opea.jpg';
 import newsImg1 from '@/assets/home/news1.png';
 import newsImg2 from '@/assets/home/news2.png';
 import newsImg3 from '@/assets/home/1120-cv.jpg';
@@ -53,18 +54,22 @@ export const homeData = [
 // 首页 解决方案
 export const solutionData = [
   {
-    title: 'OpenStack',
-    desc: '作为一个开源的云计算管理平台，OpenStack 由nova、cinder、neutron、glance、keystone、horizon等几个主要的组件组合起来完成具体工作',
-
-    img: openStack,
-    href: '/solution/openStack',
+    title: 'OPEA',
+    desc: 'OPEA是一个开源的生成式AI解决方案，提供了一系列涵盖基础模型服务、数据处理与增强、应用专用服务等各方面的微服务模块',
+    img: opea,
+    href: '/solution/opea',
   },
   {
     title: 'OpenHPC',
     desc: 'OpenHPC是Linux基金会开源的超算项目，致力于为高性能计算（HPC）构建一个开源框架，以适应现在工业和学术研究的需求',
-
     img: openHPC,
     href: '/solution/openhpc',
+  },
+  {
+    title: 'OpenStack',
+    desc: '作为一个开源的云计算管理平台，OpenStack 由nova、cinder、neutron、glance、keystone、horizon等几个主要的组件组合起来完成具体工作',
+    img: openStack,
+    href: '/solution/openStack',
   },
 ];
 
