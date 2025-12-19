@@ -20,6 +20,7 @@ import IconState from '~icons/pkg/icon-state.svg';
 import IconSetting from '~icons/app/icon-settings.svg';
 import IconHelp from '~icons/app/icon-help.svg';
 import FilterableTableHeader from '@/components/FilterableTableHeader.vue';
+import { ATOMGIT } from '@/data/config';
 
 /**
  * isDefault 是否是默认字段
@@ -128,7 +129,7 @@ const onFilterChange = (filterKey: string, val: (string | number)[] | string | n
   }
 };
 
-const SRCOPENEULER = 'https://gitee.com/src-openeuler/';
+const SRCOPENEULER = `${ATOMGIT}/src-openeuler/`;
 
 const userInfoStore = useUserInfoStore();
 const isMainPer = computed(() => userInfoStore.platformMaintainerPermission);
@@ -200,7 +201,7 @@ const changeFeedback = (v: string) => {
     repoValue.value = v;
   } else {
     message.warning({
-      content: '请绑定您的Gitee ID',
+      content: '请绑定您的AtomGit ID',
     });
   }
 };

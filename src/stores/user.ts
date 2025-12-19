@@ -21,7 +21,7 @@ export const useUserInfoStore = defineStore('userInfo', {
   getters: {
     // 获取giteeID
     getGiteeId(status): string {
-      const id = status.identities.find((id) => id.identity === 'gitee');
+      const id = status.identities.find((id) => id.identity === 'gitcode' || id.identity === 'atomgit' || id.identity === 'gitee');
       return id ? id.login_name : '';
     },
   },

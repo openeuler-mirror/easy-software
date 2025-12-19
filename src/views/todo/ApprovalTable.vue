@@ -143,7 +143,7 @@ const revoke = () => {
                   <template #target>
                     <OIcon class="maintainer-icon"><IconHelp /></OIcon>
                   </template>
-                  <div class="box">展示Gitee ID 不是openEuler用户名</div>
+                  <div class="box">展示AtomGit ID 不是openEuler用户名</div>
                 </OPopover>
               </div>
             </template>
