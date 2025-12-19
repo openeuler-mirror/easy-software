@@ -12,6 +12,7 @@ export const OPENEULER = import.meta.env.VITE_MAIN_DOMAIN_URL;
 export const OPENATOM = 'https://openatom.cn';
 export const OPENEULER_CONTACT = 'contact@openeuler.io';
 export const GITEE = 'https://gitee.com';
+export const ATOMGIT = 'https://atomgit.com';
 export const GITHUB = 'https://github.com';
 export const HIASCEND = 'https://www.hiascend.com';
 export const OPENEULER_FORUM = 'https://forum.openeuler.org';
