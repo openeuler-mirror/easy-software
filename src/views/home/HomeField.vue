@@ -6,7 +6,6 @@ import { useRouter } from 'vue-router';
 import { useLocale } from '@/composables/useLocale';
 
 import IconChevronDown from '~icons/app/icon-chevron-right.svg';
-import { oaReport } from '@/shared/analytics';
 
 defineProps({
   data: {
@@ -19,7 +18,7 @@ defineProps({
 const router = useRouter();
 const { locale } = useLocale();
 const jumpTo = (name: string) => {
-  oaReport('click', {
+  (window as any).__OA_REPORT__?.('click', {
     module: 'home_page',
     type: 'more',
     level1: '领域应用',

@@ -29,7 +29,6 @@ import IconHelp from '~icons/app/icon-question.svg';
 import IconSmile from '~icons/app/icon-smile.svg';
 import { useRoute } from 'vue-router';
 import { createReusableTemplate, onClickOutside, useDebounceFn } from '@vueuse/core';
-import { oaReport } from '@/shared/analytics';
 import ScoreSlider from './ScoreSlider.vue';
 
 const FEEDBACK_REGEXP = /(.*?)4. 【用户名】.*$/;
@@ -74,7 +73,7 @@ const placeholder = computed(() => {
 });
 
 const reportAnalytics = (data: Record<string, any>, event = 'click') => {
-  oaReport(event, {
+  (window as any).__OA_REPORT__?.(event, {
     module: 'global_feedback',
     tab: route.name,
     ...data,

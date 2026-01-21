@@ -6,7 +6,6 @@ import { useRoute } from 'vue-router';
 import { useTheme } from '@/composables/useTheme';
 
 import defaultImg from '@/assets/default-logo.png';
-import { oaReport, searchReport } from '@/shared/analytics';
 import IconCategory from '~icons/pkg/icon-category.svg';
 
 const props = defineProps({
@@ -41,7 +40,7 @@ const reportAnalytics = (data: Record<string, any>, event = 'click') => {
     module = 'image';
   }
   if (isPageSearch.value) {
-    searchReport(
+    (window as any).__OA_REPORT__?.(
       event,
       {
         module,
@@ -51,11 +50,12 @@ const reportAnalytics = (data: Record<string, any>, event = 'click') => {
         architecture: props.data.arch,
         ...data,
       },
+      'search-software',
       { immediate: true }
     );
     return;
   }
-  oaReport(
+  (window as any).__OA_REPORT__?.(
     event,
     {
       module,
