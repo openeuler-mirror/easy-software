@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { watch } from 'vue';
+import { nextTick, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { RouterView } from 'vue-router';
+import { RouterView, useRoute } from 'vue-router';
 import { OScroller, OConfigProvider } from '@opensig/opendesign';
+import { OPlusConfigProvider, OCookieNotice } from '@opendesign-plus/components';
 import zhCN from '@opensig/opendesign/es/locale/lang/zh-cn';
 import enUS from '@opensig/opendesign/es/locale/lang/en-us';
 
@@ -12,7 +13,6 @@ import { useLocale } from '@/composables/useLocale';
 import AppHeader from '@/components/header/AppHeader.vue';
 import AppFooter from '@/components/AppFooter.vue';
 import GlobalFeedback from '@/components/globalFeedback/GlobalFeedback.vue';
-import CookieNotice from './components/CookieNotice.vue';
 
 const langStore = useLangStore();
 const viewState = useViewStore();
@@ -26,6 +26,18 @@ watch(
 
 // -------------------- 组件国际化 --------------------
 const { isZh } = useLocale();
+
+const cookieNoticeVisible = ref(false);
+const cookieRef = ref();
+const MAIN_URL = import.meta.env.VITE_MAIN_DOMAIN_URL;
+const route = useRoute();
+watch(
+  () => route.path,
+  async () => {
+    await nextTick();
+    cookieRef.value?.check();
+  }
+);
 </script>
 
 <template>
@@ -39,7 +51,13 @@ const { isZh } = useLocale();
       </main>
       <AppFooter />
     </OScroller>
-    <CookieNotice />
+    <OPlusConfigProvider :locale="locale">
+      <OCookieNotice
+        v-model:visible="cookieNoticeVisible"
+        community="openEuler"
+        :detail-url="`${MAIN_URL}/${locale}/other/cookies/`"
+      />
+    </OPlusConfigProvider>
   </OConfigProvider>
 </template>
 

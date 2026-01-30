@@ -11,7 +11,6 @@ import { maintainerDefaults } from '@/data/query';
 
 import defaultImg from '@/assets/default-logo.png';
 import IconUser from '~icons/app/icon-user.svg';
-import { oaReport, searchReport } from '@/shared/analytics';
 
 const props = defineProps({
   data: {
@@ -92,7 +91,7 @@ const reportAnalytics = (data: Record<string, any>, event = 'click') => {
     module = 'field';
   }
   if (isPageSearch.value) {
-    searchReport(
+    (window as any).__OA_REPORT__?.(
       event,
       {
         module,
@@ -102,11 +101,12 @@ const reportAnalytics = (data: Record<string, any>, event = 'click') => {
         architecture: props.data.arch,
         ...data,
       },
+      'search-software',
       { immediate: true }
     );
     return;
   }
-  oaReport(
+  (window as any).__OA_REPORT__?.(
     event,
     {
       module,

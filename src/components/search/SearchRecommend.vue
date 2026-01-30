@@ -12,7 +12,6 @@ import { useLocale } from '@/composables/useLocale';
 import useSearchHistory from '@/composables/useSearchHistory';
 
 import IconChevronRight from '~icons/app/icon-chevron-right.svg';
-import { searchReport } from '@/shared/analytics';
 
 const props = defineProps({
   searchValue: {
@@ -42,12 +41,16 @@ const isShow = ref(props.isFeedback);
 const isPageHome = computed(() => route.name === 'home');
 
 const reportAnalytics = (data: Record<string, any>, event = 'click') => {
-  searchReport(event, {
-    module: isPageHome.value ? 'home_page' : 'search_page',
-    content: props.searchValue,
-    ...data,
-    ...(route.query.type ? { type: route.query.type } : {}),
-  });
+  (window as any).__OA_REPORT__?.(
+    event,
+    {
+      module: isPageHome.value ? 'home_page' : 'search_page',
+      content: props.searchValue,
+      ...data,
+      ...(route.query.type ? { type: route.query.type } : {}),
+    },
+    'search-software'
+  );
 };
 
 const jumpPages = (type: string) => {

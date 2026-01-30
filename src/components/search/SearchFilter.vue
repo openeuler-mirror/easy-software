@@ -15,7 +15,6 @@ import { pkgSortMap } from '@/utils/common';
 import SearchRecommend from '@/components/search/SearchRecommend.vue';
 
 import IconSearch from '~icons/app/icon-search.svg';
-import { searchReport } from '@/shared/analytics';
 
 defineProps({
   placeholder: {
@@ -43,10 +42,14 @@ const tabName = ref('all');
 const fliterSelected = ref(defaultValue.value);
 
 const reportAnalytics = (data: Record<string, any>, event = 'click') => {
-  searchReport(event, {
-    module: isPageHome.value ? 'home_page' : 'search_page',
-    ...data,
-  });
+  (window as any).__OA_REPORT__?.(
+    event,
+    {
+      module: isPageHome.value ? 'home_page' : 'search_page',
+      ...data,
+    },
+    'search-software'
+  );
 };
 
 const changeFilter = (v: string) => {
