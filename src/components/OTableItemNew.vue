@@ -5,7 +5,6 @@ import { useLocale } from '@/composables/useLocale';
 import { formatDateTime, checkOriginLink, windowOpen, xssAllTag, getPkgName } from '@/utils/common';
 import { useI18n } from 'vue-i18n';
 import { SORTPARAMS } from '@/data/query';
-import { oaReport, searchReport } from '@/shared/analytics';
 
 import OCodeCopy from '@/components/OCodeCopy.vue';
 import ExternalLink from '@/components/ExternalLink.vue';
@@ -54,18 +53,19 @@ const isPageSearch = computed(() => route.name === 'search');
 
 const reportAnalytics = (data: Record<string, any>, event = 'click') => {
   if (isPageSearch.value) {
-    searchReport(
+    (window as any).__OA_REPORT__?.(
       event,
       {
         module: 'search_page',
         tab: route.query.tab ?? '',
         ...data,
       },
+      'search-software',
       { immediate: true }
     );
     return;
   }
-  oaReport(
+  (window as any).__OA_REPORT__?.(
     event,
     {
       module: route.name,

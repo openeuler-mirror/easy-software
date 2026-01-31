@@ -1,5 +1,4 @@
 import type { DetailItemT } from '@/@types/app';
-import { oaReport } from '@/shared/analytics';
 import { computed, unref, type Directive, type MaybeRef, type Ref } from 'vue';
 
 const useDetailPageAnalytics = (appData: Ref<any>, basicInfo: Ref<DetailItemT[]>, tab?: MaybeRef<string>) => {
@@ -9,7 +8,7 @@ const useDetailPageAnalytics = (appData: Ref<any>, basicInfo: Ref<DetailItemT[]>
   }));
 
   const reportAnalytics = (data: Record<string, any>, event = 'click') => {
-    oaReport(event, {
+    (window as any).__OA_REPORT__?.(event, {
       module: 'detail_page',
       app_name: appData.value.name,
       version: appData.value.version,

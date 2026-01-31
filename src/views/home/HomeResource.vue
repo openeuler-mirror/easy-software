@@ -2,7 +2,6 @@
 import { OIcon } from '@opensig/opendesign';
 import { homeData } from '@/data/home/index';
 import { useLocale } from '@/composables/useLocale';
-import { oaReport } from '@/shared/analytics';
 
 const { locale } = useLocale();
 
@@ -21,7 +20,7 @@ const resourceLeave = (id: string) => {
 };
 
 const onClickLink = (name: string) => {
-  oaReport('click', {
+  (window as any).__OA_REPORT__?.('click', {
     module: 'home_page',
     type: 'resource',
     level1: '获取资源',

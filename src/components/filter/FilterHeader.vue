@@ -6,7 +6,6 @@ import { useRouter, useRoute } from 'vue-router';
 import { SORTPARAMS } from '@/data/query';
 import { useSearchStore } from '@/stores/search';
 import IconSearch from '~icons/app/icon-search.svg';
-import { searchReport } from '@/shared/analytics';
 
 const props = defineProps({
   title: {
@@ -90,13 +89,17 @@ const replaceWinUrl = () => {
 const collectDownloadData = (keyword: string) => {
   const { href } = window.location;
   const downloadTime = new Date();
-  searchReport('search', {
-    origin: href,
-    keyword,
-    filter: 'all',
-    pkg: props.title,
-    downloadTime,
-  });
+  (window as any).__OA_REPORT__?.(
+    'search',
+    {
+      origin: href,
+      keyword,
+      filter: 'all',
+      pkg: props.title,
+      downloadTime,
+    },
+    'search-software'
+  );
 };
 
 // 排序事件

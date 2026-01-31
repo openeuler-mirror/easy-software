@@ -26,7 +26,6 @@ import IconImage from '~icons/pkg/image.svg';
 import IconRpm from '~icons/pkg/rpm.svg';
 import IconCanda from '~icons/pkg/conda.svg';
 import { currentFieldDetailTabInjection, pkgIdInjection } from '@/data/injectionKeys';
-import { oaReport } from '@/shared/analytics';
 
 const { locale } = useLocale();
 const { t } = useI18n();
@@ -365,7 +364,7 @@ const tagsOptions = computed(() => {
 const onCodeSuccess = () => {
   const { href } = window.location;
   const downloadTime = new Date();
-  oaReport('download', {
+  (window as any).__OA_REPORT__?.('download', {
     origin: href,
     softwareName: appData.value.name,
     version: appData.value.version,
