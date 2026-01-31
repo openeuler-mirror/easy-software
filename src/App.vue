@@ -27,9 +27,10 @@ watch(
 // -------------------- 组件国际化 --------------------
 const { isZh } = useLocale();
 
+const MAIN_URL = import.meta.env.VITE_MAIN_DOMAIN_URL;
+const COOKIE_DOMAIN = import.meta.env.VITE_COOKIE_DOMAIN;
 const cookieNoticeVisible = ref(false);
 const cookieRef = ref();
-const MAIN_URL = import.meta.env.VITE_MAIN_DOMAIN_URL;
 const route = useRoute();
 watch(
   () => route.path,
@@ -56,6 +57,7 @@ watch(
         v-model:visible="cookieNoticeVisible"
         community="openEuler"
         :detail-url="`${MAIN_URL}/${locale}/other/cookies/`"
+        :cookie-domain="COOKIE_DOMAIN"
       />
     </OPlusConfigProvider>
   </OConfigProvider>
