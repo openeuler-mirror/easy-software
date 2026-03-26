@@ -10,7 +10,7 @@ importers:
     dependencies:
       '@opendesign-plus/components':
         specifier: 0.0.1-rc.6
-        version: 0.0.1-rc.6(@types/markdown-it@14.1.0)(markdown-it@14.1.0)(vue@3.4.38(typescript@4.9.5))
+        version: 0.0.1-rc.6(@types/markdown-it@14.1.0)(markdown-it@14.1.1)(vue@3.4.38(typescript@4.9.5))
       '@opendesign-plus/plugins':
         specifier: 0.0.1-rc.2
         version: 0.0.1-rc.2
@@ -24,8 +24,8 @@ importers:
         specifier: 10.11.1
         version: 10.11.1(vue@3.4.38(typescript@4.9.5))
       axios:
-        specifier: 1.12.0
-        version: 1.12.0
+        specifier: 1.13.5
+        version: 1.13.5
       clipboard:
         specifier: 2.0.11
         version: 2.0.11
@@ -45,8 +45,8 @@ importers:
         specifier: ^26.0.0
         version: 26.1.0
       markdown-it:
-        specifier: 14.1.0
-        version: 14.1.0
+        specifier: 14.1.1
+        version: 14.1.1
       pinia:
         specifier: 2.1.2
         version: 2.1.2(typescript@4.9.5)(vue@3.4.38(typescript@4.9.5))
@@ -1063,8 +1063,8 @@ packages:
   asynckit@0.4.0:
     resolution: {integrity: sha512-Oei9OH4tRh0YqU3GxhX79dM/mwVgvbZJaSNaRk+bshkj0S5cfHcgYakreBjrHwatXKbz+IoIdYLxrKim2MjW0Q==}
 
-  axios@1.12.0:
-    resolution: {integrity: sha512-oXTDccv8PcfjZmPGlWsPSwtOJCZ/b6W5jAMCNcfwJbCzDckwG0jrYJFaWH1yvivfCXjVzV/SPDEhMB3Q+DSurg==}
+  axios@1.13.5:
+    resolution: {integrity: sha512-cz4ur7Vb0xS4/KUN0tPWe44eqxrIu31me+fbang3ijiNscE129POzipJJA6zniq2C/Z6sJCjMimjS8Lc/GAs8Q==}
 
   balanced-match@1.0.2:
     resolution: {integrity: sha512-3oSeUO0TMV67hN1AmbXsK4yaqU7tjiHlbxRDZOpH0KW9+CeX4bRAaX0Anxt0tx2MrpRpWwQaPwIlISEJhYU5Pw==}
@@ -1431,8 +1431,8 @@ packages:
   flatted@3.3.2:
     resolution: {integrity: sha512-AiwGJM8YcNOaobumgtng+6NHuOqC3A7MixFeDafM3X9cIUM+xUXoS5Vfgf+OihAYe20fxqNM9yPBXJzRtZ/4eA==}
 
-  follow-redirects@1.15.9:
-    resolution: {integrity: sha512-gew4GsXizNgdoRyqmyfMHyAmXsZDk6mHkSxZFCzW9gwlbtOW44CDtYavM+y+72qD/Vq2l550kMF52DT8fOLJqQ==}
+  follow-redirects@1.15.11:
+    resolution: {integrity: sha512-deG2P0JfjrTxl50XGCDyfI97ZGVCxIpfKYmfyrQ54n5FO/0gfIES8C/Psl6kWVDolizcaaxZJnTS0QSMxvnsBQ==}
     engines: {node: '>=4.0'}
     peerDependencies:
       debug: '*'
@@ -1440,8 +1440,8 @@ packages:
       debug:
         optional: true
 
-  form-data@4.0.4:
-    resolution: {integrity: sha512-KrGhL9Q4zjj0kiUt5OO4Mr/A/jlI2jDYs5eHBpYHPcBEVSiipAvn2Ko2HnPe20rmcuuvMHNdZFp+4IlGTMF0Ow==}
+  form-data@4.0.5:
+    resolution: {integrity: sha512-8RipRLol37bNs2bhoV67fiTEvdTrbMUYcFTiy3+wuuOnUog2QBHCZWXDRijWQfAkhBj2Uf5UnVaiWwA5vdd82w==}
     engines: {node: '>= 6'}
 
   fs.realpath@1.0.0:
@@ -1748,8 +1748,8 @@ packages:
   markdown-it-async@2.2.0:
     resolution: {integrity: sha512-sITME+kf799vMeO/ww/CjH6q+c05f6TLpn6VOmmWCGNqPJzSh+uFgZoMB9s0plNtW6afy63qglNAC3MhrhP/gg==}
 
-  markdown-it@14.1.0:
-    resolution: {integrity: sha512-a54IwgWPaeBCAAsv13YgmALOF1elABB08FxO9i+r4VFk5Vl4pKokRPeX8u5TCgSsPi6ec1otfLjdOpVcgbpshg==}
+  markdown-it@14.1.1:
+    resolution: {integrity: sha512-BuU2qnTti9YKgK5N+IeMubp14ZUKUUw7yeJbkjtosvHiP0AZ5c8IAgEMk79D0eC8F23r4Ac/q8cAIFdm2FtyoA==}
     hasBin: true
 
   math-intrinsics@1.1.0:
@@ -2962,9 +2962,9 @@ snapshots:
       '@nodelib/fs.scandir': 2.1.5
       fastq: 1.19.0
 
-  '@opendesign-plus/components@0.0.1-rc.6(@types/markdown-it@14.1.0)(markdown-it@14.1.0)(vue@3.4.38(typescript@4.9.5))':
+  '@opendesign-plus/components@0.0.1-rc.6(@types/markdown-it@14.1.0)(markdown-it@14.1.1)(vue@3.4.38(typescript@4.9.5))':
     dependencies:
-      '@opendesign-plus/composables': 0.0.1-rc.6(@types/markdown-it@14.1.0)(markdown-it@14.1.0)(vue@3.4.38(typescript@4.9.5))
+      '@opendesign-plus/composables': 0.0.1-rc.6(@types/markdown-it@14.1.0)(markdown-it@14.1.1)(vue@3.4.38(typescript@4.9.5))
       '@opendesign-plus/styles': 0.0.1-rc.2
       '@opensig/opendesign': 1.0.2(vue@3.4.38(typescript@4.9.5))
       '@vueuse/core': 10.11.1(vue@3.4.38(typescript@4.9.5))
@@ -2975,12 +2975,12 @@ snapshots:
       - markdown-it
       - vue
 
-  '@opendesign-plus/composables@0.0.1-rc.6(@types/markdown-it@14.1.0)(markdown-it@14.1.0)(vue@3.4.38(typescript@4.9.5))':
+  '@opendesign-plus/composables@0.0.1-rc.6(@types/markdown-it@14.1.0)(markdown-it@14.1.1)(vue@3.4.38(typescript@4.9.5))':
     dependencies:
       '@opensig/opendesign': 1.0.2(vue@3.4.38(typescript@4.9.5))
       '@vueuse/core': 14.1.0(vue@3.4.38(typescript@4.9.5))
       js-cookie: 3.0.5
-      markdown-it-anchor: 9.2.0(@types/markdown-it@14.1.0)(markdown-it@14.1.0)
+      markdown-it-anchor: 9.2.0(@types/markdown-it@14.1.0)(markdown-it@14.1.1)
       markdown-it-async: 2.2.0
       shiki: 3.21.0
     transitivePeerDependencies:
@@ -3583,10 +3583,10 @@ snapshots:
 
   asynckit@0.4.0: {}
 
-  axios@1.12.0:
+  axios@1.13.5:
     dependencies:
-      follow-redirects: 1.15.9
-      form-data: 4.0.4
+      follow-redirects: 1.15.11
+      form-data: 4.0.5
       proxy-from-env: 1.1.0
     transitivePeerDependencies:
       - debug
@@ -3999,9 +3999,9 @@ snapshots:
 
   flatted@3.3.2: {}
 
-  follow-redirects@1.15.9: {}
+  follow-redirects@1.15.11: {}
 
-  form-data@4.0.4:
+  form-data@4.0.5:
     dependencies:
       asynckit: 0.4.0
       combined-stream: 1.0.8
@@ -4297,17 +4297,17 @@ snapshots:
     dependencies:
       '@jridgewell/sourcemap-codec': 1.5.0
 
-  markdown-it-anchor@9.2.0(@types/markdown-it@14.1.0)(markdown-it@14.1.0):
+  markdown-it-anchor@9.2.0(@types/markdown-it@14.1.0)(markdown-it@14.1.1):
     dependencies:
       '@types/markdown-it': 14.1.0
-      markdown-it: 14.1.0
+      markdown-it: 14.1.1
 
   markdown-it-async@2.2.0:
     dependencies:
       '@types/markdown-it': 14.1.2
-      markdown-it: 14.1.0
+      markdown-it: 14.1.1
 
-  markdown-it@14.1.0:
+  markdown-it@14.1.1:
     dependencies:
       argparse: 2.0.1
       entities: 4.5.0
