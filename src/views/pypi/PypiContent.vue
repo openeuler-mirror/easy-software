@@ -71,7 +71,7 @@ const querySearch = () => {
 
   getSearchData(newData)
     .then((res) => {
-      pkgData.value = res.data.condapkg;
+      pkgData.value = res.data.pypipkg;
       total.value = res.data.total;
       if (searchStore.nameOrder) {
         searchStore.changeNameOrderCount(total.value);

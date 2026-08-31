@@ -36,8 +36,8 @@ const columns = [
 //  ------------  main ------------
 
 const pkgData = ref([]);
-const PAGE_ID = 'NPM';
-const tabName = ref(PACKAGE_TYPE_MAPPING['npm']);
+const PAGE_ID = 'SOURCE';
+const tabName = ref(PACKAGE_TYPE_MAPPING['source']);
 const keywordType = ref('');
 const isLoading = ref(false);
 
@@ -55,7 +55,7 @@ const searchParams = computed(() => {
     keywordType: keywordType.value,
     pageNum: currentPage.value,
     pageSize: pageSize.value,
-    dataType: 'npm',
+    dataType: 'other',
     os: searchOs.value.join(),
     arch: searchArch.value.join(),
     timeOrder: timeOrder.value,
@@ -71,7 +71,7 @@ const querySearch = () => {
 
   getSearchData(newData)
     .then((res) => {
-      pkgData.value = res.data.npmpkg;
+      pkgData.value = res.data.otherpkg;
       total.value = res.data.total;
       if (searchStore.nameOrder) {
         searchStore.changeNameOrderCount(total.value);
@@ -96,7 +96,7 @@ const isSearchError = ref(false);
 const isSearchDocs = ref(false);
 const queryAllpkg = () => {
   const params = {
-    name: 'npmpkg',
+    name: 'otherpkg',
     pageNum: currentPage.value,
     pageSize: pageSize.value,
     timeOrder: timeOrder.value,
@@ -129,7 +129,7 @@ const queryAllpkg = () => {
 // 判断是走es还是sql
 const pageSearch = () => {
   isSearchError.value = false;
-  if (tabName.value === PACKAGE_TYPE_MAPPING['npm']) {
+  if (tabName.value === PACKAGE_TYPE_MAPPING['source']) {
     isLoading.value = true;
     if (searchKey.value === '') {
       isSearchDocs.value = false;
@@ -152,7 +152,7 @@ const queryFilter = () => {
   filterArchList.value = [];
   isFilterLoading.value = true;
   getSearchAllColumn({
-    name: 'npmpkg',
+    name: 'otherpkg',
     column: 'os,arch,category',
   })
     .then((res) => {
@@ -192,7 +192,7 @@ const resetTag = () => {
 
   if ((os || arch) && !isPageSearch.value) {
     router.push({
-      path: `/${locale.value}/npm`,
+      path: `/${locale.value}/source`,
     });
   }
 };
@@ -226,7 +226,7 @@ const handleCurrentChange = (val: number) => {
 const isPageSearch = ref(false);
 
 // 获取路由参数
-const { routeKey, routeName, routeType, routeOs, routeArch, routeCategory } = useRouteQuery(PACKAGE_TYPE_MAPPING['npm']);
+const { routeKey, routeName, routeType, routeOs, routeArch, routeCategory } = useRouteQuery(PACKAGE_TYPE_MAPPING['source']);
 
 const init = () => {
   searchKey.value = routeKey.value;
