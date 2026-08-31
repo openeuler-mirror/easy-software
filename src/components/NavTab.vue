@@ -42,6 +42,21 @@ const selectedOptions = [
     label: t('software.conda'),
     path: '/zh/conda',
   },
+  {
+    value: 'pypi',
+    label: t('software.pypi'),
+    path: '/zh/pypi',
+  },
+  {
+    value: 'npm',
+    label: t('software.npm'),
+    path: '/zh/npm',
+  },
+  {
+    value: 'source',
+    label: t('software.source'),
+    path: '/zh/source',
+  },
 ];
 
 const emits = defineEmits<{

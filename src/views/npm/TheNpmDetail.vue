@@ -22,7 +22,7 @@ const { t } = useI18n();
 
 const basicInfo = ref<DetailItemT[]>([]);
 
-const tabValue = ref('condapkg');
+const tabValue = ref('npmpkg');
 const maintainer = ref<MaintainerT>({ maintainerId: '', maintainerEmail: '', maintainerGiteeId: '' });
 
 const appData = ref({});
@@ -95,7 +95,7 @@ const installTabs = computed(() => {
       name: '在线安装',
       type: 'online',
       tag: appData.value.appVer,
-      installation: appData.value.condaUsage,
+      installation: appData.value.npmUsage,
     },
   ];
 });
@@ -128,7 +128,7 @@ const changePkgVersion = (v: string) => {
     return;
   }
   const current = tagsList.value.find((item: ImageTagsT) => item.appVer === v);
-  windowOpen(`/zh/conda/detail?pkgId=${current.pkgId}`, '_self');
+  windowOpen(`/zh/npm/detail?pkgId=${current.pkgId}`, '_self');
 };
 </script>
 
@@ -137,7 +137,7 @@ const changePkgVersion = (v: string) => {
     <DetailSkeleton v-if="isLoading" />
     <template v-else>
       <!-- 锚点 -->
-      <AppBreadcrumb id="conda" :name="appData.name" />
+      <AppBreadcrumb id="npm" :name="appData.name" />
       <!-- 头部信息 -->
       <DetailHead @go-feedback="goFeedback" :data="appData" />
 
@@ -164,13 +164,13 @@ const changePkgVersion = (v: string) => {
             @report-analytics="reportFeedback"
             :name="appData.name"
             :version="appData.version"
-            type="CONDA"
+            type="NPM"
             :maintainer="maintainer"
             :srcRepo="srcRepo"
           />
         </div>
         <div class="detail-row-side">
-          <DetailAside :data="appData" :ver-data="versionSupportData" :tagVer="tagVer" :maintainer="maintainer" type="CONDA" />
+          <DetailAside :data="appData" :ver-data="versionSupportData" :tagVer="tagVer" :maintainer="maintainer" type="NPM" />
         </div>
       </div>
     </template>
@@ -181,5 +181,11 @@ const changePkgVersion = (v: string) => {
 @import '@/assets/style/category/detail/index.scss';
 .software-version {
   color: var(--o-color-info2);
+}
+:deep(.markdown-body.download ul > li::after) {
+  display: none;
+}
+:deep(.markdown-body.download ul > li) {
+  padding-left: 16px;
 }
 </style>

@@ -4,7 +4,7 @@ RUN mkdir -p /home/easysoftware/web
 WORKDIR /home/easysoftware/web
 COPY . /home/easysoftware/web
 
-RUN npm install pnpm -g
+RUN npm install pnpm@10.12.1 -g
 RUN pnpm install
 RUN pnpm build-only
 

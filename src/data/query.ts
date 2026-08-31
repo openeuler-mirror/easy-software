@@ -3,7 +3,7 @@ import i18n from '@/i18n';
 const { t } = i18n.global;
 
 // tags参数
-export const TAGS_OPTIONS = ['RPM', 'IMAGE', 'EPKG', 'OEPKG', 'CONDA'];
+export const TAGS_OPTIONS = ['RPM', 'IMAGE', 'EPKG', 'OEPKG', 'CONDA', 'PYPI', 'NPM', 'SOURCE'];
 
 // 搜索tab参数
 export const PACKAGE_TYPE_MAPPING = {
@@ -17,6 +17,12 @@ export const PACKAGE_TYPE_MAPPING = {
   oepkg: 'oepkg',
   condapkg: 'condapkg',
   conda: 'condapkg',
+  pypipkg: 'pypipkg',
+  pypi: 'pypipkg',
+  npmpkg: 'npmpkg',
+  npm: 'npmpkg',
+  sourcepkg: 'sourcepkg',
+  source: 'sourcepkg',
   appversion: 'appversion',
 } as const;
 

@@ -51,7 +51,28 @@ export default defineConfig({
     },
   },
   server: {
-    proxy: {},
+    proxy: {
+      '/server/': {
+        target: 'https://easysoftware-api.test.osinfra.cn/',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/server/, ''),
+      },
+      '/api-search/': {
+        target: 'https://doc-search.test.osinfra.cn/',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api-search/, ''),
+        configure: (proxy) => {
+          proxy.on(
+            'proxyReq',
+            (proxyReq, req) => {
+              const realIp = req.headers['x-real-ip'];
+              if (realIp) {
+                proxyReq.setHeader('X-Forwarded-For', realIp);
+              }
+            },
+          );
+        },
+      },
+    },
   },
-
 });

@@ -67,4 +67,4 @@ export interface MoreMessgeItemT {
   epoch: string;
 }
 
-export type PkgTypeT = 'RPM' | 'IMAGE' | 'EPKG' | 'OEPKG' | 'CONDA';
+export type PkgTypeT = 'RPM' | 'IMAGE' | 'EPKG' | 'OEPKG' | 'CONDA' | 'PYPI' | 'NPM' | 'SOURCE';
