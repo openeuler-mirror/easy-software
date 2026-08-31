@@ -14,6 +14,9 @@ import OepkgContent from '@/views/oepkg/OEpkgContent.vue';
 import ImageContent from '@/views/image/ImageContent.vue';
 import RpmContent from '@/views/package/RpmContent.vue';
 import CondaContent from '@/views/conda/CondaContent.vue';
+import PypiContent from '@/views/pypi/PypiContent.vue';
+import NpmContent from '@/views/npm/NpmContent.vue';
+import SourceContent from '@/views/source/SourceContent.vue';
 import UpstreamContent from '@/views/upstream/UpstreamContent.vue';
 
 const route = useRoute();
@@ -94,6 +97,9 @@ const tabComponent = {
   [PACKAGE_TYPE_MAPPING['oepkg']]: OepkgContent,
   [PACKAGE_TYPE_MAPPING['image']]: ImageContent,
   [PACKAGE_TYPE_MAPPING['rpm']]: RpmContent,
+  [PACKAGE_TYPE_MAPPING['pypi']]: PypiContent,
+  [PACKAGE_TYPE_MAPPING['npm']]: NpmContent,
+  [PACKAGE_TYPE_MAPPING['source']]: SourceContent,
   [PACKAGE_TYPE_MAPPING['appversion']]: UpstreamContent,
 };
 </script>
