@@ -166,6 +166,9 @@ const getSearchplaceholder = (name: string) => {
     DOMAIN: '相关信息',
     EPKG: '软件包名称',
     APPVERSION: '应用名称',
+    PYPI: '软件包名称',
+    NPM: '软件包名称',
+    SOURCE: '软件包',
   };
   const title = {
     CONDA: 'CONDA',
@@ -175,6 +178,9 @@ const getSearchplaceholder = (name: string) => {
     EPKG: 'EPKG',
     DOMAIN: '领域应用',
     APPVERSION: '',
+    PYPI: 'PYPI',
+    NPM: 'NPM',
+    SOURCE: '源码安装',
   };
   return `${title[name]}${placeholder[name]}`;
 };

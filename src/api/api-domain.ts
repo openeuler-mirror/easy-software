@@ -35,8 +35,8 @@ export function getSearchAllFiled(params: SearchSQLT) {
 
 //Tags
 
-export function getTags(id: string) {
-  const url = `/server/apppkg/tags?name=${id}`;
+export function getTags(id: string, tabValue: string = 'apppkg') {
+  const url = `/server/${tabValue}/tags?name=${id}`;
   return request.get(url).then((res: AxiosResponse) => res?.data);
 }
 

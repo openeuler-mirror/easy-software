@@ -413,6 +413,42 @@ const onClickLink = (row: any) => {
       }
     }
   }
+  &.pypipkg {
+    thead {
+      .name,
+      .version,
+      .os {
+        width: 160px;
+      }
+      .arch {
+        width: 120px;
+      }
+    }
+  }
+  &.npmpkg {
+    thead {
+      .name,
+      .version,
+      .os {
+        width: 160px;
+      }
+      .arch {
+        width: 120px;
+      }
+    }
+  }
+  &.sourcepkg {
+    thead {
+      .name,
+      .version,
+      .os {
+        width: 160px;
+      }
+      .arch {
+        width: 120px;
+      }
+    }
+  }
   &.apppkg {
     thead {
       .os {

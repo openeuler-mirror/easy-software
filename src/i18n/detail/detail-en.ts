@@ -10,7 +10,7 @@ export default {
   repo:'所属仓库',
   repoType:'Repo源',
   information:'基本信息',
-  installation:'安装指引',
+  installation:'软件安装指引',
   more:'更多信息',
   usage:'使用方式',
   number:'版本号',

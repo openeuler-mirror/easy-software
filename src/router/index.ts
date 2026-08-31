@@ -142,6 +142,54 @@ const routes = [
     },
   },
   {
+    path: '/zh/pypi',
+    name: 'pypi',
+    component: () => import('@/views/pypi/ThePypi.vue'),
+    meta: {
+      title: `${t('software.pypi')} | ${TITLE}`,
+    },
+  },
+  {
+    path: '/zh/pypi/detail',
+    name: 'pypi-detail',
+    component: () => import('@/views/pypi/ThePypiDetail.vue'),
+    meta: {
+      title: `${t('software.pypi')} | ${TITLE}`,
+    },
+  },
+  {
+    path: '/zh/npm',
+    name: 'npm',
+    component: () => import('@/views/npm/TheNpm.vue'),
+    meta: {
+      title: `${t('software.npm')} | ${TITLE}`,
+    },
+  },
+  {
+    path: '/zh/npm/detail',
+    name: 'npm-detail',
+    component: () => import('@/views/npm/TheNpmDetail.vue'),
+    meta: {
+      title: `${t('software.npm')} | ${TITLE}`,
+    },
+  },
+  {
+    path: '/zh/source',
+    name: 'source',
+    component: () => import('@/views/source/TheSource.vue'),
+    meta: {
+      title: `${t('software.source')} | ${TITLE}`,
+    },
+  },
+  {
+    path: '/zh/source/detail',
+    name: 'source-detail',
+    component: () => import('@/views/source/TheSourceDetail.vue'),
+    meta: {
+      title: `${t('software.source')} | ${TITLE}`,
+    },
+  },
+  {
     path: '/zh/solution/opea',
     name: 'opea',
     component: () => import('@/views/solution/TheOPEA.vue'),

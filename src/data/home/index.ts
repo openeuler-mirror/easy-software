@@ -5,6 +5,9 @@ import ImageIcon from '~icons/pkg/image.svg';
 import RpmIcon from '~icons/pkg/rpm.svg';
 import OepkgIcon from '~icons/pkg/oepkg.svg';
 import CandaIcon from '~icons/pkg/conda.svg';
+import PypiIcon from '~icons/pkg/pypi.svg';
+import NpmIcon from '~icons/pkg/npm.svg';
+import SourceInstallIcon from '~icons/pkg/source-install.svg';
 
 import openHPC from '@/assets/home/openHPC.jpg';
 import openStack from '@/assets/home/openstack.jpg';
@@ -49,6 +52,27 @@ export const homeData = [
     icon: CandaIcon,
     href: '/conda',
   },
+  {
+    id: 'pypi',
+    name: 'PYPI',
+    desc: '一系列在openEuler上验证可用的PYPI生态软件包',
+    icon: PypiIcon,
+    href: '/pypi',
+  },
+  {
+    id: 'npm',
+    name: 'NPM',
+    desc: '一系列在openEuler上验证可用的NPM生态软件包',
+    icon: NpmIcon,
+    href: '/npm',
+  },
+  {
+    id: 'source',
+    name: '源码安装',
+    desc: '一系列在openEuler上验证可用的源码安装软件包',
+    icon: SourceInstallIcon,
+    href: '/source',
+  }
 ];
 
 // 首页 解决方案

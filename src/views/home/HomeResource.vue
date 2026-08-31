@@ -7,16 +7,16 @@ const { locale } = useLocale();
 
 // Hover 修改资源icon 颜色
 const resourceHover = (id: string) => {
-  const path = document.querySelector(`.resource-item #${id}-icon`);
-  if (path) {
+  const paths = document.querySelectorAll(`.resource-item #${id}-icon`);
+  paths.forEach((path) => {
     path.setAttribute('fill', 'var(--o-color-primary1)');
-  }
+  });
 };
 const resourceLeave = (id: string) => {
-  const path = document.querySelector(`.resource-item #${id}-icon`);
-  if (path) {
+  const paths = document.querySelectorAll(`.resource-item #${id}-icon`);
+  paths.forEach((path) => {
     path.setAttribute('fill', '');
-  }
+  });
 };
 
 const onClickLink = (name: string) => {
@@ -40,9 +40,13 @@ const onClickLink = (name: string) => {
         @mouseenter="resourceHover(item.id)"
         @mouseleave="resourceLeave(item.id)"
       >
-        <OIcon><component :is="item.icon" /></OIcon>
-        <p class="title">{{ item.name }}</p>
-        <p class="desc">{{ item.desc }}</p>
+        <div class="resource-item-top">
+          <OIcon><component :is="item.icon" /></OIcon>
+          <p class="title">{{ item.name }}</p>
+        </div>
+        <div class="resource-item-bottom">
+          <p class="desc">{{ item.desc }}</p>
+        </div>
       </RouterLink>
     </div>
   </div>
@@ -50,42 +54,60 @@ const onClickLink = (name: string) => {
 
 <style lang="scss" scoped>
 .resource-content {
-  background: var(--o-color-fill2);
-  padding: 42px;
   display: flex;
-  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 32px;
 
   .resource-panel {
-    flex: 1;
-  }
-  .resource-panel + .resource-panel {
-    margin-left: 32px;
+    flex: 0 1 calc(25% - 24px);
+    min-width: 0;
+    background: var(--o-color-fill2);
+    border-radius: 8px;
+    padding: 24px;
+    transition: all 0.3s ease;
+    &:hover {
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
   }
   .resource-item {
     display: flex;
     flex-direction: column;
-    align-items: center;
+    height: 100%;
     &:hover {
       .title {
         color: var(--o-color-primary1);
       }
     }
+    .resource-item-top {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+    }
+    .resource-item-bottom {
+      flex: 1;
+      display: flex;
+      justify-content: flex-start;
+      padding-top: 16px;
+    }
     svg {
-      width: 56px;
-      height: 56px;
+      width: 27px;
+      height: 27px;
       color: var(--o-color-info1);
+      transition: color 0.3s ease;
     }
     .title {
       @include h3;
       color: var(--o-color-info1);
-      margin: 16px 0 12px;
+      margin: 0 0 0 12px;
       font-weight: 500;
+      font-size: 22px;
+      line-height: 30px;
     }
     .desc {
       @include text1;
-      color: var(--o-color-info2);
+      color: var(--o-color-info3);
       max-width: 306px;
-      text-align: center;
+      text-align: left;
     }
   }
 }

@@ -63,6 +63,9 @@ import ImageIcon from '~icons/pkg/image.svg';
 import RpmIcon from '~icons/pkg/rpm.svg';
 import OepkgIcon from '~icons/pkg/oepkg.svg';
 import CandaIcon from '~icons/pkg/conda.svg';
+import PypiIcon from '~icons/pkg/pypi.svg';
+import NpmIcon from '~icons/pkg/npm.svg';
+import SourceInstallIcon from '~icons/pkg/source-install.svg';
 
 export const getTagsIcon = (v: string) => {
   const iconMap: Record<string, any> = {
@@ -76,6 +79,15 @@ export const getTagsIcon = (v: string) => {
     oepkg: OepkgIcon,
     CONDA: CandaIcon,
     conda: CandaIcon,
+    PYPI: PypiIcon,
+    pypipkg: PypiIcon,
+    pypi: PypiIcon,
+    NPM: NpmIcon,
+    npmpkg: NpmIcon,
+    npm: NpmIcon,
+    SOURCE: SourceInstallIcon,
+    sourcepkg: SourceInstallIcon,
+    source: SourceInstallIcon,
   };
   return iconMap[v];
 };
@@ -130,6 +142,12 @@ export const getPkgName = (type: string) => {
     all: 'filed',
     condapkg: 'conda',
     conda: 'conda',
+    pypipkg: 'pypi',
+    pypi: 'pypi',
+    npmpkg: 'npm',
+    npm: 'npm',
+    sourcepkg: 'source',
+    source: 'source',
   };
   return nameMap[type] || '';
 };
@@ -144,4 +162,13 @@ export const pkgSortMap = {
   oepkg: 3,
   CONDA: 4,
   conda: 4,
+  PYPI: 5,
+  pypipkg: 5,
+  pypi: 5,
+  NPM: 6,
+  npmpkg: 6,
+  npm: 6,
+  SOURCE: 7,
+  sourcepkg: 7,
+  source: 7,
 };
