@@ -88,6 +88,7 @@ export const getTagsIcon = (v: string) => {
     SOURCE: SourceInstallIcon,
     sourcepkg: SourceInstallIcon,
     source: SourceInstallIcon,
+    other: SourceInstallIcon,
   };
   return iconMap[v];
 };
@@ -148,6 +149,7 @@ export const getPkgName = (type: string) => {
     npm: 'npm',
     sourcepkg: 'source',
     source: 'source',
+    other: 'source',
   };
   return nameMap[type] || '';
 };
@@ -171,4 +173,5 @@ export const pkgSortMap = {
   SOURCE: 7,
   sourcepkg: 7,
   source: 7,
+  other: 7,
 };
