@@ -65,7 +65,7 @@ const jumpPages = (type: string) => {
 
 const goDetail = (ev: MouseEvent, key: string, id: string) => {
   const type = getPkgName(key);
-  const pkgName = ['filed', 'rpm', 'epkg', 'image', 'oepkg', 'conda', 'pypi', 'npm', 'source'];
+  const pkgName = ['filed', 'rpm', 'epkg', 'image', 'oepkg', 'conda', 'pypi', 'npm', 'source', 'other'];
   if (pkgName.includes(type)) {
     reportAnalytics({
       type: `suggest_${key}`,
