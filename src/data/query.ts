@@ -23,6 +23,7 @@ export const PACKAGE_TYPE_MAPPING = {
   npm: 'npmpkg',
   sourcepkg: 'sourcepkg',
   source: 'sourcepkg',
+  other: 'sourcepkg',
   appversion: 'appversion',
 } as const;
 

@@ -17,6 +17,7 @@ export default {
   npmpkg: 'NPM',
   source: '源码安装',
   sourcepkg: '源码安装',
+  other: '源码安装',
   appversion: '软件版本支持',
   filterAll: '全部',
   filterName: '按名称',

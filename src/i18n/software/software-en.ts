@@ -17,6 +17,7 @@ export default {
   npmpkg: 'NPM',
   source: 'Source Install',
   sourcepkg: 'Source Install',
+  other: 'Source Install',
   appversion: 'Upstream',
   filterAll: 'All',
   filterName: 'name',
