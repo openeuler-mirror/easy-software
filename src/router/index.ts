@@ -12,6 +12,13 @@ const { t } = i18n.global;
 
 const TITLE = 'openEuler 软件中心';
 
+/**
+ * 路由表。
+ *
+ * 注意：新增【公开静态】路由（无需登录、无动态参数）后，
+ * 请同步在 build/sitemap.ts 的 SITEMAP_PATHS 中补充对应 path，
+ * 以保证构建产物 sitemap.xml 收录完整。
+ */
 const routes = [
   {
     path: '/',
