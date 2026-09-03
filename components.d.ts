@@ -61,4 +61,7 @@ declare module 'vue' {
     StatusFeedback: typeof import('./src/components/collaboration/StatusFeedback.vue')['default']
     TableShowOverflowTips: typeof import('./src/components/collaboration/TableShowOverflowTips.vue')['default']
   }
+  export interface ComponentCustomProperties {
+    vLoading: typeof import('element-plus/es')['ElLoadingDirective']
+  }
 }

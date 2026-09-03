@@ -1,6 +1,6 @@
 // import { fileURLToPath, URL } from 'node:url';
 
-import { defineConfig } from 'vite';
+import { defineConfig, loadEnv } from 'vite';
 import vue from '@vitejs/plugin-vue';
 import vueJsx from '@vitejs/plugin-vue-jsx';
 
@@ -13,66 +13,71 @@ import AutoImport from 'unplugin-auto-import/vite';
 import Components from 'unplugin-vue-components/vite';
 import { ElementPlusResolver } from 'unplugin-vue-components/resolvers';
 
+// 构建期 sitemap/robots 生成插件，见 build/sitemap.ts
+import { generateSitemapPlugin } from './build/sitemap';
+
 // https://vitejs.dev/config/
-export default defineConfig({
-  plugins: [
-    vue(),
-    vueJsx(),
-    AutoImport({
-      resolvers: [ElementPlusResolver({ importStyle: 'sass' })],
-    }),
-    Components({
-      resolvers: [ElementPlusResolver({ importStyle: 'sass' })],
-    }),
-    Icons({
-      compiler: 'vue3',
-      customCollections: {
-        app: FileSystemIconLoader('./src/assets/svg-icons'),
-        pkg: FileSystemIconLoader('./src/assets/icon'),
-      },
-    }),
-  ],
-  css: {
-    preprocessorOptions: {
-      scss: {
-        additionalData: `
+export default defineConfig(({ mode }) => {
+  const env = loadEnv(mode, process.cwd());
+  const siteUrl = 'https://easysoftware' + (env.VITE_COOKIE_DOMAIN || '');
+  return {
+    plugins: [
+      vue(),
+      vueJsx(),
+      AutoImport({
+        resolvers: [ElementPlusResolver({ importStyle: 'sass' })],
+      }),
+      Components({
+        resolvers: [ElementPlusResolver({ importStyle: 'sass' })],
+      }),
+      Icons({
+        compiler: 'vue3',
+        customCollections: {
+          app: FileSystemIconLoader('./src/assets/svg-icons'),
+          pkg: FileSystemIconLoader('./src/assets/icon'),
+        },
+      }),
+      generateSitemapPlugin(siteUrl),
+    ],
+    css: {
+      preprocessorOptions: {
+        scss: {
+          additionalData: `
           @use "@/assets/style/element-plus/var.scss" as *;
           @use "@/assets/style/mixin/screen.scss" as *;
           @use "@/assets/style/mixin/font.scss" as *;
           @use "@/assets/style/mixin/common.scss" as *;
         `,
+        },
       },
     },
-  },
-  resolve: {
-    alias: {
-      '@/': `${path.resolve(__dirname, './src')}/`,
-      'vue-i18n': 'vue-i18n/dist/vue-i18n.cjs.js',
-    },
-  },
-  server: {
-    proxy: {
-      '/server/': {
-        target: 'https://easysoftware-api.test.osinfra.cn/',
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/server/, ''),
+    resolve: {
+      alias: {
+        '@/': `${path.resolve(__dirname, './src')}/`,
+        'vue-i18n': 'vue-i18n/dist/vue-i18n.cjs.js',
       },
-      '/api-search/': {
-        target: 'https://doc-search.test.osinfra.cn/',
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api-search/, ''),
-        configure: (proxy) => {
-          proxy.on(
-            'proxyReq',
-            (proxyReq, req) => {
+    },
+    server: {
+      proxy: {
+        '/server/': {
+          target: 'https://easysoftware-api.test.osinfra.cn/',
+          changeOrigin: true,
+          rewrite: (path) => path.replace(/^\/server/, ''),
+        },
+        '/api-search/': {
+          target: 'https://doc-search.test.osinfra.cn/',
+          changeOrigin: true,
+          rewrite: (path) => path.replace(/^\/api-search/, ''),
+          configure: (proxy) => {
+            proxy.on('proxyReq', (proxyReq, req) => {
               const realIp = req.headers['x-real-ip'];
               if (realIp) {
                 proxyReq.setHeader('X-Forwarded-For', realIp);
               }
-            },
-          );
+            });
+          },
         },
       },
     },
-  },
+  };
 });
