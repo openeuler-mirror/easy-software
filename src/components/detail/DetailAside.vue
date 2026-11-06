@@ -11,13 +11,13 @@ import { verColumns } from '@/data/detail/index';
 import { useLocale } from '@/composables/useLocale';
 import type { PkgTypeT } from '@/@types/app';
 import { useI18n } from 'vue-i18n';
-import { ATOMGIT, GITEE } from '@/data/config';
+import { ATOMGIT } from '@/data/config';
 
 import IconChevronDown from '~icons/app/icon-chevron-down.svg';
 import IconState from '~icons/pkg/icon-state.svg';
 import IconLevel from '~icons/pkg/icon-level.svg';
 import IconEmail from '~icons/pkg/email.svg';
-import IconGitee from '~icons/pkg/gitee.svg';
+import IconGitcode from '~icons/pkg/gitcode.svg';
 
 interface EulerverT {
   pkgId: string;
@@ -155,9 +155,9 @@ const isSecurityIconShow = (v: string) => {
         </a>
       </p>
       <p v-if="maintainer.maintainerGiteeId" class="text">
-        <a class="warehouse" @click="onExternalDialog(`${GITEE}/${maintainer.maintainerGiteeId}`)">
-          <OIcon class="icon-img"><IconGitee /></OIcon>
-          <span>{{ `${GITEE}/${maintainer.maintainerGiteeId}` }}</span>
+        <a class="warehouse" @click="onExternalDialog(`${ATOMGIT}/${maintainer.maintainerGiteeId}`)">
+          <OIcon class="icon-img"><IconGitcode /></OIcon>
+          <span>{{ `${ATOMGIT}/${maintainer.maintainerGiteeId}` }}</span>
         </a>
       </p>
     </div>
