@@ -213,7 +213,7 @@ const routes = [
     },
   },
   {
-    path: '/zh/solution/openstack',
+    path: '/zh/solution/OpenStack',
     name: 'openstack',
     component: () => import('@/views/solution/TheOpenStack.vue'),
     meta: {
