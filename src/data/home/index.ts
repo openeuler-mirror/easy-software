@@ -93,7 +93,7 @@ export const solutionData = [
     title: 'OpenStack',
     desc: '作为一个开源的云计算管理平台，OpenStack 由nova、cinder、neutron、glance、keystone、horizon等几个主要的组件组合起来完成具体工作',
     img: openStack,
-    href: '/solution/openStack',
+    href: '/solution/OpenStack',
   },
 ];
 

@@ -29,7 +29,7 @@ export const SITEMAP_PATHS: string[] = [
   '/zh/source/detail',
   '/zh/solution/opea',
   '/zh/solution/openhpc',
-  '/zh/solution/openstack',
+  '/zh/solution/OpenStack',
 ];
 
 /**

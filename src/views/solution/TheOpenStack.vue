@@ -6,7 +6,7 @@ import ContentWrapper from '@/components/ContentWrapper.vue';
 import ExternalLink from '@/components/ExternalLink.vue';
 import bannerImg from '@/assets/banner/banner1.jpg';
 import OpenStack from '@/data/solution/openstack';
-import { ATOMGIT, OPENEULER } from '@/data/config';
+import { ATOMGIT, OPENEULER, OPENEULER_DOCS } from '@/data/config';
 import { checkOriginLink, windowOpen } from '@/utils/common';
 import { useTheme } from '@/composables/useTheme';
 
@@ -122,7 +122,7 @@ const advImg = computed(() => {
           </OCard>
         </div>
         <p class="more">
-          更多信息请参考<OLink color="primary" href="https://pages.openeuler.openatom.cn/openstack/site/" target="_blank" ref="noopener noreferrer"
+          更多信息请参考<OLink color="primary" :href="`${OPENEULER_DOCS}/zh/docs/26.09/virtualization/virtualization_platform/openstack/index.html`" target="_blank" ref="noopener noreferrer"
             >openEuler OpenStack SIG官方文档</OLink
           >
         </p>

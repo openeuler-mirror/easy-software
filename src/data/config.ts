@@ -9,6 +9,7 @@ export const LINKEDIN = 'https://www.linkedin.com';
 export const TWITTER = 'https://twitter.com';
 export const YOUTUBE = 'https://www.youtube.com';
 export const OPENEULER = import.meta.env.VITE_MAIN_DOMAIN_URL;
+export const OPENEULER_DOCS = import.meta.env.VITE_OPENEULER_DOCS;
 export const OPENATOM = 'https://openatom.cn';
 export const OPENEULER_CONTACT = 'contact@openeuler.io';
 export const GITEE = 'https://gitee.com';
