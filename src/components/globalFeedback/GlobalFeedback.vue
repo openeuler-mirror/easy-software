@@ -291,7 +291,7 @@ const [DefinePopupHint, ReuseablePopupHint] = createReusableTemplate();
           <div class="title">
             <span v-if="!isShowingFeedbackList">
               您对
-              <span class="title-name">软件中心</span>
+              <span class="title-name">{{ t('software.nssSection') }}</span>
               的整体满意度如何？
             </span>
             <template v-else>历史反馈信息<ReuseablePopupHint /></template>

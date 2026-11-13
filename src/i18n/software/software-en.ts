@@ -74,6 +74,7 @@ export default {
     ' contact openEuler assistant ',
   ],
   feedbackButton: ['Quick Feedback ', ' Submit Issue '],
+  nssSection: 'Download',
   feedbackPkg: {
     btn: 'One click feedback',
     text: 'We have received feedback that there are no relevant applications.',

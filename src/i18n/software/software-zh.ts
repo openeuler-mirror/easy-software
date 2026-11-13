@@ -71,6 +71,7 @@ export default {
   feedbackMessage: ['请输入您的反馈', '请选择星号评分', '非法字符，请重新输入'],
   feedbackTxt: ['感谢您的反馈，我们会尽快改进！您也可', '联系维护者', '或', '联系openEuler小助手'],
   feedbackButton: ['快速反馈', '提交issue'],
+  nssSection: '下载版块',
   feedbackPkg: {
     btn: '一键反馈',
     text: '我们已收到无相关应用的反馈，',
